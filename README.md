@@ -185,3 +185,34 @@ Lyu）。
 
 界面的细分割线、不对称卡片和编号视觉语言参考了 Apache-2.0 许可的
 [webtemplate](https://github.com/huangshiyu13/webtemplate)。
+
+## 更新线上网站
+
+推送顺序是：本地改完 → 提交 → 推到 GitHub → Vercel 自动构建并发布。
+如果 `git push` 因为网络被重置而失败（`Recv failure: Connection was reset`），
+改用仓库自带的 Git Data API 脚本，它只依赖 `api.github.com`：
+
+```powershell
+git add -A
+git commit -m "说明这次改了什么"
+$env:GITHUB_TOKEN = "<你的 GitHub Token>"
+node scripts/push-via-api.mjs
+```
+
+脚本会拿本地 `HEAD` 和 `HEAD^` 做比较，只上传这次提交改动的文件，
+远端提交历史和本地父提交对不上时会直接报错退出，不会误覆盖。
+推送完成后 Vercel 会自动重新部署，通常 1 分钟左右生效。
+
+## 费用说明
+
+- 域名 `iball.top`：唯一固定支出，按年续费。
+- Vercel Hobby：免费额度（每月 100 GB 流量、百万级请求），个人小站够用。
+- 登录、朗读、翻译、单词释义：不需要付费 Key。朗读走浏览器本地语音合成；
+  翻译使用 Google 免费接口并以 MyMemory 兜底；释义使用有道公开接口。
+- Word/PDF 解析脚本通过 jsDelivr 免费 CDN 加载。
+- 阅读记录、不会/掌握标记存在浏览器 `localStorage`，不占服务器空间，
+  也不跨设备或跨浏览器同步。
+- 情景对话与自由对话的本地模式免费；只有填写自己的 OpenAI 兼容接口和 Key 时，
+  才由该服务商按用量计费。
+- 有道与 Google 的免费接口属于公开网页接口，没有付费 SLA；流量很大时可能限流，
+  届时需要换成官方付费翻译或自建词典。
