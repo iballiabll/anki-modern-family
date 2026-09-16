@@ -10,8 +10,12 @@ const publicRoot = path.join(root, "public");
 const checkOnly = process.argv.includes("--check");
 const staticEntries = [
   "app.js",
+  "deck-data.js",
   "index.html",
   "resources.json",
+  "review.css",
+  "review.html",
+  "review.js",
   "styles.css",
   "materials",
 ];

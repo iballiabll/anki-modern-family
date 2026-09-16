@@ -1,18 +1,37 @@
+const {
+  parseDeck,
+  DEFAULT_UNIT_SIZE,
+  REVIEW_DAY_MS,
+  REVIEW_LEARNING_STEPS_MS,
+  REVIEW_MAX_INTERVAL_DAYS,
+  REVIEW_GRADES,
+  formatUnitNumber,
+  buildDeckUnits,
+  getItemKey,
+  clampReviewEase,
+  computeReviewSchedule,
+  formatReviewInterval,
+  getReviewDayKey,
+  restoreSet,
+  persistSet,
+  fetchLibrary,
+  buildReviewQueue,
+} = window.IballDeck;
+
+const {
+  known: STORAGE_KEY,
+  favorites: FAVORITES_STORAGE_KEY,
+  unknown: UNKNOWN_STORAGE_KEY,
+  reviewProgress: REVIEW_PROGRESS_STORAGE_KEY,
+  reviewDaily: REVIEW_DAILY_STORAGE_KEY,
+} = window.IballDeck.STORAGE_KEYS;
+
 const MANIFEST_PATH = "./resources.json";
 const WORD_API_PATH = "./api/word";
-const STORAGE_KEY = "iball-listening-cabin-known";
-const FAVORITES_STORAGE_KEY = "iball-listening-cabin-favorites";
-const UNKNOWN_STORAGE_KEY = "iball-listening-cabin-unknown";
 const PRACTICE_HISTORY_STORAGE_KEY =
   "iball-listening-cabin-speaking-history";
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
-const REVIEW_PROGRESS_STORAGE_KEY = "iball-listening-cabin-review-v1";
-const REVIEW_DAILY_STORAGE_KEY = "iball-listening-cabin-review-daily-v1";
-const REVIEW_DAY_MS = 24 * 60 * 60 * 1000;
-const REVIEW_LEARNING_STEPS_MS = [60 * 1000, 10 * 60 * 1000];
-const REVIEW_MAX_INTERVAL_DAYS = 365;
-const REVIEW_GRADES = ["again", "hard", "good", "easy"];
 const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
 const AMERICAN_VOICE_NAMES = {
   female: [
@@ -1509,13 +1528,16 @@ const state = {
   categories: [],
   decks: new Map(),
   activeResourceId: "",
+  activeUnitIndex: -1,
   known: new Set(),
   favorites: new Set(),
   unknown: new Set(),
   view: "all",
   query: "",
   materialQuery: "",
+  mobileLibraryExpanded: false,
   favoriteCategory: "all",
+  unknownCategory: "all",
   ankiExportCategory: "all",
   ankiExportSection: "all",
   ankiExportStatus: "",
@@ -1573,6 +1595,7 @@ const state = {
   reviewActive: false,
   reviewCategory: "all",
   reviewSection: "all",
+  reviewUnitKey: "all",
   reviewNewLimit: 20,
   reviewProgress: {},
   reviewDaily: { date: "", reviewedKeys: [], newKeys: [] },
@@ -1594,9 +1617,14 @@ const elements = {
   appView: document.querySelector("#appView"),
   userLabel: document.querySelector("#userLabel"),
   logoutButton: document.querySelector("#logoutButton"),
+  libraryPanel: document.querySelector(".library-panel"),
+  libraryToggleButton: document.querySelector("#libraryToggleButton"),
+  libraryToggleMeta: document.querySelector("#libraryToggleMeta"),
   resourceCount: document.querySelector("#resourceCount"),
   materialSearchInput: document.querySelector("#materialSearchInput"),
   resourceList: document.querySelector("#resourceList"),
+  backToLibraryButton: document.querySelector("#backToLibraryButton"),
+  workspace: document.querySelector(".workspace"),
   activeTitle: document.querySelector("#activeTitle"),
   activeDescription: document.querySelector("#activeDescription"),
   progressRing: document.querySelector("#progressRing"),
@@ -1609,6 +1637,7 @@ const elements = {
   reviewSource: document.querySelector("#reviewSource"),
   reviewCategory: document.querySelector("#reviewCategory"),
   reviewSection: document.querySelector("#reviewSection"),
+  reviewUnit: document.querySelector("#reviewUnit"),
   reviewNewLimit: document.querySelector("#reviewNewLimit"),
   reviewRestartButton: document.querySelector("#reviewRestartButton"),
   reviewExportButton: document.querySelector("#reviewExportButton"),
@@ -1630,6 +1659,9 @@ const elements = {
   reviewCardTranslation: document.querySelector("#reviewCardTranslation"),
   reviewSpeakButton: document.querySelector("#reviewSpeakButton"),
   reviewShowButton: document.querySelector("#reviewShowButton"),
+  reviewMarkActions: document.querySelector("#reviewMarkActions"),
+  reviewUnknownButton: document.querySelector("#reviewUnknownButton"),
+  reviewKnownButton: document.querySelector("#reviewKnownButton"),
   reviewGradeActions: document.querySelector("#reviewGradeActions"),
   reviewGradeButtons: document.querySelectorAll("[data-review-grade]"),
   reviewIntervalAgain: document.querySelector("#reviewIntervalAgain"),
@@ -1657,6 +1689,7 @@ const elements = {
   viewSwitcher: document.querySelector("#viewSwitcher"),
   viewButtons: document.querySelectorAll("[data-view]"),
   collectionFilters: document.querySelector("#collectionFilters"),
+  collectionFilterLabel: document.querySelector("#collectionFilterLabel"),
   collectionFilterList: document.querySelector("#collectionFilterList"),
   favoriteCount: document.querySelector("#favoriteCount"),
   unknownCount: document.querySelector("#unknownCount"),
@@ -1800,333 +1833,41 @@ function compareCategoryNames(left, right) {
   return left.localeCompare(right, "zh-CN");
 }
 
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let field = "";
-  let inQuotes = false;
 
-  for (let index = 0; index < text.length; index += 1) {
-    const character = text[index];
-
-    if (inQuotes) {
-      if (character === '"' && text[index + 1] === '"') {
-        field += '"';
-        index += 1;
-      } else if (character === '"') {
-        inQuotes = false;
-      } else {
-        field += character;
-      }
-      continue;
-    }
-
-    if (character === '"') {
-      inQuotes = true;
-    } else if (character === ",") {
-      row.push(field);
-      field = "";
-    } else if (character === "\n") {
-      row.push(field);
-      rows.push(row);
-      row = [];
-      field = "";
-    } else if (character !== "\r") {
-      field += character;
-    }
-  }
-
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    rows.push(row);
-  }
-
-  return rows.filter((item) => item.some((value) => value.length > 0));
-}
-
-function extractAnnotation(back) {
-  const groups = [...String(back || "").matchAll(/（([^（）]+)）/g)];
-  if (groups.length === 0) {
-    return null;
-  }
-
-  const annotation = groups.at(-1)[1].trim();
-  const firstPart = annotation.split(/[，,]/)[0].trim();
-  const equalsIndex = firstPart.indexOf("=");
-
-  if (equalsIndex < 0) {
-    return null;
-  }
-
-  const phrase = firstPart.slice(0, equalsIndex).trim();
-  const remainder = firstPart.slice(equalsIndex + 1).trim();
-  const phoneticMatch = remainder.match(/^(.*?)\s*\/([^/]+)\//);
-
-  return {
-    phrase,
-    meaning: phoneticMatch ? phoneticMatch[1].trim() : remainder,
-    phonetic: phoneticMatch ? `/${phoneticMatch[2].trim()}/` : "",
-    fullMatch: groups.at(-1)[0],
-  };
-}
-
-function normalizeCsvHeader(value) {
-  return String(value || "")
-    .replace(/^\uFEFF/, "")
-    .trim();
-}
-
-function findVocabularyHeaderRow(rows) {
-  return rows.findIndex((row) => {
-    const headers = row.map(normalizeCsvHeader);
-    return (
-      headers.includes("单词") &&
-      (headers.includes("中文释义") ||
-        headers.includes("英文例句") ||
-        headers.includes("例句"))
-    );
-  });
-}
-
-function cleanVocabularyText(value) {
-  return String(value || "")
-    .replace(/\s*\d*\s*<<\s*零基础词汇讲义Level\s*\d+/gi, " ")
-    .replace(/线｜教研团队/gi, " ")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function removeEmbeddedVocabularyCard(value) {
-  const marker =
-    /\s+\d{1,4}\s*\.\s*[A-Za-z][A-Za-z'’-]*(?:\s+[A-Za-z][A-Za-z'’-]*){0,3}\s+\/[^/\n]+\//;
-  const match = marker.exec(value);
-  return match ? value.slice(0, match.index) : value;
-}
-
-function splitVocabularyExample(value) {
-  const englishParts = [];
-  const chineseParts = [];
-  const segments = String(value || "")
-    .split(/\s*\|\s*/)
-    .map((segment) => removeEmbeddedVocabularyCard(segment).trim())
-    .filter(Boolean);
-
-  segments.forEach((segment) => {
-    const chineseIndex = segment.search(/[\u3400-\u9fff]/);
-    const rawEnglish =
-      chineseIndex >= 0 ? segment.slice(0, chineseIndex) : segment;
-    const rawChinese = chineseIndex >= 0 ? segment.slice(chineseIndex) : "";
-    const english = cleanVocabularyText(rawEnglish).replace(
-      /^[\s,;:.!?-]+|[\s,;:|-]+$/g,
-      "",
-    );
-    const chinese = cleanVocabularyText(rawChinese);
-
-    if (english) {
-      englishParts.push(english);
-    }
-    if (chinese) {
-      chineseParts.push(chinese);
-    }
-  });
-
-  return {
-    sentence: englishParts.join(" | "),
-    translation: chineseParts.join(" | "),
-  };
-}
-
-function parseVocabularyDeck(rows, headerIndex, resource, index) {
-  const headers = rows[headerIndex].map(normalizeCsvHeader);
-  const findColumn = (...names) =>
-    headers.findIndex((header) => names.includes(header));
-  const phraseIndex = findColumn("单词", "词/短语", "Front");
-  const phoneticIndex = findColumn("音标", "IPA");
-  const partOfSpeechIndex = findColumn("词性");
-  const meaningIndex = findColumn("中文释义", "释义", "Back");
-  const sentenceIndex = findColumn("英文例句", "例句");
-
-  if (phraseIndex < 0) {
-    return [];
-  }
-
-  return rows
-    .slice(headerIndex + 1)
-    .map((row, itemIndex) => {
-      const phrase = cleanVocabularyText(row[phraseIndex]);
-      if (!phrase || findVocabularyHeaderRow([row]) === 0) {
-        return null;
-      }
-
-      const partOfSpeech = cleanVocabularyText(row[partOfSpeechIndex]);
-      const meaning = cleanVocabularyText(row[meaningIndex]);
-      const example = splitVocabularyExample(row[sentenceIndex]);
-      const combinedMeaning = [partOfSpeech, meaning]
-        .filter(Boolean)
-        .join(" ");
-
-      return {
-        id: `${resource.id}:${index + 1}:${itemIndex + 1}`,
-        phrase,
-        phonetic: cleanVocabularyText(row[phoneticIndex]),
-        meaning: combinedMeaning || "查看例句理解用法",
-        sentence: example.sentence || phrase,
-        translation: example.translation,
-      };
-    })
-    .filter(Boolean);
-}
-
-function parseAnkiDeck(text, resource, index) {
-  const metadata = {};
-  const dataRows = [];
-  const rows = parseCsv(text.replace(/^\uFEFF/, ""));
-  const vocabularyHeaderIndex = findVocabularyHeaderRow(rows);
-
-  if (vocabularyHeaderIndex >= 0) {
-    return parseVocabularyDeck(
-      rows,
-      vocabularyHeaderIndex,
-      resource,
-      index,
-    );
-  }
-
-  rows.forEach((row) => {
-    if (row[0]?.startsWith("#")) {
-      const separatorIndex = row[0].indexOf(":");
-      if (separatorIndex > 0) {
-        metadata[row[0].slice(0, separatorIndex)] = row[0]
-          .slice(separatorIndex + 1)
-          .trim();
-      }
-      return;
-    }
-    dataRows.push(row);
-  });
-
-  const columns = String(metadata["#columns"] || "Front,Back")
-    .split(",")
-    .map((column) => column.trim());
-  const frontIndex = Math.max(0, columns.indexOf("Front"));
-  const backIndex = Math.max(1, columns.indexOf("Back"));
-
-  return dataRows
-    .map((row, itemIndex) => {
-      const sentence = String(row[frontIndex] || "").trim();
-      const back = String(row[backIndex] || "").trim();
-      if (!sentence && !back) {
-        return null;
-      }
-
-      const annotation = extractAnnotation(back);
-      const translation = annotation
-        ? back.replace(annotation.fullMatch, "").trim()
-        : back;
-      const phrase = annotation?.phrase || sentence || `词汇 ${itemIndex + 1}`;
-
-      return {
-        id: `${resource.id}:${index + 1}:${itemIndex + 1}`,
-        phrase,
-        phonetic: annotation?.phonetic || "",
-        meaning: annotation?.meaning || "查看原句理解用法",
-        sentence,
-        translation,
-      };
-    })
-    .filter(Boolean);
-}
-
-function splitMarkdownRow(line) {
-  return line
-    .trim()
-    .replace(/^\|/, "")
-    .replace(/\|$/, "")
-    .split("|")
-    .map((value) => value.trim().replace(/\*\*(.*?)\*\*/g, "$1"));
-}
-
-function parseMarkdownDeck(text, resource, index) {
-  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
-  const headerIndex = lines.findIndex((line) => {
-    if (!/^\|.*\|$/.test(line.trim())) {
-      return false;
-    }
-    const headers = splitMarkdownRow(line);
-    return headers.includes("#") && headers.includes("词/短语");
-  });
-
-  if (headerIndex < 0) {
-    return [];
-  }
-
-  const headers = splitMarkdownRow(lines[headerIndex]);
-  const findColumn = (...names) =>
-    headers.findIndex((header) => names.includes(header));
-  const phraseIndex = findColumn("词/短语");
-  const meaningIndex = findColumn("释义");
-  const phoneticIndex = findColumn("IPA", "音标");
-  const sentenceIndex = findColumn("英文原句");
-  const translationIndex = findColumn("译句");
-
-  return lines
-    .slice(headerIndex + 2)
-    .filter((line) => /^\|/.test(line.trim()))
-    .map((line, itemIndex) => {
-      const row = splitMarkdownRow(line);
-      const phrase = String(row[phraseIndex] || "").trim();
-      const sentence = String(row[sentenceIndex] || "").trim();
-      if (!phrase && !sentence) {
-        return null;
-      }
-
-      return {
-        id: `${resource.id}:${index + 1}:${itemIndex + 1}`,
-        phrase: phrase || sentence,
-        phonetic: String(row[phoneticIndex] || "").trim(),
-        meaning: String(row[meaningIndex] || "").trim() || "查看原句理解用法",
-        sentence,
-        translation: String(row[translationIndex] || "").trim(),
-      };
-    })
-    .filter(Boolean);
-}
-
-function parseDeck(text, resource, index) {
-  if (resource.attachment) {
-    return [];
-  }
-  if (resource.format === "markdown-table") {
-    return parseMarkdownDeck(text, resource, index);
-  }
-  return parseAnkiDeck(text, resource, index);
-}
-
-function restoreSet(storageKey) {
-  try {
-    const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
-    if (Array.isArray(stored)) {
-      return new Set(stored);
-    }
-  } catch {
-    return new Set();
-  }
-  return new Set();
-}
-
-function persistSet(storageKey, values) {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify([...values]));
-  } catch {
-    // Marks still work for the current visit when storage is unavailable.
-  }
-}
 
 function restoreMarks() {
   state.known = restoreSet(STORAGE_KEY);
   state.favorites = restoreSet(FAVORITES_STORAGE_KEY);
   state.unknown = restoreSet(UNKNOWN_STORAGE_KEY);
+}
+
+function getItemMark(itemKey) {
+  if (state.known.has(itemKey)) {
+    return "known";
+  }
+  if (state.unknown.has(itemKey)) {
+    return "unknown";
+  }
+  return "";
+}
+
+function toggleItemMark(itemKey, mark) {
+  const isActive = getItemMark(itemKey) === mark;
+  setItemMark(itemKey, isActive ? "" : mark);
+}
+
+function setItemMark(itemKey, mark) {
+  state.known.delete(itemKey);
+  state.unknown.delete(itemKey);
+
+  if (mark === "known") {
+    state.known.add(itemKey);
+  } else if (mark === "unknown") {
+    state.unknown.add(itemKey);
+  }
+
+  persistSet(STORAGE_KEY, state.known);
+  persistSet(UNKNOWN_STORAGE_KEY, state.unknown);
 }
 
 function restorePracticeHistory() {
@@ -2250,13 +1991,42 @@ function getActiveResource() {
   );
 }
 
-function getActiveItems() {
-  return state.decks.get(state.activeResourceId) || [];
+function getResourceItems(resource) {
+  return resource ? state.decks.get(resource.id) || [] : [];
 }
 
-function getItemKey(resourceId, item) {
-  return `${resourceId}:${item.id}`;
+function getDeckUnits(resource, size = DEFAULT_UNIT_SIZE) {
+  return buildDeckUnits(getResourceItems(resource), size);
 }
+
+function getDeckUnit(resource, unitKey) {
+  return (
+    getDeckUnits(resource).find((unit) => unit.key === unitKey) || null
+  );
+}
+
+function getActiveUnit() {
+  const resource = getActiveResource();
+  if (!resource) {
+    return null;
+  }
+  const unitKey =
+    state.activeUnitIndex < 1
+      ? "all"
+      : `unit-${formatUnitNumber(state.activeUnitIndex)}`;
+  const unit = getDeckUnit(resource, unitKey);
+  return unit?.index > 0 ? unit : null;
+}
+
+function getActiveItems() {
+  const items = getResourceItems(getActiveResource());
+  if (state.activeUnitIndex < 1) {
+    return items;
+  }
+  const start = (state.activeUnitIndex - 1) * DEFAULT_UNIT_SIZE;
+  return items.slice(start, start + DEFAULT_UNIT_SIZE);
+}
+
 
 function isMeaningVisible(itemKey) {
   return state.showAllMeanings
@@ -2290,7 +2060,7 @@ function getBaseEntries() {
     return getCollectionEntries(state.favorites, state.favoriteCategory);
   }
   if (state.view === "unknown") {
-    return getCollectionEntries(state.unknown);
+    return getCollectionEntries(state.unknown, state.unknownCategory);
   }
 
   const resource = getActiveResource();
@@ -6324,12 +6094,6 @@ function downloadAnkiExport() {
   renderAnkiExport();
 }
 
-function getReviewDayKey(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
 
 function restoreReviewData() {
   try {
@@ -6392,8 +6156,100 @@ function persistReviewDaily() {
   }
 }
 
+function getReviewScopeResources() {
+  return state.resources.filter((resource) => {
+    const resourceCategory = resource.category || "未分类素材";
+    const resourceSection = resource.section || "";
+    if (
+      state.reviewCategory !== "all" &&
+      resourceCategory !== state.reviewCategory
+    ) {
+      return false;
+    }
+    return (
+      state.reviewCategory === "all" ||
+      state.reviewSection === "all" ||
+      resourceSection === state.reviewSection
+    );
+  });
+}
+
+function getReviewUnitOptions() {
+  const resources = getReviewScopeResources();
+  const total = resources.reduce(
+    (sum, resource) => sum + getResourceItems(resource).length,
+    0,
+  );
+  const deckResources = resources.filter(
+    (resource) => getResourceItems(resource).length > DEFAULT_UNIT_SIZE,
+  );
+  const options = [
+    {
+      key: "all",
+      label: deckResources.length ? "整套" : "全部",
+      detail: `${total} 张`,
+    },
+  ];
+
+  deckResources.forEach((resource) => {
+    const prefix = deckResources.length > 1 ? `${resource.title} · ` : "";
+    getDeckUnits(resource).forEach((unit) => {
+      if (unit.index < 1) {
+        return;
+      }
+      options.push({
+        key: `${resource.id}::${unit.key}`,
+        label: `${prefix}${unit.label}`,
+        detail: unit.detail,
+      });
+    });
+  });
+
+  return options;
+}
+
+function parseReviewUnitKey(unitKey) {
+  const separator = String(unitKey || "").indexOf("::");
+  if (separator < 0) {
+    return null;
+  }
+  return {
+    resourceId: unitKey.slice(0, separator),
+    deckUnitKey: unitKey.slice(separator + 2),
+  };
+}
+
+function getReviewUnitLabel() {
+  const option = getReviewUnitOptions().find(
+    (item) => item.key === state.reviewUnitKey,
+  );
+  return option && option.key !== "all" ? option.label : "";
+}
+
 function getReviewEntries() {
-  return getAnkiExportEntries(state.reviewCategory, state.reviewSection);
+  const entries = getAnkiExportEntries(
+    state.reviewCategory,
+    state.reviewSection,
+  );
+  const parsed = parseReviewUnitKey(state.reviewUnitKey);
+  if (!parsed) {
+    return entries;
+  }
+
+  const resource = state.resources.find(
+    (item) => item.id === parsed.resourceId,
+  );
+  const unit = resource ? getDeckUnit(resource, parsed.deckUnitKey) : null;
+  if (!unit || unit.index < 1) {
+    return entries;
+  }
+
+  const unitItemIds = new Set(unit.items.map((item) => item.id));
+  return entries.filter(
+    (entry) =>
+      entry.resource.id === parsed.resourceId &&
+      unitItemIds.has(entry.item.id),
+  );
 }
 
 function getReviewRecord(cardKey) {
@@ -6401,116 +6257,8 @@ function getReviewRecord(cardKey) {
   return record && typeof record === "object" ? record : null;
 }
 
-function formatReviewInterval(milliseconds) {
-  const value = Number(milliseconds);
-  if (!Number.isFinite(value) || value <= 0) {
-    return "现在";
-  }
 
-  const minutes = value / 60000;
-  if (minutes < 1) {
-    return "1 分钟内";
-  }
-  if (minutes < 60) {
-    return `${Math.round(minutes)} 分钟后`;
-  }
 
-  const hours = minutes / 60;
-  if (hours < 24) {
-    return `${Math.round(hours)} 小时后`;
-  }
-
-  const days = Math.round(hours / 24);
-  if (days < 30) {
-    return `${days} 天后`;
-  }
-  if (days < 365) {
-    return `${Math.round(days / 30)} 个月后`;
-  }
-  return `${Math.round(days / 365)} 年后`;
-}
-
-function clampReviewEase(value) {
-  return Math.min(3.1, Math.max(1.3, value));
-}
-
-function computeReviewSchedule(previous, grade, now = Date.now()) {
-  const base = previous || {};
-  const ease = clampReviewEase(Number(base.ease) || 2.5);
-  const previousInterval = Math.max(0, Number(base.intervalDays) || 0);
-  const reps = Math.max(0, Number(base.reps) || 0);
-  const lapses = Math.max(0, Number(base.lapses) || 0);
-  const status = base.status === "review" ? "review" : "learning";
-  const step = Math.max(0, Number(base.step) || 0);
-  const isReview = status === "review" && previousInterval >= 1;
-
-  const schedule = (intervalDays, nextEase, nextStep, nextStatus, dueAt) => {
-    const capped = Math.min(REVIEW_MAX_INTERVAL_DAYS, intervalDays);
-    const fuzzed =
-      capped >= 3 ? capped * (0.97 + Math.random() * 0.06) : capped;
-    const finalDays = Math.max(0, Math.round(fuzzed * 100) / 100);
-    return {
-      ease: clampReviewEase(nextEase),
-      intervalDays: finalDays,
-      step: nextStep,
-      status: nextStatus,
-      reps: reps + 1,
-      lapses,
-      lastGrade: grade,
-      reviewedAt: now,
-      dueAt:
-        Number.isFinite(dueAt) && dueAt > 0
-          ? dueAt
-          : now + finalDays * REVIEW_DAY_MS,
-    };
-  };
-
-  if (grade === "again") {
-    return schedule(0, ease - 0.2, 0, "learning", now + 60 * 1000);
-  }
-
-  if (grade === "hard") {
-    if (isReview) {
-      return schedule(
-        Math.max(1, previousInterval * 1.2),
-        ease - 0.15,
-        step,
-        "review",
-      );
-    }
-    const delay = step === 0 ? 2 * 60 * 1000 : 8 * 60 * 1000;
-    return schedule(0, ease, step, "learning", now + delay);
-  }
-
-  if (grade === "good") {
-    if (isReview) {
-      return schedule(previousInterval * ease, ease, step, "review");
-    }
-    const nextStep = step + 1;
-    if (nextStep >= REVIEW_LEARNING_STEPS_MS.length) {
-      return schedule(1, ease, nextStep, "review", now + REVIEW_DAY_MS);
-    }
-    return schedule(
-      0,
-      ease,
-      nextStep,
-      "learning",
-      now + REVIEW_LEARNING_STEPS_MS[nextStep],
-    );
-  }
-
-  if (isReview) {
-    return schedule(
-      Math.max(2, previousInterval * ease * 1.3),
-      ease + 0.15,
-      step,
-      "review",
-    );
-  }
-
-  const easyStep = Math.max(step, REVIEW_LEARNING_STEPS_MS.length);
-  return schedule(4, ease + 0.15, easyStep, "review", now + 4 * REVIEW_DAY_MS);
-}
 
 function markReviewDaily(cardKey, isNew) {
   if (state.reviewDaily.date !== getReviewDayKey()) {
@@ -6536,59 +6284,54 @@ function getCurrentReviewEntry() {
 
 function startReviewSession() {
   const entries = getReviewEntries();
-  const now = Date.now();
-  const dueEntries = [];
-  const freshEntries = [];
-  let masteredCount = 0;
-
-  entries.forEach((entry) => {
-    const record = getReviewRecord(entry.item.id);
-    if (!record || !Number(record.reps)) {
-      freshEntries.push(entry);
-      return;
-    }
-    if ((Number(record.dueAt) || 0) <= now) {
-      dueEntries.push(entry);
-      return;
-    }
-    masteredCount += 1;
+  const summary = buildReviewQueue(entries, {
+    progress: state.reviewProgress,
+    daily: state.reviewDaily,
+    newLimit: state.reviewNewLimit,
   });
 
-  dueEntries.sort(
-    (left, right) =>
-      (Number(getReviewRecord(left.item.id)?.dueAt) || 0) -
-      (Number(getReviewRecord(right.item.id)?.dueAt) || 0),
-  );
-
-  const remainingNew = Math.max(
-    0,
-    state.reviewNewLimit - state.reviewDaily.newKeys.length,
-  );
-  state.reviewQueue = [
-    ...dueEntries,
-    ...freshEntries.slice(0, remainingNew),
-  ];
+  state.reviewQueue = summary.queue;
   state.reviewQueueIndex = 0;
   state.reviewRevealed = false;
   state.reviewSessionDone = 0;
   state.reviewMessage = entries.length
     ? state.reviewQueue.length
       ? "队列已重新整理。"
-      : masteredCount === entries.length
+      : summary.masteredCount === entries.length
         ? "范围内的卡片都已经安排到未来，稍后再来复习。"
         : "今天的新卡额度已经用完，明天会解锁新的卡片。"
     : "当前范围没有可复习的卡片。";
   state.reviewMessageType = "";
 }
 
+function getStandaloneReviewUrl() {
+  const params = new URLSearchParams();
+  const resource = getActiveResource();
+  const activeUnit = getActiveUnit();
+
+  if (resource) {
+    if (resource.category) {
+      params.set("category", resource.category);
+    }
+    if (resource.section) {
+      params.set("section", resource.section);
+    }
+    params.set("resource", resource.id);
+  }
+  if (activeUnit) {
+    params.set("unit", activeUnit.key);
+  }
+
+  const query = params.toString();
+  return `./review.html${query ? `?${query}` : ""}`;
+}
+
 function openReview() {
   stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.practiceActive = false;
-  state.reviewActive = true;
-  startReviewSession();
-  render();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  state.reviewActive = false;
+  window.location.assign(getStandaloneReviewUrl());
 }
 
 function closeReview() {
@@ -6610,7 +6353,7 @@ function revealReviewCard() {
   renderReviewView();
 }
 
-function gradeReviewCard(grade) {
+function gradeReviewCard(grade, options = {}) {
   if (!REVIEW_GRADES.includes(grade)) {
     return;
   }
@@ -6643,13 +6386,55 @@ function gradeReviewCard(grade) {
 
   state.reviewRevealed = false;
   state.reviewSessionDone += 1;
-  state.reviewMessage = `${entry.item.phrase} · 下次复习 ${
+  const markLabel = options.markLabel ? `${options.markLabel} · ` : "";
+  state.reviewMessage = `${entry.item.phrase} · ${markLabel}下次复习 ${
     record.status === "review"
       ? formatReviewInterval(record.dueAt - Date.now())
       : "本次会话内"
   }`;
   state.reviewMessageType = "info";
   renderReviewView();
+}
+
+function markReviewCard(mark) {
+  const entry = getCurrentReviewEntry();
+  if (!entry) {
+    return;
+  }
+
+  setItemMark(getItemKey(entry.resource.id, entry.item), mark);
+  state.reviewRevealed = true;
+  gradeReviewCard(mark === "known" ? "good" : "again", {
+    markLabel: mark === "known" ? "已标记掌握" : "已标不会",
+  });
+}
+
+function renderReviewMarkButtons(entry) {
+  if (!elements.reviewMarkActions) {
+    return;
+  }
+
+  const hasCard = Boolean(entry);
+  elements.reviewMarkActions.hidden = !hasCard;
+  if (!hasCard) {
+    return;
+  }
+
+  const mark = getItemMark(getItemKey(entry.resource.id, entry.item));
+  const states = [
+    { element: elements.reviewUnknownButton, mark: "unknown", label: "不会", activeLabel: "已标不会" },
+    { element: elements.reviewKnownButton, mark: "known", label: "标记掌握", activeLabel: "已掌握" },
+  ];
+
+  states.forEach((state) => {
+    if (!state.element) {
+      return;
+    }
+    const isActive = mark === state.mark;
+    state.element.textContent = isActive ? state.activeLabel : state.label;
+    state.element.classList.toggle("is-active", isActive);
+    state.element.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function speakReviewCard() {
@@ -6727,43 +6512,48 @@ function renderReviewScope() {
   elements.reviewSection.disabled =
     state.reviewCategory === "all" || sectionNames.length === 0;
 
+  if (elements.reviewUnit) {
+    const unitOptions = getReviewUnitOptions();
+    const unitKeys = new Set(unitOptions.map((option) => option.key));
+    if (!unitKeys.has(state.reviewUnitKey)) {
+      state.reviewUnitKey = "all";
+    }
+
+    const unitFragment = document.createDocumentFragment();
+    unitOptions.forEach((option) => {
+      const unitOption = document.createElement("option");
+      unitOption.value = option.key;
+      unitOption.textContent = `${option.label} · ${option.detail}`;
+      unitFragment.append(unitOption);
+    });
+    elements.reviewUnit.replaceChildren(unitFragment);
+    elements.reviewUnit.value = state.reviewUnitKey;
+    elements.reviewUnit.disabled = unitOptions.length <= 1;
+  }
+
   elements.reviewNewLimit.value = String(state.reviewNewLimit);
 }
 
 function renderReviewStats() {
   const entries = getReviewEntries();
-  const now = Date.now();
-  let dueCount = 0;
-  let freshCount = 0;
-  let masteredCount = 0;
-
-  entries.forEach((entry) => {
-    const record = getReviewRecord(entry.item.id);
-    if (!record || !Number(record.reps)) {
-      freshCount += 1;
-      return;
-    }
-    if ((Number(record.dueAt) || 0) <= now) {
-      dueCount += 1;
-      return;
-    }
-    masteredCount += 1;
+  const summary = buildReviewQueue(entries, {
+    progress: state.reviewProgress,
+    daily: state.reviewDaily,
+    newLimit: state.reviewNewLimit,
   });
+  const masteredCount = summary.masteredCount;
 
-  const remainingNew = Math.max(
-    0,
-    state.reviewNewLimit - state.reviewDaily.newKeys.length,
-  );
-
-  elements.reviewDueCount.textContent = String(dueCount);
+  elements.reviewDueCount.textContent = String(summary.dueCount);
   elements.reviewNewCount.textContent = String(
-    Math.min(freshCount, remainingNew),
+    Math.min(summary.freshCount, summary.remainingNew),
   );
   elements.reviewDoneCount.textContent = String(state.reviewSessionDone);
   elements.reviewTotalCount.textContent = String(entries.length);
 
+  const unitLabel = getReviewUnitLabel();
+  const unitSuffix = unitLabel ? ` · ${unitLabel}` : "";
   if (state.reviewCategory === "all") {
-    elements.reviewSource.textContent = `整个素材库 · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
+    elements.reviewSource.textContent = `整个素材库${unitSuffix} · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
     return;
   }
 
@@ -6771,7 +6561,7 @@ function renderReviewStats() {
     state.reviewSection === "all"
       ? `${state.reviewCategory} · 整个分类`
       : `${state.reviewCategory} / ${state.reviewSection}`;
-  elements.reviewSource.textContent = `${scopeLabel} · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
+  elements.reviewSource.textContent = `${scopeLabel}${unitSuffix} · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
 }
 
 function renderReviewCard() {
@@ -6783,6 +6573,7 @@ function renderReviewCard() {
   elements.reviewShowButton.disabled = !hasCard || state.reviewRevealed;
   elements.reviewShowButton.hidden = state.reviewRevealed;
   elements.reviewGradeActions.hidden = !state.reviewRevealed || !hasCard;
+  renderReviewMarkButtons(entry);
 
   if (!hasCard) {
     const entries = getReviewEntries();
@@ -7005,24 +6796,153 @@ function createResourceButton(resource, index) {
       return;
     }
 
-    stopRealtimeConversation("", { silent: true });
-    cancelPracticeRecognition();
-    state.practiceActive = false;
-    state.reviewActive = false;
-    state.reviewQueue = [];
-    state.reviewQueueIndex = 0;
-    state.reviewRevealed = false;
-    state.practiceResult = null;
-    state.activeResourceId = resource.id;
-    state.view = "all";
-    state.query = "";
-    state.favoriteCategory = "all";
-    elements.searchInput.value = "";
-    render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    activateResource(resource);
   });
 
   return button;
+}
+
+const MOBILE_LIBRARY_QUERY = "(max-width: 760px)";
+
+function isMobileLibraryLayout() {
+  return window.matchMedia(MOBILE_LIBRARY_QUERY).matches;
+}
+
+function getScrollBehavior() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
+
+function updateLibraryToggleMeta() {
+  if (!elements.libraryToggleMeta) {
+    return;
+  }
+
+  const activeResource = getActiveResource();
+  const resourceCount = state.resources.length;
+  elements.libraryToggleMeta.textContent = resourceCount
+    ? `${resourceCount} 项素材${
+        activeResource ? ` · ${activeResource.title}` : ""
+      }`
+    : "按分类浏览素材";
+}
+
+function syncLibraryDisclosure() {
+  const mobile = isMobileLibraryLayout();
+  const expanded = mobile && state.mobileLibraryExpanded;
+
+  elements.libraryPanel?.classList.toggle(
+    "is-mobile-expanded",
+    expanded,
+  );
+  elements.libraryToggleButton?.setAttribute(
+    "aria-expanded",
+    String(expanded),
+  );
+
+  if (elements.resourceList) {
+    elements.resourceList.hidden = mobile && !expanded;
+  }
+
+  updateLibraryToggleMeta();
+}
+
+function setLibraryPanelExpanded(expanded) {
+  state.mobileLibraryExpanded = Boolean(expanded);
+  syncLibraryDisclosure();
+}
+
+function scrollToWorkspace() {
+  const behavior = getScrollBehavior();
+  window.requestAnimationFrame(() => {
+    elements.workspace?.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  });
+}
+
+function scrollToLibraryNavigation() {
+  setLibraryPanelExpanded(true);
+  const behavior = getScrollBehavior();
+  window.requestAnimationFrame(() => {
+    elements.libraryPanel?.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  });
+}
+
+function activateResource(resource, unitIndex = null) {
+  const sameDeck = resource.id === state.activeResourceId;
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.reviewActive = false;
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  state.practiceResult = null;
+  state.activeUnitIndex =
+    unitIndex === null ? (sameDeck ? state.activeUnitIndex : -1) : unitIndex;
+  state.activeResourceId = resource.id;
+  state.view = "all";
+  state.query = "";
+  state.favoriteCategory = "all";
+  state.unknownCategory = "all";
+  elements.searchInput.value = "";
+  render();
+
+  if (isMobileLibraryLayout()) {
+    setLibraryPanelExpanded(false);
+    scrollToWorkspace();
+    return;
+  }
+
+  window.scrollTo({ top: 0, behavior: getScrollBehavior() });
+}
+
+function createResourceEntry(resource, index) {
+  const button = createResourceButton(resource, index);
+  const items = getResourceItems(resource);
+  if (resource.attachment || items.length <= DEFAULT_UNIT_SIZE) {
+    return button;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "resource-item";
+  wrapper.classList.toggle(
+    "is-active",
+    resource.id === state.activeResourceId,
+  );
+
+  const picker = document.createElement("label");
+  picker.className = "resource-unit-picker";
+
+  const pickerLabel = document.createElement("span");
+  pickerLabel.textContent = "学习单元";
+
+  const select = document.createElement("select");
+  select.setAttribute("aria-label", `${resource.title} 学习单元`);
+  getDeckUnits(resource).forEach((unit) => {
+    const option = document.createElement("option");
+    option.value = unit.key;
+    option.textContent = `${unit.label} · ${unit.detail}`;
+    select.append(option);
+  });
+  select.value =
+    resource.id === state.activeResourceId && state.activeUnitIndex >= 1
+      ? `unit-${formatUnitNumber(state.activeUnitIndex)}`
+      : "all";
+  select.addEventListener("change", (event) => {
+    const unit = getDeckUnit(resource, event.target.value);
+    activateResource(resource, unit?.index > 0 ? unit.index : -1);
+  });
+
+  picker.append(pickerLabel, select);
+  wrapper.append(button, picker);
+  return wrapper;
 }
 
 function renderResourceList() {
@@ -7100,7 +7020,7 @@ function renderResourceList() {
     );
     directResources.forEach((resource) => {
       group.append(
-        createResourceButton(resource, state.resources.indexOf(resource)),
+        createResourceEntry(resource, state.resources.indexOf(resource)),
       );
     });
 
@@ -7123,7 +7043,7 @@ function renderResourceList() {
 
       sectionResources.forEach((resource) => {
         group.append(
-          createResourceButton(resource, state.resources.indexOf(resource)),
+          createResourceEntry(resource, state.resources.indexOf(resource)),
         );
       });
     });
@@ -7149,6 +7069,7 @@ function renderResourceList() {
   elements.resourceCount.textContent = String(
     query ? visibleResourceCount : state.resources.length,
   );
+  updateLibraryToggleMeta();
 }
 
 function createCard(entry, index) {
@@ -7288,14 +7209,7 @@ function createCard(entry, index) {
     `${isUnknown ? "取消标记" : "标记"} ${item.phrase} 为不会`,
   );
   unknownButton.addEventListener("click", () => {
-    if (state.unknown.has(itemKey)) {
-      state.unknown.delete(itemKey);
-    } else {
-      state.unknown.add(itemKey);
-      state.known.delete(itemKey);
-      persistSet(STORAGE_KEY, state.known);
-    }
-    persistSet(UNKNOWN_STORAGE_KEY, state.unknown);
+    toggleItemMark(itemKey, "unknown");
     render();
   });
 
@@ -7305,14 +7219,7 @@ function createCard(entry, index) {
   knownButton.textContent = isKnown ? "已掌握" : "标记掌握";
   knownButton.setAttribute("aria-pressed", String(isKnown));
   knownButton.addEventListener("click", () => {
-    if (state.known.has(itemKey)) {
-      state.known.delete(itemKey);
-    } else {
-      state.known.add(itemKey);
-      state.unknown.delete(itemKey);
-      persistSet(UNKNOWN_STORAGE_KEY, state.unknown);
-    }
-    persistSet(STORAGE_KEY, state.known);
+    toggleItemMark(itemKey, "known");
     render();
   });
 
@@ -7349,47 +7256,74 @@ function updateProgress() {
   elements.progressText.textContent = `${knownCount} / ${items.length} 已掌握`;
 }
 
-function renderCollectionFilters() {
-  const isFavoritesView = state.view === "favorites";
-  elements.collectionFilters.hidden = !isFavoritesView;
+function getCollectionViewConfig() {
+  const isUnknownView = state.view === "unknown";
+  return {
+    collection: isUnknownView ? state.unknown : state.favorites,
+    activeCategory: isUnknownView
+      ? state.unknownCategory
+      : state.favoriteCategory,
+    heading: isUnknownView ? "不会分类" : "收藏集分类",
+    allLabel: isUnknownView ? "全部不会" : "全部收藏集",
+    labelFor: (name) =>
+      isUnknownView ? `${name}不会` : `${name}收藏集`,
+    setCategory: (category) => {
+      if (isUnknownView) {
+        state.unknownCategory = category;
+      } else {
+        state.favoriteCategory = category;
+      }
+    },
+  };
+}
 
-  if (!isFavoritesView) {
+function renderCollectionFilters() {
+  const isCollectionView =
+    state.view === "favorites" || state.view === "unknown";
+  elements.collectionFilters.hidden = !isCollectionView;
+
+  if (!isCollectionView) {
     elements.collectionFilterList.replaceChildren();
     return;
   }
 
+  const config = getCollectionViewConfig();
   const definitions = getCategoryDefinitions();
   const categoryNames = new Set(definitions.map((category) => category.name));
-  if (
-    state.favoriteCategory !== "all" &&
-    !categoryNames.has(state.favoriteCategory)
-  ) {
-    state.favoriteCategory = "all";
+  let activeCategory = config.activeCategory;
+  if (activeCategory !== "all" && !categoryNames.has(activeCategory)) {
+    config.setCategory("all");
+    activeCategory = "all";
   }
 
-  const favoriteEntries = getCollectionEntries(state.favorites, "all");
+  const entries = getCollectionEntries(config.collection, "all");
   const counts = new Map();
-  favoriteEntries.forEach(({ resource }) => {
+  entries.forEach(({ resource }) => {
     counts.set(resource.category, (counts.get(resource.category) || 0) + 1);
   });
 
   const filters = [
     {
       category: "all",
-      label: "全部收藏集",
-      count: favoriteEntries.length,
+      label: config.allLabel,
+      count: entries.length,
     },
     ...definitions.map((category) => ({
       category: category.name,
-      label: `${category.name}收藏集`,
+      label: config.labelFor(category.name),
       count: counts.get(category.name) || 0,
     })),
   ];
 
+  if (elements.collectionFilterLabel) {
+    elements.collectionFilterLabel.textContent = config.heading;
+  }
+  elements.collectionFilters.setAttribute("aria-label", config.heading);
+
   const fragment = document.createDocumentFragment();
   filters.forEach((filter) => {
     const button = document.createElement("button");
-    const isActive = filter.category === state.favoriteCategory;
+    const isActive = filter.category === activeCategory;
     button.type = "button";
     button.className = "collection-filter-button";
     button.classList.toggle("is-active", isActive);
@@ -7405,7 +7339,7 @@ function renderCollectionFilters() {
 
     button.append(label, count);
     button.addEventListener("click", () => {
-      state.favoriteCategory = filter.category;
+      config.setCategory(filter.category);
       render();
     });
     fragment.append(button);
@@ -7533,15 +7467,24 @@ function render() {
       : `汇总“${state.favoriteCategory}”分类中手动收藏的词汇，方便集中复习。`;
     elements.footerResource.textContent = `${collectionName} · ${visibleEntries.length} 条`;
   } else if (state.view === "unknown") {
-    elements.activeTitle.textContent = "不会的单词";
-    elements.activeDescription.textContent =
-      "汇总所有素材中标记为不会的词汇，掌握后可随时移出。";
-    elements.footerResource.textContent = `不会的单词 · ${state.unknown.size} 条`;
+    const isAllUnknown = state.unknownCategory === "all";
+    const unknownName = isAllUnknown
+      ? "不会的单词"
+      : `${state.unknownCategory}不会`;
+    elements.activeTitle.textContent = unknownName;
+    elements.activeDescription.textContent = isAllUnknown
+      ? "按一级分类汇总标记为不会的词汇，掌握后可随时移出。"
+      : `汇总“${state.unknownCategory}”分类中标记为不会的词汇，掌握后可随时移出。`;
+    elements.footerResource.textContent = `${unknownName} · ${visibleEntries.length} 条`;
   } else if (resource) {
-    elements.activeTitle.textContent = resource.title;
-    elements.activeDescription.textContent =
-      resource.description || resource.group || "上传素材";
-    elements.footerResource.textContent = `${resource.title} · ${
+    const unit = getActiveUnit();
+    const unitLabel = unit ? ` · ${unit.label}` : "";
+    const description = resource.description || resource.group || "上传素材";
+    elements.activeTitle.textContent = `${resource.title}${unitLabel}`;
+    elements.activeDescription.textContent = unit
+      ? `${description} · ${unit.detail}`
+      : description;
+    elements.footerResource.textContent = `${resource.title}${unitLabel} · ${
       getActiveItems().length
     } 条`;
   }
@@ -7562,7 +7505,10 @@ function render() {
           : `${state.favoriteCategory}收藏集还是空的`;
       copy.textContent = "在任意词汇卡片上点“收藏”，它会汇总到这里。";
     } else if (state.view === "unknown") {
-      title.textContent = "还没有标记不会的单词";
+      title.textContent =
+        state.unknownCategory === "all"
+          ? "还没有标记不会的单词"
+          : `${state.unknownCategory}还没有标记不会的单词`;
       copy.textContent = "遇到不熟的词汇时点“不会”，之后可在这里集中复习。";
     } else {
       title.textContent = "素材里还没有卡片";
@@ -7631,32 +7577,10 @@ async function loadLibrary() {
   elements.emptyState.hidden = false;
 
   try {
-    const manifestResponse = await fetch(MANIFEST_PATH, { cache: "no-store" });
-    if (!manifestResponse.ok) {
-      throw new Error(`资源清单加载失败：${manifestResponse.status}`);
-    }
-
-    const manifest = await manifestResponse.json();
-    state.categories = Array.isArray(manifest.categories)
-      ? manifest.categories
-      : [];
-    state.resources = Array.isArray(manifest.resources)
-      ? manifest.resources
-      : [];
-    const deckEntries = await Promise.all(
-      state.resources.map(async (resource, index) => {
-        if (resource.attachment) {
-          return [resource.id, []];
-        }
-        const response = await fetch(resource.file, { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error(`${resource.title} 加载失败：${response.status}`);
-        }
-        const text = await response.text();
-        return [resource.id, parseDeck(text, resource, index)];
-      }),
-    );
-    state.decks = new Map(deckEntries);
+    const library = await fetchLibrary(MANIFEST_PATH);
+    state.categories = library.categories;
+    state.resources = library.resources;
+    state.decks = library.decks;
 
     if (!state.activeResourceId) {
       const firstDeck = state.resources.find(
@@ -7732,6 +7656,12 @@ elements.reviewRestartButton.addEventListener("click", () => {
 });
 elements.reviewShowButton.addEventListener("click", revealReviewCard);
 elements.reviewSpeakButton.addEventListener("click", speakReviewCard);
+elements.reviewUnknownButton?.addEventListener("click", () => {
+  markReviewCard("unknown");
+});
+elements.reviewKnownButton?.addEventListener("click", () => {
+  markReviewCard("known");
+});
 elements.reviewGradeButtons.forEach((button) => {
   button.addEventListener("click", () => {
     gradeReviewCard(button.dataset.reviewGrade);
@@ -7740,11 +7670,18 @@ elements.reviewGradeButtons.forEach((button) => {
 elements.reviewCategory.addEventListener("change", (event) => {
   state.reviewCategory = event.target.value;
   state.reviewSection = "all";
+  state.reviewUnitKey = "all";
   startReviewSession();
   renderReviewView();
 });
 elements.reviewSection.addEventListener("change", (event) => {
   state.reviewSection = event.target.value;
+  state.reviewUnitKey = "all";
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewUnit.addEventListener("change", (event) => {
+  state.reviewUnitKey = event.target.value;
   startReviewSession();
   renderReviewView();
 });
@@ -7944,6 +7881,13 @@ elements.materialSearchInput.addEventListener("input", (event) => {
   state.materialQuery = event.target.value;
   renderResourceList();
 });
+elements.libraryToggleButton.addEventListener("click", () => {
+  setLibraryPanelExpanded(!state.mobileLibraryExpanded);
+});
+elements.backToLibraryButton.addEventListener(
+  "click",
+  scrollToLibraryNavigation,
+);
 elements.ankiExportButton.addEventListener("click", () => {
   if (elements.ankiExportPanel.hidden) {
     openAnkiExport();
@@ -8061,6 +8005,8 @@ document.addEventListener("keydown", (event) => {
 });
 window.addEventListener("resize", closeWordPopover);
 window.addEventListener("scroll", closeWordPopover, { passive: true });
+const mobileLibraryMediaQuery = window.matchMedia(MOBILE_LIBRARY_QUERY);
+mobileLibraryMediaQuery.addEventListener?.("change", syncLibraryDisclosure);
 
 function dismissWelcomeOverlay() {
   const overlay = elements.welcomeOverlay;
@@ -8097,5 +8043,6 @@ restoreMarks();
 restorePracticeHistory();
 restorePracticeSettings();
 restoreReviewData();
+syncLibraryDisclosure();
 dismissWelcomeOverlay();
 checkSession();

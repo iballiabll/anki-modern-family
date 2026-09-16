@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="iball的小屋独立滑动抽卡复习页。"
+    />
+    <title>滑动抽卡 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./review.css" />
+    <script src="./deck-data.js" defer></script>
+    <script src="./review.js" defer></script>
+  </head>
+  <body>
+    <header class="review-topbar">
+      <a class="back-link" href="./index.html">返回素材库</a>
+      <a class="review-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span>
+          <strong>滑动抽卡</strong>
+          <small>IBALL'S LISTENING CABIN</small>
+        </span>
+      </a>
+      <button id="restartButton" class="topbar-button" type="button">
+        重新开始
+      </button>
+    </header>
+
+    <main class="review-shell">
+      <section id="scopePanel" class="scope-panel" aria-labelledby="scopeTitle">
+        <div class="scope-head">
+          <div>
+            <span class="scope-label">当前抽卡范围</span>
+            <h1 id="scopeTitle">正在读取素材</h1>
+            <p id="scopeMeta">请稍候</p>
+          </div>
+          <button
+            id="scopeToggleButton"
+            class="scope-toggle-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="scopeControls"
+          >
+            调整范围
+          </button>
+        </div>
+
+        <div id="scopeControls" class="scope-controls" hidden>
+          <label class="scope-field" for="categorySelect">
+            <span>一级分类</span>
+            <select id="categorySelect"></select>
+          </label>
+          <label class="scope-field" for="sectionSelect">
+            <span>二级小节</span>
+            <select id="sectionSelect"></select>
+          </label>
+          <label class="scope-field" for="resourceSelect">
+            <span>素材</span>
+            <select id="resourceSelect"></select>
+          </label>
+          <label class="scope-field" for="unitSelect">
+            <span>单元</span>
+            <select id="unitSelect"></select>
+          </label>
+          <label class="scope-field" for="limitSelect">
+            <span>本轮数量</span>
+            <select id="limitSelect">
+              <option value="20">20 张</option>
+              <option value="50">50 张</option>
+              <option value="100">100 张</option>
+              <option value="all">全部可用</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="review-progress" aria-live="polite">
+        <div class="review-progress-copy">
+          <span id="queueStatus">准备卡片中</span>
+          <strong id="positionLabel">0 / 0</strong>
+        </div>
+        <div class="review-progress-track" aria-hidden="true">
+          <span id="reviewProgressBar"></span>
+        </div>
+      </section>
+
+      <section id="reviewStage" class="review-stage" aria-label="抽卡区域">
+        <article id="reviewCard" class="review-card" tabindex="0" hidden>
+          <div class="card-topline">
+            <span id="cardDeck" class="card-deck"></span>
+            <button id="speakButton" class="speak-button" type="button">
+              朗读
+            </button>
+          </div>
+
+          <div class="card-word-block">
+            <h2 id="cardWord" lang="en"></h2>
+            <p id="cardPhonetic" class="card-phonetic" lang="en"></p>
+          </div>
+
+          <div id="cardAnswer" class="card-answer" hidden>
+            <p id="cardMeaning" class="card-meaning"></p>
+            <div id="exampleBlock" class="example-block">
+              <p id="cardSentence" class="card-sentence" lang="en"></p>
+              <p id="cardTranslation" class="card-translation"></p>
+            </div>
+          </div>
+
+          <button id="revealButton" class="reveal-button" type="button">
+            显示释义
+          </button>
+        </article>
+
+        <div id="completionView" class="completion-view" hidden>
+          <span class="completion-mark" aria-hidden="true">✓</span>
+          <h2 id="completionTitle">本轮抽卡完成</h2>
+          <p id="completionCopy"></p>
+          <button id="completionRestartButton" class="primary-button" type="button">
+            再来一轮
+          </button>
+        </div>
+
+        <div id="emptyView" class="empty-view" hidden>
+          <strong id="emptyTitle">正在准备卡片</strong>
+          <p id="emptyCopy">请稍候。</p>
+          <a class="primary-button" href="./index.html">返回素材库</a>
+        </div>
+      </section>
+
+      <div class="review-actions" aria-label="抽卡操作">
+        <button id="previousButton" class="direction-button" type="button">
+          上一张
+        </button>
+        <button id="unknownButton" class="mark-button is-unknown" type="button">
+          不会
+        </button>
+        <button id="knownButton" class="mark-button is-known" type="button">
+          掌握
+        </button>
+        <button id="nextButton" class="direction-button" type="button">
+          下一张
+        </button>
+      </div>
+
+      <p id="reviewMessage" class="review-message" aria-live="polite"></p>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

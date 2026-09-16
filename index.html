@@ -15,6 +15,7 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <script src="./deck-data.js" defer></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
@@ -112,6 +113,19 @@
           <span>素材分类</span>
           <strong id="resourceCount">0</strong>
         </div>
+        <button
+          id="libraryToggleButton"
+          class="library-toggle-button"
+          type="button"
+          aria-expanded="false"
+          aria-controls="resourceList"
+        >
+          <span class="library-toggle-copy">
+            <strong>素材导航</strong>
+            <span id="libraryToggleMeta">按分类浏览素材</span>
+          </span>
+          <span class="library-toggle-chevron" aria-hidden="true">⌄</span>
+        </button>
         <label class="material-search-field" for="materialSearchInput">
           <span class="search-symbol" aria-hidden="true">⌕</span>
           <input
@@ -133,6 +147,14 @@
       <main class="workspace">
         <header class="workspace-header">
           <div class="workspace-title">
+            <button
+              id="backToLibraryButton"
+              class="back-to-library-button"
+              type="button"
+            >
+              <span aria-hidden="true">←</span>
+              返回素材导航
+            </button>
             <p class="section-label">当前素材</p>
             <h1 id="activeTitle">正在加载素材</h1>
             <p id="activeDescription" class="active-description">
@@ -316,7 +338,9 @@
             aria-label="收藏集分类"
             hidden
           >
-            <span class="collection-filter-label">收藏集分类</span>
+            <span id="collectionFilterLabel" class="collection-filter-label">
+              收藏集分类
+            </span>
             <div
               id="collectionFilterList"
               class="collection-filter-list"
@@ -1065,6 +1089,10 @@
               <span>二级小节</span>
               <select id="reviewSection"></select>
             </label>
+            <label class="practice-field" for="reviewUnit">
+              <span>学习单元</span>
+              <select id="reviewUnit"></select>
+            </label>
             <label class="practice-field" for="reviewNewLimit">
               <span>今日新卡上限</span>
               <select id="reviewNewLimit">
@@ -1176,6 +1204,25 @@
                 type="button"
               >
                 显示答案
+              </button>
+            </div>
+
+            <div id="reviewMarkActions" class="review-mark-actions">
+              <button
+                id="reviewUnknownButton"
+                class="review-mark-button is-unknown"
+                type="button"
+                aria-pressed="false"
+              >
+                不会
+              </button>
+              <button
+                id="reviewKnownButton"
+                class="review-mark-button is-known"
+                type="button"
+                aria-pressed="false"
+              >
+                标记掌握
               </button>
             </div>
 
