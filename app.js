@@ -36,6 +36,9 @@ const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其�
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
 const INTENSIVE_ENTRY_SEARCH_TEXT =
   "四级听力全文翻译语法精读2022年6月第1套";
+const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
+const READING_ENTRY_SEARCH_TEXT =
+  "上传四六级考研题目翻译阅读背单词真题精读";
 const AMERICAN_VOICE_NAMES = {
   female: [
     "aria",
@@ -6784,6 +6787,50 @@ function matchesIntensiveEntryQuery(query) {
   return Boolean(compactQuery) && searchable.includes(compactQuery);
 }
 
+function matchesReadingEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(READING_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function createReadingEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-reading-entry";
+  link.href = "./reading.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.readingEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `上传${categoryName}题目并翻译阅读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "读";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "上传题目 · 翻译阅读";
+
+  const meta = document.createElement("span");
+  meta.textContent = "上传真题 · 点词背诵 · 加入复习";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
 function createIntensiveEntry(categoryName) {
   const link = document.createElement("a");
   link.className = "resource-button is-intensive-entry";
@@ -7050,6 +7097,9 @@ function renderResourceList() {
     const showIntensiveEntry =
       INTENSIVE_ENTRY_CATEGORIES.includes(category.name) &&
       (!query || categoryNameMatches || matchesIntensiveEntryQuery(query));
+    const showReadingEntry =
+      READING_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesReadingEntryQuery(query));
     const visibleResources = categoryResources.filter(
       (resource) =>
         !query || categoryNameMatches || matchesMaterialQuery(resource, query),
@@ -7084,7 +7134,8 @@ function renderResourceList() {
       !categoryNameMatches &&
       visibleResources.length === 0 &&
       visibleSections.length === 0 &&
-      !showIntensiveEntry
+      !showIntensiveEntry &&
+      !showReadingEntry
     ) {
       return;
     }
@@ -7103,11 +7154,17 @@ function renderResourceList() {
 
     const headingCount = document.createElement("span");
     headingCount.textContent = String(
-      visibleResources.length + (showIntensiveEntry ? 1 : 0),
+      visibleResources.length +
+        (showIntensiveEntry ? 1 : 0) +
+        (showReadingEntry ? 1 : 0),
     );
 
     heading.append(headingName, headingCount);
     group.append(heading);
+
+    if (showReadingEntry) {
+      group.append(createReadingEntry(category.name));
+    }
 
     if (showIntensiveEntry) {
       group.append(createIntensiveEntry(category.name));
@@ -7148,6 +7205,7 @@ function renderResourceList() {
 
     if (
       !showIntensiveEntry &&
+      !showReadingEntry &&
       !directResources.length &&
       !visibleSections.length
     ) {

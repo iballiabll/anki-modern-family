@@ -3508,6 +3508,36 @@ p {
   background: #f0dfaa;
 }
 
+.resource-button.is-reading-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(86, 156, 214, 0.22),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(120, 178, 224, 0.36);
+  text-decoration: none;
+}
+
+.resource-button.is-reading-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(86, 156, 214, 0.3),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(146, 196, 234, 0.54);
+}
+
+.resource-button.is-reading-entry .resource-index {
+  background: #8ec2e6;
+  color: #123049;
+}
+
+.resource-button.is-reading-entry .resource-count {
+  color: #17405f;
+  background: #cfe6f6;
+}
+
 /* Welcome curtain */
 
 .welcome-overlay {

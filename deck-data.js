@@ -19,6 +19,7 @@
     unknown: "iball-listening-cabin-unknown",
     reviewProgress: "iball-listening-cabin-review-v1",
     reviewDaily: "iball-listening-cabin-review-daily-v1",
+    readings: "iball-listening-cabin-readings-v1",
   };
 
   function parseCsv(text) {
@@ -522,6 +523,181 @@
     }
   }
 
+  function cleanReadingText(value, maxLength = 5000) {
+    return String(value || "")
+      .replace(/\u0000/g, "")
+      .replace(/\r\n?/g, "\n")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+      .slice(0, maxLength);
+  }
+
+  function hashReadingValue(value) {
+    let hash = 2166136261;
+    const text = String(value || "");
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(36).padStart(6, "0");
+  }
+
+  function normalizeReadingWord(word, index = 0) {
+    const phrase = cleanReadingText(word?.phrase, 120);
+    if (!phrase) {
+      return null;
+    }
+
+    const sentence = cleanReadingText(word?.sentence, 1200);
+    const id =
+      cleanReadingText(word?.id, 160).replace(/[^a-zA-Z0-9:_-]/g, "") ||
+      `word-${index + 1}-${hashReadingValue(`${phrase}|${sentence}`)}`;
+
+    return {
+      id,
+      phrase,
+      phonetic: cleanReadingText(word?.phonetic, 120),
+      meaning: cleanReadingText(word?.meaning, 800) || "查看上下文理解用法",
+      sentence: sentence || phrase,
+      translation: cleanReadingText(word?.translation, 1200),
+      addedAt: Math.max(0, Number(word?.addedAt) || Date.now()),
+    };
+  }
+
+  function normalizeReadingParagraph(paragraph, index = 0) {
+    if (typeof paragraph === "string") {
+      const english = cleanReadingText(paragraph, 8000);
+      return english ? { id: `paragraph-${index + 1}`, english, chinese: "" } : null;
+    }
+
+    const english = cleanReadingText(paragraph?.english, 8000);
+    if (!english) {
+      return null;
+    }
+
+    return {
+      id:
+        cleanReadingText(paragraph?.id, 120).replace(/[^a-zA-Z0-9:_-]/g, "") ||
+        `paragraph-${index + 1}`,
+      english,
+      chinese: cleanReadingText(paragraph?.chinese, 12000),
+    };
+  }
+
+  function normalizeReadingDocument(document, index = 0) {
+    if (!document || typeof document !== "object") {
+      return null;
+    }
+
+    const title = cleanReadingText(document.title, 160) || `上传题目 ${index + 1}`;
+    const category = cleanReadingText(document.category, 40) || "其他";
+    const createdAt = Math.max(0, Number(document.createdAt) || Date.now());
+    const id =
+      cleanReadingText(document.id, 160).replace(/[^a-zA-Z0-9:_-]/g, "") ||
+      `reading-${createdAt}-${hashReadingValue(`${category}|${title}`)}`;
+    const paragraphs = (Array.isArray(document.paragraphs) ? document.paragraphs : [])
+      .map(normalizeReadingParagraph)
+      .filter(Boolean);
+    const words = (Array.isArray(document.words) ? document.words : [])
+      .map(normalizeReadingWord)
+      .filter(Boolean);
+
+    return {
+      id,
+      title,
+      category,
+      section: cleanReadingText(document.section, 80) || "上传阅读",
+      createdAt,
+      updatedAt: Math.max(0, Number(document.updatedAt) || createdAt),
+      paragraphs,
+      words,
+    };
+  }
+
+  function getReadingDocuments() {
+    const stored = readJson(STORAGE_KEYS.readings, []);
+    const documents = Array.isArray(stored)
+      ? stored
+      : Array.isArray(stored?.documents)
+        ? stored.documents
+        : [];
+
+    return documents
+      .map(normalizeReadingDocument)
+      .filter(Boolean)
+      .sort((left, right) => right.updatedAt - left.updatedAt);
+  }
+
+  function saveReadingDocument(document) {
+    const normalized = normalizeReadingDocument(document);
+    if (!normalized) {
+      return null;
+    }
+
+    normalized.updatedAt = Date.now();
+    const documents = getReadingDocuments().filter(
+      (item) => item.id !== normalized.id,
+    );
+    documents.unshift(normalized);
+    writeJson(STORAGE_KEYS.readings, documents);
+    return normalized;
+  }
+
+  function deleteReadingDocument(documentId) {
+    const id = cleanReadingText(documentId, 160);
+    const documents = getReadingDocuments();
+    const nextDocuments = documents.filter((document) => document.id !== id);
+    writeJson(STORAGE_KEYS.readings, nextDocuments);
+    return nextDocuments.length !== documents.length;
+  }
+
+  function buildReadingItems(document) {
+    const normalized = normalizeReadingDocument(document);
+    if (!normalized) {
+      return [];
+    }
+
+    return normalized.words.map((word) => ({
+      id: word.id,
+      phrase: word.phrase,
+      phonetic: word.phonetic,
+      meaning: word.meaning,
+      sentence: word.sentence,
+      translation: word.translation,
+    }));
+  }
+
+  function mergeLibraryCategories(categories, resources) {
+    const byName = new Map();
+
+    (Array.isArray(categories) ? categories : []).forEach((category) => {
+      if (!category?.name) {
+        return;
+      }
+      byName.set(category.name, {
+        name: category.name,
+        sections: [...new Set(Array.isArray(category.sections) ? category.sections : [])],
+      });
+    });
+
+    (Array.isArray(resources) ? resources : []).forEach((resource) => {
+      if (!resource?.category) {
+        return;
+      }
+      const category = byName.get(resource.category) || {
+        name: resource.category,
+        sections: [],
+      };
+      if (resource.section && !category.sections.includes(resource.section)) {
+        category.sections.push(resource.section);
+      }
+      byName.set(resource.category, category);
+    });
+
+    return [...byName.values()];
+  }
+
   async function fetchLibrary(manifestPath = MANIFEST_PATH) {
     const manifestResponse = await fetch(manifestPath, { cache: "no-store" });
     if (!manifestResponse.ok) {
@@ -532,11 +708,27 @@
     const categories = Array.isArray(manifest.categories)
       ? manifest.categories
       : [];
-    const resources = Array.isArray(manifest.resources)
+    const staticResources = Array.isArray(manifest.resources)
       ? manifest.resources
       : [];
+    const readingDocuments = getReadingDocuments();
+    const readingResources = readingDocuments.map((document) => ({
+      id: document.id,
+      title: document.title,
+      category: document.category,
+      section: document.section,
+      group: document.category,
+      description: [document.category, document.section, document.title]
+        .filter(Boolean)
+        .join(" · "),
+      file: "",
+      format: "reading-upload",
+      attachment: false,
+      reading: true,
+    }));
+    const resources = [...staticResources, ...readingResources];
     const deckEntries = await Promise.all(
-      resources.map(async (resource, index) => {
+      staticResources.map(async (resource, index) => {
         if (resource.attachment) {
           return [resource.id, []];
         }
@@ -549,7 +741,15 @@
       }),
     );
 
-    return { categories, resources, decks: new Map(deckEntries) };
+    readingDocuments.forEach((document) => {
+      deckEntries.push([document.id, buildReadingItems(document)]);
+    });
+
+    return {
+      categories: mergeLibraryCategories(categories, resources),
+      resources,
+      decks: new Map(deckEntries),
+    };
   }
 
   /**
@@ -623,6 +823,12 @@
     persistSet,
     readJson,
     writeJson,
+    cleanReadingText,
+    hashReadingValue,
+    getReadingDocuments,
+    saveReadingDocument,
+    deleteReadingDocument,
+    buildReadingItems,
     fetchLibrary,
     buildReviewQueue,
   };
