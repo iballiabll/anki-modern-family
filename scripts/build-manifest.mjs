@@ -15,6 +15,7 @@ const staticEntries = [
   "styles.css",
   "materials",
 ];
+const categoryOrder = ["四级", "六级", "考研", "电影", "其他"];
 const supportedExtensions = new Map([
   [".csv", "anki-csv"],
   [".md", "markdown-table"],
@@ -30,6 +31,26 @@ function cleanTitle(value) {
     .replace(/[-_]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function cleanFolderName(value) {
+  return String(value || "").trim();
+}
+
+function compareCategoryNames(left, right) {
+  const leftIndex = categoryOrder.indexOf(left);
+  const rightIndex = categoryOrder.indexOf(right);
+
+  if (leftIndex >= 0 && rightIndex >= 0) {
+    return leftIndex - rightIndex;
+  }
+  if (leftIndex >= 0) {
+    return -1;
+  }
+  if (rightIndex >= 0) {
+    return 1;
+  }
+  return left.localeCompare(right, "zh-CN");
 }
 
 function encodeAssetPath(relativePath) {
@@ -82,32 +103,84 @@ async function walk(directory) {
   return files;
 }
 
+async function walkDirectories(directory, parentParts = []) {
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  const directoryPaths = [];
+
+  for (const entry of entries.sort((left, right) =>
+    left.name.localeCompare(right.name, "zh-CN"),
+  )) {
+    if (!entry.isDirectory() || entry.name.startsWith(".")) {
+      continue;
+    }
+
+    const parts = [...parentParts, cleanFolderName(entry.name)].filter(Boolean);
+    directoryPaths.push(parts);
+    directoryPaths.push(
+      ...(await walkDirectories(path.join(directory, entry.name), parts)),
+    );
+  }
+
+  return directoryPaths;
+}
+
+async function buildCategories() {
+  const directoryPaths = await walkDirectories(materialsRoot);
+  const categories = new Map();
+
+  for (const parts of directoryPaths) {
+    const [categoryName, ...sectionParts] = parts;
+    if (!categoryName) {
+      continue;
+    }
+
+    if (!categories.has(categoryName)) {
+      categories.set(categoryName, new Set());
+    }
+
+    if (sectionParts.length > 0) {
+      categories.get(categoryName).add(sectionParts.join(" / "));
+    }
+  }
+
+  return [...categories.entries()]
+    .sort(([left], [right]) => compareCategoryNames(left, right))
+    .map(([name, sections]) => ({
+      name,
+      sections: [...sections].sort((left, right) =>
+        left.localeCompare(right, "zh-CN"),
+      ),
+    }));
+}
+
 function buildResource(absolutePath) {
   const relativePath = toPosixPath(path.relative(materialsRoot, absolutePath));
   const pathParts = relativePath.split("/");
   const fileName = pathParts.pop();
   const extension = path.extname(fileName).toLowerCase();
   const fileTitle = cleanTitle(path.basename(fileName, extension));
-  const folderParts = pathParts.map(cleanTitle).filter(Boolean);
-  const group = folderParts.at(-1) || "未分类素材";
-  const titleParts = folderParts.slice(0, -1).concat(fileTitle);
-  const title = titleParts.join(" · ") || fileTitle;
+  const folderParts = pathParts.map(cleanFolderName).filter(Boolean);
+  const category = folderParts[0] || "未分类素材";
+  const section = folderParts.slice(1).join(" / ");
 
   return {
     id: makeId(relativePath),
-    title,
-    group,
-    description: [group, fileTitle].filter(Boolean).join(" · "),
+    title: fileTitle,
+    category,
+    section,
+    group: category,
+    description: [category, section, fileTitle].filter(Boolean).join(" · "),
     file: `./materials/${encodeAssetPath(relativePath)}`,
     format: supportedExtensions.get(extension),
   };
 }
 
-function serializeManifest(resources) {
+function serializeManifest(resources, categories) {
   return `${JSON.stringify(
     {
       siteName: "iball的小屋",
       generatedFrom: "materials",
+      categories,
       resources,
     },
     null,
@@ -116,6 +189,16 @@ function serializeManifest(resources) {
 }
 
 async function buildPublicDirectory() {
+  const resolvedRoot = path.resolve(root);
+  const resolvedPublicRoot = path.resolve(publicRoot);
+  if (
+    resolvedPublicRoot === resolvedRoot ||
+    !resolvedPublicRoot.startsWith(`${resolvedRoot}${path.sep}`)
+  ) {
+    throw new Error(`Refusing to clean output outside the project: ${publicRoot}`);
+  }
+
+  await fs.rm(publicRoot, { recursive: true, force: true });
   await fs.mkdir(publicRoot, { recursive: true });
 
   for (const entry of staticEntries) {
@@ -128,7 +211,8 @@ async function buildPublicDirectory() {
 await fs.mkdir(materialsRoot, { recursive: true });
 const files = await walk(materialsRoot);
 const resources = files.map(buildResource);
-const nextManifest = serializeManifest(resources);
+const categories = await buildCategories();
+const nextManifest = serializeManifest(resources, categories);
 
 if (checkOnly) {
   const currentManifest = await fs

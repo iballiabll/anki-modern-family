@@ -1,21 +1,45 @@
 {
   "siteName": "iball的小屋",
   "generatedFrom": "materials",
+  "categories": [
+    {
+      "name": "四级",
+      "sections": []
+    },
+    {
+      "name": "六级",
+      "sections": []
+    },
+    {
+      "name": "考研",
+      "sections": []
+    },
+    {
+      "name": "电影",
+      "sections": [
+        "摩登家庭"
+      ]
+    }
+  ],
   "resources": [
     {
-      "id": "modern-family-s01e01-50-737e5cea",
+      "id": "s01e01-50-37ed3d0b",
       "title": "S01E01 精选 50",
-      "group": "Modern Family",
-      "description": "Modern Family · S01E01 精选 50",
-      "file": "./materials/Modern%20Family/S01E01%20%E7%B2%BE%E9%80%89%2050.md",
+      "category": "电影",
+      "section": "摩登家庭",
+      "group": "电影",
+      "description": "电影 · 摩登家庭 · S01E01 精选 50",
+      "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01%20%E7%B2%BE%E9%80%89%2050.md",
       "format": "markdown-table"
     },
     {
-      "id": "modern-family-s01e01-100-6e7fbc36",
+      "id": "s01e01-100-4570f530",
       "title": "S01E01 完整 100",
-      "group": "Modern Family",
-      "description": "Modern Family · S01E01 完整 100",
-      "file": "./materials/Modern%20Family/S01E01%20%E5%AE%8C%E6%95%B4%20100.md",
+      "category": "电影",
+      "section": "摩登家庭",
+      "group": "电影",
+      "description": "电影 · 摩登家庭 · S01E01 完整 100",
+      "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01%20%E5%AE%8C%E6%95%B4%20100.md",
       "format": "markdown-table"
     }
   ]

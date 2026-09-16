@@ -34,6 +34,7 @@
             <span>逐条标记掌握</span>
             <span>浏览器直接发音</span>
           </div>
+          <p class="login-usage">仅供个人学习使用，非商业用途。</p>
         </div>
 
         <div class="login-panel">
@@ -96,6 +97,16 @@
           <span>素材分类</span>
           <strong id="resourceCount">0</strong>
         </div>
+        <label class="material-search-field" for="materialSearchInput">
+          <span class="search-symbol" aria-hidden="true">⌕</span>
+          <input
+            id="materialSearchInput"
+            type="search"
+            placeholder="搜索素材或分类"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
         <nav
           id="resourceList"
           class="resource-list"
@@ -132,7 +143,7 @@
               <input
                 id="searchInput"
                 type="search"
-                placeholder="搜索句子、短语、释义或音标"
+                placeholder="搜索短语、释义、句子或音标"
                 autocomplete="off"
                 spellcheck="false"
               />
@@ -140,6 +151,30 @@
             <p class="result-count" aria-live="polite">
               显示 <strong id="visibleCount">0</strong> 条
             </p>
+          </div>
+
+          <div
+            class="meaning-controls"
+            role="group"
+            aria-label="词汇释义显示控制"
+          >
+            <span class="meaning-controls-label">词汇释义</span>
+            <div class="meaning-control-actions">
+              <button
+                id="showAllMeaningsButton"
+                class="meaning-control-button"
+                type="button"
+              >
+                全部显示释义
+              </button>
+              <button
+                id="hideAllMeaningsButton"
+                class="meaning-control-button is-active"
+                type="button"
+              >
+                全部关闭释义
+              </button>
+            </div>
           </div>
 
           <div
@@ -175,6 +210,20 @@
               <span id="unknownCount" class="view-count">0</span>
             </button>
           </div>
+
+          <div
+            id="collectionFilters"
+            class="collection-filters"
+            aria-label="收藏集分类"
+            hidden
+          >
+            <span class="collection-filter-label">收藏集分类</span>
+            <div
+              id="collectionFilterList"
+              class="collection-filter-list"
+              role="group"
+            ></div>
+          </div>
         </section>
 
         <section
@@ -191,8 +240,37 @@
         <footer class="workspace-footer">
           <span>iball的小屋</span>
           <span id="footerResource">听力词汇素材库</span>
+          <span>仅供个人学习使用，非商业用途。</span>
         </footer>
       </main>
+    </div>
+
+    <div
+      id="wordPopover"
+      class="word-popover"
+      role="dialog"
+      aria-labelledby="wordPopoverWord"
+      hidden
+    >
+      <div class="word-popover-head">
+        <div>
+          <strong id="wordPopoverWord" class="word-popover-word"></strong>
+          <span
+            id="wordPopoverPhonetic"
+            class="word-popover-phonetic"
+            lang="en"
+          ></span>
+        </div>
+        <button
+          id="wordPopoverClose"
+          class="word-popover-close"
+          type="button"
+          aria-label="关闭单词释义"
+        >
+          关闭
+        </button>
+      </div>
+      <div id="wordPopoverContent" class="word-popover-content"></div>
     </div>
   </body>
 </html>
