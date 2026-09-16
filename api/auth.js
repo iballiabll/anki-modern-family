@@ -2,6 +2,9 @@ const crypto = require("crypto");
 
 const COOKIE_NAME = "iball_cabin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
+const PASSWORD_SHA256 =
+  "481f6cc0511143ccdd7e2d1b1b94faf0a700a8b49cd13922a70b5ae28acaa8c5";
+const SESSION_SIGNING_REVISION = "password-2026-09-16";
 
 function base64UrlEncode(value) {
   return Buffer.from(value).toString("base64url");
@@ -36,8 +39,12 @@ function safeEqual(left, right) {
 function getSignature(payload) {
   return crypto
     .createHmac("sha256", process.env.SESSION_SECRET || "")
-    .update(payload)
+    .update(`${SESSION_SIGNING_REVISION}:${payload}`)
     .digest("base64url");
+}
+
+function hashPassword(password) {
+  return crypto.createHash("sha256").update(String(password)).digest("hex");
 }
 
 function createSession(username) {
@@ -144,7 +151,6 @@ module.exports = async function handler(request, response) {
 
   const configured =
     Boolean(process.env.APP_USERNAME) &&
-    Boolean(process.env.APP_PASSWORD) &&
     Boolean(process.env.SESSION_SECRET);
 
   if (!configured) {
@@ -159,7 +165,7 @@ module.exports = async function handler(request, response) {
   const password = String(body.password || "");
   const credentialsMatch =
     safeEqual(username, process.env.APP_USERNAME) &&
-    safeEqual(password, process.env.APP_PASSWORD);
+    safeEqual(hashPassword(password), PASSWORD_SHA256);
 
   if (!credentialsMatch) {
     response.status(401).json({ ok: false, message: "账号或密码不正确" });

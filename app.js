@@ -33,6 +33,9 @@ const PRACTICE_HISTORY_STORAGE_KEY =
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
 const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
+const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
+const INTENSIVE_ENTRY_SEARCH_TEXT =
+  "四级听力全文翻译语法精读2022年6月第1套";
 const AMERICAN_VOICE_NAMES = {
   female: [
     "aria",
@@ -2055,12 +2058,46 @@ function getCollectionEntries(collection, category = "all") {
     );
 }
 
+function getUnknownCategoryDefinitions() {
+  const definitions = getCategoryDefinitions();
+  if (definitions.length) {
+    return definitions;
+  }
+  return [{ name: "未分类素材", sections: [] }];
+}
+
+function resolveUnknownCategory(preferredCategory = "") {
+  const definitions = getUnknownCategoryDefinitions();
+  const names = new Set(definitions.map((category) => category.name));
+  const counts = new Map();
+  getCollectionEntries(state.unknown, "all").forEach(({ resource }) => {
+    counts.set(resource.category, (counts.get(resource.category) || 0) + 1);
+  });
+
+  const preferred = String(preferredCategory || "").trim();
+  if (preferred && names.has(preferred) && counts.get(preferred)) {
+    state.unknownCategory = preferred;
+    return preferred;
+  }
+
+  if (state.unknownCategory !== "all" && names.has(state.unknownCategory)) {
+    return state.unknownCategory;
+  }
+
+  const firstPopulated = definitions.find(
+    (category) => counts.get(category.name),
+  );
+  state.unknownCategory =
+    firstPopulated?.name || definitions[0]?.name || "未分类素材";
+  return state.unknownCategory;
+}
+
 function getBaseEntries() {
   if (state.view === "favorites") {
     return getCollectionEntries(state.favorites, state.favoriteCategory);
   }
   if (state.view === "unknown") {
-    return getCollectionEntries(state.unknown, state.unknownCategory);
+    return getCollectionEntries(state.unknown, resolveUnknownCategory());
   }
 
   const resource = getActiveResource();
@@ -6309,6 +6346,13 @@ function getStandaloneReviewUrl() {
   const resource = getActiveResource();
   const activeUnit = getActiveUnit();
 
+  if (state.view === "unknown") {
+    params.set("category", resolveUnknownCategory());
+    params.set("scope", "unknown");
+    const query = params.toString();
+    return `./review.html${query ? `?${query}` : ""}`;
+  }
+
   if (resource) {
     if (resource.category) {
       params.set("category", resource.category);
@@ -6731,6 +6775,50 @@ function matchesMaterialQuery(resource, query) {
   return normalizeText(searchable).includes(query);
 }
 
+function matchesIntensiveEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(INTENSIVE_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function createIntensiveEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-intensive-entry";
+  link.href = "./intensive.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.intensiveEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开四级听力全文翻译与语法精读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "精";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "四级听力全文翻译 + 语法精读";
+
+  const meta = document.createElement("span");
+  meta.textContent = "2022 年 6 月 · 第 1 套 · 逐句翻译";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
 function openResourceAttachment(resource) {
   const link = document.createElement("a");
   link.href = resource.file;
@@ -6959,6 +7047,9 @@ function renderResourceList() {
     );
     const categoryNameMatches =
       Boolean(query) && normalizeText(category.name).includes(query);
+    const showIntensiveEntry =
+      INTENSIVE_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesIntensiveEntryQuery(query));
     const visibleResources = categoryResources.filter(
       (resource) =>
         !query || categoryNameMatches || matchesMaterialQuery(resource, query),
@@ -6992,7 +7083,8 @@ function renderResourceList() {
       query &&
       !categoryNameMatches &&
       visibleResources.length === 0 &&
-      visibleSections.length === 0
+      visibleSections.length === 0 &&
+      !showIntensiveEntry
     ) {
       return;
     }
@@ -7010,10 +7102,16 @@ function renderResourceList() {
     headingName.textContent = category.name;
 
     const headingCount = document.createElement("span");
-    headingCount.textContent = String(visibleResources.length);
+    headingCount.textContent = String(
+      visibleResources.length + (showIntensiveEntry ? 1 : 0),
+    );
 
     heading.append(headingName, headingCount);
     group.append(heading);
+
+    if (showIntensiveEntry) {
+      group.append(createIntensiveEntry(category.name));
+    }
 
     const directResources = visibleResources.filter(
       (resource) => !resource.section,
@@ -7048,7 +7146,11 @@ function renderResourceList() {
       });
     });
 
-    if (!directResources.length && !visibleSections.length) {
+    if (
+      !showIntensiveEntry &&
+      !directResources.length &&
+      !visibleSections.length
+    ) {
       const empty = document.createElement("p");
       empty.className = "resource-empty";
       empty.textContent = "暂无素材";
@@ -7289,9 +7391,20 @@ function renderCollectionFilters() {
 
   const config = getCollectionViewConfig();
   const definitions = getCategoryDefinitions();
-  const categoryNames = new Set(definitions.map((category) => category.name));
+  const filterDefinitions =
+    config.heading === "不会分类"
+      ? getUnknownCategoryDefinitions()
+      : definitions;
+  const categoryNames = new Set(
+    filterDefinitions.map((category) => category.name),
+  );
   let activeCategory = config.activeCategory;
-  if (activeCategory !== "all" && !categoryNames.has(activeCategory)) {
+  if (config.heading === "不会分类") {
+    activeCategory = resolveUnknownCategory();
+  } else if (
+    activeCategory !== "all" &&
+    !categoryNames.has(activeCategory)
+  ) {
     config.setCategory("all");
     activeCategory = "all";
   }
@@ -7302,18 +7415,22 @@ function renderCollectionFilters() {
     counts.set(resource.category, (counts.get(resource.category) || 0) + 1);
   });
 
-  const filters = [
-    {
-      category: "all",
-      label: config.allLabel,
-      count: entries.length,
-    },
-    ...definitions.map((category) => ({
-      category: category.name,
-      label: config.labelFor(category.name),
-      count: counts.get(category.name) || 0,
-    })),
-  ];
+  const categoryFilters = filterDefinitions.map((category) => ({
+    category: category.name,
+    label: config.labelFor(category.name),
+    count: counts.get(category.name) || 0,
+  }));
+  const filters =
+    config.heading === "不会分类"
+      ? categoryFilters
+      : [
+          {
+            category: "all",
+            label: config.allLabel,
+            count: entries.length,
+          },
+          ...categoryFilters,
+        ];
 
   if (elements.collectionFilterLabel) {
     elements.collectionFilterLabel.textContent = config.heading;
@@ -7467,14 +7584,10 @@ function render() {
       : `汇总“${state.favoriteCategory}”分类中手动收藏的词汇，方便集中复习。`;
     elements.footerResource.textContent = `${collectionName} · ${visibleEntries.length} 条`;
   } else if (state.view === "unknown") {
-    const isAllUnknown = state.unknownCategory === "all";
-    const unknownName = isAllUnknown
-      ? "不会的单词"
-      : `${state.unknownCategory}不会`;
+    const unknownCategory = resolveUnknownCategory();
+    const unknownName = `${unknownCategory}不会`;
     elements.activeTitle.textContent = unknownName;
-    elements.activeDescription.textContent = isAllUnknown
-      ? "按一级分类汇总标记为不会的词汇，掌握后可随时移出。"
-      : `汇总“${state.unknownCategory}”分类中标记为不会的词汇，掌握后可随时移出。`;
+    elements.activeDescription.textContent = `只汇总“${unknownCategory}”分类中标记为不会的词汇，掌握后可随时移出。`;
     elements.footerResource.textContent = `${unknownName} · ${visibleEntries.length} 条`;
   } else if (resource) {
     const unit = getActiveUnit();
@@ -7505,10 +7618,7 @@ function render() {
           : `${state.favoriteCategory}收藏集还是空的`;
       copy.textContent = "在任意词汇卡片上点“收藏”，它会汇总到这里。";
     } else if (state.view === "unknown") {
-      title.textContent =
-        state.unknownCategory === "all"
-          ? "还没有标记不会的单词"
-          : `${state.unknownCategory}还没有标记不会的单词`;
+      title.textContent = `${resolveUnknownCategory()}还没有标记不会的单词`;
       copy.textContent = "遇到不熟的词汇时点“不会”，之后可在这里集中复习。";
     } else {
       title.textContent = "素材里还没有卡片";
@@ -7927,6 +8037,9 @@ elements.viewSwitcher.addEventListener("click", (event) => {
   const button = event.target.closest("[data-view]");
   if (!button) {
     return;
+  }
+  if (button.dataset.view === "unknown") {
+    resolveUnknownCategory(getActiveResource()?.category || "");
   }
   state.view = button.dataset.view;
   render();

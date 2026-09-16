@@ -3479,6 +3479,35 @@ p {
   background: #e5f1ea;
 }
 
+.resource-button.is-intensive-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(209, 165, 72, 0.2),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(225, 193, 108, 0.34);
+  text-decoration: none;
+}
+
+.resource-button.is-intensive-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(209, 165, 72, 0.28),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(232, 205, 132, 0.52);
+}
+
+.resource-button.is-intensive-entry .resource-index {
+  background: #e1c16c;
+}
+
+.resource-button.is-intensive-entry .resource-count {
+  color: #6a4d0b;
+  background: #f0dfaa;
+}
+
 /* Welcome curtain */
 
 .welcome-overlay {

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="2022 年 6 月四级听力第 1 套全文翻译与逐句语法精读。"
+    />
+    <title>四级听力全文精读 · iball的小屋</title>
+    <link rel="stylesheet" href="./intensive.css" />
+    <script src="./intensive-data.js" defer></script>
+    <script src="./intensive.js" defer></script>
+  </head>
+  <body>
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <a class="topbar-link" href="./index.html">返回素材库</a>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>听力精读</strong>
+          <small>IBALL'S LISTENING CABIN</small>
+        </span>
+      </a>
+      <a
+        id="sourceLink"
+        class="topbar-link topbar-source"
+        href="https://english-exam.lazynote.cn/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        原文出处
+      </a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">2022 年 6 月 · CET-4 · 第 1 套</p>
+            <h1 id="pageTitle">四级听力全文精读</h1>
+            <p class="hero-description">逐段对照翻译，难点句子点击展开语法拆解。</p>
+            <div id="heroStats" class="hero-stats" aria-label="精读内容统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="阅读设置">
+            <div class="setting-group">
+              <span class="setting-label">显示模式</span>
+              <div class="segmented-control" role="group" aria-label="显示模式">
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-display-mode="bilingual"
+                  aria-pressed="true"
+                >
+                  中英对照
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-display-mode="english"
+                  aria-pressed="false"
+                >
+                  只看英文
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <button id="grammarToggleButton" class="tool-button" type="button">
+                展开全部语法
+              </button>
+              <button id="readAllButton" class="tool-button is-primary" type="button">
+                全文播放
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="intensive-layout">
+        <nav
+          id="pieceNavigation"
+          class="piece-navigation"
+          aria-label="听力篇目导航"
+        ></nav>
+
+        <section id="intensiveContent" class="intensive-content">
+          <div class="loading-state">
+            <strong>正在读取精读内容</strong>
+            <span>请稍候。</span>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

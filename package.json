@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build-manifest.mjs",
-    "check": "node --check deck-data.js && node --check app.js && node --check review.js && node --check api/auth.js && node --check api/word.js && node scripts/build-manifest.mjs --check"
+    "check": "node --check deck-data.js && node --check app.js && node --check review.js && node --check intensive-data.js && node --check intensive.js && node --check api/auth.js && node --check api/word.js && node scripts/build-manifest.mjs --check"
   },
   "engines": {
     "node": ">=20"

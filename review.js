@@ -31,6 +31,7 @@
     categories: [],
     resources: [],
     decks: new Map(),
+    scope: "all",
     category: "all",
     section: "all",
     resourceId: "all",
@@ -124,6 +125,13 @@
       .filter((resource) => !resource.attachment)
       .filter(
         (resource) =>
+          state.scope !== "unknown" ||
+          getResourceItems(resource).some((item) =>
+            state.unknown.has(getItemKey(resource.id, item)),
+          ),
+      )
+      .filter(
+        (resource) =>
           state.category === "all" || resource.category === state.category,
       )
       .filter(
@@ -146,20 +154,35 @@
         (item) => item.key === state.unitKey,
       );
       if (unit && unit.index > 0) {
-        return unit.items.map((item) => ({
-          item,
-          resource: selectedResource,
-        }));
+        return unit.items
+          .filter(
+            (item) =>
+              state.scope !== "unknown" ||
+              state.unknown.has(getItemKey(selectedResource.id, item)),
+          )
+          .map((item) => ({
+            item,
+            resource: selectedResource,
+          }));
       }
     }
 
     return resources.flatMap((resource) =>
-      getResourceItems(resource).map((item) => ({ item, resource })),
+      getResourceItems(resource)
+        .filter(
+          (item) =>
+            state.scope !== "unknown" ||
+            state.unknown.has(getItemKey(resource.id, item)),
+        )
+        .map((item) => ({ item, resource })),
     );
   }
 
   function getScopeTitle() {
     const parts = [];
+    if (state.scope === "unknown") {
+      parts.push("不会复习");
+    }
     parts.push(state.category === "all" ? "整个素材库" : state.category);
     if (state.category !== "all" && state.section !== "all") {
       parts.push(state.section);
@@ -221,6 +244,7 @@
 
   function readScopeFromUrl() {
     const params = new URLSearchParams(window.location.search);
+    state.scope = params.get("scope") === "unknown" ? "unknown" : "all";
     state.category = params.get("category") || "all";
     state.section = params.get("section") || "all";
     state.resourceId = params.get("resource") || "all";
@@ -237,6 +261,7 @@
   function syncScopeToUrl() {
     const url = new URL(window.location.href);
     const values = {
+      scope: state.scope === "unknown" ? "unknown" : "",
       category: state.category === "all" ? "" : state.category,
       section: state.section === "all" ? "" : state.section,
       resource: state.resourceId === "all" ? "" : state.resourceId,
