@@ -6,7 +6,15 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const materialsRoot = path.join(root, "materials");
 const manifestPath = path.join(root, "resources.json");
+const publicRoot = path.join(root, "public");
 const checkOnly = process.argv.includes("--check");
+const staticEntries = [
+  "app.js",
+  "index.html",
+  "resources.json",
+  "styles.css",
+  "materials",
+];
 const supportedExtensions = new Map([
   [".csv", "anki-csv"],
   [".md", "markdown-table"],
@@ -107,6 +115,16 @@ function serializeManifest(resources) {
   )}\n`;
 }
 
+async function buildPublicDirectory() {
+  await fs.mkdir(publicRoot, { recursive: true });
+
+  for (const entry of staticEntries) {
+    const source = path.join(root, entry);
+    const destination = path.join(publicRoot, entry);
+    await fs.cp(source, destination, { recursive: true, force: true });
+  }
+}
+
 await fs.mkdir(materialsRoot, { recursive: true });
 const files = await walk(materialsRoot);
 const resources = files.map(buildResource);
@@ -123,5 +141,7 @@ if (checkOnly) {
   console.log(`Manifest is current with ${resources.length} material(s).`);
 } else {
   await fs.writeFile(manifestPath, nextManifest, "utf8");
+  await buildPublicDirectory();
   console.log(`Generated resources.json with ${resources.length} material(s).`);
+  console.log("Prepared public directory for deployment.");
 }
