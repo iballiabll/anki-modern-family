@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
     <meta
       name="description"
       content="iball的小屋：按上传素材整理、复习英语听力词汇，并进行口语跟读练习。"
@@ -249,7 +250,7 @@
           <header class="practice-header">
             <div>
               <p class="section-label">SPEAKING PRACTICE</p>
-              <h2 id="practiceHeading">口语跟读</h2>
+              <h2 id="practiceHeading">口语练习</h2>
               <p id="practiceSource" class="practice-source"></p>
             </div>
             <button
@@ -261,8 +262,34 @@
             </button>
           </header>
 
+          <div
+            class="practice-section-switch"
+            role="group"
+            aria-label="口语练习模式"
+          >
+            <button
+              id="practiceShadowTab"
+              class="practice-section-tab is-active"
+              type="button"
+              data-practice-section="shadow"
+              aria-pressed="true"
+            >
+              素材跟读
+            </button>
+            <button
+              id="practiceDialogueTab"
+              class="practice-section-tab"
+              type="button"
+              data-practice-section="dialogue"
+              aria-pressed="false"
+            >
+              情景对话
+            </button>
+          </div>
+
           <div class="practice-layout">
             <article class="practice-stage">
+              <div id="shadowPracticeView" class="practice-stage-view">
               <div class="practice-stage-top">
                 <span id="practiceCounter" class="practice-counter"></span>
                 <span
@@ -388,6 +415,175 @@
                 >
                   随机一句
                 </button>
+              </div>
+              </div>
+
+              <div
+                id="dialoguePracticeView"
+                class="practice-stage-view dialogue-stage"
+                hidden
+              >
+                <div class="dialogue-scenario-picker">
+                  <div class="dialogue-scenario-head">
+                    <div>
+                      <span class="practice-block-label">情景选择</span>
+                      <h3>选择一个真实场景开始练习</h3>
+                    </div>
+                    <span
+                      id="dialogueScenarioMeta"
+                      class="dialogue-scenario-meta"
+                    ></span>
+                  </div>
+                  <div
+                    id="dialogueScenarioList"
+                    class="dialogue-scenario-list"
+                    role="group"
+                    aria-label="口语情景"
+                  ></div>
+                </div>
+
+                <div class="dialogue-conversation">
+                  <div class="dialogue-conversation-head">
+                    <div>
+                      <span
+                        id="dialoguePartnerLabel"
+                        class="practice-block-label"
+                      ></span>
+                      <strong id="dialogueScenarioTitle"></strong>
+                    </div>
+                    <span
+                      id="dialogueTurnCounter"
+                      class="dialogue-turn-counter"
+                    ></span>
+                  </div>
+
+                  <div
+                    id="dialogueMessages"
+                    class="dialogue-messages"
+                    aria-live="polite"
+                  ></div>
+
+                  <div class="dialogue-reply-block">
+                    <label for="dialogueAnswerInput">你的回答</label>
+                    <textarea
+                      id="dialogueAnswerInput"
+                      rows="3"
+                      lang="en"
+                      autocomplete="off"
+                      spellcheck="false"
+                      placeholder="说出或输入你的英文回答..."
+                    ></textarea>
+                    <div class="dialogue-reply-actions">
+                      <button
+                        id="dialogueListenButton"
+                        class="practice-secondary-button"
+                        type="button"
+                      >
+                        播放提问
+                      </button>
+                      <button
+                        id="dialogueHintButton"
+                        class="practice-secondary-button"
+                        type="button"
+                      >
+                        参考表达
+                      </button>
+                      <button
+                        id="dialogueRecordButton"
+                        class="practice-record-button"
+                        type="button"
+                      >
+                        开口回答
+                      </button>
+                      <button
+                        id="dialogueStopButton"
+                        class="practice-stop-button"
+                        type="button"
+                        hidden
+                      >
+                        结束回答
+                      </button>
+                      <button
+                        id="dialogueSubmitButton"
+                        class="practice-primary-button"
+                        type="button"
+                      >
+                        提交回答
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    id="dialogueHint"
+                    class="dialogue-hint"
+                    hidden
+                  ></div>
+                  <div
+                    id="dialogueNotice"
+                    class="practice-notice"
+                    hidden
+                  ></div>
+                  <div
+                    id="dialogueResult"
+                    class="dialogue-result"
+                    hidden
+                  >
+                    <div class="dialogue-result-score">
+                      <strong id="dialogueScore">0%</strong>
+                      <span>关键信息覆盖</span>
+                    </div>
+                    <div class="dialogue-result-copy">
+                      <p id="dialogueFeedback"></p>
+                      <div
+                        id="dialogueKeyPoints"
+                        class="dialogue-key-points"
+                      ></div>
+                      <div class="dialogue-coach">
+                        <div class="dialogue-coach-head">
+                          <span class="practice-block-label">教练建议</span>
+                          <span
+                            id="dialogueCoachLevel"
+                            class="dialogue-coach-level"
+                          ></span>
+                        </div>
+                        <p
+                          id="dialogueCoachMessage"
+                          class="dialogue-coach-message"
+                        ></p>
+                        <ul
+                          id="dialogueCoachTips"
+                          class="dialogue-coach-tips"
+                        ></ul>
+                        <p class="dialogue-coach-task">
+                          <span>下一步</span>
+                          <strong id="dialogueCoachTask"></strong>
+                        </p>
+                      </div>
+                      <p class="dialogue-sample-label">参考表达</p>
+                      <p
+                        id="dialogueSampleAnswer"
+                        class="dialogue-sample-answer"
+                        lang="en"
+                      ></p>
+                    </div>
+                    <div class="dialogue-result-actions">
+                      <button
+                        id="dialogueRetryButton"
+                        class="practice-secondary-button"
+                        type="button"
+                      >
+                        再说一次
+                      </button>
+                      <button
+                        id="dialogueNextButton"
+                        class="practice-primary-button"
+                        type="button"
+                      >
+                        下一轮
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </article>
 
@@ -525,6 +721,39 @@
             >
               SpeakHub
             </a>
+          </span>
+          <span>
+            情景对话参考：
+            <a
+              href="https://github.com/EthanLyu30/spoken"
+              target="_blank"
+              rel="noreferrer"
+            >
+              spoken
+            </a>
+            · MIT
+          </span>
+          <span>
+            口语反馈参考：
+            <a
+              href="https://github.com/luyou666/english-speaking-coach"
+              target="_blank"
+              rel="noreferrer"
+            >
+              english-speaking-coach
+            </a>
+            · MIT
+          </span>
+          <span>
+            界面设计参考：
+            <a
+              href="https://github.com/huangshiyu13/webtemplate"
+              target="_blank"
+              rel="noreferrer"
+            >
+              webtemplate
+            </a>
+            · Apache-2.0
           </span>
         </footer>
       </main>

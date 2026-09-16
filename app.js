@@ -8,6 +8,423 @@ const PRACTICE_HISTORY_STORAGE_KEY =
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
 const CATEGORY_ORDER = ["四级", "六级", "考研", "电影", "其他"];
+const DIALOGUE_SCENARIOS = [
+  {
+    id: "cafe",
+    title: "咖啡馆点单",
+    titleEn: "Ordering at a Cafe",
+    category: "日常",
+    level: "入门",
+    summary: "点饮品、选择规格并完成付款。",
+    turns: [
+      {
+        speaker: "Barista",
+        prompt: "Hi, welcome in! What can I get for you today?",
+        promptZh: "你好，欢迎光临！今天想喝点什么？",
+        sample: "I'd like a latte, please.",
+        sampleZh: "我想要一杯拿铁，谢谢。",
+        keywords: [
+          {
+            label: "说出饮品",
+            options: [["latte"], ["coffee"], ["cappuccino"], ["tea"]],
+          },
+          {
+            label: "礼貌点单",
+            options: [["i'd like"], ["can i have"], ["could i get"], ["i would like"]],
+          },
+        ],
+      },
+      {
+        speaker: "Barista",
+        prompt: "Sure. What size would you like, and do you want any milk?",
+        promptZh: "好的。你要什么杯型？需要加牛奶吗？",
+        sample: "A medium one with oat milk, please.",
+        sampleZh: "请给我中杯，加燕麦奶。",
+        keywords: [
+          {
+            label: "说明杯型",
+            options: [["small"], ["medium"], ["large"]],
+          },
+          {
+            label: "选择牛奶",
+            options: [["milk"], ["oat milk"], ["almond milk"], ["soy milk"]],
+          },
+        ],
+      },
+      {
+        speaker: "Barista",
+        prompt: "That'll be five dollars. How would you like to pay?",
+        promptZh: "一共五美元。你想怎么付款？",
+        sample: "I'll pay by card. Could I get it to go?",
+        sampleZh: "我刷卡。可以帮我做成外带吗？",
+        keywords: [
+          {
+            label: "付款方式",
+            options: [["card"], ["cash"], ["apple pay"], ["google pay"]],
+          },
+          {
+            label: "说明堂食或外带",
+            options: [["to go"], ["takeaway"], ["for here"], ["to stay"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "hotel",
+    title: "酒店入住",
+    titleEn: "Hotel Check-in",
+    category: "出行",
+    level: "入门",
+    summary: "办理入住、出示证件并询问酒店服务。",
+    turns: [
+      {
+        speaker: "Receptionist",
+        prompt: "Welcome! Do you have a reservation with us?",
+        promptZh: "欢迎！您有预订吗？",
+        sample: "Yes, I have a reservation under the name Li.",
+        sampleZh: "有，我用李这个名字预订了。",
+        keywords: [
+          {
+            label: "确认预订",
+            options: [["reservation"], ["booked"], ["booking"]],
+          },
+          {
+            label: "说明预订姓名",
+            options: [["under the name"], ["name is"], ["my name"]],
+          },
+        ],
+      },
+      {
+        speaker: "Receptionist",
+        prompt: "May I see your passport and a credit card, please?",
+        promptZh: "可以出示您的护照和一张信用卡吗？",
+        sample: "Of course. Here are my passport and credit card.",
+        sampleZh: "当然可以。这是我的护照和信用卡。",
+        keywords: [
+          {
+            label: "出示护照",
+            options: [["passport"], ["id"]],
+          },
+          {
+            label: "出示信用卡",
+            options: [["credit card"], ["card"]],
+          },
+          {
+            label: "礼貌回应",
+            options: [["of course"], ["sure"], ["here is"], ["here are"]],
+          },
+        ],
+      },
+      {
+        speaker: "Receptionist",
+        prompt: "Your room is ready. Is there anything else you need?",
+        promptZh: "您的房间准备好了。还需要其他帮助吗？",
+        sample: "Yes, what time is breakfast, and is Wi-Fi free?",
+        sampleZh: "有，早餐几点开始？Wi-Fi 免费吗？",
+        keywords: [
+          {
+            label: "询问酒店服务",
+            options: [
+              ["breakfast"],
+              ["wifi"],
+              ["gym"],
+              ["checkout"],
+              ["airport shuttle"],
+            ],
+          },
+          {
+            label: "礼貌提问",
+            options: [["what time"], ["is there"], ["could you tell me"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "interview",
+    title: "求职面试",
+    titleEn: "The Job Interview",
+    category: "职场",
+    level: "进阶",
+    summary: "介绍经历、回答追问并表达求职动机。",
+    turns: [
+      {
+        speaker: "Interviewer",
+        prompt: "Thanks for coming in. Could you tell me about yourself?",
+        promptZh: "感谢你来面试。可以先介绍一下自己吗？",
+        sample:
+          "I'm a product designer with three years of experience in mobile apps.",
+        sampleZh: "我是一名产品设计师，有三年移动应用经验。",
+        keywords: [
+          {
+            label: "说明职业",
+            options: [
+              ["designer"],
+              ["engineer"],
+              ["manager"],
+              ["developer"],
+              ["student"],
+            ],
+          },
+          {
+            label: "说明经验",
+            options: [["experience"], ["years"], ["worked"], ["project"]],
+          },
+        ],
+      },
+      {
+        speaker: "Interviewer",
+        prompt: "What experience makes you a good fit for this role?",
+        promptZh: "哪些经历让你适合这个岗位？",
+        sample:
+          "I led a project that improved user retention by twenty percent.",
+        sampleZh: "我曾负责一个项目，把用户留存率提高了百分之二十。",
+        keywords: [
+          {
+            label: "举出具体经历",
+            options: [["project"], ["led"], ["built"], ["launched"], ["managed"]],
+          },
+          {
+            label: "说明能力和结果",
+            options: [
+              ["improved"],
+              ["increased"],
+              ["reduced"],
+              ["result"],
+              ["skill"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Interviewer",
+        prompt: "Why do you want to join our company?",
+        promptZh: "你为什么想加入我们公司？",
+        sample:
+          "I admire your product, and I want to grow with a strong team.",
+        sampleZh: "我很欣赏贵公司的产品，也希望和优秀的团队一起成长。",
+        keywords: [
+          {
+            label: "表达对公司的兴趣",
+            options: [["product"], ["mission"], ["company"], ["team"]],
+          },
+          {
+            label: "说明个人动机",
+            options: [["grow"], ["learn"], ["contribute"], ["opportunity"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "directions",
+    title: "街头问路",
+    titleEn: "Asking for Directions",
+    category: "出行",
+    level: "入门",
+    summary: "询问目的地、交通方式并确认路线。",
+    turns: [
+      {
+        speaker: "Local",
+        prompt: "Hi, you look a little lost. Where are you trying to go?",
+        promptZh: "你好，你好像在找路。你想去哪里？",
+        sample: "I'm trying to find the train station.",
+        sampleZh: "我想去火车站。",
+        keywords: [
+          {
+            label: "说明目的地",
+            options: [
+              ["train station"],
+              ["museum"],
+              ["hotel"],
+              ["airport"],
+              ["city center"],
+            ],
+          },
+          {
+            label: "询问位置",
+            options: [["find"], ["get to"], ["where is"], ["looking for"]],
+          },
+        ],
+      },
+      {
+        speaker: "Local",
+        prompt: "Do you want to walk, or would you rather take the subway?",
+        promptZh: "你想走路，还是坐地铁？",
+        sample: "I'd rather take the subway if it's faster.",
+        sampleZh: "如果更快的话，我更想坐地铁。",
+        keywords: [
+          {
+            label: "选择交通方式",
+            options: [["walk"], ["subway"], ["bus"], ["taxi"]],
+          },
+          {
+            label: "比较时间",
+            options: [["faster"], ["quicker"], ["how long"], ["time"]],
+          },
+        ],
+      },
+      {
+        speaker: "Local",
+        prompt:
+          "Take the number two line and get off at Central Park. Got it?",
+        promptZh: "坐二号线，在中央公园下车。记住了吗？",
+        sample:
+          "Yes, take line two and get off at Central Park. Thank you!",
+        sampleZh: "好，坐二号线，在中央公园下车。谢谢！",
+        keywords: [
+          {
+            label: "复述路线",
+            options: [["line two"], ["number two"], ["central park"]],
+          },
+          {
+            label: "确认理解",
+            options: [["got it"], ["i see"], ["yes"], ["understand"]],
+          },
+          {
+            label: "表达感谢",
+            options: [["thank you"], ["thanks"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "doctor",
+    title: "医院看诊",
+    titleEn: "A Doctor's Visit",
+    category: "生活",
+    level: "进阶",
+    summary: "描述症状、说明持续时间并回答医生问题。",
+    turns: [
+      {
+        speaker: "Doctor",
+        prompt: "Come in and take a seat. What brings you in today?",
+        promptZh: "请进，坐吧。今天哪里不舒服？",
+        sample: "I have a bad headache and a sore throat.",
+        sampleZh: "我头很痛，嗓子也疼。",
+        keywords: [
+          {
+            label: "描述症状",
+            options: [
+              ["headache"],
+              ["sore throat"],
+              ["cough"],
+              ["fever"],
+              ["stomachache"],
+            ],
+          },
+          {
+            label: "说明严重程度",
+            options: [["bad"], ["terrible"], ["painful"], ["hurts"], ["mild"]],
+          },
+        ],
+      },
+      {
+        speaker: "Doctor",
+        prompt: "How long have you had these symptoms?",
+        promptZh: "这些症状持续多久了？",
+        sample: "I've had them since Monday, so about three days.",
+        sampleZh: "从周一开始的，大约三天了。",
+        keywords: [
+          {
+            label: "说明持续时间",
+            options: [["days"], ["weeks"], ["since"], ["yesterday"], ["last night"]],
+          },
+          {
+            label: "给出起始时间",
+            options: [["monday"], ["tuesday"], ["weekend"], ["three days"]],
+          },
+        ],
+      },
+      {
+        speaker: "Doctor",
+        prompt: "Are you allergic to any medicine, and are you taking anything?",
+        promptZh: "你对药物过敏吗？目前有在服药吗？",
+        sample: "I'm not allergic, and I'm only taking vitamins.",
+        sampleZh: "我没有过敏，只吃维生素。",
+        keywords: [
+          {
+            label: "说明过敏情况",
+            options: [["allergic"], ["no allergies"], ["not allergic"]],
+          },
+          {
+            label: "说明用药情况",
+            options: [["taking"], ["medicine"], ["medication"], ["vitamins"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "small-talk",
+    title: "朋友闲聊",
+    titleEn: "Catching Up",
+    category: "社交",
+    level: "入门",
+    summary: "问候近况、聊周末安排并自然约见。",
+    turns: [
+      {
+        speaker: "Friend",
+        prompt: "Hey! It's been a while. How have you been?",
+        promptZh: "嗨！好久不见，你最近怎么样？",
+        sample: "I've been good, just busy with work. How about you?",
+        sampleZh: "我挺好的，就是工作有点忙。你呢？",
+        keywords: [
+          {
+            label: "回应近况",
+            options: [["good"], ["not bad"], ["busy"], ["great"], ["okay"]],
+          },
+          {
+            label: "反问对方",
+            options: [["how about you"], ["what about you"], ["and you"]],
+          },
+        ],
+      },
+      {
+        speaker: "Friend",
+        prompt: "What did you get up to on the weekend?",
+        promptZh: "你周末做了什么？",
+        sample: "I went hiking with friends and watched a movie.",
+        sampleZh: "我和朋友去徒步了，还看了一部电影。",
+        keywords: [
+          {
+            label: "说明周末活动",
+            options: [
+              ["hiking"],
+              ["movie"],
+              ["shopping"],
+              ["visited"],
+              ["stayed home"],
+            ],
+          },
+          {
+            label: "补充同行或时间",
+            options: [["with friends"], ["family"], ["on saturday"], ["sunday"]],
+          },
+        ],
+      },
+      {
+        speaker: "Friend",
+        prompt: "We should grab coffee sometime. When are you free?",
+        promptZh: "我们找时间喝杯咖啡吧。你什么时候有空？",
+        sample: "I'm free on Friday afternoon. Does that work for you?",
+        sampleZh: "我周五下午有空。你方便吗？",
+        keywords: [
+          {
+            label: "提出时间",
+            options: [["friday"], ["weekend"], ["afternoon"], ["tomorrow"]],
+          },
+          {
+            label: "确认对方安排",
+            options: [["does that work"], ["works for you"], ["how about"], ["are you free"]],
+          },
+        ],
+      },
+    ],
+  },
+];
 const wordLookupCache = new Map();
 let activeWordButton = null;
 let wordLookupRequestId = 0;
@@ -34,6 +451,7 @@ const state = {
   meaningHides: new Set(),
   user: "",
   practiceActive: false,
+  practiceSection: "shadow",
   practiceIndex: 0,
   practiceRate: 0.9,
   practiceListening: false,
@@ -51,6 +469,12 @@ const state = {
   practiceApiModel: "",
   practiceApiKey: "",
   practiceApiAuth: "bearer",
+  dialogueScenarioId: DIALOGUE_SCENARIOS[0].id,
+  dialogueTurnIndex: 0,
+  dialogueInput: "",
+  dialogueHintVisible: false,
+  dialogueMessages: [],
+  dialogueResult: null,
 };
 
 const elements = {
@@ -87,6 +511,8 @@ const elements = {
   footerResource: document.querySelector("#footerResource"),
   practiceButton: document.querySelector("#practiceButton"),
   practiceStudio: document.querySelector("#practiceStudio"),
+  practiceShadowTab: document.querySelector("#practiceShadowTab"),
+  practiceDialogueTab: document.querySelector("#practiceDialogueTab"),
   practiceHeading: document.querySelector("#practiceHeading"),
   practiceSource: document.querySelector("#practiceSource"),
   practiceExitButton: document.querySelector("#practiceExitButton"),
@@ -114,6 +540,33 @@ const elements = {
     "#practicePreviousButton",
   ),
   practiceShuffleButton: document.querySelector("#practiceShuffleButton"),
+  shadowPracticeView: document.querySelector("#shadowPracticeView"),
+  dialoguePracticeView: document.querySelector("#dialoguePracticeView"),
+  dialogueScenarioMeta: document.querySelector("#dialogueScenarioMeta"),
+  dialogueScenarioList: document.querySelector("#dialogueScenarioList"),
+  dialoguePartnerLabel: document.querySelector("#dialoguePartnerLabel"),
+  dialogueScenarioTitle: document.querySelector("#dialogueScenarioTitle"),
+  dialogueTurnCounter: document.querySelector("#dialogueTurnCounter"),
+  dialogueMessages: document.querySelector("#dialogueMessages"),
+  dialogueAnswerInput: document.querySelector("#dialogueAnswerInput"),
+  dialogueListenButton: document.querySelector("#dialogueListenButton"),
+  dialogueHintButton: document.querySelector("#dialogueHintButton"),
+  dialogueRecordButton: document.querySelector("#dialogueRecordButton"),
+  dialogueStopButton: document.querySelector("#dialogueStopButton"),
+  dialogueSubmitButton: document.querySelector("#dialogueSubmitButton"),
+  dialogueHint: document.querySelector("#dialogueHint"),
+  dialogueNotice: document.querySelector("#dialogueNotice"),
+  dialogueResult: document.querySelector("#dialogueResult"),
+  dialogueScore: document.querySelector("#dialogueScore"),
+  dialogueFeedback: document.querySelector("#dialogueFeedback"),
+  dialogueKeyPoints: document.querySelector("#dialogueKeyPoints"),
+  dialogueCoachLevel: document.querySelector("#dialogueCoachLevel"),
+  dialogueCoachMessage: document.querySelector("#dialogueCoachMessage"),
+  dialogueCoachTips: document.querySelector("#dialogueCoachTips"),
+  dialogueCoachTask: document.querySelector("#dialogueCoachTask"),
+  dialogueSampleAnswer: document.querySelector("#dialogueSampleAnswer"),
+  dialogueRetryButton: document.querySelector("#dialogueRetryButton"),
+  dialogueNextButton: document.querySelector("#dialogueNextButton"),
   practiceClearButton: document.querySelector("#practiceClearButton"),
   practiceModeStatus: document.querySelector("#practiceModeStatus"),
   practiceMode: document.querySelector("#practiceMode"),
@@ -792,6 +1245,627 @@ function resetPracticeAttempt() {
   }
 }
 
+function getCurrentDialogueScenario() {
+  const scenario =
+    DIALOGUE_SCENARIOS.find(
+      (item) => item.id === state.dialogueScenarioId,
+    ) || DIALOGUE_SCENARIOS[0];
+
+  if (scenario && scenario.id !== state.dialogueScenarioId) {
+    state.dialogueScenarioId = scenario.id;
+  }
+  return scenario || null;
+}
+
+function getCurrentDialogueTurn() {
+  const scenario = getCurrentDialogueScenario();
+  if (!scenario?.turns?.length) {
+    state.dialogueTurnIndex = 0;
+    return null;
+  }
+
+  if (
+    state.dialogueTurnIndex < 0 ||
+    state.dialogueTurnIndex >= scenario.turns.length
+  ) {
+    state.dialogueTurnIndex = 0;
+  }
+  return scenario.turns[state.dialogueTurnIndex];
+}
+
+function clearDialogueAttempt({ keepMessages = false } = {}) {
+  cancelPracticeRecognition();
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.dialogueInput = "";
+  state.dialogueHintVisible = false;
+  state.dialogueResult = null;
+  if (!keepMessages) {
+    state.dialogueMessages = [];
+  }
+  state.practiceStatusText =
+    state.practiceRecognitionMode === "off"
+      ? "已关闭"
+      : "准备开始";
+}
+
+function selectDialogueScenario(scenarioId) {
+  const scenario = DIALOGUE_SCENARIOS.find(
+    (item) => item.id === scenarioId,
+  );
+  if (!scenario) {
+    return;
+  }
+
+  state.dialogueScenarioId = scenario.id;
+  state.dialogueTurnIndex = 0;
+  clearDialogueAttempt();
+  renderPracticeView();
+}
+
+function normalizeDialogueText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[’]/g, "'")
+    .replace(/[^a-z0-9']+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dialogueTextIncludes(text, phrase) {
+  const normalizedText = ` ${normalizeDialogueText(text)} `;
+  const normalizedPhrase = normalizeDialogueText(phrase);
+  return Boolean(
+    normalizedPhrase && normalizedText.includes(` ${normalizedPhrase} `),
+  );
+}
+
+function getDialogueTranscriptMeta(transcript) {
+  const normalizedText = normalizeDialogueText(transcript);
+  return {
+    wordCount: normalizedText ? normalizedText.split(" ").length : 0,
+    hasChinese: /[\u3400-\u9fff]/.test(String(transcript || "")),
+  };
+}
+
+function scoreDialogueAnswer(turn, transcript) {
+  const groups = (turn?.keywords || []).map((group) => {
+    const options = (group.options || []).map((option) =>
+      Array.isArray(option) ? option[0] : option,
+    );
+    const matchedOption = options.find((option) =>
+      dialogueTextIncludes(transcript, option),
+    );
+    return {
+      label: group.label,
+      covered: Boolean(matchedOption),
+      matchedOption: matchedOption || "",
+    };
+  });
+  const coveredCount = groups.filter((group) => group.covered).length;
+  const score = groups.length
+    ? Math.round((coveredCount / groups.length) * 100)
+    : 0;
+
+  return {
+    score,
+    groups,
+    ...getDialogueTranscriptMeta(transcript),
+  };
+}
+
+function getDialogueFeedback(score) {
+  if (score >= 100) {
+    return "这一轮已经可以直接用于真实交流。";
+  }
+  if (score >= 70) {
+    return "整体表达很稳，再连起来说一遍会更自然。";
+  }
+  if (score >= 40) {
+    return "已经开口表达，先补充一个重点再继续。";
+  }
+  return "先跟着参考表达说一遍，再用自己的话回答。";
+}
+
+function getDialogueCoachAdvice(turn, result) {
+  const coveredGroups = result.groups.filter((group) => group.covered);
+  const missingGroups = result.groups.filter((group) => !group.covered);
+  const coveredLabels = coveredGroups
+    .slice(0, 2)
+    .map((group) => `“${group.label}”`)
+    .join("、");
+  let message;
+
+  if (result.hasChinese && coveredGroups.length === 0) {
+    message =
+      "你先把意思表达出来了，接下来把这句话换成简单英文就好。";
+  } else if (result.hasChinese) {
+    message = `你已经表达出${coveredLabels}，再用英文补完整会更自然。`;
+  } else if (result.score >= 100) {
+    message = "关键信息都说到了，这一轮回答很完整。";
+  } else if (coveredGroups.length > 0) {
+    message = `你已经表达了${coveredLabels}，回答方向是对的。`;
+  } else {
+    message = "先抓住一个最关键的信息，不用一次说到完美。";
+  }
+
+  const tips = [];
+  if (result.wordCount > 0 && result.wordCount <= 3) {
+    tips.push("把单词扩展成一句完整回答。");
+  }
+  missingGroups.forEach((group) => {
+    if (tips.length < 2) {
+      tips.push(`补充“${group.label}”相关信息。`);
+    }
+  });
+  if (tips.length === 0) {
+    tips.push(
+      result.score >= 100
+        ? "换一种说法再说一次，练习自然表达。"
+        : "用一整句话把现有信息连起来。",
+    );
+  }
+
+  let task;
+  if (result.hasChinese) {
+    task = "先跟读参考表达，再用英文说一遍。";
+  } else if (missingGroups.length > 0) {
+    task = `再回答一次，只补上${missingGroups
+      .slice(0, 2)
+      .map((group) => `“${group.label}”`)
+      .join("和")}。`;
+  } else if (turn?.level === "进阶") {
+    task = "遮住参考表达，换一种说法再回答一次。";
+  } else {
+    task = "遮住参考表达，用自己的话再回答一次。";
+  }
+
+  return {
+    levelLabel: turn?.level || "基础",
+    message,
+    tips: tips.slice(0, 2),
+    task,
+  };
+}
+
+function renderDialogueScenarioList() {
+  const activeScenario = getCurrentDialogueScenario();
+  const fragment = document.createDocumentFragment();
+
+  DIALOGUE_SCENARIOS.forEach((scenario) => {
+    const button = document.createElement("button");
+    const isActive = scenario.id === activeScenario?.id;
+    button.type = "button";
+    button.className = "dialogue-scenario-button";
+    button.classList.toggle("is-active", isActive);
+    button.dataset.scenarioId = scenario.id;
+    button.setAttribute("aria-pressed", String(isActive));
+
+    const meta = document.createElement("span");
+    meta.className = "dialogue-scenario-button-meta";
+    meta.textContent = `${scenario.category} · ${scenario.level}`;
+
+    const title = document.createElement("strong");
+    title.textContent = scenario.title;
+
+    const summary = document.createElement("span");
+    summary.className = "dialogue-scenario-button-summary";
+    summary.textContent = scenario.summary;
+
+    button.append(meta, title, summary);
+    button.addEventListener("click", () => {
+      selectDialogueScenario(scenario.id);
+    });
+    fragment.append(button);
+  });
+
+  elements.dialogueScenarioList.replaceChildren(fragment);
+}
+
+function createDialogueMessage(role, label, english, chinese = "") {
+  const message = document.createElement("div");
+  message.className = `dialogue-message is-${role}`;
+
+  const meta = document.createElement("span");
+  meta.className = "dialogue-message-meta";
+  meta.textContent = label;
+
+  const englishText = document.createElement("p");
+  englishText.className = "dialogue-message-en";
+  englishText.lang = "en";
+  englishText.textContent = english;
+
+  message.append(meta, englishText);
+  if (chinese) {
+    const chineseText = document.createElement("p");
+    chineseText.className = "dialogue-message-zh";
+    chineseText.textContent = chinese;
+    message.append(chineseText);
+  }
+  return message;
+}
+
+function renderDialogueMessages() {
+  const scenario = getCurrentDialogueScenario();
+  const currentTurn = getCurrentDialogueTurn();
+  if (!scenario || !currentTurn) {
+    elements.dialogueMessages.replaceChildren();
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const liveTranscript =
+    state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+
+  scenario.turns.forEach((turn, index) => {
+    if (index > state.dialogueTurnIndex) {
+      return;
+    }
+
+    fragment.append(
+      createDialogueMessage(
+        "partner",
+        `${turn.speaker} · 第 ${index + 1} 轮`,
+        turn.prompt,
+        turn.promptZh,
+      ),
+    );
+
+    const answer =
+      index === state.dialogueTurnIndex
+        ? liveTranscript || state.dialogueMessages[index]
+        : state.dialogueMessages[index];
+    if (answer) {
+      fragment.append(
+        createDialogueMessage("user", "你的回答", answer),
+      );
+    }
+  });
+
+  elements.dialogueMessages.replaceChildren(fragment);
+}
+
+function renderDialogueHint() {
+  const turn = getCurrentDialogueTurn();
+  if (!turn || !state.dialogueHintVisible) {
+    elements.dialogueHint.hidden = true;
+    elements.dialogueHint.replaceChildren();
+    elements.dialogueHintButton.textContent = "参考表达";
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "practice-block-label";
+  label.textContent = "参考表达";
+
+  const sample = document.createElement("p");
+  sample.className = "dialogue-hint-sample";
+  sample.lang = "en";
+  sample.textContent = turn.sample;
+
+  const translation = document.createElement("p");
+  translation.className = "dialogue-hint-translation";
+  translation.textContent = turn.sampleZh;
+
+  elements.dialogueHint.replaceChildren(label, sample, translation);
+  elements.dialogueHint.hidden = false;
+  elements.dialogueHintButton.textContent = "收起提示";
+}
+
+function renderDialogueKeyPoints(result) {
+  const fragment = document.createDocumentFragment();
+  result.groups.forEach((group) => {
+    const item = document.createElement("span");
+    item.className = "dialogue-key-point";
+    item.classList.toggle("is-covered", group.covered);
+    item.textContent = group.covered
+      ? `${group.label}：已覆盖`
+      : `${group.label}：待补充`;
+    fragment.append(item);
+  });
+  elements.dialogueKeyPoints.replaceChildren(fragment);
+}
+
+function renderDialogueCoach(turn, result) {
+  const advice = getDialogueCoachAdvice(turn, result);
+  const fragment = document.createDocumentFragment();
+
+  elements.dialogueCoachLevel.textContent = advice.levelLabel;
+  elements.dialogueCoachMessage.textContent = advice.message;
+  advice.tips.forEach((tip) => {
+    const item = document.createElement("li");
+    item.textContent = tip;
+    fragment.append(item);
+  });
+  elements.dialogueCoachTips.replaceChildren(fragment);
+  elements.dialogueCoachTask.textContent = advice.task;
+}
+
+function renderDialogueView() {
+  const scenario = getCurrentDialogueScenario();
+  const turn = getCurrentDialogueTurn();
+  const availability = getPracticeModeAvailability();
+  const isDialogue = state.practiceSection === "dialogue";
+
+  elements.practiceShadowTab.classList.toggle(
+    "is-active",
+    !isDialogue,
+  );
+  elements.practiceDialogueTab.classList.toggle(
+    "is-active",
+    isDialogue,
+  );
+  elements.practiceShadowTab.setAttribute(
+    "aria-pressed",
+    String(!isDialogue),
+  );
+  elements.practiceDialogueTab.setAttribute(
+    "aria-pressed",
+    String(isDialogue),
+  );
+  elements.shadowPracticeView.hidden = isDialogue;
+  elements.dialoguePracticeView.hidden = !isDialogue;
+
+  if (!scenario || !turn) {
+    return;
+  }
+
+  elements.dialogueScenarioMeta.textContent =
+    `${scenario.category} · ${scenario.level} · ${scenario.turns.length} 轮`;
+  elements.dialoguePartnerLabel.textContent = `${turn.speaker} 说`;
+  elements.dialogueScenarioTitle.textContent =
+    `${scenario.title} · ${scenario.titleEn}`;
+  elements.dialogueTurnCounter.textContent =
+    `第 ${state.dialogueTurnIndex + 1} / ${scenario.turns.length} 轮`;
+
+  renderDialogueScenarioList();
+  renderDialogueMessages();
+  renderDialogueHint();
+
+  const liveTranscript =
+    state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+  elements.dialogueAnswerInput.value =
+    liveTranscript || state.dialogueInput;
+  elements.dialogueAnswerInput.disabled =
+    state.practiceListening || state.practiceTranscribing;
+
+  elements.dialogueListenButton.disabled =
+    !("speechSynthesis" in window);
+  elements.dialogueHintButton.disabled =
+    state.practiceListening || state.practiceTranscribing;
+  elements.dialogueRecordButton.disabled =
+    !availability.available ||
+    state.practiceListening ||
+    state.practiceTranscribing;
+  elements.dialogueRecordButton.textContent =
+    state.practiceTranscribing
+      ? "正在转写"
+      : state.practiceRecognitionMode === "api"
+        ? "开始录音"
+        : "开口回答";
+  elements.dialogueRecordButton.hidden = state.practiceListening;
+  elements.dialogueStopButton.hidden = !state.practiceListening;
+  elements.dialogueStopButton.disabled = !state.practiceListening;
+  elements.dialogueSubmitButton.disabled =
+    !elements.dialogueAnswerInput.value.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    Boolean(state.dialogueResult);
+  elements.dialogueNextButton.disabled =
+    state.practiceListening || state.practiceTranscribing;
+  elements.dialogueNextButton.textContent =
+    state.dialogueTurnIndex === scenario.turns.length - 1
+      ? "再练一遍"
+      : "下一轮";
+
+  elements.dialogueNotice.hidden = !state.practiceMessage;
+  elements.dialogueNotice.textContent = state.practiceMessage;
+  elements.dialogueNotice.classList.toggle(
+    "is-error",
+    state.practiceMessageType === "error",
+  );
+
+  const result = state.dialogueResult;
+  const showResult = Boolean(
+    result &&
+      result.scenarioId === scenario.id &&
+      result.turnIndex === state.dialogueTurnIndex,
+  );
+  elements.dialogueResult.hidden = !showResult;
+  if (showResult) {
+    elements.dialogueScore.textContent = `${result.score}%`;
+    elements.dialogueFeedback.textContent = getDialogueFeedback(
+      result.score,
+    );
+    renderDialogueKeyPoints(result);
+    renderDialogueCoach(turn, result);
+    elements.dialogueSampleAnswer.textContent = turn.sample;
+  }
+}
+
+function setPracticeSection(section) {
+  const nextSection = section === "dialogue" ? "dialogue" : "shadow";
+  if (state.practiceSection === nextSection) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  state.practiceSection = nextSection;
+  if (nextSection === "dialogue") {
+    clearDialogueAttempt();
+  } else {
+    resetPracticeAttempt();
+  }
+  render();
+}
+
+function playDialoguePrompt() {
+  const turn = getCurrentDialogueTurn();
+  if (!turn) {
+    return;
+  }
+
+  if (!speak(turn.prompt, 0.9)) {
+    state.practiceMessage =
+      "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    renderDialogueView();
+    return;
+  }
+
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  renderDialogueView();
+}
+
+function toggleDialogueHint() {
+  state.dialogueHintVisible = !state.dialogueHintVisible;
+  renderDialogueView();
+}
+
+function addDialogueHistory(scenario, turnIndex, transcript, score) {
+  state.practiceHistory.unshift({
+    itemKey: `dialogue:${scenario.id}:${turnIndex}`,
+    resourceTitle: scenario.title,
+    target: `${scenario.title} · 第 ${turnIndex + 1} 轮`,
+    transcript,
+    accuracy: score,
+    createdAt: new Date().toISOString(),
+  });
+  state.practiceHistory = state.practiceHistory.slice(0, 80);
+  persistPracticeHistory();
+}
+
+function submitDialogueAnswer(providedTranscript = "") {
+  const scenario = getCurrentDialogueScenario();
+  const turn = getCurrentDialogueTurn();
+  if (
+    !scenario ||
+    !turn ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.dialogueResult
+  ) {
+    return;
+  }
+
+  const transcript = String(
+    providedTranscript || elements.dialogueAnswerInput.value,
+  ).trim();
+  if (!transcript) {
+    state.practiceMessage = "请先说出或输入一个英文回答。";
+    state.practiceMessageType = "error";
+    renderDialogueView();
+    return;
+  }
+
+  const result = scoreDialogueAnswer(turn, transcript);
+  state.dialogueInput = transcript;
+  state.dialogueMessages[state.dialogueTurnIndex] = transcript;
+  state.dialogueHintVisible = false;
+  state.dialogueResult = {
+    ...result,
+    scenarioId: scenario.id,
+    turnIndex: state.dialogueTurnIndex,
+  };
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  addDialogueHistory(
+    scenario,
+    state.dialogueTurnIndex,
+    transcript,
+    result.score,
+  );
+  renderPracticeView();
+  updateProgress();
+}
+
+function finalizeDialogueAttempt(transcript) {
+  submitDialogueAnswer(transcript);
+}
+
+function startDialogueRecording() {
+  if (state.practiceListening || state.practiceTranscribing) {
+    return;
+  }
+
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.practiceMessage = availability.message;
+    state.practiceMessageType =
+      state.practiceRecognitionMode === "off" ? "info" : "error";
+    renderDialogueView();
+    return;
+  }
+
+  state.dialogueInput = "";
+  state.dialogueResult = null;
+  state.dialogueHintVisible = false;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording({
+      onTranscript: finalizeDialogueAttempt,
+      requireEntry: false,
+    });
+    return;
+  }
+
+  startBrowserPracticeRecording({
+    onTranscript: finalizeDialogueAttempt,
+    requireEntry: false,
+  });
+}
+
+function stopDialogueRecording() {
+  stopPracticeRecording();
+}
+
+function retryDialogueTurn() {
+  const turn = getCurrentDialogueTurn();
+  if (!turn) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  state.dialogueInput = "";
+  state.dialogueMessages[state.dialogueTurnIndex] = "";
+  state.dialogueHintVisible = false;
+  state.dialogueResult = null;
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  renderDialogueView();
+}
+
+function moveDialogueTurn() {
+  const scenario = getCurrentDialogueScenario();
+  if (!scenario || state.practiceListening || state.practiceTranscribing) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if (state.dialogueTurnIndex < scenario.turns.length - 1) {
+    state.dialogueTurnIndex += 1;
+    clearDialogueAttempt({ keepMessages: true });
+  } else {
+    state.dialogueTurnIndex = 0;
+    clearDialogueAttempt();
+  }
+  renderPracticeView();
+}
+
 function renderPracticeDiff(result) {
   const fragment = document.createDocumentFragment();
 
@@ -885,6 +1959,8 @@ function renderPracticeStats() {
 function renderPracticeView() {
   const entries = getPracticeEntries();
   const entry = getCurrentPracticeEntry();
+  const dialogueScenario = getCurrentDialogueScenario();
+  const isDialogue = state.practiceSection === "dialogue";
   const hasEntry = Boolean(entry);
   const target = hasEntry ? getPracticeTarget(entry) : "";
   const availability = getPracticeModeAvailability();
@@ -895,9 +1971,13 @@ function renderPracticeView() {
   elements.practiceCounter.textContent = hasEntry
     ? `${state.practiceIndex + 1} / ${entries.length}`
     : "0 / 0";
-  elements.practiceSource.textContent = hasEntry
-    ? `${entry.resource.category} · ${entry.resource.title} · ${entry.item.phrase}`
-    : "当前视图没有可练习的句子";
+  elements.practiceSource.textContent = isDialogue
+    ? dialogueScenario
+      ? `${dialogueScenario.category} · ${dialogueScenario.title} · ${dialogueScenario.turns.length} 轮情景对话`
+      : "情景对话加载失败"
+    : hasEntry
+      ? `${entry.resource.category} · ${entry.resource.title} · ${entry.item.phrase}`
+      : "当前视图没有可练习的句子";
   elements.practiceStatus.textContent = state.practiceStatusText;
   elements.practiceTarget.replaceChildren(
     createSentenceText(target || "暂无可练习句子"),
@@ -976,6 +2056,7 @@ function renderPracticeView() {
     renderPracticeDiff(result);
   }
 
+  renderDialogueView();
   renderPracticeStats();
 }
 
@@ -1043,6 +2124,9 @@ function openPractice(targetKey = "") {
       )
     : -1;
 
+  if (targetKey) {
+    state.practiceSection = "shadow";
+  }
   state.practiceActive = true;
   if (targetIndex >= 0) {
     state.practiceIndex = targetIndex;
@@ -1053,7 +2137,11 @@ function openPractice(targetKey = "") {
     state.practiceIndex = 0;
   }
 
-  resetPracticeAttempt();
+  if (state.practiceSection === "dialogue") {
+    clearDialogueAttempt();
+  } else {
+    resetPracticeAttempt();
+  }
   syncPracticeSettingsForm();
   if (entries.length === 0) {
     state.practiceMessage = "当前视图没有可练习的句子，请先选择其他素材。";
@@ -1192,7 +2280,10 @@ function buildPracticeApiHeaders() {
   return headers;
 }
 
-async function transcribePracticeAudio(audioBlob) {
+async function transcribePracticeAudio(
+  audioBlob,
+  onTranscript = finalizePracticeAttempt,
+) {
   const controller = new AbortController();
   practiceApiAbortController = controller;
   state.practiceTranscribing = true;
@@ -1249,7 +2340,7 @@ async function transcribePracticeAudio(audioBlob) {
 
     state.practiceTranscribing = false;
     practiceApiAbortController = null;
-    finalizePracticeAttempt(transcript);
+    onTranscript(transcript);
   } catch (error) {
     if (controller.signal.aborted) {
       return;
@@ -1266,7 +2357,10 @@ async function transcribePracticeAudio(audioBlob) {
   }
 }
 
-async function startApiPracticeRecording() {
+async function startApiPracticeRecording({
+  onTranscript = finalizePracticeAttempt,
+  requireEntry = true,
+} = {}) {
   const availability = getPracticeModeAvailability();
   if (!availability.available) {
     state.practiceMessage = availability.message;
@@ -1276,8 +2370,8 @@ async function startApiPracticeRecording() {
     return;
   }
 
-  const entry = getCurrentPracticeEntry();
-  if (!entry) {
+  const entry = requireEntry ? getCurrentPracticeEntry() : null;
+  if (requireEntry && !entry) {
     state.practiceMessage = "当前没有可跟读的句子。";
     state.practiceMessageType = "error";
     renderPracticeView();
@@ -1369,7 +2463,7 @@ async function startApiPracticeRecording() {
         return;
       }
 
-      transcribePracticeAudio(audioBlob);
+      transcribePracticeAudio(audioBlob, onTranscript);
     };
 
     recorder.start();
@@ -1445,13 +2539,16 @@ function stopPracticeRecording() {
   }
 }
 
-function startBrowserPracticeRecording() {
+function startBrowserPracticeRecording({
+  onTranscript = finalizePracticeAttempt,
+  requireEntry = true,
+} = {}) {
   if (state.practiceListening) {
     return;
   }
 
   const Recognition = getSpeechRecognitionConstructor();
-  const entry = getCurrentPracticeEntry();
+  const entry = requireEntry ? getCurrentPracticeEntry() : null;
   if (!Recognition) {
     state.practiceMessage =
       "当前浏览器不支持语音识别，请使用最新版 Chrome 或 Edge。";
@@ -1460,7 +2557,7 @@ function startBrowserPracticeRecording() {
     renderPracticeView();
     return;
   }
-  if (!entry) {
+  if (requireEntry && !entry) {
     state.practiceMessage = "当前没有可跟读的句子。";
     state.practiceMessageType = "error";
     renderPracticeView();
@@ -1544,7 +2641,7 @@ function startBrowserPracticeRecording() {
       `${state.practiceFinalTranscript} ${state.practiceInterimTranscript}`.trim();
 
     if (transcript) {
-      finalizePracticeAttempt(transcript);
+      onTranscript(transcript);
       return;
     }
 
@@ -2324,16 +3421,26 @@ function render() {
 
   if (state.practiceActive) {
     const practiceEntries = getPracticeEntries();
+    const dialogueScenario = getCurrentDialogueScenario();
+    const isDialogue = state.practiceSection === "dialogue";
     elements.vocabularyToolbar.hidden = true;
     elements.practiceStudio.hidden = false;
     elements.cardGrid.hidden = true;
     elements.emptyState.hidden = true;
-    elements.activeTitle.textContent = "口语跟读";
-    elements.activeDescription.textContent = practiceEntries.length
-      ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
-      : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
-    elements.footerResource.textContent =
-      `口语练习 · ${practiceEntries.length} 句`;
+    elements.practiceHeading.textContent = isDialogue
+      ? "情景对话"
+      : "口语跟读";
+    elements.activeTitle.textContent = isDialogue
+      ? "情景对话"
+      : "口语跟读";
+    elements.activeDescription.textContent = isDialogue
+      ? "选择生活场景，按自己的表达完成多轮英文对话。"
+      : practiceEntries.length
+        ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
+        : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
+    elements.footerResource.textContent = isDialogue
+      ? `情景对话 · ${dialogueScenario?.turns.length || 0} 轮`
+      : `口语跟读 · ${practiceEntries.length} 句`;
     renderResourceList();
     updateProgress();
     updateViewSwitcher();
@@ -2552,6 +3659,12 @@ elements.practiceButton.addEventListener("click", () => {
   openPractice();
 });
 elements.practiceExitButton.addEventListener("click", closePractice);
+elements.practiceShadowTab.addEventListener("click", () => {
+  setPracticeSection("shadow");
+});
+elements.practiceDialogueTab.addEventListener("click", () => {
+  setPracticeSection("dialogue");
+});
 elements.practiceListenButton.addEventListener("click", playPracticeTarget);
 elements.practiceRecordButton.addEventListener(
   "click",
@@ -2572,6 +3685,56 @@ elements.practicePreviousButton.addEventListener("click", () => {
   movePractice(-1);
 });
 elements.practiceShuffleButton.addEventListener("click", shufflePractice);
+elements.dialogueListenButton.addEventListener(
+  "click",
+  playDialoguePrompt,
+);
+elements.dialogueHintButton.addEventListener(
+  "click",
+  toggleDialogueHint,
+);
+elements.dialogueRecordButton.addEventListener(
+  "click",
+  startDialogueRecording,
+);
+elements.dialogueStopButton.addEventListener(
+  "click",
+  stopDialogueRecording,
+);
+elements.dialogueSubmitButton.addEventListener("click", () => {
+  submitDialogueAnswer();
+});
+elements.dialogueRetryButton.addEventListener(
+  "click",
+  retryDialogueTurn,
+);
+elements.dialogueNextButton.addEventListener(
+  "click",
+  moveDialogueTurn,
+);
+elements.dialogueAnswerInput.addEventListener("input", (event) => {
+  if (state.dialogueResult) {
+    state.dialogueResult = null;
+    elements.dialogueResult.hidden = true;
+    state.dialogueMessages[state.dialogueTurnIndex] = "";
+  }
+  state.dialogueInput = event.target.value;
+  elements.dialogueSubmitButton.disabled =
+    !state.dialogueInput.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    Boolean(state.dialogueResult);
+});
+elements.dialogueAnswerInput.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Enter" &&
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey
+  ) {
+    event.preventDefault();
+    submitDialogueAnswer();
+  }
+});
 elements.practiceClearButton.addEventListener("click", () => {
   if (
     state.practiceHistory.length > 0 &&
