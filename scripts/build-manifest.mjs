@@ -15,11 +15,14 @@ const staticEntries = [
   "styles.css",
   "materials",
 ];
-const categoryOrder = ["四级", "六级", "考研", "电影", "其他"];
+const categoryOrder = ["0基础", "四级", "六级", "考研", "电影", "其他"];
 const supportedExtensions = new Map([
   [".csv", "anki-csv"],
   [".md", "markdown-table"],
+  [".html", "html-page"],
+  [".docx", "download-only"],
 ]);
+const attachmentExtensions = new Set([".html", ".docx"]);
 
 function toPosixPath(value) {
   return value.split(path.sep).join("/");
@@ -28,7 +31,7 @@ function toPosixPath(value) {
 function cleanTitle(value) {
   return value
     .replace(/^\d{4}-\d{2}-\d{2}[-_\s]+/, "")
-    .replace(/[-_]+/g, " ")
+    .replace(/_+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -172,6 +175,7 @@ function buildResource(absolutePath) {
     description: [category, section, fileTitle].filter(Boolean).join(" · "),
     file: `./materials/${encodeAssetPath(relativePath)}`,
     format: supportedExtensions.get(extension),
+    attachment: attachmentExtensions.has(extension),
   };
 }
 

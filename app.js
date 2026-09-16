@@ -7,7 +7,13 @@ const PRACTICE_HISTORY_STORAGE_KEY =
   "iball-listening-cabin-speaking-history";
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
-const CATEGORY_ORDER = ["四级", "六级", "考研", "电影", "其他"];
+const REVIEW_PROGRESS_STORAGE_KEY = "iball-listening-cabin-review-v1";
+const REVIEW_DAILY_STORAGE_KEY = "iball-listening-cabin-review-daily-v1";
+const REVIEW_DAY_MS = 24 * 60 * 60 * 1000;
+const REVIEW_LEARNING_STEPS_MS = [60 * 1000, 10 * 60 * 1000];
+const REVIEW_MAX_INTERVAL_DAYS = 365;
+const REVIEW_GRADES = ["again", "hard", "good", "easy"];
+const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
 const AMERICAN_VOICE_NAMES = {
   female: [
     "aria",
@@ -57,6 +63,10 @@ const FREE_CHAT_COACH_PROFILE = {
   pitch: 1,
   rateScale: 0.96,
 };
+const REALTIME_SILENCE_MS = 1000;
+const REALTIME_RESTART_DELAY_MS = 260;
+const REALTIME_SPEECH_TAIL_MS = 420;
+const REALTIME_MAX_RESTARTS = 8;
 const FREE_CHAT_TOPICS = {
   daily: {
     label: "日常交流",
@@ -191,6 +201,224 @@ const FREE_CHAT_TOPICS = {
     ],
   },
 };
+const FREE_CHAT_OPENERS = [
+  { english: "That makes sense.", chinese: "这说得通。" },
+  { english: "I can picture that.", chinese: "我能想象出那个画面。" },
+  { english: "Nice, that's a good detail.", chinese: "不错，这个细节很好。" },
+  { english: "Got it.", chinese: "明白了。" },
+  { english: "I see what you mean.", chinese: "我明白你的意思。" },
+  { english: "That sounds familiar.", chinese: "这听起来很熟悉。" },
+  { english: "Fair enough.", chinese: "有道理。" },
+  { english: "Okay, good to know.", chinese: "好，知道了。" },
+];
+const FREE_CHAT_KEYWORD_REACTIONS = [
+  {
+    pattern:
+      /\b(work|job|office|career|meeting|project|boss|colleague|company)\b/i,
+    english: "Work can eat up a lot of energy.",
+    chinese: "工作确实很消耗精力。",
+    question: "What part of your work do you enjoy the most?",
+    questionZh: "工作中你最享受的部分是什么？",
+  },
+  {
+    pattern:
+      /\b(study|studying|exam|test|school|university|class|homework|ielts|english)\b/i,
+    english: "Learning something new always takes patience.",
+    chinese: "学新东西总是需要耐心。",
+    question: "What is the hardest part for you right now?",
+    questionZh: "现在对你来说最难的部分是什么？",
+  },
+  {
+    pattern:
+      /\b(travel|trip|city|flight|hotel|holiday|vacation|visit|abroad)\b/i,
+    english: "Travel usually leaves you with a few strong memories.",
+    chinese: "旅行常常会留下几个很深的记忆。",
+    question: "What would you like to do there next time?",
+    questionZh: "下次去那里你想做什么？",
+  },
+  {
+    pattern:
+      /\b(food|eat|eating|cook|cooking|restaurant|dinner|lunch|breakfast|coffee|tea)\b/i,
+    english: "Food is such a big part of daily life.",
+    chinese: "吃确实是日常生活里很重要的一部分。",
+    question: "Do you cook it yourself, or do you usually eat out?",
+    questionZh: "你是自己做饭，还是通常在外面吃？",
+  },
+  {
+    pattern:
+      /\b(family|mother|father|mom|dad|parents|brother|sister|son|daughter|child|children|kid)\b/i,
+    english: "Family things tend to stay with us.",
+    chinese: "家里的事往往最让人记挂。",
+    question: "How often do you get to spend time together?",
+    questionZh: "你们多久能一起待一会儿？",
+  },
+  {
+    pattern:
+      /\b(run|running|gym|sport|exercise|walk|walking|swim|basketball|football|yoga|health|sleep)\b/i,
+    english: "Keeping that habit going is the hard part.",
+    chinese: "能坚持这个习惯才是最难的。",
+    question: "How did you get started with it?",
+    questionZh: "你最初是怎么开始的？",
+  },
+  {
+    pattern:
+      /\b(phone|app|computer|laptop|ai|internet|online|software|video|game|social media)\b/i,
+    english: "Technology changes how we spend our time.",
+    chinese: "科技会改变我们花时间的方式。",
+    question: "Could you live without it for a week?",
+    questionZh: "你能一周不用它吗？",
+  },
+  {
+    pattern:
+      /\b(happy|glad|excited|tired|stressed|worried|nervous|proud|angry|sad|relaxed|busy)\b/i,
+    english: "It sounds like that really shaped your day.",
+    chinese: "听起来那件事真的影响了你的这一天。",
+    question: "What helped you deal with it?",
+    questionZh: "后来是什么帮你应对的？",
+  },
+  {
+    pattern: /\b(music|song|movie|film|book|reading|series|show|concert)\b/i,
+    english: "That is a good way to switch off.",
+    chinese: "这是放松的好方式。",
+    question: "What do you like most about it?",
+    questionZh: "你最喜欢它的哪一点？",
+  },
+  {
+    pattern: /\b(weather|rain|sunny|cold|hot|town|park|street|neighbour|neighbor)\b/i,
+    english: "Places and weather shape the mood of a day.",
+    chinese: "地方和天气会影响一天的心情。",
+    question: "Is that typical for where you live?",
+    questionZh: "在你住的地方这算典型情况吗？",
+  },
+];
+const FREE_CHAT_TOPIC_FOLLOW_UPS = {
+  daily: [
+    {
+      english: "What does a normal day look like for you?",
+      chinese: "你平常的一天是怎样的？",
+    },
+    {
+      english: "Is there anything you would like to change about your routine?",
+      chinese: "你的日常安排里有什么想改变的吗？",
+    },
+    {
+      english: "How do you usually relax after a busy day?",
+      chinese: "忙完一天你通常怎么放松？",
+    },
+    {
+      english: "Has anything about your daily habits changed recently?",
+      chinese: "最近你的日常习惯有什么变化吗？",
+    },
+  ],
+  study: [
+    {
+      english: "Which part of your studies takes the most effort?",
+      chinese: "学习中哪一部分最费力气？",
+    },
+    {
+      english: "How do you usually prepare for a big exam?",
+      chinese: "大考前你通常怎么准备？",
+    },
+    {
+      english: "Is there a method that works better for you than others?",
+      chinese: "有哪种方法对你特别有效？",
+    },
+    {
+      english: "What would you like to improve in the next few months?",
+      chinese: "接下来几个月你想提升什么？",
+    },
+  ],
+  travel: [
+    {
+      english: "What do you usually enjoy most on a trip?",
+      chinese: "旅行中你最享受什么？",
+    },
+    {
+      english: "Do you prefer busy cities or quiet places?",
+      chinese: "你更喜欢热闹的城市还是安静的地方？",
+    },
+    {
+      english: "What is the most memorable place you have been to?",
+      chinese: "你去过最难忘的地方是哪里？",
+    },
+    {
+      english: "If you could leave tomorrow, where would you go?",
+      chinese: "如果明天就能出发，你会去哪里？",
+    },
+  ],
+  work: [
+    {
+      english: "What does a typical working day look like for you?",
+      chinese: "你典型的工作日是怎样的？",
+    },
+    {
+      english: "Which skill matters most in your job?",
+      chinese: "你的工作中哪项能力最重要？",
+    },
+    {
+      english: "What would make your work easier?",
+      chinese: "什么会让你的工作更轻松？",
+    },
+    {
+      english: "Where would you like to be in a few years?",
+      chinese: "几年后你希望自己处在什么位置？",
+    },
+  ],
+  technology: [
+    {
+      english: "Which app do you open the most during the day?",
+      chinese: "你一天里打开最多的应用是哪个？",
+    },
+    {
+      english: "How does it help you in daily life?",
+      chinese: "它在日常生活中怎么帮到你？",
+    },
+    {
+      english: "Do you ever feel you spend too much time on screens?",
+      chinese: "你会不会觉得看屏幕的时间太长了？",
+    },
+    {
+      english: "What would you change about it if you could?",
+      chinese: "如果可以，你会改变它的哪一点？",
+    },
+  ],
+  culture: [
+    {
+      english: "Is there a custom in your city that visitors find interesting?",
+      chinese: "你所在的城市有什么让外地人觉得有趣的习俗？",
+    },
+    {
+      english: "How do people usually celebrate it?",
+      chinese: "大家通常怎么庆祝？",
+    },
+    {
+      english: "Has that custom changed since you were a child?",
+      chinese: "这个习俗和你小时候相比有变化吗？",
+    },
+    {
+      english: "What do you think it says about the local culture?",
+      chinese: "你觉得它体现了怎样的当地文化？",
+    },
+  ],
+};
+const FREE_CHAT_GENERIC_FOLLOW_UPS = [
+  {
+    english: "Could you tell me a bit more about that?",
+    chinese: "能再多说一点吗？",
+  },
+  {
+    english: "What happened next?",
+    chinese: "后来发生了什么？",
+  },
+  {
+    english: "Why do you think that is?",
+    chinese: "你觉得为什么会这样？",
+  },
+  {
+    english: "How did that make you feel at the time?",
+    chinese: "当时那让你有什么感受？",
+  },
+];
 const FREE_LANGUAGE_RULES = [
   {
     type: "语法",
@@ -1264,6 +1492,17 @@ let practiceAudioChunks = [];
 let practiceApiAbortController = null;
 let speechVoiceCache = [];
 let freeChatRequestId = 0;
+const realtimeVoice = {
+  recognition: null,
+  silenceTimer: 0,
+  restartTimer: 0,
+  speechTimer: 0,
+  speechToken: 0,
+  finalText: "",
+  interimText: "",
+  restartCount: 0,
+  stopRequested: false,
+};
 
 const state = {
   resources: [],
@@ -1325,6 +1564,24 @@ const state = {
   freeChatApiAuth: "bearer",
   freeChatApiMessage: "",
   freeChatApiMessageType: "",
+  realtimeActive: false,
+  realtimePhase: "idle",
+  realtimeTranscript: "",
+  realtimeMessage: "",
+  realtimeMessageType: "",
+  freeUsedLines: new Set(),
+  reviewActive: false,
+  reviewCategory: "all",
+  reviewSection: "all",
+  reviewNewLimit: 20,
+  reviewProgress: {},
+  reviewDaily: { date: "", reviewedKeys: [], newKeys: [] },
+  reviewQueue: [],
+  reviewQueueIndex: 0,
+  reviewRevealed: false,
+  reviewSessionDone: 0,
+  reviewMessage: "",
+  reviewMessageType: "",
 };
 
 const elements = {
@@ -1346,6 +1603,41 @@ const elements = {
   progressPercent: document.querySelector("#progressPercent"),
   progressText: document.querySelector("#progressText"),
   vocabularyToolbar: document.querySelector("#vocabularyToolbar"),
+  reviewButton: document.querySelector("#reviewButton"),
+  reviewStudio: document.querySelector("#reviewStudio"),
+  reviewExitButton: document.querySelector("#reviewExitButton"),
+  reviewSource: document.querySelector("#reviewSource"),
+  reviewCategory: document.querySelector("#reviewCategory"),
+  reviewSection: document.querySelector("#reviewSection"),
+  reviewNewLimit: document.querySelector("#reviewNewLimit"),
+  reviewRestartButton: document.querySelector("#reviewRestartButton"),
+  reviewExportButton: document.querySelector("#reviewExportButton"),
+  reviewImportButton: document.querySelector("#reviewImportButton"),
+  reviewImportInput: document.querySelector("#reviewImportInput"),
+  reviewClearButton: document.querySelector("#reviewClearButton"),
+  reviewDueCount: document.querySelector("#reviewDueCount"),
+  reviewNewCount: document.querySelector("#reviewNewCount"),
+  reviewDoneCount: document.querySelector("#reviewDoneCount"),
+  reviewTotalCount: document.querySelector("#reviewTotalCount"),
+  reviewCardScope: document.querySelector("#reviewCardScope"),
+  reviewCardProgress: document.querySelector("#reviewCardProgress"),
+  reviewCardSentence: document.querySelector("#reviewCardSentence"),
+  reviewCardPrompt: document.querySelector("#reviewCardPrompt"),
+  reviewCardAnswer: document.querySelector("#reviewCardAnswer"),
+  reviewCardPhrase: document.querySelector("#reviewCardPhrase"),
+  reviewCardPhonetic: document.querySelector("#reviewCardPhonetic"),
+  reviewCardMeaning: document.querySelector("#reviewCardMeaning"),
+  reviewCardTranslation: document.querySelector("#reviewCardTranslation"),
+  reviewSpeakButton: document.querySelector("#reviewSpeakButton"),
+  reviewShowButton: document.querySelector("#reviewShowButton"),
+  reviewGradeActions: document.querySelector("#reviewGradeActions"),
+  reviewGradeButtons: document.querySelectorAll("[data-review-grade]"),
+  reviewIntervalAgain: document.querySelector("#reviewIntervalAgain"),
+  reviewIntervalHard: document.querySelector("#reviewIntervalHard"),
+  reviewIntervalGood: document.querySelector("#reviewIntervalGood"),
+  reviewIntervalEasy: document.querySelector("#reviewIntervalEasy"),
+  reviewStatus: document.querySelector("#reviewStatus"),
+  welcomeOverlay: document.querySelector("#welcomeOverlay"),
   searchInput: document.querySelector("#searchInput"),
   showAllMeaningsButton: document.querySelector("#showAllMeaningsButton"),
   hideAllMeaningsButton: document.querySelector("#hideAllMeaningsButton"),
@@ -1415,6 +1707,8 @@ const elements = {
   dialogueTurnCounter: document.querySelector("#dialogueTurnCounter"),
   dialogueMessages: document.querySelector("#dialogueMessages"),
   dialogueAnswerInput: document.querySelector("#dialogueAnswerInput"),
+  dialogueRealtimeButton: document.querySelector("#dialogueRealtimeButton"),
+  dialogueRealtimeStatus: document.querySelector("#dialogueRealtimeStatus"),
   dialogueListenButton: document.querySelector("#dialogueListenButton"),
   dialogueHintButton: document.querySelector("#dialogueHintButton"),
   dialogueRecordButton: document.querySelector("#dialogueRecordButton"),
@@ -1441,6 +1735,8 @@ const elements = {
   freeRestartButton: document.querySelector("#freeRestartButton"),
   freeMessages: document.querySelector("#freeMessages"),
   freeAnswerInput: document.querySelector("#freeAnswerInput"),
+  freeRealtimeButton: document.querySelector("#freeRealtimeButton"),
+  freeRealtimeStatus: document.querySelector("#freeRealtimeStatus"),
   freeListenButton: document.querySelector("#freeListenButton"),
   freeHintButton: document.querySelector("#freeHintButton"),
   freeRecordButton: document.querySelector("#freeRecordButton"),
@@ -1574,11 +1870,130 @@ function extractAnnotation(back) {
   };
 }
 
+function normalizeCsvHeader(value) {
+  return String(value || "")
+    .replace(/^\uFEFF/, "")
+    .trim();
+}
+
+function findVocabularyHeaderRow(rows) {
+  return rows.findIndex((row) => {
+    const headers = row.map(normalizeCsvHeader);
+    return (
+      headers.includes("单词") &&
+      (headers.includes("中文释义") ||
+        headers.includes("英文例句") ||
+        headers.includes("例句"))
+    );
+  });
+}
+
+function cleanVocabularyText(value) {
+  return String(value || "")
+    .replace(/\s*\d*\s*<<\s*零基础词汇讲义Level\s*\d+/gi, " ")
+    .replace(/线｜教研团队/gi, " ")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function removeEmbeddedVocabularyCard(value) {
+  const marker =
+    /\s+\d{1,4}\s*\.\s*[A-Za-z][A-Za-z'’-]*(?:\s+[A-Za-z][A-Za-z'’-]*){0,3}\s+\/[^/\n]+\//;
+  const match = marker.exec(value);
+  return match ? value.slice(0, match.index) : value;
+}
+
+function splitVocabularyExample(value) {
+  const englishParts = [];
+  const chineseParts = [];
+  const segments = String(value || "")
+    .split(/\s*\|\s*/)
+    .map((segment) => removeEmbeddedVocabularyCard(segment).trim())
+    .filter(Boolean);
+
+  segments.forEach((segment) => {
+    const chineseIndex = segment.search(/[\u3400-\u9fff]/);
+    const rawEnglish =
+      chineseIndex >= 0 ? segment.slice(0, chineseIndex) : segment;
+    const rawChinese = chineseIndex >= 0 ? segment.slice(chineseIndex) : "";
+    const english = cleanVocabularyText(rawEnglish).replace(
+      /^[\s,;:.!?-]+|[\s,;:|-]+$/g,
+      "",
+    );
+    const chinese = cleanVocabularyText(rawChinese);
+
+    if (english) {
+      englishParts.push(english);
+    }
+    if (chinese) {
+      chineseParts.push(chinese);
+    }
+  });
+
+  return {
+    sentence: englishParts.join(" | "),
+    translation: chineseParts.join(" | "),
+  };
+}
+
+function parseVocabularyDeck(rows, headerIndex, resource, index) {
+  const headers = rows[headerIndex].map(normalizeCsvHeader);
+  const findColumn = (...names) =>
+    headers.findIndex((header) => names.includes(header));
+  const phraseIndex = findColumn("单词", "词/短语", "Front");
+  const phoneticIndex = findColumn("音标", "IPA");
+  const partOfSpeechIndex = findColumn("词性");
+  const meaningIndex = findColumn("中文释义", "释义", "Back");
+  const sentenceIndex = findColumn("英文例句", "例句");
+
+  if (phraseIndex < 0) {
+    return [];
+  }
+
+  return rows
+    .slice(headerIndex + 1)
+    .map((row, itemIndex) => {
+      const phrase = cleanVocabularyText(row[phraseIndex]);
+      if (!phrase || findVocabularyHeaderRow([row]) === 0) {
+        return null;
+      }
+
+      const partOfSpeech = cleanVocabularyText(row[partOfSpeechIndex]);
+      const meaning = cleanVocabularyText(row[meaningIndex]);
+      const example = splitVocabularyExample(row[sentenceIndex]);
+      const combinedMeaning = [partOfSpeech, meaning]
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        id: `${resource.id}:${index + 1}:${itemIndex + 1}`,
+        phrase,
+        phonetic: cleanVocabularyText(row[phoneticIndex]),
+        meaning: combinedMeaning || "查看例句理解用法",
+        sentence: example.sentence || phrase,
+        translation: example.translation,
+      };
+    })
+    .filter(Boolean);
+}
+
 function parseAnkiDeck(text, resource, index) {
   const metadata = {};
   const dataRows = [];
+  const rows = parseCsv(text.replace(/^\uFEFF/, ""));
+  const vocabularyHeaderIndex = findVocabularyHeaderRow(rows);
 
-  parseCsv(text.replace(/^\uFEFF/, "")).forEach((row) => {
+  if (vocabularyHeaderIndex >= 0) {
+    return parseVocabularyDeck(
+      rows,
+      vocabularyHeaderIndex,
+      resource,
+      index,
+    );
+  }
+
+  rows.forEach((row) => {
     if (row[0]?.startsWith("#")) {
       const separatorIndex = row[0].indexOf(":");
       if (separatorIndex > 0) {
@@ -1651,7 +2066,7 @@ function parseMarkdownDeck(text, resource, index) {
     headers.findIndex((header) => names.includes(header));
   const phraseIndex = findColumn("词/短语");
   const meaningIndex = findColumn("释义");
-  const phoneticIndex = findColumn("IPA");
+  const phoneticIndex = findColumn("IPA", "音标");
   const sentenceIndex = findColumn("英文原句");
   const translationIndex = findColumn("译句");
 
@@ -1679,6 +2094,9 @@ function parseMarkdownDeck(text, resource, index) {
 }
 
 function parseDeck(text, resource, index) {
+  if (resource.attachment) {
+    return [];
+  }
   if (resource.format === "markdown-table") {
     return parseMarkdownDeck(text, resource, index);
   }
@@ -2052,11 +2470,7 @@ function getPracticeVoiceStatusText() {
   return `当前声线：${voice.name}${isNatural ? " · 自然音色" : ""}`;
 }
 
-function speak(text, rate = 0.9, options = {}) {
-  if (!("speechSynthesis" in window)) {
-    return false;
-  }
-
+function createSpeechUtterance(text, rate = 0.9, options = {}) {
   const profile = options.profile || null;
   const voice = getPreferredSpeechVoice(
     options.voicePreference || state.practiceVoice,
@@ -2065,7 +2479,6 @@ function speak(text, rate = 0.9, options = {}) {
   const rateScale = Number(options.rateScale) || 1;
   const utterance = new SpeechSynthesisUtterance(text);
 
-  window.speechSynthesis.cancel();
   utterance.lang = voice?.lang || "en-US";
   if (voice) {
     utterance.voice = voice;
@@ -2079,13 +2492,645 @@ function speak(text, rate = 0.9, options = {}) {
     Math.max(0.75, Number(options.pitch) || 1),
   );
   utterance.volume = 1;
+  return utterance;
+}
+
+function speak(text, rate = 0.9, options = {}) {
+  if (!("speechSynthesis" in window)) {
+    return false;
+  }
+
+  const utterance = createSpeechUtterance(text, rate, options);
+  if (typeof options.onStart === "function") {
+    utterance.onstart = options.onStart;
+  }
+  if (typeof options.onEnd === "function") {
+    utterance.onend = options.onEnd;
+  }
+  if (typeof options.onError === "function") {
+    utterance.onerror = options.onError;
+  }
+
+  window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
   window.speechSynthesis.speak(utterance);
-  return true;
+  return utterance;
 }
 
 function getSpeechRecognitionConstructor() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function getRealtimeSection() {
+  return state.practiceSection === "free" ? "free" : "dialogue";
+}
+
+function isRealtimeSectionActive(section) {
+  return state.realtimeActive && getRealtimeSection() === section;
+}
+
+function getRealtimeSupport() {
+  if (!("speechSynthesis" in window)) {
+    return {
+      supported: false,
+      message: "当前浏览器不支持语音朗读，实时对话不可用，可继续用文字练习。",
+    };
+  }
+
+  if (state.practiceRecognitionMode === "off") {
+    return {
+      supported: false,
+      message: "语音识别已关闭，实时对话需要浏览器免费识别。",
+    };
+  }
+
+  if (state.practiceRecognitionMode !== "browser") {
+    return {
+      supported: false,
+      message: "实时对话使用浏览器免费识别，请把识别方式切换为“浏览器免费”。",
+    };
+  }
+
+  if (!getSpeechRecognitionConstructor()) {
+    return {
+      supported: false,
+      message: "当前浏览器不支持连续语音识别，请使用最新版 Chrome、Edge 或 Safari。",
+    };
+  }
+
+  return { supported: true, message: "" };
+}
+
+function setRealtimePhase(phase, message = "") {
+  state.realtimePhase = phase;
+  state.realtimeMessage = message;
+  state.realtimeMessageType = phase === "error" ? "error" : "";
+
+  if (phase === "listening") {
+    state.practiceStatusText = "实时聆听";
+  } else if (phase === "thinking") {
+    state.practiceStatusText = "正在准备回应";
+  } else if (phase === "speaking") {
+    state.practiceStatusText = "正在朗读回应";
+  }
+
+  renderPracticeView();
+}
+
+function getRealtimeStatusText(section) {
+  const support = getRealtimeSupport();
+  if (!isRealtimeSectionActive(section)) {
+    if (!support.supported) {
+      return support.message;
+    }
+    return state.realtimeMessage || "未开启";
+  }
+
+  if (state.realtimePhase === "thinking") {
+    return state.realtimeMessage || "正在理解你的表达…";
+  }
+  if (state.realtimePhase === "speaking") {
+    return state.realtimeMessage || "正在用美音回应…";
+  }
+  if (state.realtimePhase === "listening") {
+    return state.realtimeTranscript
+      ? "正在聆听 · 已识别到语音"
+      : "正在聆听 · 说完停顿一下自动发送";
+  }
+  return state.realtimeMessage || "未开启";
+}
+
+function renderRealtimeBar(section) {
+  const isFree = section === "free";
+  const button = isFree
+    ? elements.freeRealtimeButton
+    : elements.dialogueRealtimeButton;
+  const status = isFree
+    ? elements.freeRealtimeStatus
+    : elements.dialogueRealtimeStatus;
+  if (!button || !status) {
+    return;
+  }
+
+  const support = getRealtimeSupport();
+  const active = isRealtimeSectionActive(section);
+  const phase = active ? state.realtimePhase : "idle";
+
+  button.textContent = active ? "结束实时对话" : "开始实时对话";
+  button.setAttribute("aria-pressed", String(active));
+  button.classList.toggle("is-active", active);
+  button.disabled = !active && !support.supported;
+  button.dataset.phase = phase;
+
+  status.dataset.phase = phase;
+  status.classList.toggle("is-error", !active && !support.supported);
+  status.textContent = getRealtimeStatusText(section);
+}
+
+function stopRealtimeRecognition() {
+  const recognition = realtimeVoice.recognition;
+  realtimeVoice.recognition = null;
+  if (!recognition) {
+    return;
+  }
+
+  recognition.onstart = null;
+  recognition.onresult = null;
+  recognition.onerror = null;
+  recognition.onend = null;
+  try {
+    recognition.abort();
+  } catch {
+    // The recognition session may already have ended.
+  }
+}
+
+function clearRealtimeTimers() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  clearTimeout(realtimeVoice.restartTimer);
+  clearTimeout(realtimeVoice.speechTimer);
+  realtimeVoice.silenceTimer = 0;
+  realtimeVoice.restartTimer = 0;
+  realtimeVoice.speechTimer = 0;
+}
+
+function stopRealtimeConversation(message = "", { silent = false } = {}) {
+  const wasActive = state.realtimeActive;
+
+  realtimeVoice.stopRequested = true;
+  realtimeVoice.restartCount = 0;
+  realtimeVoice.speechToken += 1;
+  clearRealtimeTimers();
+  stopRealtimeRecognition();
+
+  if ((!silent || wasActive) && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  state.realtimeActive = false;
+  state.realtimePhase = "idle";
+  state.realtimeTranscript = "";
+  state.realtimeMessage = message;
+  state.realtimeMessageType = "";
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+
+  if (wasActive) {
+    state.practiceStatusText = "准备开始";
+    renderPracticeView();
+  }
+
+  return wasActive;
+}
+
+function getDialogueSpeechOptions(turn) {
+  const profile = DIALOGUE_SPEAKER_VOICE_PROFILES[turn?.speaker] || {};
+  return {
+    profile,
+    pitch: profile.pitch,
+    rateScale: profile.rateScale,
+    voicePreference: state.practiceVoice,
+    rate: 0.9,
+  };
+}
+
+function getFreeSpeechOptions() {
+  return {
+    profile: FREE_CHAT_COACH_PROFILE,
+    pitch: FREE_CHAT_COACH_PROFILE.pitch,
+    rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+    voicePreference: state.practiceVoice,
+    rate: 0.94,
+  };
+}
+
+function speakRealtime(text, options = {}, onDone = null) {
+  const speakable = String(text || "").trim();
+  if (!state.realtimeActive || !speakable) {
+    return false;
+  }
+  if (!("speechSynthesis" in window)) {
+    if (typeof onDone === "function") {
+      onDone();
+    }
+    return false;
+  }
+
+  const utterance = createSpeechUtterance(speakable, options.rate || 0.92, options);
+  const token = realtimeVoice.speechToken + 1;
+  realtimeVoice.speechToken = token;
+  realtimeVoice.speechTimer = 0;
+  let finished = false;
+
+  const finish = () => {
+    if (finished || realtimeVoice.speechToken !== token) {
+      return;
+    }
+    finished = true;
+    clearTimeout(realtimeVoice.speechTimer);
+    realtimeVoice.speechTimer = window.setTimeout(() => {
+      realtimeVoice.speechTimer = 0;
+      if (!state.realtimeActive || realtimeVoice.speechToken !== token) {
+        return;
+      }
+      if (typeof onDone === "function") {
+        onDone();
+      }
+    }, REALTIME_SPEECH_TAIL_MS);
+  };
+
+  utterance.onend = finish;
+  utterance.onerror = finish;
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
+  window.speechSynthesis.speak(utterance);
+
+  const words = speakable.split(/\s+/).filter(Boolean).length;
+  const estimated =
+    (words / Math.max(1.1, 2.4 * utterance.rate)) * 1000 + 3000;
+  realtimeVoice.speechTimer = window.setTimeout(
+    finish,
+    Math.min(45000, Math.max(8000, estimated)),
+  );
+  return true;
+}
+
+function restartRealtimeRecognitionSoon(delay = REALTIME_RESTART_DELAY_MS) {
+  clearTimeout(realtimeVoice.restartTimer);
+  realtimeVoice.restartTimer = window.setTimeout(() => {
+    realtimeVoice.restartTimer = 0;
+    if (!state.realtimeActive || realtimeVoice.stopRequested) {
+      return;
+    }
+    if (state.realtimePhase !== "listening") {
+      return;
+    }
+    startRealtimeRecognition();
+  }, delay);
+}
+
+function scheduleRealtimeCommit() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  const wordCount = String(state.realtimeTranscript || "")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  const delay = Math.min(2600, REALTIME_SILENCE_MS + wordCount * 60);
+  realtimeVoice.silenceTimer = window.setTimeout(() => {
+    realtimeVoice.silenceTimer = 0;
+    commitRealtimeUtterance();
+  }, delay);
+}
+
+function collectRealtimeTranscript(event) {
+  let interimText = "";
+  const startIndex = Number.isInteger(event.resultIndex) ? event.resultIndex : 0;
+
+  for (let index = startIndex; index < event.results.length; index += 1) {
+    const transcript = event.results[index]?.[0]?.transcript || "";
+    if (event.results[index]?.isFinal) {
+      realtimeVoice.finalText =
+        `${realtimeVoice.finalText} ${transcript}`.trim();
+    } else {
+      interimText = `${interimText} ${transcript}`.trim();
+    }
+  }
+
+  realtimeVoice.interimText = interimText;
+  state.realtimeTranscript =
+    `${realtimeVoice.finalText} ${realtimeVoice.interimText}`.trim();
+
+  if (!state.realtimeTranscript) {
+    renderPracticeView();
+    return;
+  }
+
+  scheduleRealtimeCommit();
+  renderPracticeView();
+}
+
+function startRealtimeRecognition() {
+  if (!state.realtimeActive || realtimeVoice.stopRequested) {
+    return;
+  }
+
+  const Recognition = getSpeechRecognitionConstructor();
+  if (!Recognition) {
+    state.practiceMessage =
+      "当前浏览器不支持连续语音识别，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    stopRealtimeConversation("实时对话不可用。");
+    return;
+  }
+
+  stopRealtimeRecognition();
+  clearTimeout(realtimeVoice.silenceTimer);
+  realtimeVoice.silenceTimer = 0;
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  state.realtimeTranscript = "";
+
+  const recognition = new Recognition();
+  realtimeVoice.recognition = recognition;
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+    realtimeVoice.restartCount = 0;
+    state.realtimeMessage = "";
+    state.realtimeMessageType = "";
+    renderPracticeView();
+  };
+
+  recognition.onresult = (event) => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+    collectRealtimeTranscript(event);
+  };
+
+  recognition.onerror = (event) => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+
+    const errorType = String(event?.error || "");
+    if (errorType === "aborted") {
+      return;
+    }
+    if (errorType === "no-speech") {
+      realtimeVoice.restartCount += 1;
+      return;
+    }
+    if (errorType === "not-allowed" || errorType === "service-not-allowed") {
+      state.practiceMessage =
+        "麦克风权限未开启，请在地址栏允许麦克风后重新开始实时对话。";
+      state.practiceMessageType = "error";
+      stopRealtimeConversation("麦克风权限未开启。");
+      return;
+    }
+
+    realtimeVoice.restartCount += 1;
+    state.realtimeMessage = getRecognitionErrorMessage(errorType);
+    state.realtimeMessageType = "error";
+    if (realtimeVoice.restartCount > REALTIME_MAX_RESTARTS) {
+      stopRealtimeConversation("语音识别多次中断，已结束实时对话。");
+      return;
+    }
+    renderPracticeView();
+  };
+
+  recognition.onend = () => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+    realtimeVoice.recognition = null;
+    if (!state.realtimeActive || realtimeVoice.stopRequested) {
+      return;
+    }
+    if (state.realtimePhase !== "listening") {
+      return;
+    }
+    if (state.realtimeTranscript) {
+      commitRealtimeUtterance();
+      return;
+    }
+    restartRealtimeRecognitionSoon();
+  };
+
+  try {
+    recognition.start();
+  } catch {
+    realtimeVoice.recognition = null;
+    realtimeVoice.restartCount += 1;
+    if (realtimeVoice.restartCount > REALTIME_MAX_RESTARTS) {
+      stopRealtimeConversation("语音识别启动失败，已结束实时对话。");
+      return;
+    }
+    restartRealtimeRecognitionSoon(600);
+  }
+}
+
+function resumeRealtimeListening() {
+  if (!state.realtimeActive || realtimeVoice.stopRequested) {
+    return;
+  }
+
+  state.realtimeTranscript = "";
+  state.practiceTranscript = "";
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  setRealtimePhase("listening");
+  restartRealtimeRecognitionSoon();
+}
+
+function cancelRealtimeUtteranceCapture() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  realtimeVoice.silenceTimer = 0;
+  stopRealtimeRecognition();
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  state.realtimeTranscript = "";
+  state.practiceTranscript = "";
+}
+
+function commitRealtimeUtterance() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  realtimeVoice.silenceTimer = 0;
+
+  if (!state.realtimeActive || realtimeVoice.stopRequested) {
+    return;
+  }
+  if (state.realtimePhase !== "listening") {
+    return;
+  }
+
+  const transcript = String(state.realtimeTranscript || "").trim();
+  if (!transcript) {
+    return;
+  }
+
+  stopRealtimeRecognition();
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  state.realtimeTranscript = "";
+  state.practiceTranscript = "";
+
+  if (getRealtimeSection() === "free") {
+    setRealtimePhase("thinking", "正在理解你的表达…");
+    handleRealtimeFreeUtterance(transcript);
+    return;
+  }
+
+  setRealtimePhase("thinking", "正在评价你的回答…");
+  handleRealtimeDialogueUtterance(transcript);
+}
+
+function getRealtimeDialogueReaction(score) {
+  const value = Number(score) || 0;
+  if (value >= 85) {
+    return "Nice, that sounded really natural.";
+  }
+  if (value >= 65) {
+    return "Good, that worked well.";
+  }
+  if (value >= 40) {
+    return "Okay, good try.";
+  }
+  return "Let's keep going.";
+}
+
+function continueDialogueRealtimeAfterAnswer(result) {
+  const scenario = getCurrentDialogueScenario();
+  if (!state.realtimeActive || !scenario) {
+    resumeRealtimeListening();
+    return;
+  }
+
+  const reaction = getRealtimeDialogueReaction(result?.score ?? 0);
+  const isLastTurn = state.dialogueTurnIndex >= scenario.turns.length - 1;
+
+  setRealtimePhase("speaking", "正在回应你的回答…");
+  speakRealtime(reaction, getFreeSpeechOptions(), () => {
+    if (!state.realtimeActive) {
+      return;
+    }
+    if (isLastTurn) {
+      stopRealtimeConversation("这一轮情景已练完，可以再次开始继续。");
+      return;
+    }
+
+    state.dialogueTurnIndex += 1;
+    clearDialogueAttempt({ keepMessages: true });
+    state.realtimeTranscript = "";
+    renderPracticeView();
+
+    const nextTurn = getCurrentDialogueTurn();
+    if (!nextTurn) {
+      resumeRealtimeListening();
+      return;
+    }
+
+    setRealtimePhase("speaking", "正在朗读对方的话…");
+    speakRealtime(
+      nextTurn.prompt,
+      getDialogueSpeechOptions(nextTurn),
+      resumeRealtimeListening,
+    );
+  });
+}
+
+function handleRealtimeDialogueUtterance(transcript) {
+  const result = submitDialogueAnswer(transcript);
+  if (!result) {
+    resumeRealtimeListening();
+    return;
+  }
+  continueDialogueRealtimeAfterAnswer(result);
+}
+
+async function handleRealtimeFreeUtterance(transcript) {
+  const reply = await sendFreeMessage(transcript);
+  if (!state.realtimeActive || getRealtimeSection() !== "free") {
+    return;
+  }
+  if (!reply?.english) {
+    resumeRealtimeListening();
+    return;
+  }
+
+  setRealtimePhase("speaking", "正在用美音回应…");
+  speakRealtime(reply.english, getFreeSpeechOptions(), resumeRealtimeListening);
+}
+
+function startRealtimeConversation() {
+  if (state.realtimeActive) {
+    return;
+  }
+
+  const section = getRealtimeSection();
+  const support = getRealtimeSupport();
+  if (!support.supported) {
+    state.practiceMessage = support.message;
+    state.practiceMessageType = "error";
+    renderPracticeView();
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  if (section === "free" && state.freeMessages.length === 0) {
+    resetFreeConversation();
+  }
+
+  realtimeVoice.stopRequested = false;
+  realtimeVoice.restartCount = 0;
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  clearRealtimeTimers();
+  state.realtimeActive = true;
+  state.realtimePhase = "idle";
+  state.realtimeTranscript = "";
+  state.realtimeMessage = "";
+  state.realtimeMessageType = "";
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+
+  if (section === "free") {
+    const lastMessage = state.freeMessages[state.freeMessages.length - 1];
+    const latestReply = [...state.freeMessages]
+      .reverse()
+      .find((message) => message.role === "assistant" && message.english);
+
+    if (lastMessage?.role === "assistant" && latestReply?.english) {
+      setRealtimePhase("speaking", "正在朗读陪练的上一句话…");
+      speakRealtime(
+        latestReply.english,
+        getFreeSpeechOptions(),
+        resumeRealtimeListening,
+      );
+      return;
+    }
+    resumeRealtimeListening();
+    return;
+  }
+
+  if (state.dialogueResult) {
+    continueDialogueRealtimeAfterAnswer(state.dialogueResult);
+    return;
+  }
+
+  const turn = getCurrentDialogueTurn();
+  if (!turn) {
+    stopRealtimeConversation("当前没有可练习的情景对话。");
+    return;
+  }
+
+  setRealtimePhase("speaking", "正在朗读对方的话…");
+  speakRealtime(
+    turn.prompt,
+    getDialogueSpeechOptions(turn),
+    resumeRealtimeListening,
+  );
+}
+
+function toggleRealtimeConversation() {
+  const section = getRealtimeSection();
+  if (isRealtimeSectionActive(section)) {
+    stopRealtimeConversation("实时对话已结束。");
+    return;
+  }
+  startRealtimeConversation();
 }
 
 function getPracticeModeLabel(mode = state.practiceRecognitionMode) {
@@ -2400,6 +3445,7 @@ function selectDialogueScenario(scenarioId) {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   state.dialogueScenarioId = scenario.id;
   state.dialogueTurnIndex = 0;
   clearDialogueAttempt();
@@ -2725,24 +3771,32 @@ function renderDialogueView() {
   renderDialogueScenarioList();
   renderDialogueMessages();
   renderDialogueHint();
+  renderRealtimeBar("dialogue");
 
-  const liveTranscript =
-    state.practiceListening || state.practiceTranscribing
+  const realtimeActive = isRealtimeSectionActive("dialogue");
+  const liveTranscript = realtimeActive
+    ? state.realtimeTranscript
+    : state.practiceListening || state.practiceTranscribing
       ? state.practiceTranscript
       : "";
   elements.dialogueAnswerInput.value =
     liveTranscript || state.dialogueInput;
   elements.dialogueAnswerInput.disabled =
-    state.practiceListening || state.practiceTranscribing;
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
 
   elements.dialogueListenButton.disabled =
-    !("speechSynthesis" in window);
+    !("speechSynthesis" in window) || realtimeActive;
   elements.dialogueHintButton.disabled =
-    state.practiceListening || state.practiceTranscribing;
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
   elements.dialogueRecordButton.disabled =
     !availability.available ||
     state.practiceListening ||
-    state.practiceTranscribing;
+    state.practiceTranscribing ||
+    realtimeActive;
   elements.dialogueRecordButton.textContent =
     state.practiceTranscribing
       ? "正在转写"
@@ -2756,13 +3810,17 @@ function renderDialogueView() {
     !elements.dialogueAnswerInput.value.trim() ||
     state.practiceListening ||
     state.practiceTranscribing ||
+    realtimeActive ||
     Boolean(state.dialogueResult);
   elements.dialogueNextButton.disabled =
-    state.practiceListening || state.practiceTranscribing;
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
   elements.dialogueNextButton.textContent =
     state.dialogueTurnIndex === scenario.turns.length - 1
       ? "再练一遍"
       : "下一轮";
+  elements.dialogueRetryButton.disabled = realtimeActive;
 
   elements.dialogueNotice.hidden = !state.practiceMessage;
   elements.dialogueNotice.textContent = state.practiceMessage;
@@ -2796,6 +3854,7 @@ function setPracticeSection(section) {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.practiceSection = nextSection;
   if (nextSection === "dialogue") {
@@ -2867,7 +3926,7 @@ function submitDialogueAnswer(providedTranscript = "") {
     state.practiceTranscribing ||
     state.dialogueResult
   ) {
-    return;
+    return null;
   }
 
   const transcript = String(
@@ -2877,7 +3936,7 @@ function submitDialogueAnswer(providedTranscript = "") {
     state.practiceMessage = "请先说出或输入一个英文回答。";
     state.practiceMessageType = "error";
     renderDialogueView();
-    return;
+    return null;
   }
 
   const result = scoreDialogueAnswer(turn, transcript);
@@ -2899,6 +3958,7 @@ function submitDialogueAnswer(providedTranscript = "") {
   );
   renderPracticeView();
   updateProgress();
+  return state.dialogueResult;
 }
 
 function finalizeDialogueAttempt(transcript) {
@@ -2910,6 +3970,7 @@ function startDialogueRecording() {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   const availability = getPracticeModeAvailability();
   if (!availability.available) {
     state.practiceMessage = availability.message;
@@ -2949,6 +4010,7 @@ function retryDialogueTurn() {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.dialogueInput = "";
   state.dialogueMessages[state.dialogueTurnIndex] = "";
@@ -2968,6 +4030,7 @@ function moveDialogueTurn() {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   if (state.dialogueTurnIndex < scenario.turns.length - 1) {
     state.dialogueTurnIndex += 1;
@@ -3029,6 +4092,7 @@ function getFreeTopicIntroZh(topicId) {
 }
 
 function resetFreeConversation() {
+  stopRealtimeConversation("", { silent: true });
   freeChatRequestId += 1;
   const topic = getFreeTopic();
   state.freeMessages = [
@@ -3048,6 +4112,7 @@ function resetFreeConversation() {
   state.practiceMessageType = "";
   state.freeChatApiMessage = "";
   state.freeChatApiMessageType = "";
+  state.freeUsedLines = new Set();
   if (state.practiceSection === "free") {
     renderPracticeView();
   }
@@ -3181,15 +4246,62 @@ function analyzeFreeEnglish(text) {
   return feedback;
 }
 
+function pickFreeChatLine(pool, namespace) {
+  const items = (pool || []).filter(Boolean);
+  if (items.length === 0) {
+    return null;
+  }
+
+  if (!state.freeUsedLines || typeof state.freeUsedLines.has !== "function") {
+    state.freeUsedLines = new Set();
+  }
+
+  const keyOf = (item) => `${namespace}:${item.english}`;
+  const unused = items.filter((item) => !state.freeUsedLines.has(keyOf(item)));
+  const candidates = unused.length > 0 ? unused : items;
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+
+  state.freeUsedLines.add(keyOf(chosen));
+  if (state.freeUsedLines.size > 80) {
+    state.freeUsedLines = new Set([keyOf(chosen)]);
+  }
+  return chosen;
+}
+
 function buildLocalFreeTurn(text, turnIndex) {
-  const topic = getFreeTopic();
-  const replies = topic.replies || FREE_CHAT_TOPICS.daily.replies;
-  const reply = replies[turnIndex % replies.length];
+  const feedback = analyzeFreeEnglish(text);
+  const opener = pickFreeChatLine(FREE_CHAT_OPENERS, "opener");
+  const reaction = FREE_CHAT_KEYWORD_REACTIONS.find((item) =>
+    item.pattern.test(text),
+  );
+  const topicFollowUp = pickFreeChatLine(
+    FREE_CHAT_TOPIC_FOLLOW_UPS[state.freeTopic] ||
+      FREE_CHAT_TOPIC_FOLLOW_UPS.daily,
+    `topic-${state.freeTopic}`,
+  );
+  const genericFollowUp = pickFreeChatLine(
+    FREE_CHAT_GENERIC_FOLLOW_UPS,
+    "generic",
+  );
+
+  const question =
+    reaction && (turnIndex % 2 === 0 || Math.random() < 0.5)
+      ? { english: reaction.question, chinese: reaction.questionZh }
+      : topicFollowUp || genericFollowUp;
+  const english = cleanFreeEnglish(
+    [opener?.english, reaction?.english, question?.english]
+      .filter(Boolean)
+      .join(" "),
+  );
+  const chinese = [opener?.chinese, reaction?.chinese, question?.chinese]
+    .filter(Boolean)
+    .join("");
+
   return {
-    feedback: analyzeFreeEnglish(text),
+    feedback,
     reply: {
-      english: reply.english,
-      chinese: reply.chinese,
+      english: english || FREE_CHAT_TOPICS.daily.replies[0].english,
+      chinese: chinese || FREE_CHAT_TOPICS.daily.replies[0].chinese,
     },
   };
 }
@@ -3226,10 +4338,20 @@ function buildFreeChatHeaders() {
 
 function buildFreeChatSystemPrompt() {
   const topic = getFreeTopic();
+  const learnerTurns = state.freeMessages.filter(
+    (message) => message.role === "user" && message.english,
+  ).length;
   return [
-    "You are a friendly American English conversation coach for a Chinese learner who is preparing for IELTS Speaking.",
-    `The current conversation topic is: ${topic.label}.`,
-    "Reply naturally in 2 to 4 sentences and end with one follow-up question.",
+    "You are Mia, a warm, easygoing American conversation partner in your early thirties.",
+    "You are talking with a Chinese learner who is preparing for IELTS Speaking. Your reply is read aloud by text-to-speech, so it has to sound natural when spoken.",
+    `Current conversation topic: ${topic.label}.`,
+    `The learner has already answered ${learnerTurns} time(s) in this conversation; keep building on those details instead of restarting the topic.`,
+    "Sound like a real person, not a textbook or an assistant: use contractions, short sentences, and a relaxed spoken rhythm.",
+    "React to the specific detail the learner just mentioned first, and paraphrase it in your own words.",
+    "Ask at most one follow-up question, and make it specific and easy to answer out loud in a few sentences.",
+    "Never begin two replies in the same conversation with the same words, and never repeat a question you already asked.",
+    'Avoid formulaic chatbot openers such as "That\'s a great question", "Certainly", or "As an AI". Avoid lists, headings, emoji, and bullet points.',
+    "Keep the English reply to 1-3 sentences, roughly 20-45 words, unless the learner clearly asks for more detail.",
     "Use American English spelling and phrasing.",
     "Always provide an accurate Simplified Chinese translation of your English reply.",
     "Correct the learner's grammar, vocabulary, and unnatural expressions. Do not invent errors; if the sentence is already clear, say so.",
@@ -3316,7 +4438,7 @@ async function requestFreeChatTurn(text) {
 
   const history = state.freeMessages
     .filter((message) => message.role === "user" || message.role === "assistant")
-    .slice(-10)
+    .slice(-12)
     .map((message) => ({
       role: message.role,
       content:
@@ -3324,19 +4446,39 @@ async function requestFreeChatTurn(text) {
           ? `${message.english}\n中文：${message.chinese}`
           : message.english,
     }));
-  const response = await fetch(endpoint, {
+  const messages = [
+    { role: "system", content: buildFreeChatSystemPrompt() },
+    ...history,
+  ];
+  const requestBody = {
+    model: state.freeChatApiModel || "gpt-4o-mini",
+    temperature: 0.85,
+    frequency_penalty: 0.3,
+    presence_penalty: 0.4,
+    max_tokens: 600,
+    messages,
+  };
+  const requestOptions = {
     method: "POST",
     headers: buildFreeChatHeaders(),
-    body: JSON.stringify({
-      model: state.freeChatApiModel || "gpt-4o-mini",
-      temperature: 0.6,
-      messages: [
-        { role: "system", content: buildFreeChatSystemPrompt() },
-        ...history,
-      ],
-    }),
-  });
-  const responseText = await response.text();
+    body: JSON.stringify(requestBody),
+  };
+  let response = await fetch(endpoint, requestOptions);
+  let responseText = await response.text();
+
+  // Some OpenAI-compatible providers reject sampling extras such as
+  // frequency_penalty even though they accept the core Chat Completions body.
+  if (!response.ok && [400, 422].includes(response.status)) {
+    const retryBody = { ...requestBody };
+    delete retryBody.frequency_penalty;
+    delete retryBody.presence_penalty;
+    response = await fetch(endpoint, {
+      ...requestOptions,
+      body: JSON.stringify(retryBody),
+    });
+    responseText = await response.text();
+  }
+
   let payload = null;
   try {
     payload = JSON.parse(responseText);
@@ -3420,7 +4562,7 @@ function toggleFreeHint() {
 async function sendFreeMessage(providedText = "") {
   const text = cleanFreeEnglish(providedText || state.freeInput);
   if (!text || state.freeChatLoading) {
-    return;
+    return null;
   }
 
   const requestId = freeChatRequestId + 1;
@@ -3455,7 +4597,7 @@ async function sendFreeMessage(providedText = "") {
     };
     state.freeChatLoading = false;
     renderPracticeView();
-    return;
+    return null;
   }
 
   try {
@@ -3465,7 +4607,7 @@ async function sendFreeMessage(providedText = "") {
         : buildLocalFreeTurn(text, state.freeTurnCount - 1);
   } catch (error) {
     if (requestId !== freeChatRequestId) {
-      return;
+      return null;
     }
     turn = buildLocalFreeTurn(text, state.freeTurnCount - 1);
     state.freeChatApiMessage = `Chat API 调用失败，已切换到本地免费陪练：${
@@ -3475,21 +4617,22 @@ async function sendFreeMessage(providedText = "") {
   }
 
   if (requestId !== freeChatRequestId) {
-    return;
+    return null;
   }
 
   userMessage.feedback = turn.feedback;
-  state.freeMessages.push({
+  const assistantMessage = {
     role: "assistant",
     english: turn.reply.english,
     chinese: turn.reply.chinese,
     source: state.freeChatMode,
     createdAt: new Date().toISOString(),
-  });
+  };
+  state.freeMessages.push(assistantMessage);
   state.freeChatLoading = false;
   renderPracticeView();
 
-  if (state.freeAutoSpeak && turn.reply.english) {
+  if (!state.realtimeActive && state.freeAutoSpeak && turn.reply.english) {
     speak(turn.reply.english, 0.94, {
       profile: FREE_CHAT_COACH_PROFILE,
       pitch: FREE_CHAT_COACH_PROFILE.pitch,
@@ -3497,6 +4640,7 @@ async function sendFreeMessage(providedText = "") {
       voicePreference: state.practiceVoice,
     });
   }
+  return assistantMessage;
 }
 
 function finalizeFreeAttempt(transcript) {
@@ -3513,6 +4657,7 @@ function startFreeRecording() {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   const availability = getPracticeModeAvailability();
   if (!availability.available) {
     state.practiceMessage = availability.message;
@@ -3758,25 +4903,33 @@ function renderFreeView() {
   elements.freeTurnCounter.textContent = `第 ${state.freeTurnCount} 轮`;
   elements.freeTopic.value = state.freeTopic;
   elements.freeAutoSpeak.checked = state.freeAutoSpeak;
-  elements.freeAnswerInput.value =
-    state.practiceListening || state.practiceTranscribing
+  renderRealtimeBar("free");
+
+  const realtimeActive = isRealtimeSectionActive("free");
+  const liveTranscript = realtimeActive
+    ? state.realtimeTranscript
+    : state.practiceListening || state.practiceTranscribing
       ? state.practiceTranscript
-      : state.freeInput;
+      : "";
+  elements.freeAnswerInput.value = liveTranscript || state.freeInput;
   elements.freeAnswerInput.disabled =
     state.practiceListening ||
     state.practiceTranscribing ||
+    realtimeActive ||
     state.freeChatLoading;
   elements.freeListenButton.disabled =
     !("speechSynthesis" in window) ||
+    realtimeActive ||
     state.freeChatLoading ||
     !state.freeMessages.some(
       (message) => message.role === "assistant" && message.english,
     );
-  elements.freeHintButton.disabled = state.freeChatLoading;
+  elements.freeHintButton.disabled = state.freeChatLoading || realtimeActive;
   elements.freeRecordButton.disabled =
     !availability.available ||
     state.practiceListening ||
     state.practiceTranscribing ||
+    realtimeActive ||
     state.freeChatLoading;
   elements.freeRecordButton.textContent = state.practiceTranscribing
     ? "正在转写"
@@ -3790,9 +4943,12 @@ function renderFreeView() {
     !elements.freeAnswerInput.value.trim() ||
     state.practiceListening ||
     state.practiceTranscribing ||
+    realtimeActive ||
     state.freeChatLoading;
-  elements.freeRestartButton.disabled = state.freeChatLoading;
-  elements.freeTopic.disabled = state.freeChatLoading;
+  elements.freeRestartButton.disabled =
+    state.freeChatLoading || realtimeActive;
+  elements.freeTopic.disabled = state.freeChatLoading || realtimeActive;
+  elements.freeAutoSpeak.disabled = realtimeActive;
 
   renderFreeMessages();
   renderFreeHint();
@@ -4024,6 +5180,7 @@ function setPracticeRecognitionMode(mode) {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.practiceRecognitionMode = mode;
   persistPracticeSettings();
@@ -4069,6 +5226,7 @@ function setFreeChatMode(mode) {
     return;
   }
 
+  stopRealtimeConversation("", { silent: true });
   state.freeChatMode = mode;
   state.freeChatApiMessage = "";
   state.freeChatApiMessageType = "";
@@ -4109,6 +5267,12 @@ function saveFreeChatApiSettings() {
 }
 
 function openPractice(targetKey = "") {
+  stopRealtimeConversation("", { silent: true });
+  state.reviewActive = false;
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+
   const entries = getPracticeEntries();
   const targetIndex = targetKey
     ? entries.findIndex(
@@ -4146,6 +5310,7 @@ function openPractice(targetKey = "") {
 }
 
 function closePractice() {
+  stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.practiceActive = false;
   state.practiceTranscript = "";
@@ -5159,6 +6324,611 @@ function downloadAnkiExport() {
   renderAnkiExport();
 }
 
+function getReviewDayKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function restoreReviewData() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(REVIEW_PROGRESS_STORAGE_KEY) || "{}",
+    );
+    state.reviewProgress =
+      stored && typeof stored === "object" && !Array.isArray(stored)
+        ? stored
+        : {};
+  } catch {
+    state.reviewProgress = {};
+  }
+
+  const today = getReviewDayKey();
+  let daily = null;
+  try {
+    daily = JSON.parse(
+      localStorage.getItem(REVIEW_DAILY_STORAGE_KEY) || "{}",
+    );
+  } catch {
+    daily = null;
+  }
+
+  if (daily && daily.date === today) {
+    state.reviewDaily = {
+      date: today,
+      reviewedKeys: Array.isArray(daily.reviewedKeys)
+        ? daily.reviewedKeys.filter((key) => typeof key === "string")
+        : [],
+      newKeys: Array.isArray(daily.newKeys)
+        ? daily.newKeys.filter((key) => typeof key === "string")
+        : [],
+    };
+    return;
+  }
+
+  state.reviewDaily = { date: today, reviewedKeys: [], newKeys: [] };
+}
+
+function persistReviewProgress() {
+  try {
+    localStorage.setItem(
+      REVIEW_PROGRESS_STORAGE_KEY,
+      JSON.stringify(state.reviewProgress),
+    );
+  } catch {
+    // Storage may be unavailable in private mode; the session still works.
+  }
+}
+
+function persistReviewDaily() {
+  try {
+    localStorage.setItem(
+      REVIEW_DAILY_STORAGE_KEY,
+      JSON.stringify(state.reviewDaily),
+    );
+  } catch {
+    // Storage may be unavailable in private mode; the session still works.
+  }
+}
+
+function getReviewEntries() {
+  return getAnkiExportEntries(state.reviewCategory, state.reviewSection);
+}
+
+function getReviewRecord(cardKey) {
+  const record = state.reviewProgress[cardKey];
+  return record && typeof record === "object" ? record : null;
+}
+
+function formatReviewInterval(milliseconds) {
+  const value = Number(milliseconds);
+  if (!Number.isFinite(value) || value <= 0) {
+    return "现在";
+  }
+
+  const minutes = value / 60000;
+  if (minutes < 1) {
+    return "1 分钟内";
+  }
+  if (minutes < 60) {
+    return `${Math.round(minutes)} 分钟后`;
+  }
+
+  const hours = minutes / 60;
+  if (hours < 24) {
+    return `${Math.round(hours)} 小时后`;
+  }
+
+  const days = Math.round(hours / 24);
+  if (days < 30) {
+    return `${days} 天后`;
+  }
+  if (days < 365) {
+    return `${Math.round(days / 30)} 个月后`;
+  }
+  return `${Math.round(days / 365)} 年后`;
+}
+
+function clampReviewEase(value) {
+  return Math.min(3.1, Math.max(1.3, value));
+}
+
+function computeReviewSchedule(previous, grade, now = Date.now()) {
+  const base = previous || {};
+  const ease = clampReviewEase(Number(base.ease) || 2.5);
+  const previousInterval = Math.max(0, Number(base.intervalDays) || 0);
+  const reps = Math.max(0, Number(base.reps) || 0);
+  const lapses = Math.max(0, Number(base.lapses) || 0);
+  const status = base.status === "review" ? "review" : "learning";
+  const step = Math.max(0, Number(base.step) || 0);
+  const isReview = status === "review" && previousInterval >= 1;
+
+  const schedule = (intervalDays, nextEase, nextStep, nextStatus, dueAt) => {
+    const capped = Math.min(REVIEW_MAX_INTERVAL_DAYS, intervalDays);
+    const fuzzed =
+      capped >= 3 ? capped * (0.97 + Math.random() * 0.06) : capped;
+    const finalDays = Math.max(0, Math.round(fuzzed * 100) / 100);
+    return {
+      ease: clampReviewEase(nextEase),
+      intervalDays: finalDays,
+      step: nextStep,
+      status: nextStatus,
+      reps: reps + 1,
+      lapses,
+      lastGrade: grade,
+      reviewedAt: now,
+      dueAt:
+        Number.isFinite(dueAt) && dueAt > 0
+          ? dueAt
+          : now + finalDays * REVIEW_DAY_MS,
+    };
+  };
+
+  if (grade === "again") {
+    return schedule(0, ease - 0.2, 0, "learning", now + 60 * 1000);
+  }
+
+  if (grade === "hard") {
+    if (isReview) {
+      return schedule(
+        Math.max(1, previousInterval * 1.2),
+        ease - 0.15,
+        step,
+        "review",
+      );
+    }
+    const delay = step === 0 ? 2 * 60 * 1000 : 8 * 60 * 1000;
+    return schedule(0, ease, step, "learning", now + delay);
+  }
+
+  if (grade === "good") {
+    if (isReview) {
+      return schedule(previousInterval * ease, ease, step, "review");
+    }
+    const nextStep = step + 1;
+    if (nextStep >= REVIEW_LEARNING_STEPS_MS.length) {
+      return schedule(1, ease, nextStep, "review", now + REVIEW_DAY_MS);
+    }
+    return schedule(
+      0,
+      ease,
+      nextStep,
+      "learning",
+      now + REVIEW_LEARNING_STEPS_MS[nextStep],
+    );
+  }
+
+  if (isReview) {
+    return schedule(
+      Math.max(2, previousInterval * ease * 1.3),
+      ease + 0.15,
+      step,
+      "review",
+    );
+  }
+
+  const easyStep = Math.max(step, REVIEW_LEARNING_STEPS_MS.length);
+  return schedule(4, ease + 0.15, easyStep, "review", now + 4 * REVIEW_DAY_MS);
+}
+
+function markReviewDaily(cardKey, isNew) {
+  if (state.reviewDaily.date !== getReviewDayKey()) {
+    state.reviewDaily = {
+      date: getReviewDayKey(),
+      reviewedKeys: [],
+      newKeys: [],
+    };
+  }
+
+  if (!state.reviewDaily.reviewedKeys.includes(cardKey)) {
+    state.reviewDaily.reviewedKeys.push(cardKey);
+  }
+  if (isNew && !state.reviewDaily.newKeys.includes(cardKey)) {
+    state.reviewDaily.newKeys.push(cardKey);
+  }
+  persistReviewDaily();
+}
+
+function getCurrentReviewEntry() {
+  return state.reviewQueue[state.reviewQueueIndex] || null;
+}
+
+function startReviewSession() {
+  const entries = getReviewEntries();
+  const now = Date.now();
+  const dueEntries = [];
+  const freshEntries = [];
+  let masteredCount = 0;
+
+  entries.forEach((entry) => {
+    const record = getReviewRecord(entry.item.id);
+    if (!record || !Number(record.reps)) {
+      freshEntries.push(entry);
+      return;
+    }
+    if ((Number(record.dueAt) || 0) <= now) {
+      dueEntries.push(entry);
+      return;
+    }
+    masteredCount += 1;
+  });
+
+  dueEntries.sort(
+    (left, right) =>
+      (Number(getReviewRecord(left.item.id)?.dueAt) || 0) -
+      (Number(getReviewRecord(right.item.id)?.dueAt) || 0),
+  );
+
+  const remainingNew = Math.max(
+    0,
+    state.reviewNewLimit - state.reviewDaily.newKeys.length,
+  );
+  state.reviewQueue = [
+    ...dueEntries,
+    ...freshEntries.slice(0, remainingNew),
+  ];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  state.reviewSessionDone = 0;
+  state.reviewMessage = entries.length
+    ? state.reviewQueue.length
+      ? "队列已重新整理。"
+      : masteredCount === entries.length
+        ? "范围内的卡片都已经安排到未来，稍后再来复习。"
+        : "今天的新卡额度已经用完，明天会解锁新的卡片。"
+    : "当前范围没有可复习的卡片。";
+  state.reviewMessageType = "";
+}
+
+function openReview() {
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.reviewActive = true;
+  startReviewSession();
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function closeReview() {
+  state.reviewActive = false;
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  render();
+  elements.reviewButton.focus();
+}
+
+function revealReviewCard() {
+  if (!getCurrentReviewEntry() || state.reviewRevealed) {
+    return;
+  }
+  state.reviewRevealed = true;
+  state.reviewMessage = "";
+  state.reviewMessageType = "";
+  renderReviewView();
+}
+
+function gradeReviewCard(grade) {
+  if (!REVIEW_GRADES.includes(grade)) {
+    return;
+  }
+
+  const entry = getCurrentReviewEntry();
+  if (!entry || !state.reviewRevealed) {
+    return;
+  }
+
+  const cardKey = entry.item.id;
+  const previous = getReviewRecord(cardKey);
+  const isNew = !previous || !Number(previous.reps);
+  const record = computeReviewSchedule(previous, grade, Date.now());
+  state.reviewProgress[cardKey] = record;
+  persistReviewProgress();
+  markReviewDaily(cardKey, isNew);
+
+  const needsRelearn = record.status !== "review";
+  state.reviewQueue.splice(state.reviewQueueIndex, 1);
+  if (needsRelearn) {
+    const insertAt = Math.min(
+      state.reviewQueue.length,
+      state.reviewQueueIndex + 3,
+    );
+    state.reviewQueue.splice(insertAt, 0, entry);
+  }
+  if (state.reviewQueueIndex >= state.reviewQueue.length) {
+    state.reviewQueueIndex = 0;
+  }
+
+  state.reviewRevealed = false;
+  state.reviewSessionDone += 1;
+  state.reviewMessage = `${entry.item.phrase} · 下次复习 ${
+    record.status === "review"
+      ? formatReviewInterval(record.dueAt - Date.now())
+      : "本次会话内"
+  }`;
+  state.reviewMessageType = "info";
+  renderReviewView();
+}
+
+function speakReviewCard() {
+  const entry = getCurrentReviewEntry();
+  if (!entry || !("speechSynthesis" in window)) {
+    return;
+  }
+
+  const text = entry.item.sentence || entry.item.phrase;
+  speak(text, 0.92, {
+    profile: { pitch: 1, rateScale: 1 },
+    voicePreference: state.practiceVoice,
+  });
+}
+
+function renderReviewScope() {
+  if (!elements.reviewCategory || !elements.reviewSection) {
+    return;
+  }
+
+  const definitions = getCategoryDefinitions();
+  const categoryNames = new Set(
+    definitions.map((category) => category.name),
+  );
+  if (
+    state.reviewCategory !== "all" &&
+    !categoryNames.has(state.reviewCategory)
+  ) {
+    state.reviewCategory = "all";
+    state.reviewSection = "all";
+  }
+
+  const categoryFragment = document.createDocumentFragment();
+  const allCategoryOption = document.createElement("option");
+  allCategoryOption.value = "all";
+  allCategoryOption.textContent = "整个素材库";
+  categoryFragment.append(allCategoryOption);
+  definitions.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.name;
+    option.textContent = category.name;
+    categoryFragment.append(option);
+  });
+  elements.reviewCategory.replaceChildren(categoryFragment);
+  elements.reviewCategory.value = state.reviewCategory;
+
+  const activeCategory = definitions.find(
+    (category) => category.name === state.reviewCategory,
+  );
+  const sectionNames =
+    state.reviewCategory === "all"
+      ? []
+      : activeCategory?.sections || [];
+  if (
+    state.reviewSection !== "all" &&
+    !sectionNames.includes(state.reviewSection)
+  ) {
+    state.reviewSection = "all";
+  }
+
+  const sectionFragment = document.createDocumentFragment();
+  const allSectionOption = document.createElement("option");
+  allSectionOption.value = "all";
+  allSectionOption.textContent =
+    state.reviewCategory === "all" ? "整个素材库" : "整个分类";
+  sectionFragment.append(allSectionOption);
+  sectionNames.forEach((sectionName) => {
+    const option = document.createElement("option");
+    option.value = sectionName;
+    option.textContent = sectionName;
+    sectionFragment.append(option);
+  });
+  elements.reviewSection.replaceChildren(sectionFragment);
+  elements.reviewSection.value = state.reviewSection;
+  elements.reviewSection.disabled =
+    state.reviewCategory === "all" || sectionNames.length === 0;
+
+  elements.reviewNewLimit.value = String(state.reviewNewLimit);
+}
+
+function renderReviewStats() {
+  const entries = getReviewEntries();
+  const now = Date.now();
+  let dueCount = 0;
+  let freshCount = 0;
+  let masteredCount = 0;
+
+  entries.forEach((entry) => {
+    const record = getReviewRecord(entry.item.id);
+    if (!record || !Number(record.reps)) {
+      freshCount += 1;
+      return;
+    }
+    if ((Number(record.dueAt) || 0) <= now) {
+      dueCount += 1;
+      return;
+    }
+    masteredCount += 1;
+  });
+
+  const remainingNew = Math.max(
+    0,
+    state.reviewNewLimit - state.reviewDaily.newKeys.length,
+  );
+
+  elements.reviewDueCount.textContent = String(dueCount);
+  elements.reviewNewCount.textContent = String(
+    Math.min(freshCount, remainingNew),
+  );
+  elements.reviewDoneCount.textContent = String(state.reviewSessionDone);
+  elements.reviewTotalCount.textContent = String(entries.length);
+
+  if (state.reviewCategory === "all") {
+    elements.reviewSource.textContent = `整个素材库 · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
+    return;
+  }
+
+  const scopeLabel =
+    state.reviewSection === "all"
+      ? `${state.reviewCategory} · 整个分类`
+      : `${state.reviewCategory} / ${state.reviewSection}`;
+  elements.reviewSource.textContent = `${scopeLabel} · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
+}
+
+function renderReviewCard() {
+  const entry = getCurrentReviewEntry();
+  const hasCard = Boolean(entry);
+
+  elements.reviewSpeakButton.disabled =
+    !hasCard || !("speechSynthesis" in window);
+  elements.reviewShowButton.disabled = !hasCard || state.reviewRevealed;
+  elements.reviewShowButton.hidden = state.reviewRevealed;
+  elements.reviewGradeActions.hidden = !state.reviewRevealed || !hasCard;
+
+  if (!hasCard) {
+    const entries = getReviewEntries();
+    elements.reviewCardScope.textContent = "本次队列已完成";
+    elements.reviewCardProgress.textContent = entries.length
+      ? `${state.reviewSessionDone} 张已评分`
+      : "";
+    elements.reviewCardSentence.textContent = entries.length
+      ? "这一轮复习结束了"
+      : "当前范围还没有卡片";
+    elements.reviewCardPrompt.textContent = entries.length
+      ? "点“重新排队”可以继续处理到期和新解锁的卡片。"
+      : "先在素材库上传或选择带词汇的素材。";
+    elements.reviewCardAnswer.hidden = true;
+    return;
+  }
+
+  const { item, resource } = entry;
+  const record = getReviewRecord(item.id);
+  elements.reviewCardScope.textContent = `${resource.category} · ${resource.title}`;
+  elements.reviewCardProgress.textContent = record?.reps
+    ? `已复习 ${record.reps} 次 · ${
+        record.lapses ? `遗忘 ${record.lapses} 次` : "暂无遗忘"
+      }`
+    : "新卡片";
+  elements.reviewCardSentence.textContent = item.sentence || item.phrase;
+  elements.reviewCardPrompt.textContent = state.reviewRevealed
+    ? ""
+    : "先回忆它的含义和用法";
+
+  elements.reviewCardAnswer.hidden = !state.reviewRevealed;
+  elements.reviewCardPhrase.textContent = item.phrase || "";
+  elements.reviewCardPhonetic.textContent = item.phonetic || "";
+  elements.reviewCardMeaning.textContent = item.meaning || "";
+  elements.reviewCardTranslation.textContent = item.translation || "";
+
+  const now = Date.now();
+  const previews = {
+    again: computeReviewSchedule(record, "again", now),
+    hard: computeReviewSchedule(record, "hard", now),
+    good: computeReviewSchedule(record, "good", now),
+    easy: computeReviewSchedule(record, "easy", now),
+  };
+  elements.reviewIntervalAgain.textContent = formatReviewInterval(
+    previews.again.dueAt - now,
+  );
+  elements.reviewIntervalHard.textContent = formatReviewInterval(
+    previews.hard.dueAt - now,
+  );
+  elements.reviewIntervalGood.textContent = formatReviewInterval(
+    previews.good.dueAt - now,
+  );
+  elements.reviewIntervalEasy.textContent = formatReviewInterval(
+    previews.easy.dueAt - now,
+  );
+}
+
+function renderReviewView() {
+  if (!elements.reviewStudio) {
+    return;
+  }
+  renderReviewScope();
+  renderReviewStats();
+  renderReviewCard();
+  elements.reviewStatus.textContent = state.reviewMessage;
+  elements.reviewStatus.classList.toggle(
+    "is-error",
+    state.reviewMessageType === "error",
+  );
+}
+
+function exportReviewProgress() {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    progress: state.reviewProgress,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json;charset=utf-8",
+  });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = `iball的小屋-在线复习进度-${getReviewDayKey()}.json`;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  state.reviewMessage = "复习进度已导出，可以在其他设备导入继续。";
+  state.reviewMessageType = "info";
+  renderReviewView();
+}
+
+async function importReviewProgress(file) {
+  if (!file) {
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    const incoming = payload?.progress;
+    if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) {
+      throw new Error("invalid");
+    }
+
+    let imported = 0;
+    Object.entries(incoming).forEach(([key, value]) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        return;
+      }
+      state.reviewProgress[key] = value;
+      imported += 1;
+    });
+    persistReviewProgress();
+    startReviewSession();
+    state.reviewMessage = `已导入 ${imported} 张卡片的复习进度。`;
+    state.reviewMessageType = "info";
+  } catch {
+    state.reviewMessage = "导入失败，请选择本站在线复习导出的 JSON 文件。";
+    state.reviewMessageType = "error";
+  }
+
+  renderReviewView();
+}
+
+function clearReviewProgress() {
+  const total = Object.keys(state.reviewProgress).length;
+  if (
+    total > 0 &&
+    !window.confirm("确定清空在线复习的全部进度吗？此操作不可撤销。")
+  ) {
+    return;
+  }
+
+  state.reviewProgress = {};
+  state.reviewDaily = { date: getReviewDayKey(), reviewedKeys: [], newKeys: [] };
+  persistReviewProgress();
+  persistReviewDaily();
+  startReviewSession();
+  state.reviewMessage = "复习进度已清空。";
+  state.reviewMessageType = "info";
+  renderReviewView();
+}
+
 function matchesMaterialQuery(resource, query) {
   const searchable = [
     resource.category,
@@ -5170,16 +6940,39 @@ function matchesMaterialQuery(resource, query) {
   return normalizeText(searchable).includes(query);
 }
 
+function openResourceAttachment(resource) {
+  const link = document.createElement("a");
+  link.href = resource.file;
+  link.rel = "noopener noreferrer";
+
+  if (resource.format === "html-page") {
+    link.target = "_blank";
+  } else {
+    const extension = resource.file.match(/\.[^./?#]+(?=($|[?#]))/)?.[0] || "";
+    link.download = `${resource.title}${extension}`;
+  }
+
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
 function createResourceButton(resource, index) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "resource-button";
+  button.classList.toggle("is-attachment", Boolean(resource.attachment));
   button.dataset.resourceId = resource.id;
-  button.setAttribute(
-    "aria-pressed",
-    String(resource.id === state.activeResourceId),
-  );
-  button.classList.toggle("is-active", resource.id === state.activeResourceId);
+  if (!resource.attachment) {
+    button.setAttribute(
+      "aria-pressed",
+      String(resource.id === state.activeResourceId),
+    );
+    button.classList.toggle(
+      "is-active",
+      resource.id === state.activeResourceId,
+    );
+  }
 
   const badge = document.createElement("span");
   badge.className = "resource-index";
@@ -5199,12 +6992,26 @@ function createResourceButton(resource, index) {
 
   const count = document.createElement("span");
   count.className = "resource-count";
-  count.textContent = String((state.decks.get(resource.id) || []).length);
+  count.textContent = resource.attachment
+    ? resource.format === "html-page"
+      ? "打开"
+      : "下载"
+    : String((state.decks.get(resource.id) || []).length);
 
   button.append(badge, copy, count);
   button.addEventListener("click", () => {
+    if (resource.attachment) {
+      openResourceAttachment(resource);
+      return;
+    }
+
+    stopRealtimeConversation("", { silent: true });
     cancelPracticeRecognition();
     state.practiceActive = false;
+    state.reviewActive = false;
+    state.reviewQueue = [];
+    state.reviewQueueIndex = 0;
+    state.reviewRevealed = false;
     state.practiceResult = null;
     state.activeResourceId = resource.id;
     state.view = "all";
@@ -5642,6 +7449,25 @@ function render() {
   const resource = getActiveResource();
   const visibleEntries = getVisibleEntries();
 
+  if (state.reviewActive) {
+    elements.vocabularyToolbar.hidden = true;
+    elements.practiceStudio.hidden = true;
+    elements.reviewStudio.hidden = false;
+    elements.cardGrid.hidden = true;
+    elements.emptyState.hidden = true;
+    elements.activeTitle.textContent = "在线复习";
+    elements.activeDescription.textContent =
+      "按间隔重复的顺序复习当前素材，复习进度保存在本机浏览器。";
+    elements.footerResource.textContent = `在线复习 · ${getReviewEntries().length} 张卡片`;
+    renderResourceList();
+    updateProgress();
+    updateViewSwitcher();
+    updateMeaningControls();
+    renderCollectionFilters();
+    renderReviewView();
+    return;
+  }
+
   if (state.practiceActive) {
     const practiceEntries = getPracticeEntries();
     const dialogueScenario = getCurrentDialogueScenario();
@@ -5649,6 +7475,7 @@ function render() {
     const isFree = state.practiceSection === "free";
     elements.vocabularyToolbar.hidden = true;
     elements.practiceStudio.hidden = false;
+    elements.reviewStudio.hidden = true;
     elements.cardGrid.hidden = true;
     elements.emptyState.hidden = true;
     elements.practiceHeading.textContent = isDialogue
@@ -5684,6 +7511,7 @@ function render() {
 
   elements.vocabularyToolbar.hidden = false;
   elements.practiceStudio.hidden = true;
+  elements.reviewStudio.hidden = true;
   const fragment = document.createDocumentFragment();
 
   visibleEntries.forEach((entry, index) => {
@@ -5817,6 +7645,9 @@ async function loadLibrary() {
       : [];
     const deckEntries = await Promise.all(
       state.resources.map(async (resource, index) => {
+        if (resource.attachment) {
+          return [resource.id, []];
+        }
         const response = await fetch(resource.file, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`${resource.title} 加载失败：${response.status}`);
@@ -5827,8 +7658,11 @@ async function loadLibrary() {
     );
     state.decks = new Map(deckEntries);
 
-    if (!state.activeResourceId && state.resources.length > 0) {
-      state.activeResourceId = state.resources[0].id;
+    if (!state.activeResourceId) {
+      const firstDeck = state.resources.find(
+        (resource) => !resource.attachment,
+      );
+      state.activeResourceId = firstDeck?.id || "";
     }
     render();
   } catch (error) {
@@ -5890,6 +7724,45 @@ elements.logoutButton.addEventListener("click", handleLogout);
 elements.practiceButton.addEventListener("click", () => {
   openPractice();
 });
+elements.reviewButton.addEventListener("click", openReview);
+elements.reviewExitButton.addEventListener("click", closeReview);
+elements.reviewRestartButton.addEventListener("click", () => {
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewShowButton.addEventListener("click", revealReviewCard);
+elements.reviewSpeakButton.addEventListener("click", speakReviewCard);
+elements.reviewGradeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    gradeReviewCard(button.dataset.reviewGrade);
+  });
+});
+elements.reviewCategory.addEventListener("change", (event) => {
+  state.reviewCategory = event.target.value;
+  state.reviewSection = "all";
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewSection.addEventListener("change", (event) => {
+  state.reviewSection = event.target.value;
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewNewLimit.addEventListener("change", (event) => {
+  state.reviewNewLimit = Math.max(0, Number(event.target.value) || 0);
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewExportButton.addEventListener("click", exportReviewProgress);
+elements.reviewImportButton.addEventListener("click", () => {
+  elements.reviewImportInput.click();
+});
+elements.reviewImportInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  importReviewProgress(file);
+  event.target.value = "";
+});
+elements.reviewClearButton.addEventListener("click", clearReviewProgress);
 elements.practiceExitButton.addEventListener("click", closePractice);
 elements.practiceShadowTab.addEventListener("click", () => {
   setPracticeSection("shadow");
@@ -5939,6 +7812,10 @@ elements.dialogueStopButton.addEventListener(
 elements.dialogueSubmitButton.addEventListener("click", () => {
   submitDialogueAnswer();
 });
+elements.dialogueRealtimeButton.addEventListener(
+  "click",
+  toggleRealtimeConversation,
+);
 elements.dialogueRetryButton.addEventListener(
   "click",
   retryDialogueTurn,
@@ -5981,6 +7858,10 @@ elements.freeStopButton.addEventListener("click", stopFreeRecording);
 elements.freeSubmitButton.addEventListener("click", () => {
   sendFreeMessage();
 });
+elements.freeRealtimeButton.addEventListener(
+  "click",
+  toggleRealtimeConversation,
+);
 elements.freeTopic.addEventListener("change", (event) => {
   const topicId = event.target.value;
   if (!FREE_CHAT_TOPICS[topicId]) {
@@ -6128,8 +8009,79 @@ document.addEventListener("keydown", (event) => {
     button?.focus();
   }
 });
+document.addEventListener("keydown", (event) => {
+  if (!state.reviewActive) {
+    return;
+  }
+
+  const target = event.target;
+  if (
+    target instanceof HTMLElement &&
+    (target.tagName === "INPUT" ||
+      target.tagName === "SELECT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable)
+  ) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    closeReview();
+    return;
+  }
+
+  if (!getCurrentReviewEntry()) {
+    return;
+  }
+
+  if (event.code === "Space" || event.key === "Enter") {
+    event.preventDefault();
+    if (!state.reviewRevealed) {
+      revealReviewCard();
+      return;
+    }
+    if (event.code === "Space") {
+      gradeReviewCard("good");
+    }
+    return;
+  }
+
+  const shortcuts = { "1": "again", "2": "hard", "3": "good", "4": "easy" };
+  const grade = shortcuts[event.key];
+  if (grade) {
+    event.preventDefault();
+    gradeReviewCard(grade);
+    return;
+  }
+
+  if (event.key === "s" || event.key === "S") {
+    event.preventDefault();
+    speakReviewCard();
+  }
+});
 window.addEventListener("resize", closeWordPopover);
 window.addEventListener("scroll", closeWordPopover, { passive: true });
+
+function dismissWelcomeOverlay() {
+  const overlay = elements.welcomeOverlay;
+  if (!overlay) {
+    return;
+  }
+
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  window.setTimeout(
+    () => {
+      overlay.classList.add("is-leaving");
+      window.setTimeout(
+        () => overlay.remove(),
+        reduceMotion ? 150 : 900,
+      );
+    },
+    reduceMotion ? 700 : 3000,
+  );
+}
 
 if ("speechSynthesis" in window) {
   refreshSpeechVoiceCache();
@@ -6144,4 +8096,6 @@ if ("speechSynthesis" in window) {
 restoreMarks();
 restorePracticeHistory();
 restorePracticeSettings();
+restoreReviewData();
+dismissWelcomeOverlay();
 checkSession();

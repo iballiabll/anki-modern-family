@@ -18,6 +18,19 @@
     <script src="./app.js" defer></script>
   </head>
   <body>
+    <div
+      id="welcomeOverlay"
+      class="welcome-overlay"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="welcome-inner">
+        <span class="welcome-eyebrow">IBALL'S LISTENING CABIN</span>
+        <strong class="welcome-title">欢迎 wzh 女王光临</strong>
+        <span class="welcome-sub">小屋的灯已经点亮，慢慢进来就好。</span>
+      </div>
+    </div>
+
     <section id="loginView" class="login-view" aria-labelledby="loginTitle">
       <div class="login-shell">
         <div class="login-story">
@@ -218,6 +231,13 @@
               </button>
             </div>
             <div class="toolbar-actions">
+              <button
+                id="reviewButton"
+                class="review-launch-button"
+                type="button"
+              >
+                在线复习
+              </button>
               <button
                 id="ankiExportButton"
                 class="anki-export-launch-button"
@@ -560,6 +580,21 @@
                       spellcheck="false"
                       placeholder="说出或输入你的英文回答..."
                     ></textarea>
+                    <div class="practice-realtime-bar">
+                      <button
+                        id="dialogueRealtimeButton"
+                        class="practice-realtime-button"
+                        type="button"
+                        aria-pressed="false"
+                      >
+                        开始实时对话
+                      </button>
+                      <span
+                        id="dialogueRealtimeStatus"
+                        class="practice-realtime-status"
+                        aria-live="polite"
+                      ></span>
+                    </div>
                     <div class="dialogue-reply-actions">
                       <button
                         id="dialogueListenButton"
@@ -730,6 +765,21 @@
                     spellcheck="false"
                     placeholder="用英语说出或输入你的想法，按 Ctrl + Enter 发送..."
                   ></textarea>
+                  <div class="practice-realtime-bar">
+                    <button
+                      id="freeRealtimeButton"
+                      class="practice-realtime-button"
+                      type="button"
+                      aria-pressed="false"
+                    >
+                      开始实时对话
+                    </button>
+                    <span
+                      id="freeRealtimeStatus"
+                      class="practice-realtime-status"
+                      aria-live="polite"
+                    ></span>
+                  </div>
                   <div class="free-reply-actions">
                     <button
                       id="freeListenButton"
@@ -986,6 +1036,194 @@
         </section>
 
         <section
+          id="reviewStudio"
+          class="review-studio"
+          aria-labelledby="reviewHeading"
+          hidden
+        >
+          <header class="review-header">
+            <div>
+              <p class="section-label">SPACED REPETITION</p>
+              <h2 id="reviewHeading">在线复习</h2>
+              <p id="reviewSource" class="review-source"></p>
+            </div>
+            <button
+              id="reviewExitButton"
+              class="practice-secondary-button"
+              type="button"
+            >
+              返回词汇
+            </button>
+          </header>
+
+          <div class="review-controls">
+            <label class="practice-field" for="reviewCategory">
+              <span>复习范围</span>
+              <select id="reviewCategory"></select>
+            </label>
+            <label class="practice-field" for="reviewSection">
+              <span>二级小节</span>
+              <select id="reviewSection"></select>
+            </label>
+            <label class="practice-field" for="reviewNewLimit">
+              <span>今日新卡上限</span>
+              <select id="reviewNewLimit">
+                <option value="0">只复习旧卡</option>
+                <option value="10">10 张</option>
+                <option value="20" selected>20 张</option>
+                <option value="40">40 张</option>
+              </select>
+            </label>
+            <div class="review-control-actions">
+              <button
+                id="reviewRestartButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                重新排队
+              </button>
+              <button
+                id="reviewExportButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                导出进度
+              </button>
+              <button
+                id="reviewImportButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                导入进度
+              </button>
+              <button
+                id="reviewClearButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                清空进度
+              </button>
+              <input
+                id="reviewImportInput"
+                type="file"
+                accept=".json,application/json"
+                hidden
+              />
+            </div>
+          </div>
+
+          <div class="review-stat-grid">
+            <div>
+              <strong id="reviewDueCount">0</strong>
+              <span>到期复习</span>
+            </div>
+            <div>
+              <strong id="reviewNewCount">0</strong>
+              <span>可学新卡</span>
+            </div>
+            <div>
+              <strong id="reviewDoneCount">0</strong>
+              <span>本次完成</span>
+            </div>
+            <div>
+              <strong id="reviewTotalCount">0</strong>
+              <span>范围内卡片</span>
+            </div>
+          </div>
+
+          <article id="reviewCard" class="review-card">
+            <div class="review-card-meta">
+              <span id="reviewCardScope"></span>
+              <span id="reviewCardProgress"></span>
+            </div>
+
+            <div class="review-card-front">
+              <p
+                id="reviewCardSentence"
+                class="review-card-sentence"
+                lang="en"
+              ></p>
+              <p id="reviewCardPrompt" class="review-card-prompt"></p>
+            </div>
+
+            <div id="reviewCardAnswer" class="review-card-answer" hidden>
+              <div class="review-answer-row">
+                <strong id="reviewCardPhrase" lang="en"></strong>
+                <span
+                  id="reviewCardPhonetic"
+                  class="review-answer-phonetic"
+                  lang="en"
+                ></span>
+              </div>
+              <p id="reviewCardMeaning" class="review-answer-meaning"></p>
+              <p
+                id="reviewCardTranslation"
+                class="review-answer-translation"
+              ></p>
+            </div>
+
+            <div class="review-card-actions">
+              <button
+                id="reviewSpeakButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                朗读句子
+              </button>
+              <button
+                id="reviewShowButton"
+                class="practice-primary-button"
+                type="button"
+              >
+                显示答案
+              </button>
+            </div>
+
+            <div id="reviewGradeActions" class="review-grade-actions" hidden>
+              <button
+                class="review-grade-button is-again"
+                data-review-grade="again"
+                type="button"
+              >
+                <strong>忘记</strong>
+                <span id="reviewIntervalAgain"></span>
+              </button>
+              <button
+                class="review-grade-button is-hard"
+                data-review-grade="hard"
+                type="button"
+              >
+                <strong>模糊</strong>
+                <span id="reviewIntervalHard"></span>
+              </button>
+              <button
+                class="review-grade-button is-good"
+                data-review-grade="good"
+                type="button"
+              >
+                <strong>记得</strong>
+                <span id="reviewIntervalGood"></span>
+              </button>
+              <button
+                class="review-grade-button is-easy"
+                data-review-grade="easy"
+                type="button"
+              >
+                <strong>简单</strong>
+                <span id="reviewIntervalEasy"></span>
+              </button>
+            </div>
+
+            <p id="reviewStatus" class="review-status" aria-live="polite"></p>
+          </article>
+
+          <p class="review-footnote">
+            卡片调度参考开源的间隔重复思路，复习进度只保存在当前浏览器，
+            也可以导出备份文件。
+          </p>
+        </section>
+
+        <section
           id="cardGrid"
           class="card-grid"
           aria-label="听力词汇卡片"
@@ -1051,6 +1289,17 @@
               rel="noreferrer"
             >
               EchoMentor
+            </a>
+            · MIT
+          </span>
+          <span>
+            间隔重复思路参考：
+            <a
+              href="https://github.com/open-spaced-repetition/fsrs4anki"
+              target="_blank"
+              rel="noreferrer"
+            >
+              FSRS4Anki
             </a>
             · MIT
           </span>

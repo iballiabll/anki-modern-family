@@ -3,8 +3,16 @@
   "generatedFrom": "materials",
   "categories": [
     {
+      "name": "0基础",
+      "sections": [
+        "Level 1-2"
+      ]
+    },
+    {
       "name": "四级",
-      "sections": []
+      "sections": [
+        "2022年6月听力"
+      ]
     },
     {
       "name": "六级",
@@ -23,6 +31,28 @@
   ],
   "resources": [
     {
+      "id": "0-level-1-2-level1-2-102dbb6a",
+      "title": "零基础词汇讲义Level1-2 词汇表",
+      "category": "0基础",
+      "section": "Level 1-2",
+      "group": "0基础",
+      "description": "0基础 · Level 1-2 · 零基础词汇讲义Level1-2 词汇表",
+      "file": "./materials/0%E5%9F%BA%E7%A1%80/Level%201-2/%E9%9B%B6%E5%9F%BA%E7%A1%80%E8%AF%8D%E6%B1%87%E8%AE%B2%E4%B9%89Level1-2_%E8%AF%8D%E6%B1%87%E8%A1%A8.csv",
+      "format": "anki-csv",
+      "attachment": false
+    },
+    {
+      "id": "0-level-1-2-level1-2-ec8db2e1",
+      "title": "零基础词汇讲义Level1-2 词汇表",
+      "category": "0基础",
+      "section": "Level 1-2",
+      "group": "0基础",
+      "description": "0基础 · Level 1-2 · 零基础词汇讲义Level1-2 词汇表",
+      "file": "./materials/0%E5%9F%BA%E7%A1%80/Level%201-2/%E9%9B%B6%E5%9F%BA%E7%A1%80%E8%AF%8D%E6%B1%87%E8%AE%B2%E4%B9%89Level1-2_%E8%AF%8D%E6%B1%87%E8%A1%A8.docx",
+      "format": "download-only",
+      "attachment": true
+    },
+    {
       "id": "s01e01-50-37ed3d0b",
       "title": "S01E01 精选 50",
       "category": "电影",
@@ -30,7 +60,8 @@
       "group": "电影",
       "description": "电影 · 摩登家庭 · S01E01 精选 50",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01%20%E7%B2%BE%E9%80%89%2050.md",
-      "format": "markdown-table"
+      "format": "markdown-table",
+      "attachment": false
     },
     {
       "id": "s01e01-100-4570f530",
@@ -40,7 +71,8 @@
       "group": "电影",
       "description": "电影 · 摩登家庭 · S01E01 完整 100",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01%20%E5%AE%8C%E6%95%B4%20100.md",
-      "format": "markdown-table"
+      "format": "markdown-table",
+      "attachment": false
     },
     {
       "id": "s01e02-100-35e7541f",
@@ -50,7 +82,74 @@
       "group": "电影",
       "description": "电影 · 摩登家庭 · S01E02 完整 100",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E02%20%E5%AE%8C%E6%95%B4%20100.md",
-      "format": "markdown-table"
+      "format": "markdown-table",
+      "attachment": false
+    },
+    {
+      "id": "2022-6-2026-09-16-cet4-2022-06-2-62c6facb",
+      "title": "CET4-2022年06月听力-第2套-手机版",
+      "category": "四级",
+      "section": "2022年6月听力",
+      "group": "四级",
+      "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第2套-手机版",
+      "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC2%E5%A5%97-%E6%89%8B%E6%9C%BA%E7%89%88.html",
+      "format": "html-page",
+      "attachment": true
+    },
+    {
+      "id": "2022-6-2026-09-16-cet4-2022-06-2-0d3e404a",
+      "title": "CET4-2022年06月听力-第2套",
+      "category": "四级",
+      "section": "2022年6月听力",
+      "group": "四级",
+      "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第2套",
+      "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC2%E5%A5%97.md",
+      "format": "markdown-table",
+      "attachment": false
+    },
+    {
+      "id": "2022-6-2026-09-16-cet4-2022-06-3-8bc3613e",
+      "title": "CET4-2022年06月听力-第3套-手机版",
+      "category": "四级",
+      "section": "2022年6月听力",
+      "group": "四级",
+      "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第3套-手机版",
+      "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC3%E5%A5%97-%E6%89%8B%E6%9C%BA%E7%89%88.html",
+      "format": "html-page",
+      "attachment": true
+    },
+    {
+      "id": "2022-6-2026-09-16-cet4-2022-06-3-cf57962f",
+      "title": "CET4-2022年06月听力-第3套",
+      "category": "四级",
+      "section": "2022年6月听力",
+      "group": "四级",
+      "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第3套",
+      "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC3%E5%A5%97.md",
+      "format": "markdown-table",
+      "attachment": false
+    },
+    {
+      "id": "2022-6-2026-09-16-cet4-2022-06-9338e526",
+      "title": "CET4-2022年06月听力-手机版",
+      "category": "四级",
+      "section": "2022年6月听力",
+      "group": "四级",
+      "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-手机版",
+      "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E6%89%8B%E6%9C%BA%E7%89%88.html",
+      "format": "html-page",
+      "attachment": true
+    },
+    {
+      "id": "2022-6-2026-09-16-cet4-2022-06-8cbf3851",
+      "title": "CET4-2022年06月听力",
+      "category": "四级",
+      "section": "2022年6月听力",
+      "group": "四级",
+      "description": "四级 · 2022年6月听力 · CET4-2022年06月听力",
+      "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B.md",
+      "format": "markdown-table",
+      "attachment": false
     }
   ]
 }
