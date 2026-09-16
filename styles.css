@@ -1367,6 +1367,30 @@ p {
   gap: 12px;
 }
 
+.toolbar-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.anki-export-launch-button {
+  min-height: 38px;
+  padding: 0 13px;
+  color: var(--forest);
+  background: #edf4ef;
+  border: 1px solid #c9dbd2;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.anki-export-launch-button:hover {
+  background: #e1eee7;
+  border-color: #9dbdaf;
+}
+
 .practice-launch-button {
   min-height: 38px;
   flex: 0 0 auto;
@@ -1383,6 +1407,99 @@ p {
 .practice-launch-button:hover {
   background: var(--coral-dark);
   border-color: var(--coral-dark);
+}
+
+.anki-export-panel {
+  padding: 14px;
+  display: grid;
+  gap: 13px;
+  background: #f7faf8;
+  border: 1px solid #d5e3da;
+  border-radius: 9px;
+}
+
+.anki-export-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.anki-export-head > div {
+  display: grid;
+  gap: 3px;
+}
+
+.anki-export-head .section-label {
+  margin: 0;
+  color: #6d8178;
+}
+
+.anki-export-head strong {
+  color: var(--forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.anki-export-close-button {
+  min-height: 30px;
+  padding: 0 9px;
+  color: #5c7067;
+  background: #ffffff;
+  border: 1px solid #d5e0da;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.anki-export-close-button:hover {
+  border-color: #9dbdaf;
+}
+
+.anki-export-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.anki-export-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.anki-export-summary {
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: #65766e;
+  font-size: 12px;
+}
+
+.anki-export-summary strong {
+  color: var(--forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+}
+
+.anki-export-scope {
+  color: #89978f;
+}
+
+.anki-export-status {
+  min-height: 16px;
+  margin: -5px 0 0;
+  color: #47735f;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.anki-export-status.is-error {
+  color: #a43f3b;
 }
 
 .practice-studio {
@@ -1680,6 +1797,13 @@ p {
 .practice-field input:focus {
   border-color: #5a9684;
   box-shadow: 0 0 0 4px rgba(90, 150, 132, 0.13);
+}
+
+.practice-voice-status {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .practice-transcript-block {
@@ -2307,6 +2431,332 @@ p {
   color: #819089;
 }
 
+.free-stage {
+  min-width: 0;
+}
+
+.free-conversation-head {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.free-conversation-head h3 {
+  margin: 5px 0 0;
+  color: var(--forest-deep);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.free-mode-summary {
+  margin: 6px 0 0;
+  color: #718078;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.free-turn-counter {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  color: #45685c;
+  background: #edf4ef;
+  border: 1px solid #d8e4dc;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.free-topic-bar {
+  min-width: 0;
+  margin-top: 15px;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  background: #f6faf7;
+  border: 1px solid #dfe9e3;
+  border-radius: 10px;
+}
+
+.free-topic-field {
+  min-width: 0;
+  flex: 1 1 190px;
+  display: grid;
+  gap: 6px;
+  color: #53665d;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.free-topic-field select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 11px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.free-topic-field select:focus {
+  border-color: #5a9684;
+  box-shadow: 0 0 0 4px rgba(90, 150, 132, 0.13);
+  outline: 0;
+}
+
+.free-auto-speak {
+  min-height: 38px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #53665d;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.free-auto-speak input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--forest);
+}
+
+.free-topic-bar > button {
+  flex: 0 0 auto;
+}
+
+.free-messages {
+  min-width: 0;
+  max-height: 430px;
+  margin-top: 15px;
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 11px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fbfdfc;
+  border: 1px solid #e2ebe6;
+  border-radius: 12px;
+}
+
+.free-message {
+  min-width: 0;
+  max-width: 88%;
+  padding: 12px 14px;
+  border: 1px solid #dce7e1;
+  border-radius: 12px;
+}
+
+.free-message.is-assistant {
+  margin-right: auto;
+  background: #f2f8f4;
+  border-left: 3px solid var(--gold);
+  border-bottom-left-radius: 4px;
+}
+
+.free-message.is-user {
+  margin-left: auto;
+  background: #fff7f3;
+  border-color: #efd9d0;
+  border-right: 3px solid var(--coral);
+  border-bottom-right-radius: 4px;
+}
+
+.free-message header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.free-message-meta {
+  min-width: 0;
+  color: #788981;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.free-message-speak {
+  flex: 0 0 auto;
+  min-height: 26px;
+  padding: 0 9px;
+  color: #35604f;
+  background: #ffffff;
+  border: 1px solid #cfe0d7;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.free-message-speak:hover {
+  background: #e8f4ee;
+}
+
+.free-message-en,
+.free-message-zh {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.free-message-en {
+  margin: 7px 0 0;
+  color: #244f43;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.free-message-zh {
+  margin: 5px 0 0;
+  color: #6f7f77;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.free-message.is-loading .free-message-en {
+  color: #7b8b83;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.free-feedback {
+  min-width: 0;
+  margin-top: 12px;
+  padding-top: 11px;
+  display: grid;
+  gap: 9px;
+  border-top: 1px solid #e6d6cf;
+}
+
+.free-feedback-heading {
+  color: #8b3e30;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.free-feedback-row {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.free-feedback-row > span {
+  color: #8a7268;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.free-feedback-row > p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #3f5349;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.free-feedback-row > ul {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.free-feedback-row li {
+  overflow-wrap: anywhere;
+  color: #4d6058;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.free-reply-block {
+  margin-top: 16px;
+  padding-top: 15px;
+  display: grid;
+  gap: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.free-reply-block > label {
+  color: #53665d;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#freeAnswerInput {
+  width: 100%;
+  min-height: 92px;
+  padding: 12px 13px;
+  color: var(--ink);
+  background: #f8faf8;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  outline: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+#freeAnswerInput:focus {
+  border-color: #5a9684;
+  box-shadow: 0 0 0 4px rgba(90, 150, 132, 0.13);
+}
+
+.free-reply-actions {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.free-reply-actions > button {
+  flex: 1 1 118px;
+}
+
+.free-hint {
+  margin-top: 13px;
+  padding: 13px 14px;
+  background: #fffaf0;
+  border: 1px solid #ebdfbd;
+  border-left: 3px solid #d4ad51;
+  border-radius: 9px;
+}
+
+.free-hint ul {
+  margin: 7px 0 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 5px;
+}
+
+.free-hint li {
+  overflow-wrap: anywhere;
+  color: #5f5232;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.free-service-note {
+  margin: 0;
+  color: #819089;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
 .practice-text-button {
   min-height: 30px;
   padding: 0 8px;
@@ -2441,6 +2891,8 @@ p {
 .meaning-control-button:focus-visible,
 .meaning-reveal-button:focus-visible,
 .collection-filter-button:focus-visible,
+.anki-export-launch-button:focus-visible,
+.anki-export-close-button:focus-visible,
 .practice-launch-button:focus-visible,
 .practice-secondary-button:focus-visible,
 .practice-primary-button:focus-visible,
@@ -2451,9 +2903,13 @@ p {
 .practice-rate-field select:focus-visible,
 .practice-field select:focus-visible,
 .practice-field input:focus-visible,
+.free-topic-field select:focus-visible,
+.free-auto-speak input:focus-visible,
+.free-message-speak:focus-visible,
 .practice-section-tab:focus-visible,
 .dialogue-scenario-button:focus-visible,
-#dialogueAnswerInput:focus-visible {
+#dialogueAnswerInput:focus-visible,
+#freeAnswerInput:focus-visible {
   outline: 3px solid rgba(90, 150, 132, 0.32);
   outline-offset: 2px;
 }
@@ -2594,7 +3050,26 @@ p {
     flex-direction: column;
   }
 
+  .toolbar-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .anki-export-launch-button,
   .practice-launch-button {
+    width: 100%;
+  }
+
+  .anki-export-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .anki-export-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .anki-export-footer .practice-primary-button {
     width: 100%;
   }
 
@@ -2640,7 +3115,7 @@ p {
   .practice-section-switch {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .practice-section-tab {
@@ -2693,6 +3168,27 @@ p {
 
   .dialogue-message {
     max-width: 94%;
+  }
+
+  .free-topic-field {
+    flex-basis: 100%;
+  }
+
+  .free-topic-bar > button {
+    flex: 1 1 100%;
+  }
+
+  .free-message {
+    max-width: 94%;
+  }
+
+  .free-reply-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .free-reply-actions > button {
+    width: 100%;
   }
 
   .view-button {
@@ -2748,7 +3244,8 @@ p {
   }
 
   .dialogue-scenario-head,
-  .dialogue-conversation-head {
+  .dialogue-conversation-head,
+  .free-conversation-head {
     flex-direction: column;
   }
 
@@ -2769,6 +3266,19 @@ p {
 
   .dialogue-message {
     max-width: 100%;
+  }
+
+  .free-message {
+    max-width: 100%;
+  }
+
+  .free-messages {
+    max-height: 360px;
+    padding: 12px;
+  }
+
+  .free-reply-actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .practice-history-item {

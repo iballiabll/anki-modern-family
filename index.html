@@ -217,13 +217,77 @@
                 <span id="unknownCount" class="view-count">0</span>
               </button>
             </div>
-            <button
-              id="practiceButton"
-              class="practice-launch-button"
-              type="button"
-            >
-              口语练习
-            </button>
+            <div class="toolbar-actions">
+              <button
+                id="ankiExportButton"
+                class="anki-export-launch-button"
+                type="button"
+                aria-expanded="false"
+                aria-controls="ankiExportPanel"
+              >
+                导出 Anki CSV
+              </button>
+              <button
+                id="practiceButton"
+                class="practice-launch-button"
+                type="button"
+              >
+                口语练习
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="ankiExportPanel"
+            class="anki-export-panel"
+            aria-labelledby="ankiExportTitle"
+            hidden
+          >
+            <div class="anki-export-head">
+              <div>
+                <span class="section-label">ANKI EXPORT</span>
+                <strong id="ankiExportTitle">导出 Anki CSV</strong>
+              </div>
+              <button
+                id="ankiExportCloseButton"
+                class="anki-export-close-button"
+                type="button"
+              >
+                关闭
+              </button>
+            </div>
+
+            <div class="anki-export-fields">
+              <label class="practice-field" for="ankiExportCategory">
+                <span>一级分类</span>
+                <select id="ankiExportCategory"></select>
+              </label>
+              <label class="practice-field" for="ankiExportSection">
+                <span>二级小节</span>
+                <select id="ankiExportSection"></select>
+              </label>
+            </div>
+
+            <div class="anki-export-footer">
+              <p class="anki-export-summary">
+                <strong id="ankiExportCount">0</strong>
+                <span>条词卡</span>
+                <span id="ankiExportScope" class="anki-export-scope"></span>
+              </p>
+              <button
+                id="ankiExportDownloadButton"
+                class="practice-primary-button"
+                type="button"
+                disabled
+              >
+                下载 CSV
+              </button>
+            </div>
+            <p
+              id="ankiExportStatus"
+              class="anki-export-status"
+              aria-live="polite"
+            ></p>
           </div>
 
           <div
@@ -285,6 +349,15 @@
             >
               情景对话
             </button>
+            <button
+              id="practiceFreeTab"
+              class="practice-section-tab"
+              type="button"
+              data-practice-section="free"
+              aria-pressed="false"
+            >
+              自由对话
+            </button>
           </div>
 
           <div class="practice-layout">
@@ -321,6 +394,15 @@
                     <option value="1">1x 原速</option>
                   </select>
                 </label>
+                <label class="practice-rate-field" for="practiceVoice">
+                  <span>示范声线</span>
+                  <select id="practiceVoice">
+                    <option value="auto">自动美音</option>
+                    <option value="female">自然女声</option>
+                    <option value="male">自然男声</option>
+                    <option value="device">设备默认</option>
+                  </select>
+                </label>
                 <button
                   id="practiceListenButton"
                   class="practice-primary-button"
@@ -344,6 +426,11 @@
                   结束跟读
                 </button>
               </div>
+              <p
+                id="practiceVoiceStatus"
+                class="practice-voice-status"
+                aria-live="polite"
+              ></p>
 
               <div class="practice-transcript-block">
                 <div class="practice-transcript-head">
@@ -585,6 +672,107 @@
                   </div>
                 </div>
               </div>
+
+              <div
+                id="freePracticeView"
+                class="practice-stage-view free-stage"
+                hidden
+              >
+                <div class="free-conversation-head">
+                  <div>
+                    <span class="practice-block-label">FREE CONVERSATION</span>
+                    <h3>和美音陪练自由聊天</h3>
+                    <p id="freeModeSummary" class="free-mode-summary"></p>
+                  </div>
+                  <span id="freeTurnCounter" class="free-turn-counter">
+                    第 0 轮
+                  </span>
+                </div>
+
+                <div class="free-topic-bar">
+                  <label class="free-topic-field" for="freeTopic">
+                    <span>练习话题</span>
+                    <select id="freeTopic">
+                      <option value="daily" selected>日常交流</option>
+                      <option value="study">学习与考试</option>
+                      <option value="travel">旅行与城市</option>
+                      <option value="work">工作与职业</option>
+                      <option value="technology">科技与媒体</option>
+                      <option value="culture">文化与生活</option>
+                    </select>
+                  </label>
+                  <label class="free-auto-speak" for="freeAutoSpeak">
+                    <input id="freeAutoSpeak" type="checkbox" checked />
+                    <span>自动美音朗读</span>
+                  </label>
+                  <button
+                    id="freeRestartButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    新对话
+                  </button>
+                </div>
+
+                <div
+                  id="freeMessages"
+                  class="free-messages"
+                  aria-live="polite"
+                ></div>
+
+                <div class="free-reply-block">
+                  <label for="freeAnswerInput">你的英文</label>
+                  <textarea
+                    id="freeAnswerInput"
+                    rows="3"
+                    lang="en"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="用英语说出或输入你的想法，按 Ctrl + Enter 发送..."
+                  ></textarea>
+                  <div class="free-reply-actions">
+                    <button
+                      id="freeListenButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      播放回复
+                    </button>
+                    <button
+                      id="freeHintButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      思路提示
+                    </button>
+                    <button
+                      id="freeRecordButton"
+                      class="practice-record-button"
+                      type="button"
+                    >
+                      开口说
+                    </button>
+                    <button
+                      id="freeStopButton"
+                      class="practice-stop-button"
+                      type="button"
+                      hidden
+                    >
+                      结束回答
+                    </button>
+                    <button
+                      id="freeSubmitButton"
+                      class="practice-primary-button"
+                      type="button"
+                    >
+                      发送
+                    </button>
+                  </div>
+                </div>
+
+                <div id="freeHint" class="free-hint" hidden></div>
+                <div id="freeNotice" class="practice-notice" hidden></div>
+              </div>
             </article>
 
             <aside class="practice-sidebar" aria-label="口语练习记录">
@@ -617,13 +805,20 @@
                     />
                   </label>
                   <label class="practice-field" for="practiceApiModel">
-                    <span>模型名称</span>
+                    <span>模型名称（可选择或输入）</span>
                     <input
                       id="practiceApiModel"
                       type="text"
+                      list="practiceApiModelOptions"
                       autocomplete="off"
                       placeholder="whisper-1"
                     />
+                    <datalist id="practiceApiModelOptions">
+                      <option value="v4flash"></option>
+                      <option value="v4pro"></option>
+                      <option value="whisper-1"></option>
+                      <option value="gpt-4o-mini-transcribe"></option>
+                    </datalist>
                   </label>
                   <label class="practice-field" for="practiceApiKey">
                     <span>API Key</span>
@@ -659,6 +854,99 @@
                     允许跨域访问（CORS）。
                   </p>
                 </div>
+              </div>
+
+              <div
+                id="freeServiceSettings"
+                class="practice-service-settings"
+                hidden
+              >
+                <div class="practice-service-head">
+                  <div>
+                    <span class="practice-block-label">自由对话</span>
+                    <h3>对话服务</h3>
+                  </div>
+                  <span
+                    id="freeChatModeStatus"
+                    class="practice-mode-status"
+                  >
+                    本地免费
+                  </span>
+                </div>
+                <label class="practice-field" for="freeChatMode">
+                  <span>AI 来源</span>
+                  <select id="freeChatMode">
+                    <option value="local" selected>本地免费陪练</option>
+                    <option value="api">自定义 Chat API</option>
+                    <option value="off">关闭自动回复</option>
+                  </select>
+                </label>
+                <div id="freeChatApiFields" class="practice-api-fields" hidden>
+                  <label class="practice-field" for="freeChatApiUrl">
+                    <span>Chat 接口地址</span>
+                    <input
+                      id="freeChatApiUrl"
+                      type="url"
+                      autocomplete="off"
+                      placeholder="https://api.openai.com/v1/chat/completions"
+                    />
+                  </label>
+                  <label class="practice-field" for="freeChatApiModel">
+                    <span>模型名称（可选择或输入）</span>
+                    <input
+                      id="freeChatApiModel"
+                      type="text"
+                      list="freeChatApiModelOptions"
+                      autocomplete="off"
+                      placeholder="gpt-4o-mini"
+                    />
+                    <datalist id="freeChatApiModelOptions">
+                      <option value="v4flash"></option>
+                      <option value="v4pro"></option>
+                      <option value="gpt-4o-mini"></option>
+                      <option value="gpt-4o"></option>
+                      <option value="deepseek-chat"></option>
+                    </datalist>
+                  </label>
+                  <label class="practice-field" for="freeChatApiKey">
+                    <span>API Key</span>
+                    <input
+                      id="freeChatApiKey"
+                      type="password"
+                      autocomplete="off"
+                      placeholder="可留空"
+                    />
+                  </label>
+                  <label class="practice-field" for="freeChatApiAuth">
+                    <span>鉴权方式</span>
+                    <select id="freeChatApiAuth">
+                      <option value="bearer" selected>Bearer</option>
+                      <option value="x-api-key">x-api-key</option>
+                      <option value="none">无鉴权</option>
+                    </select>
+                  </label>
+                  <button
+                    id="freeChatApiSaveButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    保存 Chat API 配置
+                  </button>
+                  <p
+                    id="freeChatApiStatus"
+                    class="practice-api-status"
+                    aria-live="polite"
+                  ></p>
+                  <p class="practice-api-note">
+                    浏览器会直接请求所填的 OpenAI 兼容 Chat Completions
+                    接口。API Key 只保存在本机，接口需要允许 CORS；费用由你
+                    自己的服务商结算。
+                  </p>
+                </div>
+                <p class="free-service-note">
+                  本地免费模式提供规则式追问、纠错和雅思练习建议。填写 Chat
+                  API 后才会进行完整的 AI 自由对话。
+                </p>
               </div>
 
               <div class="practice-sidebar-head">
@@ -741,6 +1029,28 @@
               rel="noreferrer"
             >
               english-speaking-coach
+            </a>
+            · MIT
+          </span>
+          <span>
+            自由对话与雅思反馈参考：
+            <a
+              href="https://github.com/Luxshan2000/ielts-prep"
+              target="_blank"
+              rel="noreferrer"
+            >
+              IELTS Prep
+            </a>
+            · MIT
+          </span>
+          <span>
+            纠错思路参考：
+            <a
+              href="https://github.com/anticipate218/EchoMentor"
+              target="_blank"
+              rel="noreferrer"
+            >
+              EchoMentor
             </a>
             · MIT
           </span>

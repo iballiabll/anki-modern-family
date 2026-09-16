@@ -8,6 +8,304 @@ const PRACTICE_HISTORY_STORAGE_KEY =
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
 const CATEGORY_ORDER = ["四级", "六级", "考研", "电影", "其他"];
+const AMERICAN_VOICE_NAMES = {
+  female: [
+    "aria",
+    "jenny",
+    "michelle",
+    "emma",
+    "ava",
+    "samantha",
+    "nicole",
+    "serena",
+    "victoria",
+    "zira",
+    "google us english",
+  ],
+  male: [
+    "guy",
+    "andrew",
+    "brian",
+    "christopher",
+    "eric",
+    "ryan",
+    "thomas",
+    "alex",
+    "fred",
+    "david",
+    "mark",
+  ],
+};
+const NATURAL_VOICE_HINTS = [
+  "natural",
+  "neural",
+  "online",
+  "enhanced",
+  "premium",
+  "multilingual",
+];
+const DIALOGUE_SPEAKER_VOICE_PROFILES = {
+  Barista: { gender: "female", pitch: 1.02, rateScale: 1 },
+  Receptionist: { gender: "female", pitch: 1, rateScale: 0.99 },
+  Interviewer: { gender: "male", pitch: 0.94, rateScale: 0.96 },
+  Local: { gender: "male", pitch: 0.96, rateScale: 0.99 },
+  Doctor: { gender: "female", pitch: 0.98, rateScale: 0.95 },
+  Friend: { gender: "female", pitch: 1.04, rateScale: 1.01 },
+};
+const FREE_CHAT_COACH_PROFILE = {
+  gender: "female",
+  pitch: 1,
+  rateScale: 0.96,
+};
+const FREE_CHAT_TOPICS = {
+  daily: {
+    label: "日常交流",
+    ideas: [
+      "描述今天发生的一件小事",
+      "说明你喜欢或不喜欢的日常习惯",
+      "补充一个原因，再问对方一个问题",
+    ],
+    replies: [
+      {
+        english:
+          "That sounds like a familiar part of everyday life. What made it stand out to you today, and how did you feel about it afterward?",
+        chinese:
+          "这听起来是日常生活中很熟悉的一部分。今天是什么让它特别值得一聊？之后你的感受如何？",
+      },
+      {
+        english:
+          "Thanks for sharing that. If you could change one detail about your routine, what would you change, and what difference would it make?",
+        chinese:
+          "谢谢你的分享。如果能改变日常安排中的一个细节，你会改变什么？这会带来什么不同？",
+      },
+    ],
+  },
+  study: {
+    label: "学习与考试",
+    ideas: [
+      "说一个最近学到的知识点",
+      "解释它为什么有用",
+      "举一个实际应用的例子",
+    ],
+    replies: [
+      {
+        english:
+          "That is a useful way to think about learning. Which part of your study routine helps you remember new material most effectively?",
+        chinese:
+          "这是看待学习的实用方式。你的学习安排中，哪一部分最能帮助你记住新内容？",
+      },
+      {
+        english:
+          "Good point. If you had to explain that idea to a beginner, what example would you use to make it easier to understand?",
+        chinese:
+          "说得好。如果要把这个想法解释给初学者，你会用什么例子让它更容易理解？",
+      },
+    ],
+  },
+  travel: {
+    label: "旅行与城市",
+    ideas: [
+      "描述一个想去或去过的地方",
+      "说一个具体场景",
+      "比较它和家乡的不同",
+    ],
+    replies: [
+      {
+        english:
+          "Travel can change the way we see ordinary places. What detail from that experience would you remember most clearly?",
+        chinese:
+          "旅行会改变我们看待普通地方的方式。那段经历中，哪一个细节你最会记得清楚？",
+      },
+      {
+        english:
+          "That makes the place sound vivid. How does it compare with the place where you live now?",
+        chinese:
+          "你的描述让这个地方很有画面感。它和你现在生活的地方相比有什么不同？",
+      },
+    ],
+  },
+  work: {
+    label: "工作与职业",
+    ideas: [
+      "介绍你正在做或想做的事",
+      "说一个需要解决的问题",
+      "解释你具备的相关能力",
+    ],
+    replies: [
+      {
+        english:
+          "That sounds like a meaningful challenge. What skill do you rely on most when you deal with that kind of situation?",
+        chinese:
+          "这听起来是一个很有意义的挑战。处理这类情况时，你最依赖哪项能力？",
+      },
+      {
+        english:
+          "I can see why that matters to you. If you could improve one part of the process, what would you focus on first?",
+        chinese:
+          "我能理解为什么这对你很重要。如果只能先改善流程中的一个部分，你会优先关注什么？",
+      },
+    ],
+  },
+  technology: {
+    label: "科技与媒体",
+    ideas: [
+      "说一个常用应用或设备",
+      "说明它带来的便利",
+      "谈一个可能的风险",
+    ],
+    replies: [
+      {
+        english:
+          "Technology often shapes our habits without us noticing. How has that tool changed the way you work or communicate?",
+        chinese:
+          "科技常常在不知不觉中改变我们的习惯。这个工具怎样改变了你的工作或沟通方式？",
+      },
+      {
+        english:
+          "That is worth considering. Do you think the benefits outweigh the possible disadvantages? Why?",
+        chinese:
+          "这确实值得思考。你认为它的好处是否大于潜在缺点？为什么？",
+      },
+    ],
+  },
+  culture: {
+    label: "文化与生活",
+    ideas: [
+      "介绍一个文化习惯",
+      "说明它和你的经验有何关系",
+      "提出一个值得讨论的问题",
+    ],
+    replies: [
+      {
+        english:
+          "Culture becomes easier to understand when we connect it with everyday examples. How did you first learn about that custom?",
+        chinese:
+          "当文化和日常例子联系起来时，它会更容易理解。你最初是怎样了解到这个习俗的？",
+      },
+      {
+        english:
+          "That is an interesting perspective. What do you think people from another culture might find surprising about it?",
+        chinese:
+          "这是一个很有意思的视角。你认为来自另一种文化的人会对它的哪一点感到意外？",
+      },
+    ],
+  },
+};
+const FREE_LANGUAGE_RULES = [
+  {
+    type: "语法",
+    pattern: /\bi\b/g,
+    replacement: "I",
+    message: "英文中的第一人称代词 I 在任何位置都要大写。",
+  },
+  {
+    type: "语法",
+    pattern: /\bI\s+am\s+agree\b/gi,
+    replacement: "I agree",
+    message: "agree 本身是动词，直接用 I agree，不需要加 am。",
+  },
+  {
+    type: "表达",
+    pattern: /\bI\s+(?:very|really very)\s+like\b/gi,
+    replacement: "I really like",
+    message: "I really like 比 I very like 更符合英语语序和搭配。",
+  },
+  {
+    type: "语法",
+    pattern: /\b(he|she|it)\s+don't\b/gi,
+    replacement: "$1 doesn't",
+    message: "第三人称单数在一般现在时的否定式要用 doesn't。",
+  },
+  {
+    type: "语法",
+    pattern: /\bI\s+have\s+(\d+)\s+years?\s+old\b/gi,
+    replacement: "I am $1 years old",
+    message: "表达年龄用 be + 数字 + years old，不用 have。",
+  },
+  {
+    type: "语法",
+    pattern: /\bmore\s+better\b/gi,
+    replacement: "better",
+    message: "better 已经是比较级，不需要再加 more。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bI\s+am\s+boring\b/gi,
+    replacement: "I am bored",
+    message: "bored 表示“感到无聊”，boring 表示“令人无聊”。",
+  },
+  {
+    type: "语法",
+    pattern: /\bdiscuss\s+about\b/gi,
+    replacement: "discuss",
+    message: "discuss 是及物动词，后面直接接讨论的内容。",
+  },
+  {
+    type: "语法",
+    pattern: /\blisten\s+music\b/gi,
+    replacement: "listen to music",
+    message: "listen 后面接对象时需要加 to。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bmarried\s+with\b/gi,
+    replacement: "married to",
+    message: "固定搭配是 be married to someone。",
+  },
+  {
+    type: "语法",
+    pattern: /\bcan\s+to\s+(\w+)\b/gi,
+    replacement: "can $1",
+    message: "情态动词 can 后直接接动词原形。",
+  },
+  {
+    type: "语法",
+    pattern: /\bthere\s+is\s+(many|several|lots of)\b/gi,
+    replacement: "there are $1",
+    message: "后面接复数名词时，要用 there are。",
+  },
+  {
+    type: "表达",
+    pattern: /\bhow\s+to\s+say\b/gi,
+    replacement: "How do you say",
+    message: "独立提问时应说 How do you say...?。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bdo\s+a\s+mistake\b/gi,
+    replacement: "make a mistake",
+    message: "英语中固定说 make a mistake。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bopen\s+the\s+light\b/gi,
+    replacement: "turn on the light",
+    message: "开灯用 turn on the light，不用 open。",
+  },
+  {
+    type: "词汇",
+    pattern: /\blearn\s+knowledge\b/gi,
+    replacement: "gain knowledge",
+    message: "knowledge 常与 gain 或 acquire 搭配；表达“学到知识”也可说 learn a lot。",
+  },
+];
+const FREE_VOCABULARY_UPGRADES = [
+  {
+    pattern: /\bvery\s+good\b/gi,
+    replacement: "excellent",
+    message: "excellent 比 very good 更凝练，也更适合雅思口语。",
+  },
+  {
+    pattern: /\bvery\s+bad\b/gi,
+    replacement: "terrible",
+    message: "terrible 可以替代 very bad，使表达更简洁。",
+  },
+  {
+    pattern: /\bI\s+think\b/gi,
+    replacement: "In my view",
+    message: "In my view 是更正式、适合展开观点的开头。",
+  },
+];
 const DIALOGUE_SCENARIOS = [
   {
     id: "cafe",
@@ -19,9 +317,9 @@ const DIALOGUE_SCENARIOS = [
     turns: [
       {
         speaker: "Barista",
-        prompt: "Hi, welcome in! What can I get for you today?",
+        prompt: "Hi, welcome in! What are you having today?",
         promptZh: "你好，欢迎光临！今天想喝点什么？",
-        sample: "I'd like a latte, please.",
+        sample: "Could I get a latte, please?",
         sampleZh: "我想要一杯拿铁，谢谢。",
         keywords: [
           {
@@ -36,9 +334,9 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Barista",
-        prompt: "Sure. What size would you like, and do you want any milk?",
+        prompt: "Sure thing. What size are we doing, and any milk with that?",
         promptZh: "好的。你要什么杯型？需要加牛奶吗？",
-        sample: "A medium one with oat milk, please.",
+        sample: "A medium with oat milk, please.",
         sampleZh: "请给我中杯，加燕麦奶。",
         keywords: [
           {
@@ -53,7 +351,7 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Barista",
-        prompt: "That'll be five dollars. How would you like to pay?",
+        prompt: "All right, that's gonna be five bucks. How do you wanna pay?",
         promptZh: "一共五美元。你想怎么付款？",
         sample: "I'll pay by card. Could I get it to go?",
         sampleZh: "我刷卡。可以帮我做成外带吗？",
@@ -80,9 +378,9 @@ const DIALOGUE_SCENARIOS = [
     turns: [
       {
         speaker: "Receptionist",
-        prompt: "Welcome! Do you have a reservation with us?",
+        prompt: "Welcome in! Do you have a reservation with us?",
         promptZh: "欢迎！您有预订吗？",
-        sample: "Yes, I have a reservation under the name Li.",
+        sample: "Yes, it's under Li. I have a reservation for two.",
         sampleZh: "有，我用李这个名字预订了。",
         keywords: [
           {
@@ -91,15 +389,20 @@ const DIALOGUE_SCENARIOS = [
           },
           {
             label: "说明预订姓名",
-            options: [["under the name"], ["name is"], ["my name"]],
+            options: [
+              ["under li"],
+              ["under the name"],
+              ["name is"],
+              ["my name"],
+            ],
           },
         ],
       },
       {
         speaker: "Receptionist",
-        prompt: "May I see your passport and a credit card, please?",
+        prompt: "Could I see your passport and a credit card?",
         promptZh: "可以出示您的护照和一张信用卡吗？",
-        sample: "Of course. Here are my passport and credit card.",
+        sample: "Sure. Here's my passport and credit card.",
         sampleZh: "当然可以。这是我的护照和信用卡。",
         keywords: [
           {
@@ -112,15 +415,21 @@ const DIALOGUE_SCENARIOS = [
           },
           {
             label: "礼貌回应",
-            options: [["of course"], ["sure"], ["here is"], ["here are"]],
+            options: [
+              ["of course"],
+              ["sure"],
+              ["here's"],
+              ["here is"],
+              ["here are"],
+            ],
           },
         ],
       },
       {
         speaker: "Receptionist",
-        prompt: "Your room is ready. Is there anything else you need?",
+        prompt: "You're all set. Anything else I can help you with?",
         promptZh: "您的房间准备好了。还需要其他帮助吗？",
-        sample: "Yes, what time is breakfast, and is Wi-Fi free?",
+        sample: "Yes, what time's breakfast, and is Wi-Fi free?",
         sampleZh: "有，早餐几点开始？Wi-Fi 免费吗？",
         keywords: [
           {
@@ -135,7 +444,12 @@ const DIALOGUE_SCENARIOS = [
           },
           {
             label: "礼貌提问",
-            options: [["what time"], ["is there"], ["could you tell me"]],
+            options: [
+              ["what time's"],
+              ["what time"],
+              ["is there"],
+              ["could you tell me"],
+            ],
           },
         ],
       },
@@ -151,7 +465,7 @@ const DIALOGUE_SCENARIOS = [
     turns: [
       {
         speaker: "Interviewer",
-        prompt: "Thanks for coming in. Could you tell me about yourself?",
+        prompt: "Thanks for coming in. So, tell me a little about yourself.",
         promptZh: "感谢你来面试。可以先介绍一下自己吗？",
         sample:
           "I'm a product designer with three years of experience in mobile apps.",
@@ -175,10 +489,10 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Interviewer",
-        prompt: "What experience makes you a good fit for this role?",
+        prompt: "What makes you a good fit for this role?",
         promptZh: "哪些经历让你适合这个岗位？",
         sample:
-          "I led a project that improved user retention by twenty percent.",
+          "I led a project that improved retention by twenty percent.",
         sampleZh: "我曾负责一个项目，把用户留存率提高了百分之二十。",
         keywords: [
           {
@@ -199,7 +513,7 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Interviewer",
-        prompt: "Why do you want to join our company?",
+        prompt: "So, why do you wanna join our team?",
         promptZh: "你为什么想加入我们公司？",
         sample:
           "I admire your product, and I want to grow with a strong team.",
@@ -227,7 +541,7 @@ const DIALOGUE_SCENARIOS = [
     turns: [
       {
         speaker: "Local",
-        prompt: "Hi, you look a little lost. Where are you trying to go?",
+        prompt: "Hey, you look a little lost. Where are you headed?",
         promptZh: "你好，你好像在找路。你想去哪里？",
         sample: "I'm trying to find the train station.",
         sampleZh: "我想去火车站。",
@@ -250,9 +564,9 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Local",
-        prompt: "Do you want to walk, or would you rather take the subway?",
+        prompt: "You wanna walk, or would you rather take the subway?",
         promptZh: "你想走路，还是坐地铁？",
-        sample: "I'd rather take the subway if it's faster.",
+        sample: "I'd rather take the subway if it's quicker.",
         sampleZh: "如果更快的话，我更想坐地铁。",
         keywords: [
           {
@@ -268,10 +582,10 @@ const DIALOGUE_SCENARIOS = [
       {
         speaker: "Local",
         prompt:
-          "Take the number two line and get off at Central Park. Got it?",
+          "Take the number two and hop off at Central Park. Make sense?",
         promptZh: "坐二号线，在中央公园下车。记住了吗？",
         sample:
-          "Yes, take line two and get off at Central Park. Thank you!",
+          "Got it, take the number two and get off at Central Park. Thanks!",
         sampleZh: "好，坐二号线，在中央公园下车。谢谢！",
         keywords: [
           {
@@ -300,9 +614,9 @@ const DIALOGUE_SCENARIOS = [
     turns: [
       {
         speaker: "Doctor",
-        prompt: "Come in and take a seat. What brings you in today?",
+        prompt: "Come on in and have a seat. What's going on today?",
         promptZh: "请进，坐吧。今天哪里不舒服？",
-        sample: "I have a bad headache and a sore throat.",
+        sample: "I've got a bad headache and a sore throat.",
         sampleZh: "我头很痛，嗓子也疼。",
         keywords: [
           {
@@ -323,9 +637,9 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Doctor",
-        prompt: "How long have you had these symptoms?",
+        prompt: "How long's that been going on?",
         promptZh: "这些症状持续多久了？",
-        sample: "I've had them since Monday, so about three days.",
+        sample: "Since Monday, so about three days.",
         sampleZh: "从周一开始的，大约三天了。",
         keywords: [
           {
@@ -340,9 +654,9 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Doctor",
-        prompt: "Are you allergic to any medicine, and are you taking anything?",
+        prompt: "Any allergies to medicine? And are you taking anything right now?",
         promptZh: "你对药物过敏吗？目前有在服药吗？",
-        sample: "I'm not allergic, and I'm only taking vitamins.",
+        sample: "No allergies, and I'm just taking vitamins.",
         sampleZh: "我没有过敏，只吃维生素。",
         keywords: [
           {
@@ -367,9 +681,9 @@ const DIALOGUE_SCENARIOS = [
     turns: [
       {
         speaker: "Friend",
-        prompt: "Hey! It's been a while. How have you been?",
+        prompt: "Hey! Long time no see. How've you been?",
         promptZh: "嗨！好久不见，你最近怎么样？",
-        sample: "I've been good, just busy with work. How about you?",
+        sample: "Pretty good, just busy with work. How about you?",
         sampleZh: "我挺好的，就是工作有点忙。你呢？",
         keywords: [
           {
@@ -384,9 +698,9 @@ const DIALOGUE_SCENARIOS = [
       },
       {
         speaker: "Friend",
-        prompt: "What did you get up to on the weekend?",
+        prompt: "So, what'd you get up to over the weekend?",
         promptZh: "你周末做了什么？",
-        sample: "I went hiking with friends and watched a movie.",
+        sample: "I went hiking with friends and caught a movie.",
         sampleZh: "我和朋友去徒步了，还看了一部电影。",
         keywords: [
           {
@@ -424,6 +738,521 @@ const DIALOGUE_SCENARIOS = [
       },
     ],
   },
+  {
+    id: "airport",
+    title: "机场值机",
+    titleEn: "Airport Check-in",
+    category: "出行",
+    level: "入门",
+    summary: "出示证件、办理托运并询问登机信息。",
+    turns: [
+      {
+        speaker: "Agent",
+        prompt: "Good morning. May I see your passport and booking reference?",
+        promptZh: "早上好。可以出示您的护照和订票号吗？",
+        sample: "Good morning. Here's my passport and my booking reference.",
+        sampleZh: "早上好。这是我的护照和订票号。",
+        keywords: [
+          {
+            label: "出示护照",
+            options: [["passport"], ["id"]],
+          },
+          {
+            label: "提供订票号",
+            options: [["booking reference"], ["booking number"], ["reference"]],
+          },
+          {
+            label: "礼貌回应",
+            options: [["here's"], ["here is"], ["sure"], ["of course"]],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt: "Are you checking any bags today?",
+        promptZh: "今天有需要托运的行李吗？",
+        sample: "Yes, I'd like to check one bag, and I'll keep a carry-on with me.",
+        sampleZh: "有的，我想托运一件行李，随身再带一个登机箱。",
+        keywords: [
+          {
+            label: "托运行李",
+            options: [
+              ["check one bag"],
+              ["check a bag"],
+              ["check in a bag"],
+              ["checked bag"],
+            ],
+          },
+          {
+            label: "随身行李",
+            options: [["carry-on"], ["carry on"], ["hand luggage"]],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt:
+          "Your gate is B12, and boarding starts at 10:40. Any questions?",
+        promptZh: "您的登机口是 B12，10:40 开始登机。有什么问题吗？",
+        sample:
+          "Yes, could you tell me where security is and how long it usually takes?",
+        sampleZh: "有，可以告诉我安检口在哪里，一般需要多长时间吗？",
+        keywords: [
+          {
+            label: "询问安检",
+            options: [["security"], ["security check"], ["security line"]],
+          },
+          {
+            label: "询问时间",
+            options: [["how long"], ["how many minutes"], ["what time"]],
+          },
+          {
+            label: "礼貌提问",
+            options: [
+              ["could you tell me"],
+              ["can you tell me"],
+              ["do you know"],
+              ["where is"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "shopping",
+    title: "商店退换货",
+    titleEn: "Returning an Item",
+    category: "生活",
+    level: "入门",
+    summary: "说明退换需求、出示凭证并确认退款方式。",
+    turns: [
+      {
+        speaker: "Assistant",
+        prompt: "Hi, how can I help you today?",
+        promptZh: "你好，今天需要什么帮助？",
+        sample: "Hi, I'd like to return this jacket. I bought it last week.",
+        sampleZh: "你好，我想退这件夹克。我上周买的。",
+        keywords: [
+          {
+            label: "说明退换",
+            options: [["return"], ["refund"], ["exchange"]],
+          },
+          {
+            label: "说明商品",
+            options: [["jacket"], ["shirt"], ["shoes"], ["coat"]],
+          },
+          {
+            label: "说明购买时间",
+            options: [
+              ["last week"],
+              ["yesterday"],
+              ["a few days ago"],
+              ["last month"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Assistant",
+        prompt: "Do you have the receipt with you?",
+        promptZh: "您带收据了吗？",
+        sample: "Yes, I have the receipt here, and I paid by card.",
+        sampleZh: "带了，收据在这里，我是刷卡付款的。",
+        keywords: [
+          {
+            label: "提供收据",
+            options: [["receipt"], ["proof of purchase"], ["order number"]],
+          },
+          {
+            label: "说明付款方式",
+            options: [["card"], ["cash"], ["apple pay"], ["credit card"]],
+          },
+        ],
+      },
+      {
+        speaker: "Assistant",
+        prompt: "Would you like a refund or store credit?",
+        promptZh: "您想退款还是换成店内额度？",
+        sample:
+          "I'd prefer a refund, please. Also, is there anything I need to sign?",
+        sampleZh: "我希望退款，谢谢。另外，有需要我签字的地方吗？",
+        keywords: [
+          {
+            label: "选择方案",
+            options: [["refund"], ["store credit"], ["gift card"], ["exchange"]],
+          },
+          {
+            label: "询问手续",
+            options: [
+              ["need to sign"],
+              ["fill in a form"],
+              ["fill out a form"],
+              ["what next"],
+            ],
+          },
+          {
+            label: "礼貌请求",
+            options: [["please"], ["i'd prefer"], ["could you"], ["would you"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "renting",
+    title: "租房看房",
+    titleEn: "Viewing an Apartment",
+    category: "生活",
+    level: "进阶",
+    summary: "说明需求、谈租金押金并检查房屋设施。",
+    turns: [
+      {
+        speaker: "Agent",
+        prompt:
+          "Thanks for coming. So, what kind of place are you looking for?",
+        promptZh: "谢谢你来。你想找什么样的房子？",
+        sample: "I'm looking for a one-bedroom apartment near the subway.",
+        sampleZh: "我在找一套靠近地铁的一居室。",
+        keywords: [
+          {
+            label: "说明房型",
+            options: [
+              ["one-bedroom"],
+              ["studio"],
+              ["two-bedroom"],
+              ["shared apartment"],
+            ],
+          },
+          {
+            label: "说明位置",
+            options: [
+              ["near the subway"],
+              ["near the station"],
+              ["city centre"],
+              ["city center"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt:
+          "The rent is 3,200 yuan a month, and utilities are not included. Does that work for you?",
+        promptZh: "房租每月 3200 元，水电另算。这个价格可以接受吗？",
+        sample:
+          "That's a little high for me. Could you tell me what the deposit is?",
+        sampleZh: "对我来说有点贵。可以告诉我押金是多少吗？",
+        keywords: [
+          {
+            label: "回应租金",
+            options: [
+              ["a little high"],
+              ["a bit expensive"],
+              ["that works"],
+              ["within my budget"],
+            ],
+          },
+          {
+            label: "询问押金",
+            options: [["deposit"], ["advance payment"], ["agency fee"]],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt:
+          "The deposit is one month's rent, and the lease is one year. Anything else?",
+        promptZh: "押金是一个月房租，租期一年。还有别的问题吗？",
+        sample:
+          "Yes, can I see the kitchen and check whether the water pressure is good?",
+        sampleZh: "有，我可以看看厨房，顺便检查一下水压好不好吗？",
+        keywords: [
+          {
+            label: "要求看房",
+            options: [
+              ["see the kitchen"],
+              ["see the bathroom"],
+              ["look around"],
+              ["see the bedroom"],
+            ],
+          },
+          {
+            label: "检查设施",
+            options: [
+              ["water pressure"],
+              ["hot water"],
+              ["air conditioning"],
+              ["heating"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ielts-part-1",
+    title: "雅思 Part 1 日常问答",
+    titleEn: "IELTS Speaking Part 1",
+    category: "雅思口语",
+    level: "Part 1",
+    summary: "简短问答日常话题，练习自然展开两三句。",
+    turns: [
+      {
+        speaker: "Examiner",
+        prompt:
+          "Let's talk about where you live. Do you live in a house or an apartment?",
+        promptZh: "我们聊聊你的住所。你住在独栋房子还是公寓里？",
+        sample: "I live in an apartment in the city centre with my family.",
+        sampleZh: "我和家人住在市中心的一套公寓里。",
+        keywords: [
+          {
+            label: "说明住所",
+            options: [["apartment"], ["house"], ["flat"]],
+          },
+          {
+            label: "说明同住情况",
+            options: [
+              ["with my family"],
+              ["on my own"],
+              ["with my parents"],
+              ["with friends"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "What do you like most about your neighbourhood?",
+        promptZh: "你最喜欢所在社区的哪一点？",
+        sample:
+          "I like that it's quiet and convenient, because there are shops and a park nearby.",
+        sampleZh: "我喜欢这里安静又方便，因为附近有商店和公园。",
+        keywords: [
+          {
+            label: "描述优点",
+            options: [["quiet"], ["convenient"], ["friendly"], ["green"]],
+          },
+          {
+            label: "给出原因",
+            options: [["because"], ["since"], ["that's why"], ["as a result"]],
+          },
+          {
+            label: "举例说明",
+            options: [["there are"], ["for example"], ["such as"], ["there is"]],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "How long have you lived there?",
+        promptZh: "你在那里住了多久？",
+        sample:
+          "I've lived there for about five years, ever since I started university.",
+        sampleZh: "我在那里住了大约五年，从上大学开始就住那儿。",
+        keywords: [
+          {
+            label: "说明时长",
+            options: [
+              ["for about five years"],
+              ["for ten years"],
+              ["since 2018"],
+              ["for a long time"],
+            ],
+          },
+          {
+            label: "使用完成时",
+            options: [["i've lived"], ["i have lived"], ["i've been living"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ielts-part-2",
+    title: "雅思 Part 2 个人陈述",
+    titleEn: "IELTS Speaking Part 2",
+    category: "雅思口语",
+    level: "Part 2",
+    summary: "按题卡连续陈述，补充细节并回应追问。",
+    turns: [
+      {
+        speaker: "Examiner",
+        prompt:
+          "Describe a skill you learned recently. You have one minute to prepare. Start when you're ready.",
+        promptZh:
+          "请描述一项你最近学会的技能。你有一分钟准备时间，准备好了就开始。",
+        sample:
+          "I'd like to talk about learning to cook, which I started about six months ago.",
+        sampleZh: "我想聊聊学做饭这件事，大约六个月前开始学的。",
+        keywords: [
+          {
+            label: "引入主题",
+            options: [
+              ["i'd like to talk about"],
+              ["i want to talk about"],
+              ["i'm going to talk about"],
+            ],
+          },
+          {
+            label: "说明时间",
+            options: [
+              ["six months ago"],
+              ["last year"],
+              ["a few weeks ago"],
+              ["recently"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "Who taught you, and why did you choose this skill?",
+        promptZh: "是谁教你的？你为什么选择学这项技能？",
+        sample:
+          "My mother taught me, because I wanted to eat healthier food instead of takeaway.",
+        sampleZh:
+          "是我妈妈教我的，因为我想吃得更健康，而不是总点外卖。",
+        keywords: [
+          {
+            label: "说明人物",
+            options: [["my mother"], ["my friend"], ["a teacher"], ["my brother"]],
+          },
+          {
+            label: "说明原因",
+            options: [["because"], ["since"], ["that's why"], ["as"]],
+          },
+          {
+            label: "对比细节",
+            options: [["instead of takeaway"], ["rather than"], ["compared with"]],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "How has this skill changed your daily life?",
+        promptZh: "这项技能怎样改变了你的日常生活？",
+        sample:
+          "It has saved me money, and I feel more confident when I invite friends over.",
+        sampleZh:
+          "它帮我省了钱，而且请朋友来家里吃饭时我更有自信了。",
+        keywords: [
+          {
+            label: "说明影响",
+            options: [
+              ["saved me money"],
+              ["helped me relax"],
+              ["changed my routine"],
+              ["made me healthier"],
+            ],
+          },
+          {
+            label: "加入细节",
+            options: [
+              ["when i invite friends"],
+              ["every weekend"],
+              ["after work"],
+              ["at home"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ielts-part-3",
+    title: "雅思 Part 3 深入讨论",
+    titleEn: "IELTS Speaking Part 3",
+    category: "雅思口语",
+    level: "Part 3",
+    summary: "围绕社会话题展开观点、举例并做出预测。",
+    turns: [
+      {
+        speaker: "Examiner",
+        prompt:
+          "Why do you think some people find it hard to change their habits?",
+        promptZh: "你觉得为什么有些人很难改变习惯？",
+        sample:
+          "In my view, people struggle because habits give them comfort and changing takes effort.",
+        sampleZh:
+          "在我看来，人们之所以难以改变，是因为习惯让人感到舒适，而改变需要付出努力。",
+        keywords: [
+          {
+            label: "表达观点",
+            options: [
+              ["in my view"],
+              ["i think"],
+              ["it seems to me"],
+              ["from my perspective"],
+            ],
+          },
+          {
+            label: "给出原因",
+            options: [["because"], ["since"], ["due to"], ["as"]],
+          },
+          {
+            label: "补充说明",
+            options: [
+              ["takes effort"],
+              ["hard work"],
+              ["need patience"],
+              ["not easy"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt:
+          "How could schools encourage healthier habits among students?",
+        promptZh: "学校可以怎样鼓励学生养成更健康的习惯？",
+        sample:
+          "Schools could offer more sports clubs, and for example they could teach cooking classes.",
+        sampleZh:
+          "学校可以提供更多运动社团，比如可以开设烹饪课。",
+        keywords: [
+          {
+            label: "提出建议",
+            options: [
+              ["could offer"],
+              ["should provide"],
+              ["might introduce"],
+              ["need to give"],
+            ],
+          },
+          {
+            label: "举例说明",
+            options: [["for example"], ["such as"], ["for instance"]],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "Do you think habits will change in the future? Why?",
+        promptZh: "你认为未来人们的习惯会改变吗？为什么？",
+        sample:
+          "I believe technology will help, but I think people will still need support from their families.",
+        sampleZh:
+          "我相信科技会有帮助，但我觉得人们仍然需要家人的支持。",
+        keywords: [
+          {
+            label: "表达预测",
+            options: [
+              ["will help"],
+              ["will change"],
+              ["are going to"],
+              ["i believe"],
+            ],
+          },
+          {
+            label: "平衡观点",
+            options: [["but"], ["however"], ["on the other hand"], ["still need"]],
+          },
+        ],
+      },
+    ],
+  },
 ];
 const wordLookupCache = new Map();
 let activeWordButton = null;
@@ -433,6 +1262,8 @@ let practiceMediaRecorder = null;
 let practiceMediaStream = null;
 let practiceAudioChunks = [];
 let practiceApiAbortController = null;
+let speechVoiceCache = [];
+let freeChatRequestId = 0;
 
 const state = {
   resources: [],
@@ -446,6 +1277,10 @@ const state = {
   query: "",
   materialQuery: "",
   favoriteCategory: "all",
+  ankiExportCategory: "all",
+  ankiExportSection: "all",
+  ankiExportStatus: "",
+  ankiExportStatusType: "",
   showAllMeanings: false,
   meaningReveals: new Set(),
   meaningHides: new Set(),
@@ -454,6 +1289,7 @@ const state = {
   practiceSection: "shadow",
   practiceIndex: 0,
   practiceRate: 0.9,
+  practiceVoice: "auto",
   practiceListening: false,
   practiceTranscribing: false,
   practiceTranscript: "",
@@ -475,6 +1311,20 @@ const state = {
   dialogueHintVisible: false,
   dialogueMessages: [],
   dialogueResult: null,
+  freeTopic: "daily",
+  freeAutoSpeak: true,
+  freeInput: "",
+  freeHintVisible: false,
+  freeMessages: [],
+  freeTurnCount: 0,
+  freeChatMode: "local",
+  freeChatLoading: false,
+  freeChatApiUrl: "",
+  freeChatApiModel: "",
+  freeChatApiKey: "",
+  freeChatApiAuth: "bearer",
+  freeChatApiMessage: "",
+  freeChatApiMessageType: "",
 };
 
 const elements = {
@@ -499,6 +1349,19 @@ const elements = {
   searchInput: document.querySelector("#searchInput"),
   showAllMeaningsButton: document.querySelector("#showAllMeaningsButton"),
   hideAllMeaningsButton: document.querySelector("#hideAllMeaningsButton"),
+  ankiExportButton: document.querySelector("#ankiExportButton"),
+  ankiExportPanel: document.querySelector("#ankiExportPanel"),
+  ankiExportCloseButton: document.querySelector(
+    "#ankiExportCloseButton",
+  ),
+  ankiExportCategory: document.querySelector("#ankiExportCategory"),
+  ankiExportSection: document.querySelector("#ankiExportSection"),
+  ankiExportCount: document.querySelector("#ankiExportCount"),
+  ankiExportScope: document.querySelector("#ankiExportScope"),
+  ankiExportDownloadButton: document.querySelector(
+    "#ankiExportDownloadButton",
+  ),
+  ankiExportStatus: document.querySelector("#ankiExportStatus"),
   viewSwitcher: document.querySelector("#viewSwitcher"),
   viewButtons: document.querySelectorAll("[data-view]"),
   collectionFilters: document.querySelector("#collectionFilters"),
@@ -513,6 +1376,7 @@ const elements = {
   practiceStudio: document.querySelector("#practiceStudio"),
   practiceShadowTab: document.querySelector("#practiceShadowTab"),
   practiceDialogueTab: document.querySelector("#practiceDialogueTab"),
+  practiceFreeTab: document.querySelector("#practiceFreeTab"),
   practiceHeading: document.querySelector("#practiceHeading"),
   practiceSource: document.querySelector("#practiceSource"),
   practiceExitButton: document.querySelector("#practiceExitButton"),
@@ -521,6 +1385,8 @@ const elements = {
   practiceTarget: document.querySelector("#practiceTarget"),
   practiceTranslation: document.querySelector("#practiceTranslation"),
   practiceRate: document.querySelector("#practiceRate"),
+  practiceVoice: document.querySelector("#practiceVoice"),
+  practiceVoiceStatus: document.querySelector("#practiceVoiceStatus"),
   practiceListenButton: document.querySelector("#practiceListenButton"),
   practiceRecordButton: document.querySelector("#practiceRecordButton"),
   practiceStopButton: document.querySelector("#practiceStopButton"),
@@ -567,6 +1433,31 @@ const elements = {
   dialogueSampleAnswer: document.querySelector("#dialogueSampleAnswer"),
   dialogueRetryButton: document.querySelector("#dialogueRetryButton"),
   dialogueNextButton: document.querySelector("#dialogueNextButton"),
+  freePracticeView: document.querySelector("#freePracticeView"),
+  freeModeSummary: document.querySelector("#freeModeSummary"),
+  freeTurnCounter: document.querySelector("#freeTurnCounter"),
+  freeTopic: document.querySelector("#freeTopic"),
+  freeAutoSpeak: document.querySelector("#freeAutoSpeak"),
+  freeRestartButton: document.querySelector("#freeRestartButton"),
+  freeMessages: document.querySelector("#freeMessages"),
+  freeAnswerInput: document.querySelector("#freeAnswerInput"),
+  freeListenButton: document.querySelector("#freeListenButton"),
+  freeHintButton: document.querySelector("#freeHintButton"),
+  freeRecordButton: document.querySelector("#freeRecordButton"),
+  freeStopButton: document.querySelector("#freeStopButton"),
+  freeSubmitButton: document.querySelector("#freeSubmitButton"),
+  freeHint: document.querySelector("#freeHint"),
+  freeNotice: document.querySelector("#freeNotice"),
+  freeServiceSettings: document.querySelector("#freeServiceSettings"),
+  freeChatModeStatus: document.querySelector("#freeChatModeStatus"),
+  freeChatMode: document.querySelector("#freeChatMode"),
+  freeChatApiFields: document.querySelector("#freeChatApiFields"),
+  freeChatApiUrl: document.querySelector("#freeChatApiUrl"),
+  freeChatApiModel: document.querySelector("#freeChatApiModel"),
+  freeChatApiKey: document.querySelector("#freeChatApiKey"),
+  freeChatApiAuth: document.querySelector("#freeChatApiAuth"),
+  freeChatApiSaveButton: document.querySelector("#freeChatApiSaveButton"),
+  freeChatApiStatus: document.querySelector("#freeChatApiStatus"),
   practiceClearButton: document.querySelector("#practiceClearButton"),
   practiceModeStatus: document.querySelector("#practiceModeStatus"),
   practiceMode: document.querySelector("#practiceMode"),
@@ -860,22 +1751,53 @@ function restorePracticeSettings() {
     );
     const allowedModes = new Set(["browser", "api", "off"]);
     const allowedAuthModes = new Set(["bearer", "x-api-key", "none"]);
+    const allowedVoicePreferences = new Set([
+      "auto",
+      "female",
+      "male",
+      "device",
+    ]);
+    const allowedFreeChatModes = new Set(["local", "api", "off"]);
 
     state.practiceRecognitionMode = allowedModes.has(stored.mode)
       ? stored.mode
       : "browser";
+    state.practiceVoice = allowedVoicePreferences.has(stored.voice)
+      ? stored.voice
+      : "auto";
     state.practiceApiUrl = String(stored.apiUrl || "").trim();
     state.practiceApiModel = String(stored.apiModel || "").trim();
     state.practiceApiKey = String(stored.apiKey || "").trim();
     state.practiceApiAuth = allowedAuthModes.has(stored.apiAuth)
       ? stored.apiAuth
       : "bearer";
+    state.freeChatMode = allowedFreeChatModes.has(stored.freeChatMode)
+      ? stored.freeChatMode
+      : "local";
+    state.freeChatApiUrl = String(stored.freeChatApiUrl || "").trim();
+    state.freeChatApiModel = String(stored.freeChatApiModel || "").trim();
+    state.freeChatApiKey = String(stored.freeChatApiKey || "").trim();
+    state.freeChatApiAuth = allowedAuthModes.has(stored.freeChatApiAuth)
+      ? stored.freeChatApiAuth
+      : "bearer";
+    state.freeAutoSpeak = stored.freeAutoSpeak !== false;
+    state.freeTopic = FREE_CHAT_TOPICS[stored.freeTopic]
+      ? stored.freeTopic
+      : "daily";
   } catch {
     state.practiceRecognitionMode = "browser";
+    state.practiceVoice = "auto";
     state.practiceApiUrl = "";
     state.practiceApiModel = "";
     state.practiceApiKey = "";
     state.practiceApiAuth = "bearer";
+    state.freeChatMode = "local";
+    state.freeChatApiUrl = "";
+    state.freeChatApiModel = "";
+    state.freeChatApiKey = "";
+    state.freeChatApiAuth = "bearer";
+    state.freeAutoSpeak = true;
+    state.freeTopic = "daily";
   }
 }
 
@@ -885,10 +1807,18 @@ function persistPracticeSettings() {
       PRACTICE_SETTINGS_STORAGE_KEY,
       JSON.stringify({
         mode: state.practiceRecognitionMode,
+        voice: state.practiceVoice,
         apiUrl: state.practiceApiUrl,
         apiModel: state.practiceApiModel,
         apiKey: state.practiceApiKey,
         apiAuth: state.practiceApiAuth,
+        freeChatMode: state.freeChatMode,
+        freeChatApiUrl: state.freeChatApiUrl,
+        freeChatApiModel: state.freeChatApiModel,
+        freeChatApiKey: state.freeChatApiKey,
+        freeChatApiAuth: state.freeChatApiAuth,
+        freeAutoSpeak: state.freeAutoSpeak,
+        freeTopic: state.freeTopic,
       }),
     );
   } catch {
@@ -971,15 +1901,185 @@ function getVisibleEntries() {
   });
 }
 
-function speak(text, rate = 0.9) {
+function normalizeVoiceText(value) {
+  return String(value || "")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getVoiceLocale(voice) {
+  return String(voice?.lang || "")
+    .toLocaleLowerCase("en-US")
+    .replace("_", "-");
+}
+
+function isAmericanEnglishVoice(voice) {
+  const locale = getVoiceLocale(voice);
+  return locale === "en-us" || locale.startsWith("en-us-");
+}
+
+function getVoiceNameRank(voiceName, names) {
+  const normalizedName = normalizeVoiceText(voiceName);
+  return names.findIndex((name) => normalizedName.includes(name));
+}
+
+function scoreSpeechVoice(voice, genderPreference = "") {
+  const locale = getVoiceLocale(voice);
+  if (!locale.startsWith("en")) {
+    return Number.NEGATIVE_INFINITY;
+  }
+
+  const voiceName = normalizeVoiceText(voice?.name);
+  const naturalHintScore = NATURAL_VOICE_HINTS.reduce(
+    (score, hint, index) =>
+      voiceName.includes(hint) ? score + 42 - index * 4 : score,
+    0,
+  );
+  let score = locale === "en-us" || locale.startsWith("en-us-") ? 120 : 24;
+
+  score += naturalHintScore;
+  if (voiceName.includes("google us english")) {
+    score += 58;
+  }
+  if (voiceName.includes("siri")) {
+    score += 36;
+  }
+  if (voice?.default) {
+    score += 6;
+  }
+
+  if (genderPreference === "female" || genderPreference === "male") {
+    const preferredRank = getVoiceNameRank(
+      voiceName,
+      AMERICAN_VOICE_NAMES[genderPreference],
+    );
+    const otherGender = genderPreference === "female" ? "male" : "female";
+    const otherRank = getVoiceNameRank(
+      voiceName,
+      AMERICAN_VOICE_NAMES[otherGender],
+    );
+
+    if (preferredRank >= 0) {
+      score += 92 - preferredRank * 5;
+    }
+    if (otherRank >= 0) {
+      score -= 48;
+    }
+  }
+
+  return score;
+}
+
+function refreshSpeechVoiceCache() {
+  if (!("speechSynthesis" in window)) {
+    speechVoiceCache = [];
+    return speechVoiceCache;
+  }
+
+  speechVoiceCache = Array.from(window.speechSynthesis.getVoices() || []);
+  return speechVoiceCache;
+}
+
+function getPreferredSpeechVoice(preference = "auto", profile = null) {
+  if (!speechVoiceCache.length) {
+    refreshSpeechVoiceCache();
+  }
+  if (!speechVoiceCache.length) {
+    return null;
+  }
+
+  if (preference === "device") {
+    return (
+      speechVoiceCache.find((voice) => voice.default) ||
+      speechVoiceCache.find(isAmericanEnglishVoice) ||
+      speechVoiceCache.find(
+        (voice) => getVoiceLocale(voice).startsWith("en"),
+      ) ||
+      speechVoiceCache[0]
+    );
+  }
+
+  const genderPreference =
+    preference === "female" || preference === "male"
+      ? preference
+      : profile?.gender || "";
+  const rankedVoices = speechVoiceCache
+    .map((voice, index) => ({
+      voice,
+      index,
+      score: scoreSpeechVoice(voice, genderPreference),
+    }))
+    .filter(({ score }) => Number.isFinite(score))
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+
+  return rankedVoices[0]?.voice || speechVoiceCache[0];
+}
+
+function getPracticeVoiceStatusText() {
+  if (!("speechSynthesis" in window)) {
+    return "当前浏览器不支持语音朗读。";
+  }
+
+  if (!speechVoiceCache.length) {
+    refreshSpeechVoiceCache();
+  }
+  if (!speechVoiceCache.length) {
+    return "正在读取设备声线；播放时会自动选择美式英语。";
+  }
+
+  const profile =
+    state.practiceSection === "dialogue"
+      ? DIALOGUE_SPEAKER_VOICE_PROFILES[
+          getCurrentDialogueTurn()?.speaker || ""
+        ]
+      : state.practiceSection === "free"
+        ? FREE_CHAT_COACH_PROFILE
+      : null;
+  const voice = getPreferredSpeechVoice(state.practiceVoice, profile);
+  if (!voice) {
+    return "未找到英语声线，将使用设备默认声音。";
+  }
+
+  if (!isAmericanEnglishVoice(voice)) {
+    return `未找到 en-US 声线，暂用 ${voice.name}。`;
+  }
+
+  const voiceName = normalizeVoiceText(voice.name);
+  const isNatural = NATURAL_VOICE_HINTS.some((hint) =>
+    voiceName.includes(hint),
+  );
+  return `当前声线：${voice.name}${isNatural ? " · 自然音色" : ""}`;
+}
+
+function speak(text, rate = 0.9, options = {}) {
   if (!("speechSynthesis" in window)) {
     return false;
   }
 
-  window.speechSynthesis.cancel();
+  const profile = options.profile || null;
+  const voice = getPreferredSpeechVoice(
+    options.voicePreference || state.practiceVoice,
+    profile,
+  );
+  const rateScale = Number(options.rateScale) || 1;
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  utterance.rate = Math.min(1.3, Math.max(0.5, Number(rate) || 0.9));
+
+  window.speechSynthesis.cancel();
+  utterance.lang = voice?.lang || "en-US";
+  if (voice) {
+    utterance.voice = voice;
+  }
+  utterance.rate = Math.min(
+    1.3,
+    Math.max(0.5, (Number(rate) || 0.9) * rateScale),
+  );
+  utterance.pitch = Math.min(
+    1.25,
+    Math.max(0.75, Number(options.pitch) || 1),
+  );
+  utterance.volume = 1;
+  window.speechSynthesis.resume();
   window.speechSynthesis.speak(utterance);
   return true;
 }
@@ -1587,30 +2687,28 @@ function renderDialogueCoach(turn, result) {
   elements.dialogueCoachTask.textContent = advice.task;
 }
 
+function updatePracticeSectionViews() {
+  const tabs = [
+    [elements.practiceShadowTab, "shadow"],
+    [elements.practiceDialogueTab, "dialogue"],
+    [elements.practiceFreeTab, "free"],
+  ];
+  tabs.forEach(([tab, section]) => {
+    const isActive = state.practiceSection === section;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-pressed", String(isActive));
+  });
+
+  elements.shadowPracticeView.hidden = state.practiceSection !== "shadow";
+  elements.dialoguePracticeView.hidden =
+    state.practiceSection !== "dialogue";
+  elements.freePracticeView.hidden = state.practiceSection !== "free";
+}
+
 function renderDialogueView() {
   const scenario = getCurrentDialogueScenario();
   const turn = getCurrentDialogueTurn();
   const availability = getPracticeModeAvailability();
-  const isDialogue = state.practiceSection === "dialogue";
-
-  elements.practiceShadowTab.classList.toggle(
-    "is-active",
-    !isDialogue,
-  );
-  elements.practiceDialogueTab.classList.toggle(
-    "is-active",
-    isDialogue,
-  );
-  elements.practiceShadowTab.setAttribute(
-    "aria-pressed",
-    String(!isDialogue),
-  );
-  elements.practiceDialogueTab.setAttribute(
-    "aria-pressed",
-    String(isDialogue),
-  );
-  elements.shadowPracticeView.hidden = isDialogue;
-  elements.dialoguePracticeView.hidden = !isDialogue;
 
   if (!scenario || !turn) {
     return;
@@ -1692,7 +2790,8 @@ function renderDialogueView() {
 }
 
 function setPracticeSection(section) {
-  const nextSection = section === "dialogue" ? "dialogue" : "shadow";
+  const allowedSections = new Set(["shadow", "dialogue", "free"]);
+  const nextSection = allowedSections.has(section) ? section : "shadow";
   if (state.practiceSection === nextSection) {
     return;
   }
@@ -1701,6 +2800,12 @@ function setPracticeSection(section) {
   state.practiceSection = nextSection;
   if (nextSection === "dialogue") {
     clearDialogueAttempt();
+  } else if (nextSection === "free") {
+    state.practiceMessage = "";
+    state.practiceMessageType = "";
+    if (state.freeMessages.length === 0) {
+      resetFreeConversation();
+    }
   } else {
     resetPracticeAttempt();
   }
@@ -1713,7 +2818,15 @@ function playDialoguePrompt() {
     return;
   }
 
-  if (!speak(turn.prompt, 0.9)) {
+  const profile = DIALOGUE_SPEAKER_VOICE_PROFILES[turn.speaker] || {};
+  if (
+    !speak(turn.prompt, 0.9, {
+      profile,
+      pitch: profile.pitch,
+      rateScale: profile.rateScale,
+      voicePreference: state.practiceVoice,
+    })
+  ) {
     state.practiceMessage =
       "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
     state.practiceMessageType = "error";
@@ -1866,6 +2979,833 @@ function moveDialogueTurn() {
   renderPracticeView();
 }
 
+function getFreeTopic() {
+  return FREE_CHAT_TOPICS[state.freeTopic] || FREE_CHAT_TOPICS.daily;
+}
+
+function getFreeChatModeLabel(mode = state.freeChatMode) {
+  const labels = {
+    local: "本地免费",
+    api: "自定义 Chat API",
+    off: "关闭自动回复",
+  };
+  return labels[mode] || labels.local;
+}
+
+function getFreeTopicIntro(topicId) {
+  const introductions = {
+    daily:
+      "Hi! I'm your American English conversation coach. Let's start with something simple: what is one small thing that happened in your day?",
+    study:
+      "Hi! Let's talk about learning and exams. What are you studying at the moment, and what part feels most challenging?",
+    travel:
+      "Hi! Let's talk about travel and cities. Is there a place you have visited or would love to visit? Tell me what interests you about it.",
+    work:
+      "Hi! Let's talk about work and careers. What kind of work are you doing now, or what career would you like to build?",
+    technology:
+      "Hi! Let's talk about technology and media. Which app or device do you use most often, and how does it affect your daily life?",
+    culture:
+      "Hi! Let's talk about culture and everyday life. What is one custom or habit in your community that visitors might find interesting?",
+  };
+  return introductions[topicId] || introductions.daily;
+}
+
+function getFreeTopicIntroZh(topicId) {
+  const introductions = {
+    daily:
+      "你好！我是你的美式英语对话教练。先从简单的话题开始：今天发生的一件小事是什么？",
+    study:
+      "你好！我们来聊聊学习和考试。你目前在学习什么？哪一部分最有挑战？",
+    travel:
+      "你好！我们来聊聊旅行和城市。有没有一个你去过或很想去的地方？说说它哪里吸引你。",
+    work:
+      "你好！我们来聊聊工作和职业。你现在做什么工作，或者想建立怎样的职业方向？",
+    technology:
+      "你好！我们来聊聊科技和媒体。你最常用哪个应用或设备？它怎样影响你的日常生活？",
+    culture:
+      "你好！我们来聊聊文化和日常生活。你的社区里有什么习俗或习惯会让外来者觉得有趣？",
+  };
+  return introductions[topicId] || introductions.daily;
+}
+
+function resetFreeConversation() {
+  freeChatRequestId += 1;
+  const topic = getFreeTopic();
+  state.freeMessages = [
+    {
+      role: "assistant",
+      english: getFreeTopicIntro(state.freeTopic),
+      chinese: getFreeTopicIntroZh(state.freeTopic),
+      source: "local",
+      createdAt: new Date().toISOString(),
+    },
+  ];
+  state.freeTurnCount = 0;
+  state.freeInput = "";
+  state.freeHintVisible = false;
+  state.freeChatLoading = false;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.freeChatApiMessage = "";
+  state.freeChatApiMessageType = "";
+  if (state.practiceSection === "free") {
+    renderPracticeView();
+  }
+}
+
+function cleanFreeEnglish(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\s+([,.!?;:])/g, "$1");
+}
+
+function applyFreeLanguageRules(text) {
+  const corrections = [];
+  let correctedText = cleanFreeEnglish(text);
+
+  FREE_LANGUAGE_RULES.forEach((rule) => {
+    const pattern = new RegExp(rule.pattern.source, rule.pattern.flags);
+    const nextText = correctedText.replace(pattern, rule.replacement);
+    if (nextText === correctedText) {
+      return;
+    }
+    correctedText = nextText;
+    corrections.push({
+      type: rule.type,
+      message: rule.message,
+    });
+  });
+
+  if (/\bbecause\b[\s\S]*\bso\b/i.test(correctedText)) {
+    corrections.push({
+      type: "连贯性",
+      message:
+        "英语里 because 和 so 通常不同时使用；保留一个连接词就足够。",
+    });
+  }
+  if (/\balthough\b[\s\S]*\bbut\b/i.test(correctedText)) {
+    corrections.push({
+      type: "连贯性",
+      message:
+        "although 和 but 通常不同时出现；可以只保留 although 或 but。",
+    });
+  }
+
+  return { correctedText, corrections };
+}
+
+function buildFreeVocabularySuggestion(text) {
+  let suggestedText = text;
+  const notes = [];
+
+  FREE_VOCABULARY_UPGRADES.forEach((upgrade) => {
+    const pattern = new RegExp(upgrade.pattern.source, upgrade.pattern.flags);
+    const nextText = suggestedText.replace(pattern, upgrade.replacement);
+    if (nextText === suggestedText) {
+      return;
+    }
+    suggestedText = nextText;
+    notes.push({
+      type: "词汇",
+      message: upgrade.message,
+    });
+  });
+
+  return { suggestedText, notes };
+}
+
+function buildFreeIeltsTips(text) {
+  const words = cleanFreeEnglish(text).match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || [];
+  const lowerText = cleanFreeEnglish(text).toLocaleLowerCase("en-US");
+  const tips = [];
+
+  if (words.length < 12) {
+    tips.push(
+      "流利度：回答偏短。雅思口语 Part 1 通常用 2–3 句展开，可以先回答，再补一个原因或例子。",
+    );
+  }
+
+  if (
+    !/\b(because|since|for example|however|although|while|which|that)\b/i.test(
+      lowerText,
+    )
+  ) {
+    tips.push(
+      "连贯性：加入 because、for example 或 however，让观点之间的关系更清楚。",
+    );
+  }
+
+  if (
+    !/\b(if|when|although|because|which|who|that|while|before|after)\b/i.test(
+      lowerText,
+    )
+  ) {
+    tips.push(
+      "语法：尝试加入一个从句，例如 “When I have time, I usually...” 来展示句式变化。",
+    );
+  }
+
+  if (words.length >= 12 && !tips.length) {
+    tips.push(
+      "表达：回答长度合适。下一步可以加入一个具体细节、数字或对比，让内容更像真实交流。",
+    );
+  }
+
+  return tips.slice(0, 2);
+}
+
+function analyzeFreeEnglish(text) {
+  const original = cleanFreeEnglish(text);
+  const { correctedText, corrections } = applyFreeLanguageRules(original);
+  const vocabulary = buildFreeVocabularySuggestion(correctedText);
+  const allCorrections = [...corrections, ...vocabulary.notes];
+  const betterExpression = vocabulary.suggestedText;
+  const ieltsTips = buildFreeIeltsTips(correctedText);
+  const feedback = {
+    correctedText,
+    corrections:
+      allCorrections.length > 0
+        ? allCorrections.slice(0, 4)
+        : [
+            {
+              type: "状态",
+              message: "没有发现明显语法错误，继续保持具体表达。",
+            },
+          ],
+    betterExpression:
+      betterExpression !== correctedText ? betterExpression : "",
+    ieltsTips,
+  };
+
+  return feedback;
+}
+
+function buildLocalFreeTurn(text, turnIndex) {
+  const topic = getFreeTopic();
+  const replies = topic.replies || FREE_CHAT_TOPICS.daily.replies;
+  const reply = replies[turnIndex % replies.length];
+  return {
+    feedback: analyzeFreeEnglish(text),
+    reply: {
+      english: reply.english,
+      chinese: reply.chinese,
+    },
+  };
+}
+
+function getFreeChatEndpoint() {
+  const rawUrl = String(state.freeChatApiUrl || "").trim();
+  if (!rawUrl) {
+    return "";
+  }
+
+  const resolved = new URL(rawUrl, window.location.href);
+  const pathname = resolved.pathname.replace(/\/+$/, "");
+  if (!pathname || pathname === "/v1") {
+    resolved.pathname = `${pathname || "/v1"}/chat/completions`;
+  }
+  return resolved.toString();
+}
+
+function buildFreeChatHeaders() {
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  if (!state.freeChatApiKey || state.freeChatApiAuth === "none") {
+    return headers;
+  }
+
+  if (state.freeChatApiAuth === "x-api-key") {
+    headers["x-api-key"] = state.freeChatApiKey;
+  } else {
+    headers.Authorization = `Bearer ${state.freeChatApiKey}`;
+  }
+  return headers;
+}
+
+function buildFreeChatSystemPrompt() {
+  const topic = getFreeTopic();
+  return [
+    "You are a friendly American English conversation coach for a Chinese learner who is preparing for IELTS Speaking.",
+    `The current conversation topic is: ${topic.label}.`,
+    "Reply naturally in 2 to 4 sentences and end with one follow-up question.",
+    "Use American English spelling and phrasing.",
+    "Always provide an accurate Simplified Chinese translation of your English reply.",
+    "Correct the learner's grammar, vocabulary, and unnatural expressions. Do not invent errors; if the sentence is already clear, say so.",
+    "Give practical IELTS Speaking practice advice about fluency, lexical resource, grammar, or coherence. Never claim an official IELTS score.",
+    "Return only a valid JSON object with this exact shape:",
+    '{"reply_en":"English reply","reply_zh":"Simplified Chinese translation","corrected_text":"A corrected, natural version of the learner message","corrections":[{"type":"语法|词汇|表达|状态","message":"short explanation in Chinese"}],"better_expression":"A more natural version or an empty string","ielts_tip":"One concise IELTS practice tip in Chinese"}',
+  ].join("\n");
+}
+
+function extractFreeChatContent(payload) {
+  const content = payload?.choices?.[0]?.message?.content;
+  if (typeof content === "string") {
+    return content.trim();
+  }
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => (typeof part === "string" ? part : part?.text || ""))
+      .join("")
+      .trim();
+  }
+  return "";
+}
+
+function parseFreeChatJson(content) {
+  const raw = String(content || "").trim();
+  if (!raw) {
+    return null;
+  }
+
+  const withoutFence = raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  try {
+    return JSON.parse(withoutFence);
+  } catch {
+    const start = withoutFence.indexOf("{");
+    const end = withoutFence.lastIndexOf("}");
+    if (start === -1 || end <= start) {
+      return null;
+    }
+    try {
+      return JSON.parse(withoutFence.slice(start, end + 1));
+    } catch {
+      return null;
+    }
+  }
+}
+
+function normalizeFreeCorrections(value) {
+  if (value == null || value === "") {
+    return [];
+  }
+
+  const items = Array.isArray(value) ? value : [value];
+  return items
+    .map((item) => {
+      if (typeof item === "string") {
+        return { type: "表达", message: item.trim() };
+      }
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+      const message = String(
+        item.message || item.explanation || item.note || "",
+      ).trim();
+      if (!message) {
+        return null;
+      }
+      return {
+        type: String(item.type || "表达").trim() || "表达",
+        message,
+      };
+    })
+    .filter(Boolean);
+}
+
+async function requestFreeChatTurn(text) {
+  const endpoint = getFreeChatEndpoint();
+  if (!endpoint) {
+    throw new Error("请先填写 Chat 接口地址。");
+  }
+
+  const history = state.freeMessages
+    .filter((message) => message.role === "user" || message.role === "assistant")
+    .slice(-10)
+    .map((message) => ({
+      role: message.role,
+      content:
+        message.role === "assistant" && message.chinese
+          ? `${message.english}\n中文：${message.chinese}`
+          : message.english,
+    }));
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: buildFreeChatHeaders(),
+    body: JSON.stringify({
+      model: state.freeChatApiModel || "gpt-4o-mini",
+      temperature: 0.6,
+      messages: [
+        { role: "system", content: buildFreeChatSystemPrompt() },
+        ...history,
+      ],
+    }),
+  });
+  const responseText = await response.text();
+  let payload = null;
+  try {
+    payload = JSON.parse(responseText);
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      payload?.error?.message ||
+      payload?.message ||
+      responseText ||
+      `Chat 接口返回 ${response.status}`;
+    throw new Error(String(message).slice(0, 180));
+  }
+
+  const content = extractFreeChatContent(payload);
+  const data = parseFreeChatJson(content);
+  if (!data?.reply_en || !data?.reply_zh) {
+    throw new Error("Chat 接口没有返回双语 JSON 内容。");
+  }
+
+  const corrections = normalizeFreeCorrections(data.corrections);
+  return {
+    feedback: {
+      correctedText: String(
+        data.corrected_text || data.correctedText || text,
+      ).trim(),
+      corrections:
+        corrections.length > 0
+          ? corrections
+          : [
+              {
+                type: "状态",
+                message: "没有发现明显语法错误，继续保持具体表达。",
+              },
+            ],
+      betterExpression: String(
+        data.better_expression || data.betterExpression || "",
+      ).trim(),
+      ieltsTips: String(data.ielts_tip || data.ieltsTip || "")
+        .trim()
+        ? [String(data.ielts_tip || data.ieltsTip).trim()]
+        : [],
+    },
+    reply: {
+      english: String(data.reply_en).trim(),
+      chinese: String(data.reply_zh).trim(),
+    },
+  };
+}
+
+function playLatestFreeReply() {
+  const latest = [...state.freeMessages]
+    .reverse()
+    .find((message) => message.role === "assistant" && message.english);
+  if (!latest) {
+    return;
+  }
+
+  if (
+    !speak(latest.english, 0.94, {
+      profile: FREE_CHAT_COACH_PROFILE,
+      pitch: FREE_CHAT_COACH_PROFILE.pitch,
+      rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+      voicePreference: state.practiceVoice,
+    })
+  ) {
+    state.practiceMessage =
+      "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    renderFreeView();
+  }
+}
+
+function toggleFreeHint() {
+  state.freeHintVisible = !state.freeHintVisible;
+  renderFreeView();
+}
+
+async function sendFreeMessage(providedText = "") {
+  const text = cleanFreeEnglish(providedText || state.freeInput);
+  if (!text || state.freeChatLoading) {
+    return;
+  }
+
+  const requestId = freeChatRequestId + 1;
+  freeChatRequestId = requestId;
+  const userMessage = {
+    role: "user",
+    english: text,
+    feedback: null,
+    createdAt: new Date().toISOString(),
+  };
+  state.freeMessages.push(userMessage);
+  state.freeTurnCount += 1;
+  state.freeInput = "";
+  state.freeHintVisible = false;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.freeChatLoading = true;
+  renderPracticeView();
+
+  let turn;
+  if (state.freeChatMode === "off") {
+    userMessage.feedback = {
+      correctedText: text,
+      corrections: [
+        {
+          type: "状态",
+          message: "自动回复已关闭，你仍然可以保留这段英文练习记录。",
+        },
+      ],
+      betterExpression: "",
+      ieltsTips: [],
+    };
+    state.freeChatLoading = false;
+    renderPracticeView();
+    return;
+  }
+
+  try {
+    turn =
+      state.freeChatMode === "api"
+        ? await requestFreeChatTurn(text)
+        : buildLocalFreeTurn(text, state.freeTurnCount - 1);
+  } catch (error) {
+    if (requestId !== freeChatRequestId) {
+      return;
+    }
+    turn = buildLocalFreeTurn(text, state.freeTurnCount - 1);
+    state.freeChatApiMessage = `Chat API 调用失败，已切换到本地免费陪练：${
+      error?.message || "未知错误"
+    }`;
+    state.freeChatApiMessageType = "error";
+  }
+
+  if (requestId !== freeChatRequestId) {
+    return;
+  }
+
+  userMessage.feedback = turn.feedback;
+  state.freeMessages.push({
+    role: "assistant",
+    english: turn.reply.english,
+    chinese: turn.reply.chinese,
+    source: state.freeChatMode,
+    createdAt: new Date().toISOString(),
+  });
+  state.freeChatLoading = false;
+  renderPracticeView();
+
+  if (state.freeAutoSpeak && turn.reply.english) {
+    speak(turn.reply.english, 0.94, {
+      profile: FREE_CHAT_COACH_PROFILE,
+      pitch: FREE_CHAT_COACH_PROFILE.pitch,
+      rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+      voicePreference: state.practiceVoice,
+    });
+  }
+}
+
+function finalizeFreeAttempt(transcript) {
+  state.freeInput = transcript;
+  sendFreeMessage(transcript);
+}
+
+function startFreeRecording() {
+  if (
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading
+  ) {
+    return;
+  }
+
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.practiceMessage = availability.message;
+    state.practiceMessageType =
+      state.practiceRecognitionMode === "off" ? "info" : "error";
+    renderFreeView();
+    return;
+  }
+
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording({
+      onTranscript: finalizeFreeAttempt,
+      requireEntry: false,
+    });
+    return;
+  }
+
+  startBrowserPracticeRecording({
+    onTranscript: finalizeFreeAttempt,
+    requireEntry: false,
+  });
+}
+
+function stopFreeRecording() {
+  stopPracticeRecording();
+}
+
+function createFreeFeedbackBlock(feedback) {
+  if (!feedback) {
+    return null;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "free-feedback";
+
+  const heading = document.createElement("span");
+  heading.className = "free-feedback-heading";
+  heading.textContent = "教练反馈";
+  wrapper.append(heading);
+
+  if (
+    feedback.correctedText &&
+    feedback.correctedText !== feedback.originalEnglish
+  ) {
+    const corrected = document.createElement("div");
+    corrected.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "修正后";
+    const copy = document.createElement("p");
+    copy.lang = "en";
+    copy.textContent = feedback.correctedText;
+    corrected.append(label, copy);
+    wrapper.append(corrected);
+  }
+
+  if (feedback.corrections?.length) {
+    const corrections = document.createElement("div");
+    corrections.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "纠错";
+    const list = document.createElement("ul");
+    feedback.corrections.forEach((correction) => {
+      const item = document.createElement("li");
+      item.textContent = `${correction.type}：${correction.message}`;
+      list.append(item);
+    });
+    corrections.append(label, list);
+    wrapper.append(corrections);
+  }
+
+  if (feedback.betterExpression) {
+    const better = document.createElement("div");
+    better.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "更自然";
+    const copy = document.createElement("p");
+    copy.lang = "en";
+    copy.textContent = feedback.betterExpression;
+    better.append(label, copy);
+    wrapper.append(better);
+  }
+
+  if (feedback.ieltsTips?.length) {
+    const ielts = document.createElement("div");
+    ielts.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "雅思练习";
+    const list = document.createElement("ul");
+    feedback.ieltsTips.forEach((tip) => {
+      const item = document.createElement("li");
+      item.textContent = tip;
+      list.append(item);
+    });
+    ielts.append(label, list);
+    wrapper.append(ielts);
+  }
+
+  return wrapper;
+}
+
+function createFreeMessageElement(message) {
+  const article = document.createElement("article");
+  article.className = `free-message is-${message.role}`;
+
+  const header = document.createElement("header");
+  const meta = document.createElement("span");
+  meta.className = "free-message-meta";
+  meta.textContent =
+    message.role === "assistant" ? "美音陪练 · 英文 / 中文" : "你的英文";
+  header.append(meta);
+
+  if (message.role === "assistant" && message.english) {
+    const speakButton = document.createElement("button");
+    speakButton.type = "button";
+    speakButton.className = "free-message-speak";
+    speakButton.textContent = "播放美音";
+    speakButton.disabled = !("speechSynthesis" in window);
+    speakButton.addEventListener("click", () => {
+      speak(message.english, 0.94, {
+        profile: FREE_CHAT_COACH_PROFILE,
+        pitch: FREE_CHAT_COACH_PROFILE.pitch,
+        rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+        voicePreference: state.practiceVoice,
+      });
+    });
+    header.append(speakButton);
+  }
+
+  const english = document.createElement("p");
+  english.className = "free-message-en";
+  english.lang = "en";
+  english.textContent = message.english || "";
+
+  article.append(header, english);
+
+  if (message.role === "assistant" && message.chinese) {
+    const chinese = document.createElement("p");
+    chinese.className = "free-message-zh";
+    chinese.textContent = message.chinese;
+    article.append(chinese);
+  }
+
+  if (message.feedback) {
+    const feedback = createFreeFeedbackBlock({
+      ...message.feedback,
+      originalEnglish: message.english,
+    });
+    if (feedback) {
+      article.append(feedback);
+    }
+  }
+
+  return article;
+}
+
+function renderFreeMessages() {
+  const fragment = document.createDocumentFragment();
+  state.freeMessages.forEach((message) => {
+    fragment.append(createFreeMessageElement(message));
+  });
+
+  if (state.freeChatLoading) {
+    const loading = document.createElement("div");
+    loading.className = "free-message is-assistant is-loading";
+    const label = document.createElement("span");
+    label.className = "free-message-meta";
+    label.textContent = "美音陪练";
+    const copy = document.createElement("p");
+    copy.className = "free-message-en";
+    copy.textContent =
+      state.freeChatMode === "api"
+        ? "Thinking about your answer..."
+        : "Preparing a follow-up...";
+    loading.append(label, copy);
+    fragment.append(loading);
+  }
+
+  elements.freeMessages.replaceChildren(fragment);
+  requestAnimationFrame(() => {
+    elements.freeMessages.scrollTop = elements.freeMessages.scrollHeight;
+  });
+}
+
+function renderFreeHint() {
+  const topic = getFreeTopic();
+  if (!state.freeHintVisible) {
+    elements.freeHint.hidden = true;
+    elements.freeHint.replaceChildren();
+    elements.freeHintButton.textContent = "思路提示";
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "practice-block-label";
+  label.textContent = "可以从这些方向展开";
+  const list = document.createElement("ul");
+  (topic.ideas || []).forEach((idea) => {
+    const item = document.createElement("li");
+    item.textContent = idea;
+    list.append(item);
+  });
+  elements.freeHint.replaceChildren(label, list);
+  elements.freeHint.hidden = false;
+  elements.freeHintButton.textContent = "收起提示";
+}
+
+function renderFreeServiceSettings() {
+  const isFree = state.practiceSection === "free";
+  elements.freeServiceSettings.hidden = !isFree;
+  if (!isFree) {
+    return;
+  }
+
+  elements.freeChatMode.value = state.freeChatMode;
+  elements.freeChatModeStatus.textContent = getFreeChatModeLabel();
+  elements.freeChatApiFields.hidden = state.freeChatMode !== "api";
+  elements.freeChatApiUrl.value = state.freeChatApiUrl;
+  elements.freeChatApiModel.value = state.freeChatApiModel;
+  elements.freeChatApiKey.value = state.freeChatApiKey;
+  elements.freeChatApiAuth.value = state.freeChatApiAuth;
+  elements.freeChatApiStatus.textContent = state.freeChatApiMessage;
+  elements.freeChatApiStatus.classList.toggle(
+    "is-error",
+    state.freeChatApiMessageType === "error",
+  );
+}
+
+function renderFreeView() {
+  const topic = getFreeTopic();
+  const availability = getPracticeModeAvailability();
+  const modeSummary = {
+    local: "本地免费陪练 · 英文回复、中文翻译、纠错与雅思练习提示",
+    api: `自定义 Chat API · ${
+      state.freeChatApiModel || "未填写模型"
+    } · 费用由你的接口账户结算`,
+    off: "自动回复已关闭 · 只保留你的英文练习记录",
+  };
+
+  elements.freeModeSummary.textContent =
+    modeSummary[state.freeChatMode] || modeSummary.local;
+  elements.freeTurnCounter.textContent = `第 ${state.freeTurnCount} 轮`;
+  elements.freeTopic.value = state.freeTopic;
+  elements.freeAutoSpeak.checked = state.freeAutoSpeak;
+  elements.freeAnswerInput.value =
+    state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : state.freeInput;
+  elements.freeAnswerInput.disabled =
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading;
+  elements.freeListenButton.disabled =
+    !("speechSynthesis" in window) ||
+    state.freeChatLoading ||
+    !state.freeMessages.some(
+      (message) => message.role === "assistant" && message.english,
+    );
+  elements.freeHintButton.disabled = state.freeChatLoading;
+  elements.freeRecordButton.disabled =
+    !availability.available ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading;
+  elements.freeRecordButton.textContent = state.practiceTranscribing
+    ? "正在转写"
+    : state.practiceRecognitionMode === "api"
+      ? "开始录音"
+      : "开口说";
+  elements.freeRecordButton.hidden = state.practiceListening;
+  elements.freeStopButton.hidden = !state.practiceListening;
+  elements.freeStopButton.disabled = !state.practiceListening;
+  elements.freeSubmitButton.disabled =
+    !elements.freeAnswerInput.value.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading;
+  elements.freeRestartButton.disabled = state.freeChatLoading;
+  elements.freeTopic.disabled = state.freeChatLoading;
+
+  renderFreeMessages();
+  renderFreeHint();
+  renderFreeServiceSettings();
+
+  elements.freeNotice.hidden = !state.practiceMessage;
+  elements.freeNotice.textContent = state.practiceMessage;
+  elements.freeNotice.classList.toggle(
+    "is-error",
+    state.practiceMessageType === "error",
+  );
+}
+
 function renderPracticeDiff(result) {
   const fragment = document.createDocumentFragment();
 
@@ -1961,6 +3901,7 @@ function renderPracticeView() {
   const entry = getCurrentPracticeEntry();
   const dialogueScenario = getCurrentDialogueScenario();
   const isDialogue = state.practiceSection === "dialogue";
+  const isFree = state.practiceSection === "free";
   const hasEntry = Boolean(entry);
   const target = hasEntry ? getPracticeTarget(entry) : "";
   const availability = getPracticeModeAvailability();
@@ -1975,6 +3916,8 @@ function renderPracticeView() {
     ? dialogueScenario
       ? `${dialogueScenario.category} · ${dialogueScenario.title} · ${dialogueScenario.turns.length} 轮情景对话`
       : "情景对话加载失败"
+    : isFree
+      ? `自由对话 · ${getFreeTopic().label} · ${getFreeChatModeLabel()}`
     : hasEntry
       ? `${entry.resource.category} · ${entry.resource.title} · ${entry.item.phrase}`
       : "当前视图没有可练习的句子";
@@ -1989,6 +3932,8 @@ function renderPracticeView() {
     !hasEntry || !entry.item.translation;
 
   elements.practiceMode.value = state.practiceRecognitionMode;
+  elements.practiceVoice.value = state.practiceVoice;
+  elements.practiceVoiceStatus.textContent = getPracticeVoiceStatusText();
   elements.practiceModeStatus.textContent = getPracticeModeLabel();
   elements.practiceApiFields.hidden =
     state.practiceRecognitionMode !== "api";
@@ -2056,12 +4001,15 @@ function renderPracticeView() {
     renderPracticeDiff(result);
   }
 
+  updatePracticeSectionViews();
   renderDialogueView();
+  renderFreeView();
   renderPracticeStats();
 }
 
 function syncPracticeSettingsForm() {
   elements.practiceMode.value = state.practiceRecognitionMode;
+  elements.practiceVoice.value = state.practiceVoice;
   elements.practiceApiUrl.value = state.practiceApiUrl;
   elements.practiceApiModel.value = state.practiceApiModel;
   elements.practiceApiKey.value = state.practiceApiKey;
@@ -2112,6 +4060,51 @@ function savePracticeApiSettings() {
   elements.practiceApiStatus.textContent = "接口配置已保存在当前浏览器。";
   elements.practiceApiStatus.classList.remove("is-error");
   resetPracticeAttempt();
+  renderPracticeView();
+}
+
+function setFreeChatMode(mode) {
+  const allowedModes = new Set(["local", "api", "off"]);
+  if (!allowedModes.has(mode)) {
+    return;
+  }
+
+  state.freeChatMode = mode;
+  state.freeChatApiMessage = "";
+  state.freeChatApiMessageType = "";
+  persistPracticeSettings();
+  renderPracticeView();
+}
+
+function saveFreeChatApiSettings() {
+  const apiUrl = elements.freeChatApiUrl.value.trim();
+  const apiModel = elements.freeChatApiModel.value.trim();
+  const apiKey = elements.freeChatApiKey.value.trim();
+  const apiAuth = elements.freeChatApiAuth.value;
+
+  if (apiUrl) {
+    try {
+      const resolved = new URL(apiUrl, window.location.href);
+      if (!["http:", "https:"].includes(resolved.protocol)) {
+        throw new Error("unsupported protocol");
+      }
+    } catch {
+      elements.freeChatApiStatus.textContent =
+        "接口地址格式不正确，请填写 http 或 https 地址。";
+      elements.freeChatApiStatus.classList.add("is-error");
+      return;
+    }
+  }
+
+  state.freeChatApiUrl = apiUrl;
+  state.freeChatApiModel = apiModel;
+  state.freeChatApiKey = apiKey;
+  state.freeChatApiAuth = apiAuth;
+  state.freeChatApiMessage = apiUrl
+    ? "Chat 接口配置已保存在当前浏览器。"
+    : "已清空 Chat 接口地址，自由对话会使用本地免费陪练。";
+  state.freeChatApiMessageType = "info";
+  persistPracticeSettings();
   renderPracticeView();
 }
 
@@ -2673,7 +4666,11 @@ function playPracticeTarget() {
     return;
   }
 
-  if (!speak(target, state.practiceRate)) {
+  if (
+    !speak(target, state.practiceRate, {
+      voicePreference: state.practiceVoice,
+    })
+  ) {
     state.practiceMessage =
       "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
     state.practiceMessageType = "error";
@@ -2939,6 +4936,229 @@ function getCategoryDefinitions() {
     }));
 }
 
+function getAnkiExportEntries(
+  categoryName = state.ankiExportCategory,
+  sectionName = state.ankiExportSection,
+) {
+  return state.resources
+    .filter((resource) => {
+      const resourceCategory = resource.category || "未分类素材";
+      const resourceSection = resource.section || "";
+      if (categoryName !== "all" && resourceCategory !== categoryName) {
+        return false;
+      }
+      return (
+        categoryName === "all" ||
+        sectionName === "all" ||
+        resourceSection === sectionName
+      );
+    })
+    .flatMap((resource) =>
+      (state.decks.get(resource.id) || []).map((item) => ({
+        item,
+        resource,
+      })),
+    );
+}
+
+function getAnkiExportScopeLabel() {
+  if (state.ankiExportCategory === "all") {
+    return "整个素材库";
+  }
+  if (state.ankiExportSection === "all") {
+    return `${state.ankiExportCategory} · 整个分类`;
+  }
+  return `${state.ankiExportCategory} / ${state.ankiExportSection}`;
+}
+
+function getAnkiExportDeckName() {
+  const deckParts = ["iball的小屋"];
+  if (state.ankiExportCategory === "all") {
+    deckParts.push("全部分类");
+  } else {
+    deckParts.push(state.ankiExportCategory);
+    if (state.ankiExportSection !== "all") {
+      deckParts.push(state.ankiExportSection);
+    }
+  }
+  return deckParts
+    .map((part) => String(part || "").replace(/::/g, " / ").trim())
+    .filter(Boolean)
+    .join("::");
+}
+
+function escapeAnkiCsvField(value) {
+  const text = String(value ?? "").replace(/\r\n|\r|\n/g, "\r\n");
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function buildAnkiExportBack(item) {
+  const backParts = [];
+  if (item.translation) {
+    backParts.push(item.translation);
+  }
+
+  const annotation = [];
+  if (item.meaning) {
+    annotation.push(`释义：${item.meaning}`);
+  }
+  if (item.phonetic) {
+    annotation.push(`音标：${item.phonetic}`);
+  }
+  if (annotation.length > 0) {
+    backParts.push(annotation.join("\n"));
+  }
+
+  return backParts.join("\n\n") || item.phrase || "";
+}
+
+function buildAnkiExportCsv(entries) {
+  const lines = [
+    "#separator:Comma",
+    "#html:false",
+    "#notetype:Basic",
+    `#deck:${getAnkiExportDeckName()}`,
+    "#columns:Front,Back",
+  ];
+
+  entries.forEach(({ item }) => {
+    lines.push(
+      [
+        escapeAnkiCsvField(item.sentence || item.phrase || ""),
+        escapeAnkiCsvField(buildAnkiExportBack(item)),
+      ].join(","),
+    );
+  });
+
+  return `\uFEFF${lines.join("\r\n")}\r\n`;
+}
+
+function getAnkiExportFileName() {
+  const scope = getAnkiExportScopeLabel()
+    .replace(/[\\/:*?"<>|]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+  const now = new Date();
+  const date = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
+  return `iball的小屋-${scope || "Anki"}-${date}.csv`;
+}
+
+function setAnkiExportStatus(message = "", type = "") {
+  state.ankiExportStatus = message;
+  state.ankiExportStatusType = type;
+}
+
+function renderAnkiExport() {
+  const definitions = getCategoryDefinitions();
+  const categoryNames = new Set(definitions.map((category) => category.name));
+  if (
+    state.ankiExportCategory !== "all" &&
+    !categoryNames.has(state.ankiExportCategory)
+  ) {
+    state.ankiExportCategory = "all";
+    state.ankiExportSection = "all";
+  }
+
+  const categoryFragment = document.createDocumentFragment();
+  const allCategoryOption = document.createElement("option");
+  allCategoryOption.value = "all";
+  allCategoryOption.textContent = "整个素材库";
+  categoryFragment.append(allCategoryOption);
+  definitions.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.name;
+    option.textContent = category.name;
+    categoryFragment.append(option);
+  });
+  elements.ankiExportCategory.replaceChildren(categoryFragment);
+  elements.ankiExportCategory.value = state.ankiExportCategory;
+
+  const selectedCategory = definitions.find(
+    (category) => category.name === state.ankiExportCategory,
+  );
+  const sectionNames =
+    state.ankiExportCategory === "all"
+      ? []
+      : selectedCategory?.sections || [];
+  if (
+    state.ankiExportSection !== "all" &&
+    !sectionNames.includes(state.ankiExportSection)
+  ) {
+    state.ankiExportSection = "all";
+  }
+
+  const sectionFragment = document.createDocumentFragment();
+  const allSectionOption = document.createElement("option");
+  allSectionOption.value = "all";
+  allSectionOption.textContent =
+    state.ankiExportCategory === "all" ? "整个素材库" : "整个分类";
+  sectionFragment.append(allSectionOption);
+  sectionNames.forEach((sectionName) => {
+    const option = document.createElement("option");
+    option.value = sectionName;
+    option.textContent = sectionName;
+    sectionFragment.append(option);
+  });
+  elements.ankiExportSection.replaceChildren(sectionFragment);
+  elements.ankiExportSection.value = state.ankiExportSection;
+  elements.ankiExportSection.disabled =
+    state.ankiExportCategory === "all" || sectionNames.length === 0;
+
+  const entries = getAnkiExportEntries();
+  elements.ankiExportCount.textContent = String(entries.length);
+  elements.ankiExportScope.textContent = `· ${getAnkiExportScopeLabel()}`;
+  elements.ankiExportDownloadButton.disabled = entries.length === 0;
+  elements.ankiExportStatus.textContent = state.ankiExportStatus;
+  elements.ankiExportStatus.classList.toggle(
+    "is-error",
+    state.ankiExportStatusType === "error",
+  );
+}
+
+function openAnkiExport() {
+  elements.ankiExportPanel.hidden = false;
+  elements.ankiExportButton.setAttribute("aria-expanded", "true");
+  renderAnkiExport();
+  elements.ankiExportCategory.focus();
+}
+
+function closeAnkiExport({ restoreFocus = false } = {}) {
+  elements.ankiExportPanel.hidden = true;
+  elements.ankiExportButton.setAttribute("aria-expanded", "false");
+  if (restoreFocus) {
+    elements.ankiExportButton.focus();
+  }
+}
+
+function downloadAnkiExport() {
+  const entries = getAnkiExportEntries();
+  if (entries.length === 0) {
+    setAnkiExportStatus("当前范围没有可导出的词卡。", "error");
+    renderAnkiExport();
+    return;
+  }
+
+  const csv = buildAnkiExportCsv(entries);
+  const fileName = getAnkiExportFileName();
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = fileName;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+
+  setAnkiExportStatus(`已生成 ${entries.length} 条词卡：${fileName}`);
+  renderAnkiExport();
+}
+
 function matchesMaterialQuery(resource, query) {
   const searchable = [
     resource.category,
@@ -3170,7 +5390,9 @@ function createCard(entry, index) {
   speakButton.type = "button";
   speakButton.textContent = "朗读";
   speakButton.setAttribute("aria-label", `播放 ${item.phrase} 的发音`);
-  speakButton.addEventListener("click", () => speak(item.phrase));
+  speakButton.addEventListener("click", () =>
+    speak(item.phrase, 0.9, { voicePreference: state.practiceVoice }),
+  );
 
   head.append(number, phraseBlock, speakButton);
 
@@ -3416,6 +5638,7 @@ function updateMeaningControls() {
 
 function render() {
   closeWordPopover();
+  renderAnkiExport();
   const resource = getActiveResource();
   const visibleEntries = getVisibleEntries();
 
@@ -3423,23 +5646,32 @@ function render() {
     const practiceEntries = getPracticeEntries();
     const dialogueScenario = getCurrentDialogueScenario();
     const isDialogue = state.practiceSection === "dialogue";
+    const isFree = state.practiceSection === "free";
     elements.vocabularyToolbar.hidden = true;
     elements.practiceStudio.hidden = false;
     elements.cardGrid.hidden = true;
     elements.emptyState.hidden = true;
     elements.practiceHeading.textContent = isDialogue
       ? "情景对话"
+      : isFree
+        ? "自由对话"
       : "口语跟读";
     elements.activeTitle.textContent = isDialogue
       ? "情景对话"
+      : isFree
+        ? "自由对话"
       : "口语跟读";
     elements.activeDescription.textContent = isDialogue
       ? "选择生活场景，按自己的表达完成多轮英文对话。"
+      : isFree
+        ? "用英语自由聊天，获得双语回复、纠错和雅思口语练习建议。"
       : practiceEntries.length
         ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
         : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
     elements.footerResource.textContent = isDialogue
       ? `情景对话 · ${dialogueScenario?.turns.length || 0} 轮`
+      : isFree
+        ? `自由对话 · ${state.freeTurnCount} 轮`
       : `口语跟读 · ${practiceEntries.length} 句`;
     renderResourceList();
     updateProgress();
@@ -3665,6 +5897,9 @@ elements.practiceShadowTab.addEventListener("click", () => {
 elements.practiceDialogueTab.addEventListener("click", () => {
   setPracticeSection("dialogue");
 });
+elements.practiceFreeTab.addEventListener("click", () => {
+  setPracticeSection("free");
+});
 elements.practiceListenButton.addEventListener("click", playPracticeTarget);
 elements.practiceRecordButton.addEventListener(
   "click",
@@ -3735,6 +5970,56 @@ elements.dialogueAnswerInput.addEventListener("keydown", (event) => {
     submitDialogueAnswer();
   }
 });
+elements.freeRestartButton.addEventListener(
+  "click",
+  resetFreeConversation,
+);
+elements.freeListenButton.addEventListener("click", playLatestFreeReply);
+elements.freeHintButton.addEventListener("click", toggleFreeHint);
+elements.freeRecordButton.addEventListener("click", startFreeRecording);
+elements.freeStopButton.addEventListener("click", stopFreeRecording);
+elements.freeSubmitButton.addEventListener("click", () => {
+  sendFreeMessage();
+});
+elements.freeTopic.addEventListener("change", (event) => {
+  const topicId = event.target.value;
+  if (!FREE_CHAT_TOPICS[topicId]) {
+    return;
+  }
+
+  state.freeTopic = topicId;
+  persistPracticeSettings();
+  resetFreeConversation();
+});
+elements.freeAutoSpeak.addEventListener("change", (event) => {
+  state.freeAutoSpeak = event.target.checked;
+  persistPracticeSettings();
+});
+elements.freeAnswerInput.addEventListener("input", (event) => {
+  state.freeInput = event.target.value;
+  elements.freeSubmitButton.disabled =
+    !state.freeInput.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading;
+});
+elements.freeAnswerInput.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Enter" &&
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey
+  ) {
+    event.preventDefault();
+    sendFreeMessage();
+  }
+});
+elements.freeChatMode.addEventListener("change", (event) => {
+  setFreeChatMode(event.target.value);
+});
+elements.freeChatApiSaveButton.addEventListener(
+  "click",
+  saveFreeChatApiSettings,
+);
 elements.practiceClearButton.addEventListener("click", () => {
   if (
     state.practiceHistory.length > 0 &&
@@ -3756,10 +6041,53 @@ elements.practiceApiSaveButton.addEventListener(
 elements.practiceRate.addEventListener("change", (event) => {
   state.practiceRate = Number(event.target.value) || 0.9;
 });
+elements.practiceVoice.addEventListener("change", (event) => {
+  const allowedPreferences = new Set([
+    "auto",
+    "female",
+    "male",
+    "device",
+  ]);
+  if (!allowedPreferences.has(event.target.value)) {
+    return;
+  }
+
+  state.practiceVoice = event.target.value;
+  persistPracticeSettings();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  renderPracticeView();
+});
 elements.materialSearchInput.addEventListener("input", (event) => {
   state.materialQuery = event.target.value;
   renderResourceList();
 });
+elements.ankiExportButton.addEventListener("click", () => {
+  if (elements.ankiExportPanel.hidden) {
+    openAnkiExport();
+  } else {
+    closeAnkiExport({ restoreFocus: true });
+  }
+});
+elements.ankiExportCloseButton.addEventListener("click", () => {
+  closeAnkiExport({ restoreFocus: true });
+});
+elements.ankiExportCategory.addEventListener("change", (event) => {
+  state.ankiExportCategory = event.target.value;
+  state.ankiExportSection = "all";
+  setAnkiExportStatus();
+  renderAnkiExport();
+});
+elements.ankiExportSection.addEventListener("change", (event) => {
+  state.ankiExportSection = event.target.value;
+  setAnkiExportStatus();
+  renderAnkiExport();
+});
+elements.ankiExportDownloadButton.addEventListener(
+  "click",
+  downloadAnkiExport,
+);
 elements.showAllMeaningsButton.addEventListener("click", () => {
   setAllMeaningsVisible(true);
 });
@@ -3790,6 +6118,10 @@ document.addEventListener("click", (event) => {
   closeWordPopover();
 });
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !elements.ankiExportPanel.hidden) {
+    closeAnkiExport({ restoreFocus: true });
+    return;
+  }
   if (event.key === "Escape" && !elements.wordPopover.hidden) {
     const button = activeWordButton;
     closeWordPopover();
@@ -3798,6 +6130,16 @@ document.addEventListener("keydown", (event) => {
 });
 window.addEventListener("resize", closeWordPopover);
 window.addEventListener("scroll", closeWordPopover, { passive: true });
+
+if ("speechSynthesis" in window) {
+  refreshSpeechVoiceCache();
+  window.speechSynthesis.addEventListener("voiceschanged", () => {
+    refreshSpeechVoiceCache();
+    if (state.practiceActive) {
+      renderPracticeView();
+    }
+  });
+}
 
 restoreMarks();
 restorePracticeHistory();
