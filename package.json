@@ -1,0 +1,12 @@
+{
+  "name": "iball-listening-cabin",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-manifest.mjs",
+    "check": "node --check app.js && node --check api/auth.js && node scripts/build-manifest.mjs --check"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

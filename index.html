@@ -6,79 +6,189 @@
     <meta name="color-scheme" content="light" />
     <meta
       name="description"
-      content="Modern Family S01E01 追剧英语卡片，可在手机和电脑上直接查看与下载。"
+      content="iball的小屋：按上传素材整理、练习和复习英语听力词汇。"
     />
-    <title>Modern Family S01E01 · 追剧英语</title>
+    <title>iball的小屋 · 听力词汇</title>
     <link rel="stylesheet" href="./styles.css" />
     <script src="./app.js" defer></script>
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <div class="brand">
-          <span class="brand-mark" aria-hidden="true">MF</span>
-          <div>
-            <p class="eyebrow">追剧英语</p>
-            <h1>Modern Family <span>S01E01</span></h1>
+    <section id="loginView" class="login-view" aria-labelledby="loginTitle">
+      <div class="login-shell">
+        <div class="login-story">
+          <div class="login-brand">
+            <span class="brand-mark" aria-hidden="true">ib</span>
+            <span class="brand-name">iball的小屋</span>
+          </div>
+          <p class="eyebrow">IBALL'S LISTENING CABIN</p>
+          <h1 id="loginTitle">听见单词，<br />也记住它出现的场景。</h1>
+          <p class="login-copy">
+            每次上传的剧集、真题或资料，都会成为小屋里的独立素材分类。
+          </p>
+          <div class="login-features" aria-label="网站特点">
+            <span>按上传素材分类</span>
+            <span>逐条标记掌握</span>
+            <span>浏览器直接发音</span>
           </div>
         </div>
-        <p class="card-count" id="cardCount" aria-live="polite">
-          <strong id="visibleCount">0</strong>
-          <span>/</span>
-          <span id="totalCount">0</span>
-          <span>张卡片</span>
-        </p>
-      </div>
-    </header>
 
-    <main>
-      <section class="toolbar" aria-label="卡片工具">
-        <label class="search-field" for="searchInput">
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+        <div class="login-panel">
+          <div>
+            <p class="panel-kicker">欢迎回来</p>
+            <h2>进入小屋</h2>
+            <p class="panel-copy">使用账号密码继续你的听力词汇复习。</p>
+          </div>
+
+          <form id="loginForm" class="login-form">
+            <label for="username">账号</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              placeholder="请输入账号"
+              required
+            />
+
+            <label for="password">密码</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="请输入密码"
+              required
+            />
+
+            <button id="loginButton" class="primary-button" type="submit">
+              登录
+            </button>
+            <p id="loginError" class="form-message" role="alert" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div id="appView" class="app-view" hidden>
+      <aside class="library-panel">
+        <div class="library-top">
+          <div class="library-brand">
+            <span class="brand-mark" aria-hidden="true">ib</span>
+            <div>
+              <strong>iball的小屋</strong>
+              <span>听力词汇素材库</span>
+            </div>
+          </div>
+
+          <div class="account-row">
+            <span id="userLabel" class="user-label"></span>
+            <button id="logoutButton" class="logout-button" type="button">
+              退出
+            </button>
+          </div>
+        </div>
+
+        <div class="library-heading">
+          <span>素材分类</span>
+          <strong id="resourceCount">0</strong>
+        </div>
+        <nav
+          id="resourceList"
+          class="resource-list"
+          aria-label="上传素材分类"
+        ></nav>
+
+      </aside>
+
+      <main class="workspace">
+        <header class="workspace-header">
+          <div class="workspace-title">
+            <p class="section-label">当前素材</p>
+            <h1 id="activeTitle">正在加载素材</h1>
+            <p id="activeDescription" class="active-description">
+              请稍候，正在整理小屋里的词汇卡片。
+            </p>
+          </div>
+
+          <div class="progress-panel" aria-live="polite">
+            <div id="progressRing" class="progress-ring">
+              <span id="progressPercent">0%</span>
+            </div>
+            <div>
+              <strong>学习进度</strong>
+              <span id="progressText">0 / 0 已掌握</span>
+            </div>
+          </div>
+        </header>
+
+        <section class="toolbar" aria-label="词汇工具">
+          <div class="toolbar-search-row">
+            <label class="search-field" for="searchInput">
+              <span class="search-symbol" aria-hidden="true">⌕</span>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="搜索句子、短语、释义或音标"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </label>
+            <p class="result-count" aria-live="polite">
+              显示 <strong id="visibleCount">0</strong> 条
+            </p>
+          </div>
+
+          <div
+            id="viewSwitcher"
+            class="view-switcher"
+            role="group"
+            aria-label="切换词汇视图"
           >
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </svg>
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="搜索英文、中文或音标"
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <button id="clearSearch" class="clear-button" type="button" aria-label="清除搜索" hidden>
-            <span aria-hidden="true"></span>
-          </button>
-        </label>
-        <a
-          class="download-button"
-          href="./anki-modern-family-S01E01.csv"
-          download="anki-modern-family-S01E01.csv"
-        >
-          下载 Anki CSV
-        </a>
-      </section>
+            <button
+              class="view-button is-active"
+              type="button"
+              data-view="all"
+              aria-pressed="true"
+            >
+              本素材
+            </button>
+            <button
+              class="view-button"
+              type="button"
+              data-view="favorites"
+              aria-pressed="false"
+            >
+              收藏集
+              <span id="favoriteCount" class="view-count">0</span>
+            </button>
+            <button
+              class="view-button"
+              type="button"
+              data-view="unknown"
+              aria-pressed="false"
+            >
+              不会的单词
+              <span id="unknownCount" class="view-count">0</span>
+            </button>
+          </div>
+        </section>
 
-      <section id="cardGrid" class="card-grid" aria-label="英语卡片"></section>
+        <section
+          id="cardGrid"
+          class="card-grid"
+          aria-label="听力词汇卡片"
+        ></section>
 
-      <div id="emptyState" class="empty-state" hidden>
-        <strong>没有找到匹配的卡片</strong>
-        <span>换一个关键词试试</span>
-      </div>
-    </main>
+        <div id="emptyState" class="empty-state">
+          <strong>正在准备卡片</strong>
+          <span>素材加载完成后会显示在这里。</span>
+        </div>
 
-    <footer>
-      <p id="deckName">追剧英语 :: Modern Family</p>
-      <p>Modern Family S01E01</p>
-    </footer>
+        <footer class="workspace-footer">
+          <span>iball的小屋</span>
+          <span id="footerResource">听力词汇素材库</span>
+        </footer>
+      </main>
+    </div>
   </body>
 </html>

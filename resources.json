@@ -1,0 +1,22 @@
+{
+  "siteName": "iball的小屋",
+  "generatedFrom": "materials",
+  "resources": [
+    {
+      "id": "modern-family-s01e01-50-737e5cea",
+      "title": "S01E01 精选 50",
+      "group": "Modern Family",
+      "description": "Modern Family · S01E01 精选 50",
+      "file": "./materials/Modern%20Family/S01E01%20%E7%B2%BE%E9%80%89%2050.md",
+      "format": "markdown-table"
+    },
+    {
+      "id": "modern-family-s01e01-100-6e7fbc36",
+      "title": "S01E01 完整 100",
+      "group": "Modern Family",
+      "description": "Modern Family · S01E01 完整 100",
+      "file": "./materials/Modern%20Family/S01E01%20%E5%AE%8C%E6%95%B4%20100.md",
+      "format": "markdown-table"
+    }
+  ]
+}
