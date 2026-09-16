@@ -3,10 +3,19 @@ const WORD_API_PATH = "./api/word";
 const STORAGE_KEY = "iball-listening-cabin-known";
 const FAVORITES_STORAGE_KEY = "iball-listening-cabin-favorites";
 const UNKNOWN_STORAGE_KEY = "iball-listening-cabin-unknown";
+const PRACTICE_HISTORY_STORAGE_KEY =
+  "iball-listening-cabin-speaking-history";
+const PRACTICE_SETTINGS_STORAGE_KEY =
+  "iball-listening-cabin-speaking-settings";
 const CATEGORY_ORDER = ["四级", "六级", "考研", "电影", "其他"];
 const wordLookupCache = new Map();
 let activeWordButton = null;
 let wordLookupRequestId = 0;
+let practiceRecognition = null;
+let practiceMediaRecorder = null;
+let practiceMediaStream = null;
+let practiceAudioChunks = [];
+let practiceApiAbortController = null;
 
 const state = {
   resources: [],
@@ -24,6 +33,24 @@ const state = {
   meaningReveals: new Set(),
   meaningHides: new Set(),
   user: "",
+  practiceActive: false,
+  practiceIndex: 0,
+  practiceRate: 0.9,
+  practiceListening: false,
+  practiceTranscribing: false,
+  practiceTranscript: "",
+  practiceFinalTranscript: "",
+  practiceInterimTranscript: "",
+  practiceStatusText: "准备开始",
+  practiceMessage: "",
+  practiceMessageType: "",
+  practiceResult: null,
+  practiceHistory: [],
+  practiceRecognitionMode: "browser",
+  practiceApiUrl: "",
+  practiceApiModel: "",
+  practiceApiKey: "",
+  practiceApiAuth: "bearer",
 };
 
 const elements = {
@@ -44,6 +71,7 @@ const elements = {
   progressRing: document.querySelector("#progressRing"),
   progressPercent: document.querySelector("#progressPercent"),
   progressText: document.querySelector("#progressText"),
+  vocabularyToolbar: document.querySelector("#vocabularyToolbar"),
   searchInput: document.querySelector("#searchInput"),
   showAllMeaningsButton: document.querySelector("#showAllMeaningsButton"),
   hideAllMeaningsButton: document.querySelector("#hideAllMeaningsButton"),
@@ -57,6 +85,52 @@ const elements = {
   cardGrid: document.querySelector("#cardGrid"),
   emptyState: document.querySelector("#emptyState"),
   footerResource: document.querySelector("#footerResource"),
+  practiceButton: document.querySelector("#practiceButton"),
+  practiceStudio: document.querySelector("#practiceStudio"),
+  practiceHeading: document.querySelector("#practiceHeading"),
+  practiceSource: document.querySelector("#practiceSource"),
+  practiceExitButton: document.querySelector("#practiceExitButton"),
+  practiceCounter: document.querySelector("#practiceCounter"),
+  practiceStatus: document.querySelector("#practiceStatus"),
+  practiceTarget: document.querySelector("#practiceTarget"),
+  practiceTranslation: document.querySelector("#practiceTranslation"),
+  practiceRate: document.querySelector("#practiceRate"),
+  practiceListenButton: document.querySelector("#practiceListenButton"),
+  practiceRecordButton: document.querySelector("#practiceRecordButton"),
+  practiceStopButton: document.querySelector("#practiceStopButton"),
+  practiceRecognitionState: document.querySelector(
+    "#practiceRecognitionState",
+  ),
+  practiceTranscript: document.querySelector("#practiceTranscript"),
+  practiceNotice: document.querySelector("#practiceNotice"),
+  practiceResult: document.querySelector("#practiceResult"),
+  practiceScore: document.querySelector("#practiceScore"),
+  practiceFeedback: document.querySelector("#practiceFeedback"),
+  practiceTargetDiff: document.querySelector("#practiceTargetDiff"),
+  practiceExtraWords: document.querySelector("#practiceExtraWords"),
+  practiceRetryButton: document.querySelector("#practiceRetryButton"),
+  practiceNextButton: document.querySelector("#practiceNextButton"),
+  practicePreviousButton: document.querySelector(
+    "#practicePreviousButton",
+  ),
+  practiceShuffleButton: document.querySelector("#practiceShuffleButton"),
+  practiceClearButton: document.querySelector("#practiceClearButton"),
+  practiceModeStatus: document.querySelector("#practiceModeStatus"),
+  practiceMode: document.querySelector("#practiceMode"),
+  practiceApiFields: document.querySelector("#practiceApiFields"),
+  practiceApiUrl: document.querySelector("#practiceApiUrl"),
+  practiceApiModel: document.querySelector("#practiceApiModel"),
+  practiceApiKey: document.querySelector("#practiceApiKey"),
+  practiceApiAuth: document.querySelector("#practiceApiAuth"),
+  practiceApiSaveButton: document.querySelector(
+    "#practiceApiSaveButton",
+  ),
+  practiceApiStatus: document.querySelector("#practiceApiStatus"),
+  practiceAttemptCount: document.querySelector("#practiceAttemptCount"),
+  practiceSentenceCount: document.querySelector("#practiceSentenceCount"),
+  practiceAverageScore: document.querySelector("#practiceAverageScore"),
+  practiceBestScore: document.querySelector("#practiceBestScore"),
+  practiceHistory: document.querySelector("#practiceHistory"),
   wordPopover: document.querySelector("#wordPopover"),
   wordPopoverWord: document.querySelector("#wordPopoverWord"),
   wordPopoverPhonetic: document.querySelector("#wordPopoverPhonetic"),
@@ -293,6 +367,82 @@ function restoreMarks() {
   state.unknown = restoreSet(UNKNOWN_STORAGE_KEY);
 }
 
+function restorePracticeHistory() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(PRACTICE_HISTORY_STORAGE_KEY) || "[]",
+    );
+    if (!Array.isArray(stored)) {
+      return;
+    }
+
+    state.practiceHistory = stored
+      .filter(
+        (record) =>
+          record &&
+          Number.isFinite(record.accuracy) &&
+          typeof record.target === "string",
+      )
+      .slice(0, 80);
+  } catch {
+    state.practiceHistory = [];
+  }
+}
+
+function persistPracticeHistory() {
+  try {
+    localStorage.setItem(
+      PRACTICE_HISTORY_STORAGE_KEY,
+      JSON.stringify(state.practiceHistory.slice(0, 80)),
+    );
+  } catch {
+    // Practice still works for the current visit when storage is unavailable.
+  }
+}
+
+function restorePracticeSettings() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(PRACTICE_SETTINGS_STORAGE_KEY) || "{}",
+    );
+    const allowedModes = new Set(["browser", "api", "off"]);
+    const allowedAuthModes = new Set(["bearer", "x-api-key", "none"]);
+
+    state.practiceRecognitionMode = allowedModes.has(stored.mode)
+      ? stored.mode
+      : "browser";
+    state.practiceApiUrl = String(stored.apiUrl || "").trim();
+    state.practiceApiModel = String(stored.apiModel || "").trim();
+    state.practiceApiKey = String(stored.apiKey || "").trim();
+    state.practiceApiAuth = allowedAuthModes.has(stored.apiAuth)
+      ? stored.apiAuth
+      : "bearer";
+  } catch {
+    state.practiceRecognitionMode = "browser";
+    state.practiceApiUrl = "";
+    state.practiceApiModel = "";
+    state.practiceApiKey = "";
+    state.practiceApiAuth = "bearer";
+  }
+}
+
+function persistPracticeSettings() {
+  try {
+    localStorage.setItem(
+      PRACTICE_SETTINGS_STORAGE_KEY,
+      JSON.stringify({
+        mode: state.practiceRecognitionMode,
+        apiUrl: state.practiceApiUrl,
+        apiModel: state.practiceApiModel,
+        apiKey: state.practiceApiKey,
+        apiAuth: state.practiceApiAuth,
+      }),
+    );
+  } catch {
+    // Settings still apply for the current visit when storage is unavailable.
+  }
+}
+
 function getActiveResource() {
   return state.resources.find(
     (resource) => resource.id === state.activeResourceId,
@@ -368,16 +518,1077 @@ function getVisibleEntries() {
   });
 }
 
-function speak(text) {
+function speak(text, rate = 0.9) {
   if (!("speechSynthesis" in window)) {
-    return;
+    return false;
   }
 
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.rate = 0.9;
+  utterance.rate = Math.min(1.3, Math.max(0.5, Number(rate) || 0.9));
   window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+function getSpeechRecognitionConstructor() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function getPracticeModeLabel(mode = state.practiceRecognitionMode) {
+  const labels = {
+    browser: "浏览器免费",
+    api: "自定义 API",
+    off: "已关闭",
+  };
+  return labels[mode] || labels.browser;
+}
+
+function getPracticeModeAvailability() {
+  if (state.practiceRecognitionMode === "off") {
+    return {
+      available: false,
+      message: "语音识别已关闭，仍可使用示范朗读和句子对照。",
+    };
+  }
+
+  if (state.practiceRecognitionMode === "api") {
+    if (!String(state.practiceApiUrl || "").trim()) {
+      return {
+        available: false,
+        message: "请先填写并保存语音转写接口地址。",
+      };
+    }
+    if (!("MediaRecorder" in window)) {
+      return {
+        available: false,
+        message: "当前浏览器不支持录音功能。",
+      };
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      return {
+        available: false,
+        message: "当前页面无法访问麦克风，请确认使用 HTTPS 打开网站。",
+      };
+    }
+    return {
+      available: true,
+      message: "接口录音完成后会自动转写并评分。",
+    };
+  }
+
+  if (!getSpeechRecognitionConstructor()) {
+    return {
+      available: false,
+      message:
+        "当前浏览器不支持免费语音识别，请使用最新版 Chrome 或 Edge，或切换自定义 API。",
+    };
+  }
+
+  return {
+    available: true,
+    message: "使用浏览器免费语音识别，需允许麦克风权限。",
+  };
+}
+
+function getPracticeEntries() {
+  return getVisibleEntries();
+}
+
+function getCurrentPracticeEntry() {
+  const entries = getPracticeEntries();
+  if (entries.length === 0) {
+    state.practiceIndex = 0;
+    return null;
+  }
+
+  if (state.practiceIndex < 0 || state.practiceIndex >= entries.length) {
+    state.practiceIndex = 0;
+  }
+  return entries[state.practiceIndex];
+}
+
+function getPracticeTarget(entry) {
+  return String(entry?.item.sentence || entry?.item.phrase || "").trim();
+}
+
+function tokenizePracticeText(text) {
+  const matches = String(text || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .match(/[a-z0-9]+(?:['’][a-z]+)*/g);
+
+  return matches
+    ? matches.map((word) => word.replace(/[’]/g, "'"))
+    : [];
+}
+
+function comparePracticeText(target, transcript) {
+  const targetWords = tokenizePracticeText(target);
+  const spokenWords = tokenizePracticeText(transcript);
+  const rows = targetWords.length + 1;
+  const columns = spokenWords.length + 1;
+  const grid = Array.from(
+    { length: rows },
+    () => new Uint16Array(columns),
+  );
+
+  for (let targetIndex = 1; targetIndex < rows; targetIndex += 1) {
+    for (
+      let spokenIndex = 1;
+      spokenIndex < columns;
+      spokenIndex += 1
+    ) {
+      if (
+        targetWords[targetIndex - 1] === spokenWords[spokenIndex - 1]
+      ) {
+        grid[targetIndex][spokenIndex] =
+          grid[targetIndex - 1][spokenIndex - 1] + 1;
+      } else {
+        grid[targetIndex][spokenIndex] = Math.max(
+          grid[targetIndex - 1][spokenIndex],
+          grid[targetIndex][spokenIndex - 1],
+        );
+      }
+    }
+  }
+
+  const matchedTargetIndexes = new Set();
+  const matchedSpokenIndexes = new Set();
+  let targetIndex = targetWords.length;
+  let spokenIndex = spokenWords.length;
+
+  while (targetIndex > 0 && spokenIndex > 0) {
+    const isMatch =
+      targetWords[targetIndex - 1] === spokenWords[spokenIndex - 1] &&
+      grid[targetIndex][spokenIndex] ===
+        grid[targetIndex - 1][spokenIndex - 1] + 1;
+
+    if (isMatch) {
+      matchedTargetIndexes.add(targetIndex - 1);
+      matchedSpokenIndexes.add(spokenIndex - 1);
+      targetIndex -= 1;
+      spokenIndex -= 1;
+    } else if (
+      grid[targetIndex - 1][spokenIndex] >=
+      grid[targetIndex][spokenIndex - 1]
+    ) {
+      targetIndex -= 1;
+    } else {
+      spokenIndex -= 1;
+    }
+  }
+
+  const missingTargetIndexes = targetWords
+    .map((_, index) => index)
+    .filter((index) => !matchedTargetIndexes.has(index));
+  const extraWords = spokenWords.filter(
+    (_, index) => !matchedSpokenIndexes.has(index),
+  );
+  const accuracy = targetWords.length
+    ? Math.round((matchedTargetIndexes.size / targetWords.length) * 100)
+    : 0;
+
+  return {
+    targetWords,
+    spokenWords,
+    matchedTargetIndexes,
+    missingTargetIndexes,
+    extraWords,
+    accuracy,
+  };
+}
+
+function getPracticeFeedback(accuracy) {
+  if (accuracy >= 90) {
+    return "句子已经很完整，可以继续练下一句。";
+  }
+  if (accuracy >= 75) {
+    return "整体不错，重点补上漏掉的单词。";
+  }
+  if (accuracy >= 55) {
+    return "已经抓住大意，放慢速度再跟一遍。";
+  }
+  return "先听两遍示范，再按短句分组跟读。";
+}
+
+function formatPracticeTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function cancelPracticeRecognition() {
+  const recognition = practiceRecognition;
+  practiceRecognition = null;
+  state.practiceListening = false;
+  state.practiceTranscribing = false;
+
+  if (recognition) {
+    recognition.onstart = null;
+    recognition.onresult = null;
+    recognition.onerror = null;
+    recognition.onend = null;
+    try {
+      recognition.abort();
+    } catch {
+      // The recognition session may already have ended.
+    }
+  }
+
+  practiceApiAbortController?.abort();
+  practiceApiAbortController = null;
+
+  const mediaRecorder = practiceMediaRecorder;
+  practiceMediaRecorder = null;
+  if (mediaRecorder) {
+    mediaRecorder.ondataavailable = null;
+    mediaRecorder.onerror = null;
+    mediaRecorder.onstop = null;
+    if (mediaRecorder.state !== "inactive") {
+      try {
+        mediaRecorder.stop();
+      } catch {
+        // The recorder may already have stopped.
+      }
+    }
+  }
+
+  if (practiceMediaStream) {
+    practiceMediaStream.getTracks().forEach((track) => track.stop());
+    practiceMediaStream = null;
+  }
+  practiceAudioChunks = [];
+}
+
+function resetPracticeAttempt() {
+  cancelPracticeRecognition();
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceResult = null;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+
+  const availability = getPracticeModeAvailability();
+  if (state.practiceRecognitionMode === "off") {
+    state.practiceStatusText = "已关闭";
+    state.practiceMessage = availability.message;
+    state.practiceMessageType = "info";
+  } else if (!availability.available) {
+    state.practiceStatusText = "需要设置";
+    state.practiceMessage = availability.message;
+    state.practiceMessageType = "error";
+  } else {
+    state.practiceStatusText = "准备开始";
+  }
+}
+
+function renderPracticeDiff(result) {
+  const fragment = document.createDocumentFragment();
+
+  result.targetWords.forEach((word, index) => {
+    const token = document.createElement("span");
+    token.className = result.matchedTargetIndexes.has(index)
+      ? "practice-token is-matched"
+      : "practice-token is-missing";
+    token.textContent = word;
+    fragment.append(token);
+    if (index < result.targetWords.length - 1) {
+      fragment.append(" ");
+    }
+  });
+
+  elements.practiceTargetDiff.replaceChildren(fragment);
+
+  if (result.extraWords.length === 0) {
+    elements.practiceExtraWords.textContent = "无";
+    elements.practiceExtraWords.classList.add("is-empty");
+    return;
+  }
+
+  const extraFragment = document.createDocumentFragment();
+  result.extraWords.forEach((word, index) => {
+    const token = document.createElement("span");
+    token.className = "practice-token is-extra";
+    token.textContent = word;
+    extraFragment.append(token);
+    if (index < result.extraWords.length - 1) {
+      extraFragment.append(" ");
+    }
+  });
+  elements.practiceExtraWords.replaceChildren(extraFragment);
+  elements.practiceExtraWords.classList.remove("is-empty");
+}
+
+function renderPracticeStats() {
+  const history = state.practiceHistory;
+  const attempts = history.length;
+  const sentenceCount = new Set(
+    history.map((record) => record.itemKey || record.target),
+  ).size;
+  const average = attempts
+    ? Math.round(
+        history.reduce((sum, record) => sum + record.accuracy, 0) /
+          attempts,
+      )
+    : 0;
+  const best = attempts
+    ? Math.max(...history.map((record) => record.accuracy))
+    : 0;
+
+  elements.practiceAttemptCount.textContent = String(attempts);
+  elements.practiceSentenceCount.textContent = String(sentenceCount);
+  elements.practiceAverageScore.textContent = `${average}%`;
+  elements.practiceBestScore.textContent = `${best}%`;
+  elements.practiceClearButton.disabled = attempts === 0;
+
+  if (attempts === 0) {
+    const empty = document.createElement("p");
+    empty.className = "practice-history-empty";
+    empty.textContent = "还没有练习记录。";
+    elements.practiceHistory.replaceChildren(empty);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  history.slice(0, 6).forEach((record) => {
+    const item = document.createElement("div");
+    item.className = "practice-history-item";
+
+    const score = document.createElement("strong");
+    score.textContent = `${record.accuracy}%`;
+    score.classList.toggle("is-high", record.accuracy >= 85);
+
+    const copy = document.createElement("span");
+    copy.className = "practice-history-copy";
+    copy.textContent = record.target;
+
+    const time = document.createElement("time");
+    time.dateTime = record.createdAt || "";
+    time.textContent = formatPracticeTime(record.createdAt);
+
+    item.append(score, copy, time);
+    fragment.append(item);
+  });
+  elements.practiceHistory.replaceChildren(fragment);
+}
+
+function renderPracticeView() {
+  const entries = getPracticeEntries();
+  const entry = getCurrentPracticeEntry();
+  const hasEntry = Boolean(entry);
+  const target = hasEntry ? getPracticeTarget(entry) : "";
+  const availability = getPracticeModeAvailability();
+  const currentItemKey = hasEntry
+    ? getItemKey(entry.resource.id, entry.item)
+    : "";
+
+  elements.practiceCounter.textContent = hasEntry
+    ? `${state.practiceIndex + 1} / ${entries.length}`
+    : "0 / 0";
+  elements.practiceSource.textContent = hasEntry
+    ? `${entry.resource.category} · ${entry.resource.title} · ${entry.item.phrase}`
+    : "当前视图没有可练习的句子";
+  elements.practiceStatus.textContent = state.practiceStatusText;
+  elements.practiceTarget.replaceChildren(
+    createSentenceText(target || "暂无可练习句子"),
+  );
+  elements.practiceTranslation.textContent = hasEntry
+    ? entry.item.translation || ""
+    : "";
+  elements.practiceTranslation.hidden =
+    !hasEntry || !entry.item.translation;
+
+  elements.practiceMode.value = state.practiceRecognitionMode;
+  elements.practiceModeStatus.textContent = getPracticeModeLabel();
+  elements.practiceApiFields.hidden =
+    state.practiceRecognitionMode !== "api";
+  elements.practiceListenButton.disabled =
+    !hasEntry || !("speechSynthesis" in window);
+  elements.practiceRecordButton.disabled =
+    !hasEntry || !availability.available || state.practiceTranscribing;
+  elements.practiceRecordButton.textContent =
+    state.practiceRecognitionMode === "api" ? "开始录音" : "开始跟读";
+  elements.practiceRecordButton.hidden = state.practiceListening;
+  elements.practiceStopButton.hidden = !state.practiceListening;
+  elements.practiceStopButton.disabled = !state.practiceListening;
+  elements.practicePreviousButton.disabled = entries.length <= 1;
+  elements.practiceShuffleButton.disabled = entries.length <= 1;
+
+  if (state.practiceRecognitionMode === "off") {
+    elements.practiceRecognitionState.textContent = "已关闭";
+  } else if (!availability.available) {
+    elements.practiceRecognitionState.textContent = "需要设置";
+  } else if (state.practiceTranscribing) {
+    elements.practiceRecognitionState.textContent = "转写中";
+  } else if (state.practiceListening) {
+    elements.practiceRecognitionState.textContent =
+      state.practiceRecognitionMode === "api" ? "录音中" : "聆听中";
+  } else if (state.practiceTranscript) {
+    elements.practiceRecognitionState.textContent = "识别完成";
+  } else {
+    elements.practiceRecognitionState.textContent =
+      state.practiceRecognitionMode === "api" ? "API 待录音" : "未开始";
+  }
+
+  elements.practiceTranscript.textContent =
+    state.practiceTranscript ||
+    (state.practiceTranscribing
+      ? "正在转写录音..."
+      : state.practiceListening
+      ? state.practiceRecognitionMode === "api"
+        ? "正在录音..."
+        : "正在识别..."
+      : state.practiceRecognitionMode === "off"
+        ? "识别已关闭"
+        : "等待跟读");
+  elements.practiceTranscript.classList.toggle(
+    "is-placeholder",
+    !state.practiceTranscript,
+  );
+
+  elements.practiceNotice.hidden = !state.practiceMessage;
+  elements.practiceNotice.textContent = state.practiceMessage;
+  elements.practiceNotice.classList.toggle(
+    "is-error",
+    state.practiceMessageType === "error",
+  );
+
+  const result = state.practiceResult;
+  const showResult = Boolean(
+    result && result.itemKey === currentItemKey,
+  );
+  elements.practiceResult.hidden = !showResult;
+  if (showResult) {
+    elements.practiceScore.textContent = `${result.accuracy}%`;
+    elements.practiceFeedback.textContent = getPracticeFeedback(
+      result.accuracy,
+    );
+    renderPracticeDiff(result);
+  }
+
+  renderPracticeStats();
+}
+
+function syncPracticeSettingsForm() {
+  elements.practiceMode.value = state.practiceRecognitionMode;
+  elements.practiceApiUrl.value = state.practiceApiUrl;
+  elements.practiceApiModel.value = state.practiceApiModel;
+  elements.practiceApiKey.value = state.practiceApiKey;
+  elements.practiceApiAuth.value = state.practiceApiAuth;
+  elements.practiceApiFields.hidden =
+    state.practiceRecognitionMode !== "api";
+}
+
+function setPracticeRecognitionMode(mode) {
+  const allowedModes = new Set(["browser", "api", "off"]);
+  if (!allowedModes.has(mode)) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  state.practiceRecognitionMode = mode;
+  persistPracticeSettings();
+  resetPracticeAttempt();
+  renderPracticeView();
+  updateProgress();
+}
+
+function savePracticeApiSettings() {
+  const apiUrl = elements.practiceApiUrl.value.trim();
+  const apiModel = elements.practiceApiModel.value.trim();
+  const apiKey = elements.practiceApiKey.value.trim();
+  const apiAuth = elements.practiceApiAuth.value;
+
+  if (apiUrl) {
+    try {
+      const resolved = new URL(apiUrl, window.location.href);
+      if (!["http:", "https:"].includes(resolved.protocol)) {
+        throw new Error("unsupported protocol");
+      }
+    } catch {
+      elements.practiceApiStatus.textContent =
+        "接口地址格式不正确，请填写 http 或 https 地址。";
+      elements.practiceApiStatus.classList.add("is-error");
+      return;
+    }
+  }
+
+  state.practiceApiUrl = apiUrl;
+  state.practiceApiModel = apiModel;
+  state.practiceApiKey = apiKey;
+  state.practiceApiAuth = apiAuth;
+  persistPracticeSettings();
+  elements.practiceApiStatus.textContent = "接口配置已保存在当前浏览器。";
+  elements.practiceApiStatus.classList.remove("is-error");
+  resetPracticeAttempt();
+  renderPracticeView();
+}
+
+function openPractice(targetKey = "") {
+  const entries = getPracticeEntries();
+  const targetIndex = targetKey
+    ? entries.findIndex(
+        ({ resource, item }) =>
+          getItemKey(resource.id, item) === targetKey,
+      )
+    : -1;
+
+  state.practiceActive = true;
+  if (targetIndex >= 0) {
+    state.practiceIndex = targetIndex;
+  } else if (
+    state.practiceIndex < 0 ||
+    state.practiceIndex >= entries.length
+  ) {
+    state.practiceIndex = 0;
+  }
+
+  resetPracticeAttempt();
+  syncPracticeSettingsForm();
+  if (entries.length === 0) {
+    state.practiceMessage = "当前视图没有可练习的句子，请先选择其他素材。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "暂无句子";
+  }
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function closePractice() {
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceResult = null;
+  render();
+  elements.practiceButton.focus();
+}
+
+function movePractice(offset) {
+  const entries = getPracticeEntries();
+  if (entries.length === 0) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  state.practiceIndex =
+    (state.practiceIndex + offset + entries.length) % entries.length;
+  resetPracticeAttempt();
+  render();
+}
+
+function shufflePractice() {
+  const entries = getPracticeEntries();
+  if (entries.length <= 1) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  let nextIndex = state.practiceIndex;
+  while (nextIndex === state.practiceIndex) {
+    nextIndex = Math.floor(Math.random() * entries.length);
+  }
+  state.practiceIndex = nextIndex;
+  resetPracticeAttempt();
+  render();
+}
+
+function addPracticeHistory(entry, target, transcript, accuracy) {
+  state.practiceHistory.unshift({
+    itemKey: getItemKey(entry.resource.id, entry.item),
+    resourceTitle: entry.resource.title,
+    target,
+    transcript,
+    accuracy,
+    createdAt: new Date().toISOString(),
+  });
+  state.practiceHistory = state.practiceHistory.slice(0, 80);
+  persistPracticeHistory();
+}
+
+function finalizePracticeAttempt(transcript) {
+  const entry = getCurrentPracticeEntry();
+  const target = getPracticeTarget(entry);
+  if (!entry || !target) {
+    return;
+  }
+
+  const cleanedTranscript = String(transcript || "").trim();
+  const result = comparePracticeText(target, cleanedTranscript);
+  state.practiceTranscript = cleanedTranscript;
+  state.practiceResult = {
+    ...result,
+    itemKey: getItemKey(entry.resource.id, entry.item),
+    transcript: cleanedTranscript,
+  };
+  state.practiceStatusText = `${result.accuracy}%`;
+  addPracticeHistory(
+    entry,
+    target,
+    cleanedTranscript,
+    result.accuracy,
+  );
+  renderPracticeView();
+  updateProgress();
+}
+
+function getRecognitionErrorMessage(errorType) {
+  const messages = {
+    "not-allowed":
+      "麦克风权限未开启，请在浏览器地址栏允许麦克风后重试。",
+    "service-not-allowed":
+      "浏览器未允许语音识别服务，请使用最新版 Chrome 或 Edge。",
+    "audio-capture": "没有检测到可用麦克风。",
+    network: "语音识别服务连接失败，请检查网络后重试。",
+    "no-speech": "没有识别到语音，请靠近麦克风再试一次。",
+    aborted: "",
+  };
+  return messages[errorType] || "语音识别中断，请再试一次。";
+}
+
+function extractApiTranscript(text) {
+  const rawText = String(text || "").trim();
+  if (!rawText) {
+    return "";
+  }
+
+  try {
+    const data = JSON.parse(rawText);
+    return String(
+      data.text ||
+        data.transcript ||
+        data.result?.text ||
+        data.result?.transcript ||
+        data.data?.text ||
+        "",
+    ).trim();
+  } catch {
+    return rawText;
+  }
+}
+
+function buildPracticeApiHeaders() {
+  const headers = {};
+  if (!state.practiceApiKey || state.practiceApiAuth === "none") {
+    return headers;
+  }
+
+  if (state.practiceApiAuth === "x-api-key") {
+    headers["x-api-key"] = state.practiceApiKey;
+  } else {
+    headers.Authorization = `Bearer ${state.practiceApiKey}`;
+  }
+  return headers;
+}
+
+async function transcribePracticeAudio(audioBlob) {
+  const controller = new AbortController();
+  practiceApiAbortController = controller;
+  state.practiceTranscribing = true;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "正在转写";
+  renderPracticeView();
+
+  const formData = new FormData();
+  const extension = audioBlob.type.includes("mp4")
+    ? "mp4"
+    : audioBlob.type.includes("ogg")
+      ? "ogg"
+      : "webm";
+  formData.append("file", audioBlob, `speaking-answer.${extension}`);
+  if (state.practiceApiModel) {
+    formData.append("model", state.practiceApiModel);
+  }
+  formData.append("language", "en");
+
+  try {
+    const response = await fetch(state.practiceApiUrl, {
+      method: "POST",
+      headers: buildPracticeApiHeaders(),
+      body: formData,
+      signal: controller.signal,
+    });
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      let serverMessage = "";
+      try {
+        const errorData = JSON.parse(responseText);
+        serverMessage =
+          errorData.error?.message ||
+          errorData.message ||
+          errorData.error ||
+          "";
+      } catch {
+        serverMessage = responseText;
+      }
+      throw new Error(
+        String(serverMessage || `语音接口返回 ${response.status}`).slice(
+          0,
+          180,
+        ),
+      );
+    }
+
+    const transcript = extractApiTranscript(responseText);
+    if (!transcript) {
+      throw new Error("语音接口没有返回可用文本。");
+    }
+
+    state.practiceTranscribing = false;
+    practiceApiAbortController = null;
+    finalizePracticeAttempt(transcript);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      return;
+    }
+
+    state.practiceTranscribing = false;
+    practiceApiAbortController = null;
+    state.practiceMessage =
+      error.message ||
+      "语音转写失败，请检查接口地址、网络和跨域设置。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "转写失败";
+    renderPracticeView();
+  }
+}
+
+async function startApiPracticeRecording() {
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.practiceMessage = availability.message;
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "需要设置";
+    renderPracticeView();
+    return;
+  }
+
+  const entry = getCurrentPracticeEntry();
+  if (!entry) {
+    state.practiceMessage = "当前没有可跟读的句子。";
+    state.practiceMessageType = "error";
+    renderPracticeView();
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceTranscript = "";
+  state.practiceResult = null;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "等待麦克风权限";
+  state.practiceListening = true;
+  renderPracticeView();
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+      },
+    });
+
+    if (!state.practiceActive || !state.practiceListening) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
+
+    practiceMediaStream = stream;
+    const preferredTypes = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/mp4",
+    ];
+    const mimeType = preferredTypes.find((type) =>
+      window.MediaRecorder.isTypeSupported?.(type),
+    );
+    const recorder = mimeType
+      ? new MediaRecorder(stream, { mimeType })
+      : new MediaRecorder(stream);
+
+    practiceMediaRecorder = recorder;
+    practiceAudioChunks = [];
+    state.practiceStatusText = "正在录音";
+    renderPracticeView();
+
+    recorder.ondataavailable = (event) => {
+      if (event.data?.size) {
+        practiceAudioChunks.push(event.data);
+      }
+    };
+
+    recorder.onerror = () => {
+      cancelPracticeRecognition();
+      state.practiceMessage = "录音过程发生错误，请重新开始。";
+      state.practiceMessageType = "error";
+      state.practiceStatusText = "录音失败";
+      renderPracticeView();
+    };
+
+    recorder.onstop = () => {
+      if (practiceMediaRecorder !== recorder) {
+        return;
+      }
+
+      practiceMediaRecorder = null;
+      state.practiceListening = false;
+      if (practiceMediaStream) {
+        practiceMediaStream.getTracks().forEach((track) => track.stop());
+        practiceMediaStream = null;
+      }
+
+      const chunks = practiceAudioChunks;
+      practiceAudioChunks = [];
+      const audioBlob = new Blob(chunks, {
+        type: recorder.mimeType || mimeType || "audio/webm",
+      });
+      if (!audioBlob.size) {
+        state.practiceMessage = "没有录到音频，请重新开始。";
+        state.practiceMessageType = "error";
+        state.practiceStatusText = "没有音频";
+        renderPracticeView();
+        return;
+      }
+
+      transcribePracticeAudio(audioBlob);
+    };
+
+    recorder.start();
+  } catch (error) {
+    cancelPracticeRecognition();
+    state.practiceMessage =
+      error?.name === "NotAllowedError"
+        ? "麦克风权限未开启，请在浏览器地址栏允许麦克风后重试。"
+        : error?.name === "NotFoundError"
+          ? "没有检测到可用麦克风。"
+          : "录音启动失败，请检查麦克风权限后重试。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "启动失败";
+    renderPracticeView();
+  }
+}
+
+function startPracticeRecording() {
+  if (state.practiceListening || state.practiceTranscribing) {
+    return;
+  }
+
+  if (state.practiceRecognitionMode === "off") {
+    state.practiceMessage =
+      "语音识别已关闭，仍可使用示范朗读和句子对照。";
+    state.practiceMessageType = "info";
+    state.practiceStatusText = "已关闭";
+    renderPracticeView();
+    return;
+  }
+
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording();
+    return;
+  }
+
+  startBrowserPracticeRecording();
+}
+
+function stopPracticeRecording() {
+  if (
+    state.practiceRecognitionMode === "api" &&
+    practiceMediaRecorder
+  ) {
+    state.practiceStatusText = "正在转写";
+    renderPracticeView();
+    try {
+      practiceMediaRecorder.stop();
+    } catch {
+      cancelPracticeRecognition();
+      state.practiceMessage = "录音已停止，请重新开始。";
+      state.practiceMessageType = "error";
+      state.practiceStatusText = "已停止";
+      renderPracticeView();
+    }
+    return;
+  }
+
+  if (!practiceRecognition) {
+    return;
+  }
+
+  state.practiceStatusText = "正在结束";
+  renderPracticeView();
+  try {
+    practiceRecognition.stop();
+  } catch {
+    cancelPracticeRecognition();
+    state.practiceMessage = "语音识别已停止，请重新开始。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "已停止";
+    renderPracticeView();
+  }
+}
+
+function startBrowserPracticeRecording() {
+  if (state.practiceListening) {
+    return;
+  }
+
+  const Recognition = getSpeechRecognitionConstructor();
+  const entry = getCurrentPracticeEntry();
+  if (!Recognition) {
+    state.practiceMessage =
+      "当前浏览器不支持语音识别，请使用最新版 Chrome 或 Edge。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "浏览器不支持";
+    renderPracticeView();
+    return;
+  }
+  if (!entry) {
+    state.practiceMessage = "当前没有可跟读的句子。";
+    state.practiceMessageType = "error";
+    renderPracticeView();
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  const recognition = new Recognition();
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceTranscript = "";
+  state.practiceResult = null;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "正在聆听";
+  state.practiceListening = true;
+  practiceRecognition = recognition;
+
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    state.practiceStatusText = "正在聆听";
+    renderPracticeView();
+  };
+
+  recognition.onresult = (event) => {
+    let interimTranscript = "";
+    const startIndex = Number.isInteger(event.resultIndex)
+      ? event.resultIndex
+      : 0;
+
+    for (
+      let resultIndex = startIndex;
+      resultIndex < event.results.length;
+      resultIndex += 1
+    ) {
+      const transcript = event.results[resultIndex][0]?.transcript || "";
+      if (event.results[resultIndex].isFinal) {
+        state.practiceFinalTranscript =
+          `${state.practiceFinalTranscript} ${transcript}`.trim();
+      } else {
+        interimTranscript =
+          `${interimTranscript} ${transcript}`.trim();
+      }
+    }
+
+    state.practiceInterimTranscript = interimTranscript;
+    state.practiceTranscript =
+      `${state.practiceFinalTranscript} ${interimTranscript}`.trim();
+    state.practiceStatusText = state.practiceTranscript
+      ? "已识别到语音"
+      : "正在聆听";
+    renderPracticeView();
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === "aborted") {
+      return;
+    }
+    state.practiceMessage = getRecognitionErrorMessage(event.error);
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "识别中断";
+    renderPracticeView();
+  };
+
+  recognition.onend = () => {
+    if (practiceRecognition !== recognition) {
+      return;
+    }
+
+    practiceRecognition = null;
+    state.practiceListening = false;
+    const transcript =
+      `${state.practiceFinalTranscript} ${state.practiceInterimTranscript}`.trim();
+
+    if (transcript) {
+      finalizePracticeAttempt(transcript);
+      return;
+    }
+
+    if (!state.practiceMessage) {
+      state.practiceMessage =
+        "没有识别到语音，请靠近麦克风再试一次。";
+      state.practiceMessageType = "error";
+    }
+    state.practiceStatusText = "未识别到语音";
+    renderPracticeView();
+  };
+
+  renderPracticeView();
+  try {
+    recognition.start();
+  } catch {
+    cancelPracticeRecognition();
+    state.practiceMessage = "语音识别启动失败，请刷新页面后重试。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "启动失败";
+    renderPracticeView();
+  }
+}
+
+function playPracticeTarget() {
+  const entry = getCurrentPracticeEntry();
+  const target = getPracticeTarget(entry);
+  if (!target) {
+    return;
+  }
+
+  if (!speak(target, state.practiceRate)) {
+    state.practiceMessage =
+      "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "无法朗读";
+    renderPracticeView();
+    return;
+  }
+
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "正在播放示范";
+  renderPracticeView();
 }
 
 function normalizeLookupWord(value) {
@@ -675,6 +1886,9 @@ function createResourceButton(resource, index) {
 
   button.append(badge, copy, count);
   button.addEventListener("click", () => {
+    cancelPracticeRecognition();
+    state.practiceActive = false;
+    state.practiceResult = null;
     state.activeResourceId = resource.id;
     state.view = "all";
     state.query = "";
@@ -976,7 +2190,21 @@ function createCard(entry, index) {
     render();
   });
 
-  actions.append(favoriteButton, unknownButton, knownButton);
+  const practiceButton = document.createElement("button");
+  practiceButton.className = "practice-card-button";
+  practiceButton.type = "button";
+  practiceButton.textContent = "跟读";
+  practiceButton.setAttribute("aria-label", `跟读练习：${item.sentence || item.phrase}`);
+  practiceButton.addEventListener("click", () => {
+    openPractice(itemKey);
+  });
+
+  actions.append(
+    favoriteButton,
+    unknownButton,
+    knownButton,
+    practiceButton,
+  );
   card.append(head, answerPanel, actions);
   return card;
 }
@@ -1093,6 +2321,30 @@ function render() {
   closeWordPopover();
   const resource = getActiveResource();
   const visibleEntries = getVisibleEntries();
+
+  if (state.practiceActive) {
+    const practiceEntries = getPracticeEntries();
+    elements.vocabularyToolbar.hidden = true;
+    elements.practiceStudio.hidden = false;
+    elements.cardGrid.hidden = true;
+    elements.emptyState.hidden = true;
+    elements.activeTitle.textContent = "口语跟读";
+    elements.activeDescription.textContent = practiceEntries.length
+      ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
+      : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
+    elements.footerResource.textContent =
+      `口语练习 · ${practiceEntries.length} 句`;
+    renderResourceList();
+    updateProgress();
+    updateViewSwitcher();
+    updateMeaningControls();
+    renderCollectionFilters();
+    renderPracticeView();
+    return;
+  }
+
+  elements.vocabularyToolbar.hidden = false;
+  elements.practiceStudio.hidden = true;
   const fragment = document.createDocumentFragment();
 
   visibleEntries.forEach((entry, index) => {
@@ -1296,6 +2548,51 @@ async function handleLogout() {
 
 elements.loginForm.addEventListener("submit", handleLogin);
 elements.logoutButton.addEventListener("click", handleLogout);
+elements.practiceButton.addEventListener("click", () => {
+  openPractice();
+});
+elements.practiceExitButton.addEventListener("click", closePractice);
+elements.practiceListenButton.addEventListener("click", playPracticeTarget);
+elements.practiceRecordButton.addEventListener(
+  "click",
+  startPracticeRecording,
+);
+elements.practiceStopButton.addEventListener(
+  "click",
+  stopPracticeRecording,
+);
+elements.practiceRetryButton.addEventListener("click", () => {
+  resetPracticeAttempt();
+  renderPracticeView();
+});
+elements.practiceNextButton.addEventListener("click", () => {
+  movePractice(1);
+});
+elements.practicePreviousButton.addEventListener("click", () => {
+  movePractice(-1);
+});
+elements.practiceShuffleButton.addEventListener("click", shufflePractice);
+elements.practiceClearButton.addEventListener("click", () => {
+  if (
+    state.practiceHistory.length > 0 &&
+    !window.confirm("确定清空本机的口语练习记录吗？")
+  ) {
+    return;
+  }
+  state.practiceHistory = [];
+  persistPracticeHistory();
+  renderPracticeView();
+});
+elements.practiceMode.addEventListener("change", (event) => {
+  setPracticeRecognitionMode(event.target.value);
+});
+elements.practiceApiSaveButton.addEventListener(
+  "click",
+  savePracticeApiSettings,
+);
+elements.practiceRate.addEventListener("change", (event) => {
+  state.practiceRate = Number(event.target.value) || 0.9;
+});
 elements.materialSearchInput.addEventListener("input", (event) => {
   state.materialQuery = event.target.value;
   renderResourceList();
@@ -1340,4 +2637,6 @@ window.addEventListener("resize", closeWordPopover);
 window.addEventListener("scroll", closeWordPopover, { passive: true });
 
 restoreMarks();
+restorePracticeHistory();
+restorePracticeSettings();
 checkSession();

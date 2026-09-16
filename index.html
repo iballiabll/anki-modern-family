@@ -6,9 +6,9 @@
     <meta name="color-scheme" content="light" />
     <meta
       name="description"
-      content="iball的小屋：按上传素材整理、练习和复习英语听力词汇。"
+      content="iball的小屋：按上传素材整理、复习英语听力词汇，并进行口语跟读练习。"
     />
-    <title>iball的小屋 · 听力词汇</title>
+    <title>iball的小屋 · 听力词汇与口语练习</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
@@ -33,6 +33,7 @@
             <span>按上传素材分类</span>
             <span>逐条标记掌握</span>
             <span>浏览器直接发音</span>
+            <span>口语跟读评分</span>
           </div>
           <p class="login-usage">仅供个人学习使用，非商业用途。</p>
         </div>
@@ -136,7 +137,11 @@
           </div>
         </header>
 
-        <section class="toolbar" aria-label="词汇工具">
+        <section
+          id="vocabularyToolbar"
+          class="toolbar"
+          aria-label="词汇工具"
+        >
           <div class="toolbar-search-row">
             <label class="search-field" for="searchInput">
               <span class="search-symbol" aria-hidden="true">⌕</span>
@@ -177,37 +182,46 @@
             </div>
           </div>
 
-          <div
-            id="viewSwitcher"
-            class="view-switcher"
-            role="group"
-            aria-label="切换词汇视图"
-          >
-            <button
-              class="view-button is-active"
-              type="button"
-              data-view="all"
-              aria-pressed="true"
+          <div class="toolbar-view-row">
+            <div
+              id="viewSwitcher"
+              class="view-switcher"
+              role="group"
+              aria-label="切换词汇视图"
             >
-              本素材
-            </button>
+              <button
+                class="view-button is-active"
+                type="button"
+                data-view="all"
+                aria-pressed="true"
+              >
+                本素材
+              </button>
+              <button
+                class="view-button"
+                type="button"
+                data-view="favorites"
+                aria-pressed="false"
+              >
+                收藏集
+                <span id="favoriteCount" class="view-count">0</span>
+              </button>
+              <button
+                class="view-button"
+                type="button"
+                data-view="unknown"
+                aria-pressed="false"
+              >
+                不会的单词
+                <span id="unknownCount" class="view-count">0</span>
+              </button>
+            </div>
             <button
-              class="view-button"
+              id="practiceButton"
+              class="practice-launch-button"
               type="button"
-              data-view="favorites"
-              aria-pressed="false"
             >
-              收藏集
-              <span id="favoriteCount" class="view-count">0</span>
-            </button>
-            <button
-              class="view-button"
-              type="button"
-              data-view="unknown"
-              aria-pressed="false"
-            >
-              不会的单词
-              <span id="unknownCount" class="view-count">0</span>
+              口语练习
             </button>
           </div>
 
@@ -227,6 +241,267 @@
         </section>
 
         <section
+          id="practiceStudio"
+          class="practice-studio"
+          aria-labelledby="practiceHeading"
+          hidden
+        >
+          <header class="practice-header">
+            <div>
+              <p class="section-label">SPEAKING PRACTICE</p>
+              <h2 id="practiceHeading">口语跟读</h2>
+              <p id="practiceSource" class="practice-source"></p>
+            </div>
+            <button
+              id="practiceExitButton"
+              class="practice-secondary-button"
+              type="button"
+            >
+              返回词汇
+            </button>
+          </header>
+
+          <div class="practice-layout">
+            <article class="practice-stage">
+              <div class="practice-stage-top">
+                <span id="practiceCounter" class="practice-counter"></span>
+                <span
+                  id="practiceStatus"
+                  class="practice-status"
+                  aria-live="polite"
+                ></span>
+              </div>
+
+              <div class="practice-target-block">
+                <span class="practice-block-label">跟读句子</span>
+                <p
+                  id="practiceTarget"
+                  class="practice-target"
+                  lang="en"
+                ></p>
+                <p
+                  id="practiceTranslation"
+                  class="practice-translation"
+                ></p>
+              </div>
+
+              <div class="practice-controls">
+                <label class="practice-rate-field" for="practiceRate">
+                  <span>示范速度</span>
+                  <select id="practiceRate">
+                    <option value="0.75">0.75x 慢速</option>
+                    <option value="0.9" selected>0.9x 标准</option>
+                    <option value="1">1x 原速</option>
+                  </select>
+                </label>
+                <button
+                  id="practiceListenButton"
+                  class="practice-primary-button"
+                  type="button"
+                >
+                  听示范
+                </button>
+                <button
+                  id="practiceRecordButton"
+                  class="practice-record-button"
+                  type="button"
+                >
+                  开始跟读
+                </button>
+                <button
+                  id="practiceStopButton"
+                  class="practice-stop-button"
+                  type="button"
+                  hidden
+                >
+                  结束跟读
+                </button>
+              </div>
+
+              <div class="practice-transcript-block">
+                <div class="practice-transcript-head">
+                  <span>你的发音</span>
+                  <span id="practiceRecognitionState"></span>
+                </div>
+                <p
+                  id="practiceTranscript"
+                  class="practice-transcript"
+                  lang="en"
+                  aria-live="polite"
+                ></p>
+              </div>
+
+              <div id="practiceNotice" class="practice-notice" hidden></div>
+
+              <div id="practiceResult" class="practice-result" hidden>
+                <div class="practice-result-head">
+                  <div class="practice-score">
+                    <strong id="practiceScore">0%</strong>
+                    <span>单词匹配度</span>
+                  </div>
+                  <p id="practiceFeedback" class="practice-feedback"></p>
+                </div>
+                <div class="practice-comparison">
+                  <div>
+                    <span class="practice-block-label">原句对照</span>
+                    <p id="practiceTargetDiff" class="practice-diff"></p>
+                  </div>
+                  <div>
+                    <span class="practice-block-label">识别到的额外词</span>
+                    <p
+                      id="practiceExtraWords"
+                      class="practice-extra-words"
+                      lang="en"
+                    ></p>
+                  </div>
+                </div>
+                <div class="practice-result-actions">
+                  <button
+                    id="practiceRetryButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    再练一次
+                  </button>
+                  <button
+                    id="practiceNextButton"
+                    class="practice-primary-button"
+                    type="button"
+                  >
+                    下一句
+                  </button>
+                </div>
+              </div>
+
+              <div class="practice-navigation">
+                <button
+                  id="practicePreviousButton"
+                  class="practice-secondary-button"
+                  type="button"
+                >
+                  上一句
+                </button>
+                <button
+                  id="practiceShuffleButton"
+                  class="practice-secondary-button"
+                  type="button"
+                >
+                  随机一句
+                </button>
+              </div>
+            </article>
+
+            <aside class="practice-sidebar" aria-label="口语练习记录">
+              <div class="practice-service-settings">
+                <div class="practice-service-head">
+                  <div>
+                    <span class="practice-block-label">语音识别</span>
+                    <h3>识别方式</h3>
+                  </div>
+                  <span id="practiceModeStatus" class="practice-mode-status">
+                    浏览器免费
+                  </span>
+                </div>
+                <label class="practice-field" for="practiceMode">
+                  <span>识别服务</span>
+                  <select id="practiceMode">
+                    <option value="browser" selected>浏览器免费</option>
+                    <option value="api">自定义 API</option>
+                    <option value="off">关闭识别</option>
+                  </select>
+                </label>
+                <div id="practiceApiFields" class="practice-api-fields" hidden>
+                  <label class="practice-field" for="practiceApiUrl">
+                    <span>接口地址</span>
+                    <input
+                      id="practiceApiUrl"
+                      type="url"
+                      autocomplete="off"
+                      placeholder="https://example.com/v1/audio/transcriptions"
+                    />
+                  </label>
+                  <label class="practice-field" for="practiceApiModel">
+                    <span>模型名称</span>
+                    <input
+                      id="practiceApiModel"
+                      type="text"
+                      autocomplete="off"
+                      placeholder="whisper-1"
+                    />
+                  </label>
+                  <label class="practice-field" for="practiceApiKey">
+                    <span>API Key</span>
+                    <input
+                      id="practiceApiKey"
+                      type="password"
+                      autocomplete="off"
+                      placeholder="可留空"
+                    />
+                  </label>
+                  <label class="practice-field" for="practiceApiAuth">
+                    <span>鉴权方式</span>
+                    <select id="practiceApiAuth">
+                      <option value="bearer" selected>Bearer</option>
+                      <option value="x-api-key">x-api-key</option>
+                      <option value="none">无鉴权</option>
+                    </select>
+                  </label>
+                  <button
+                    id="practiceApiSaveButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    保存接口配置
+                  </button>
+                  <p
+                    id="practiceApiStatus"
+                    class="practice-api-status"
+                    aria-live="polite"
+                  ></p>
+                  <p class="practice-api-note">
+                    API Key 仅保存在当前浏览器，并直接发送到所填接口。接口需
+                    允许跨域访问（CORS）。
+                  </p>
+                </div>
+              </div>
+
+              <div class="practice-sidebar-head">
+                <div>
+                  <span class="practice-block-label">学习数据</span>
+                  <h3>本机练习记录</h3>
+                </div>
+                <button
+                  id="practiceClearButton"
+                  class="practice-text-button"
+                  type="button"
+                >
+                  清空
+                </button>
+              </div>
+              <div class="practice-stat-grid">
+                <div>
+                  <strong id="practiceAttemptCount">0</strong>
+                  <span>练习次数</span>
+                </div>
+                <div>
+                  <strong id="practiceSentenceCount">0</strong>
+                  <span>涉及句子</span>
+                </div>
+                <div>
+                  <strong id="practiceAverageScore">0%</strong>
+                  <span>平均匹配</span>
+                </div>
+                <div>
+                  <strong id="practiceBestScore">0%</strong>
+                  <span>最佳匹配</span>
+                </div>
+              </div>
+              <div id="practiceHistory" class="practice-history"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section
           id="cardGrid"
           class="card-grid"
           aria-label="听力词汇卡片"
@@ -241,6 +516,16 @@
           <span>iball的小屋</span>
           <span id="footerResource">听力词汇素材库</span>
           <span>仅供个人学习使用，非商业用途。</span>
+          <span>
+            借鉴开源项目：
+            <a
+              href="https://github.com/yin-yizhen/SpeakHub"
+              target="_blank"
+              rel="noreferrer"
+            >
+              SpeakHub
+            </a>
+          </span>
         </footer>
       </main>
     </div>
