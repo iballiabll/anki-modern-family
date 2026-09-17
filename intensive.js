@@ -71,6 +71,7 @@
     wordPanel: document.querySelector("#wordPanel"),
     wordPanelTitle: document.querySelector("#wordPanelTitle"),
     wordPanelPhonetic: document.querySelector("#wordPanelPhonetic"),
+    wordLevelBadges: document.querySelector("#wordLevelBadges"),
     speakWordButton: document.querySelector("#speakWordButton"),
     wordLookupStatus: document.querySelector("#wordLookupStatus"),
     wordMeanings: document.querySelector("#wordMeanings"),
@@ -747,6 +748,20 @@
     elements.wordMeanings.append(list);
   }
 
+  function renderWordLevelBadges(levels) {
+    if (!elements.wordLevelBadges) {
+      return;
+    }
+    elements.wordLevelBadges.replaceChildren();
+    const badges = createPhraseLevelBadges(levels);
+    if (!badges) {
+      elements.wordLevelBadges.hidden = true;
+      return;
+    }
+    elements.wordLevelBadges.hidden = false;
+    elements.wordLevelBadges.append(badges);
+  }
+
   function renderPhrases(phrases) {
     if (!elements.wordPhrases || !elements.wordPhraseSection) {
       return;
@@ -828,6 +843,7 @@
     if (elements.wordPanelPhonetic) {
       elements.wordPanelPhonetic.textContent = item.phonetic || "音标查询中";
     }
+    renderWordLevelBadges(item.levels || []);
     if (elements.wordLookupStatus) {
       elements.wordLookupStatus.textContent = "正在查询词典…";
     }
@@ -1042,13 +1058,22 @@
     const kind = button.dataset.wordKind === "phrase" ? "phrase" : "word";
     const paragraph = getParagraphById(button.dataset.paragraphId);
     const existing = getStoredWord(phrase, paragraph?.english || "", kind);
+    const chipLevels = String(button.dataset.phraseLevels || "")
+      .split("|")
+      .map((level) => level.trim())
+      .filter((level) => PHRASE_LEVEL_SHORT[level]);
+    const chipMeaning = String(button.dataset.phraseMeaning || "").trim();
     const item = existing
-      ? { ...existing }
+      ? {
+          ...existing,
+          levels: existing.levels?.length ? existing.levels : chipLevels,
+        }
       : {
           id: makeWordId(phrase, paragraph?.english || "", kind),
           phrase,
-          meaning: "",
+          meaning: chipMeaning,
           phonetic: "",
+          levels: chipLevels,
         };
     if (existing) {
       item.id = existing.id;
@@ -1269,11 +1294,123 @@
     return row;
   }
 
+  const PHRASE_LEVEL_SHORT = { 四级: "四", 六级: "六", 考研: "研" };
+  const PHRASE_LEVEL_CLASS = {
+    四级: "is-cet4",
+    六级: "is-cet6",
+    考研: "is-kaoyan",
+  };
+
+  function normalizePhraseKey(value) {
+    return String(value || "")
+      .replace(/[’‘`]/g, "'")
+      .toLowerCase()
+      .replace(/[.…]+/g, " ")
+      .replace(/[^a-z0-9'\- ]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function collectPhraseEntries(paragraph) {
+    const collected = new Map();
+    const index = window.CollocationIndex;
+
+    const add = (item) => {
+      const phrase = String(item?.phrase || "").trim();
+      if (!phrase) {
+        return;
+      }
+      const key = normalizePhraseKey(phrase);
+      if (!key) {
+        return;
+      }
+
+      const levels = (Array.isArray(item.levels) ? item.levels : []).filter(
+        (level) => PHRASE_LEVEL_SHORT[level],
+      );
+      const mask = Number(item.mask) || 0;
+      const existing = collected.get(key);
+      if (existing) {
+        const merged = new Set([...existing.levels, ...levels]);
+        existing.levels = [...merged];
+        existing.mask |= mask;
+        if (!existing.meaning && item.meaning) {
+          existing.meaning = String(item.meaning).trim();
+        }
+        existing.seeded = existing.seeded || Boolean(item.seeded);
+        return;
+      }
+
+      collected.set(key, {
+        phrase,
+        levels,
+        mask,
+        meaning: String(item.meaning || "").trim(),
+        phonetic: String(item.phonetic || "").trim(),
+        seeded: Boolean(item.seeded),
+      });
+    };
+
+    (Array.isArray(paragraph?.phrases) ? paragraph.phrases : []).forEach((raw) => {
+      const phrase = String(raw || "").trim();
+      if (!phrase) {
+        return;
+      }
+      const local =
+        typeof index?.lookup === "function" ? index.lookup(phrase) : null;
+      if (local) {
+        add({
+          ...local,
+          levels: local.levels.length ? local.levels : ["四级"],
+          mask: local.mask || 1,
+          seeded: true,
+        });
+        return;
+      }
+      add({ phrase, levels: ["四级"], mask: 1, seeded: true });
+    });
+
+    if (typeof index?.findInText === "function") {
+      index.findInText(paragraph?.english || "").forEach(add);
+    }
+
+    return [...collected.values()]
+      .sort((left, right) => {
+        if (right.mask !== left.mask) {
+          return right.mask - left.mask;
+        }
+        const leftWords = left.phrase.split(" ").length;
+        const rightWords = right.phrase.split(" ").length;
+        if (rightWords !== leftWords) {
+          return rightWords - leftWords;
+        }
+        return left.phrase.localeCompare(right.phrase);
+      })
+      .slice(0, 14);
+  }
+
+  function createPhraseLevelBadges(levels) {
+    const usable = (Array.isArray(levels) ? levels : []).filter(
+      (level) => PHRASE_LEVEL_SHORT[level],
+    );
+    if (!usable.length) {
+      return null;
+    }
+
+    const wrap = document.createElement("span");
+    wrap.className = "phrase-levels";
+    usable.forEach((level) => {
+      const badge = document.createElement("i");
+      badge.className = `phrase-level ${PHRASE_LEVEL_CLASS[level] || ""}`.trim();
+      badge.textContent = PHRASE_LEVEL_SHORT[level];
+      badge.title = `${level}固定搭配`;
+      wrap.append(badge);
+    });
+    return wrap;
+  }
+
   function createPhraseRow(paragraph, paragraphId) {
-    const phrases = (Array.isArray(paragraph.phrases) ? paragraph.phrases : [])
-      .map((phrase) => String(phrase || "").trim())
-      .filter(Boolean)
-      .slice(0, 16);
+    const phrases = collectPhraseEntries(paragraph);
     if (!phrases.length) {
       return null;
     }
@@ -1286,15 +1423,35 @@
     label.textContent = "固定搭配";
     row.append(label);
 
-    phrases.forEach((phrase) => {
+    phrases.forEach((entry) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "key-word-chip phrase-chip";
-      button.dataset.word = phrase;
+      button.dataset.word = entry.phrase;
       button.dataset.wordKind = "phrase";
       button.dataset.paragraphId = paragraphId;
-      button.textContent = phrase;
-      button.setAttribute("aria-label", `查看固定搭配 ${phrase} 的释义`);
+      if (entry.levels.length) {
+        button.dataset.phraseLevels = entry.levels.join("|");
+      }
+      if (entry.meaning) {
+        button.dataset.phraseMeaning = entry.meaning.slice(0, 400);
+      }
+
+      const text = document.createElement("span");
+      text.className = "phrase-chip-text";
+      text.lang = "en";
+      text.textContent = entry.phrase;
+      button.append(text);
+
+      const badges = createPhraseLevelBadges(entry.levels);
+      if (badges) {
+        button.append(badges);
+      }
+
+      const levelText = entry.levels.length
+        ? `${entry.levels.join("、")}固定搭配`
+        : "固定搭配";
+      button.setAttribute("aria-label", `查看${levelText} ${entry.phrase} 的释义`);
       row.append(button);
     });
 
@@ -2112,9 +2269,7 @@
       (total, piece) =>
         total +
         (Array.isArray(piece.paragraphs) ? piece.paragraphs : []).reduce(
-          (subtotal, paragraph) =>
-            subtotal +
-            (Array.isArray(paragraph.phrases) ? paragraph.phrases.length : 0),
+          (subtotal, paragraph) => subtotal + collectPhraseEntries(paragraph).length,
           0,
         ),
       0,
@@ -2285,6 +2440,44 @@
         : papers[0].id;
 
     openPaper(initialId, { push: false });
+    refreshCollocationHighlights();
+  }
+
+  let collocationRefreshRun = 0;
+
+  function refreshCollocationHighlights() {
+    const index = window.CollocationIndex;
+    if (!index || typeof index.load !== "function") {
+      return;
+    }
+    const run = ++collocationRefreshRun;
+    Promise.resolve(index.load())
+      .then((built) => {
+        if (!built || run !== collocationRefreshRun) {
+          return;
+        }
+        const apply = () => {
+          if (run !== collocationRefreshRun || !state.data) {
+            return true;
+          }
+          if (!state.paragraphIndex.size) {
+            return false;
+          }
+          const scrollY = window.scrollY;
+          renderPage();
+          updateTokenMarks();
+          window.scrollTo({ top: scrollY, behavior: "auto" });
+          return true;
+        };
+        if (!apply()) {
+          window.setTimeout(() => {
+            if (!apply()) {
+              window.setTimeout(apply, 1200);
+            }
+          }, 400);
+        }
+      })
+      .catch(() => {});
   }
 
   window.intensiveReading = {

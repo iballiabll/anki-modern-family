@@ -890,6 +890,9 @@ body.is-english-only .paragraph-chinese {
 }
 
 .key-word-chip.phrase-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   color: #8a6420;
   background: #fdf5e2;
   border-color: #ecd9ae;
@@ -900,6 +903,69 @@ body.is-english-only .paragraph-chinese {
   color: #ffffff;
   background: #b58a2c;
   border-color: #b58a2c;
+}
+
+.phrase-chip-text {
+  white-space: nowrap;
+}
+
+.phrase-levels {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.key-word-chip.phrase-chip .phrase-levels {
+  margin-right: -2px;
+}
+
+.phrase-level {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 4px;
+  font-size: 9.5px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.phrase-level.is-cet4 {
+  color: #1b5f8c;
+  background: #dceaf5;
+}
+
+.phrase-level.is-cet6 {
+  color: #7a3d8c;
+  background: #eee0f4;
+}
+
+.phrase-level.is-kaoyan {
+  color: #a2542a;
+  background: #f8e5d6;
+}
+
+.key-word-chip.phrase-chip:hover .phrase-level.is-cet4,
+.key-word-chip.phrase-chip:hover .phrase-level.is-cet6,
+.key-word-chip.phrase-chip:hover .phrase-level.is-kaoyan {
+  color: #6b4a12;
+  background: #ffffff;
+}
+
+.word-levels {
+  margin: 4px 0 0;
+}
+
+.word-levels .phrase-level {
+  min-width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  font-size: 11px;
+  border-radius: 5px;
 }
 
 body.is-cues-hidden .cue-block {

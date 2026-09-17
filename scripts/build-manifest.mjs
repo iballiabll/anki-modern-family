@@ -10,6 +10,8 @@ const publicRoot = path.join(root, "public");
 const checkOnly = process.argv.includes("--check");
 const staticEntries = [
   "app.js",
+  "collocation-index.js",
+  "collocation-index.json",
   "deck-data.js",
   "index.html",
   "intensive-data",

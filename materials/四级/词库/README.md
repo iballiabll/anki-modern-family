@@ -2,10 +2,12 @@
 
 - `四级单词表.csv`：按 ECDICT 的 `cet4` 标签导出，每 50 词自动切分为一个单元。
 - `四级短语表.csv`：来源 2ndLA/english-phrases 的四级短语表，每 50 条自动切分为一个单元。
+- `四级核心词库-自定义.json`：本机补充词库。生成时只补 ECDICT 未收录的词；已有词仅在音标或释义缺失时补齐，不覆盖原内容。
 
 ## 数据来源
 
 - 单词释义与音标：ECDICT（MIT License）https://github.com/skywind3000/ECDICT
+- 四级补充词条：本机 `四级核心词库-自定义.json`
 - 短语清单：english-phrases（CC BY-SA 4.0）https://github.com/2ndLA/english-phrases
 - 短语释义：优先匹配 ECDICT 词条，未收录的短语使用有道词典补录，缓存在 `data/phrase-meanings.json`。
 

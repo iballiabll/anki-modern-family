@@ -82,6 +82,15 @@ const zeroLibraryPath = path.join(
   "Level 1-2",
   "零基础词汇讲义Level1-2_词汇表.csv",
 );
+const CUSTOM_WORD_SOURCES = {
+  cet4: path.join(
+    root,
+    "materials",
+    "四级",
+    "词库",
+    "四级核心词库-自定义.json",
+  ),
+};
 
 function normalizeHeadword(value) {
   return String(value || "")
@@ -133,6 +142,23 @@ function cleanTranslation(value, maxLength = 260) {
     return text;
   }
   return `${text.slice(0, maxLength).replace(/[，,；;、\s]+$/g, "")}…`;
+}
+
+// 零基础讲义 PDF 转表时夹带了页码标记和例句残留，这里在入库前清掉。
+function cleanZeroMeaning(value, maxLength = 160) {
+  const stripped = String(value || "")
+    .replace(/\s*\d+\s*<<[^；;\n]*/g, "")
+    .replace(/\s*(?:local\s+)?e\.g\.[^；;\n]*/gi, "")
+    .replace(/\s+[A-Za-z]{2,}\s*$/g, "");
+  return cleanTranslation(stripped, maxLength);
+}
+
+function isZeroMeaningSuspect(value) {
+  const text = cleanText(value);
+  if (!text) {
+    return false;
+  }
+  return /。|<<|\be\.g\./i.test(text) || /[A-Za-z]{2,}$/.test(text);
 }
 
 function cleanDefinition(value, maxLength = 200) {
@@ -274,10 +300,11 @@ function isPhraseHeadword(value) {
   return /\s/.test(String(value || "").trim());
 }
 
-async function scanEcdict(phraseLookup) {
+async function scanEcdict(phraseLookup, zeroLookup) {
   let rowIndex = 0;
   let headwordCount = 0;
   const matchedPhrases = new Set();
+  const zeroFilled = { phonetic: 0, meaning: 0 };
 
   for await (const row of parseCsvStream(ecdictPath)) {
     rowIndex += 1;
@@ -293,6 +320,27 @@ async function scanEcdict(phraseLookup) {
       continue;
     }
     headwordCount += 1;
+
+    if (zeroLookup) {
+      const zeroEntry = zeroLookup.get(normalizeHeadword(headword));
+      if (zeroEntry) {
+        if (!zeroEntry.phonetic) {
+          const phonetic = formatPhonetic(row[1]);
+          if (phonetic) {
+            zeroEntry.phonetic = phonetic;
+            zeroFilled.phonetic += 1;
+          }
+        }
+        if (!zeroEntry.meaning || zeroEntry.meaningSuspect) {
+          const meaning = cleanTranslation(row[3], 160);
+          if (meaning) {
+            zeroEntry.meaning = meaning;
+            zeroEntry.meaningSuspect = false;
+            zeroFilled.meaning += 1;
+          }
+        }
+      }
+    }
 
     const tags = cleanText(row[7]).split(/\s+/).filter(Boolean);
     if (tags.length > 0) {
@@ -335,7 +383,93 @@ async function scanEcdict(phraseLookup) {
     });
   }
 
-  return { rowIndex, headwordCount, matchedPhrases: matchedPhrases.size };
+  return {
+    rowIndex,
+    headwordCount,
+    matchedPhrases: matchedPhrases.size,
+    zeroFilled,
+  };
+}
+
+async function loadCustomWordSources() {
+  const stats = [];
+
+  for (const [deckKey, filePath] of Object.entries(CUSTOM_WORD_SOURCES)) {
+    const deck = DECKS.find((item) => item.key === deckKey);
+    if (!deck) {
+      continue;
+    }
+
+    const raw = await fs.readFile(filePath, "utf8").catch(() => "[]");
+    let entries;
+    try {
+      entries = JSON.parse(raw);
+    } catch (error) {
+      throw new Error(`自定义词库无法解析：${filePath}（${error.message}）`);
+    }
+    if (!Array.isArray(entries)) {
+      throw new Error(`自定义词库必须是 JSON 数组：${filePath}`);
+    }
+
+    let added = 0;
+    let completed = 0;
+    let skipped = 0;
+
+    entries.forEach((item) => {
+      const word = cleanText(item?.name);
+      const key = normalizeHeadword(word);
+      if (!key) {
+        skipped += 1;
+        return;
+      }
+
+      const phonetic = formatPhonetic(item?.usphone || item?.ukphone || "");
+      const translations = Array.isArray(item?.trans)
+        ? item.trans
+        : [item?.trans];
+      const meaning = cleanTranslation(
+        translations.filter(Boolean).join("\n"),
+        220,
+      );
+      const existing = deck.words.get(key);
+
+      if (!existing) {
+        deck.words.set(key, {
+          word,
+          phonetic,
+          meaning,
+          definition: "",
+          source: `${deck.label} · 本机词库`,
+        });
+        added += 1;
+        return;
+      }
+
+      let changed = false;
+      if (!existing.phonetic && phonetic) {
+        existing.phonetic = phonetic;
+        changed = true;
+      }
+      if (!existing.meaning && meaning) {
+        existing.meaning = meaning;
+        changed = true;
+      }
+      if (changed) {
+        completed += 1;
+      }
+    });
+
+    stats.push({
+      deck: deck.label,
+      filePath,
+      total: entries.length,
+      added,
+      completed,
+      skipped,
+    });
+  }
+
+  return stats;
 }
 
 function cleanYoudaoText(value) {
@@ -624,10 +758,12 @@ async function loadZeroLibraryEntries() {
     if (!word || word === "单词") {
       return;
     }
+    const meaning = cleanZeroMeaning(row[meaningIndex]);
     entries.push({
       word,
       phonetic: formatPhonetic(row[phoneticIndex]),
-      meaning: cleanTranslation(row[meaningIndex], 160),
+      meaning,
+      meaningSuspect: isZeroMeaningSuspect(meaning),
       source: "零基础",
       kind: "word",
     });
@@ -672,7 +808,7 @@ function buildIndexEntries(zeroEntries) {
         word: word.word,
         phonetic: word.phonetic,
         meaning: compactMeaning(word.meaning, 150),
-        source: deck.label,
+        source: word.source || deck.label,
         kind: "word",
       });
     });
@@ -754,9 +890,14 @@ async function main() {
 
   const phraseCount = await loadPhraseSources();
   const phraseLookup = buildPhraseLookup();
+  const zeroEntries = await loadZeroLibraryEntries();
+  const zeroLookup = new Map(
+    zeroEntries.map((entry) => [normalizeHeadword(entry.word), entry]),
+  );
 
   console.log("扫描 ECDICT ...");
-  const stats = await scanEcdict(phraseLookup);
+  const stats = await scanEcdict(phraseLookup, zeroLookup);
+  const customWordStats = await loadCustomWordSources();
 
   const phraseCache = await loadPhraseCache();
   const cachedCount = applyPhraseCache(phraseCache);
@@ -765,7 +906,6 @@ async function main() {
   }
   const fetchStats = await fillMissingPhraseMeanings(phraseCache);
 
-  const zeroEntries = await loadZeroLibraryEntries();
   const indexEntries = buildIndexEntries(zeroEntries);
   const overriddenPhonetics = await applyPhoneticOverrides(indexEntries);
 
@@ -784,6 +924,16 @@ async function main() {
     );
   });
   console.log(`零基础词条：${zeroEntries.length}`);
+  if (stats.zeroFilled) {
+    console.log(
+      `零基础补齐：释义 ${stats.zeroFilled.meaning} 条，音标 ${stats.zeroFilled.phonetic} 条`,
+    );
+  }
+  customWordStats.forEach((item) => {
+    console.log(
+      `${item.deck}本机词库：读取 ${item.total} 条，新增 ${item.added} 条，补齐 ${item.completed} 条，跳过 ${item.skipped} 条`,
+    );
+  });
   if (overriddenPhonetics > 0) {
     console.log(`已补齐本地音标：${overriddenPhonetics} 条`);
   }
