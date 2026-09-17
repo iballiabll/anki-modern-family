@@ -127,6 +127,16 @@
     return PHONETIC_PLACEHOLDERS.has(text) ? "" : text;
   }
 
+  function isUsablePhonetic(value) {
+    const text = cleanPhonetic(value);
+    return text && text !== "-" ? text : "";
+  }
+
+  function renderPanelPhonetic(value) {
+    elements.wordPanelPhonetic.textContent =
+      isUsablePhonetic(value) || "暂无音标";
+  }
+
   function makeWordId(phrase, sentence) {
     return `word-${hashReadingValue(
       `${normalizeWord(phrase)}|${cleanReadingText(sentence, 1200)}`,
@@ -653,7 +663,8 @@
     };
 
     elements.wordPanelTitle.textContent = phrase;
-    elements.wordPanelPhonetic.textContent = item.phonetic || "音标查询中";
+    elements.wordPanelPhonetic.textContent =
+      isUsablePhonetic(item.phonetic) || "音标查询中";
     elements.wordLookupStatus.textContent = "正在查询词典…";
     elements.wordMeanings.replaceChildren();
     elements.wordContextSentence.textContent = sentence;
@@ -714,8 +725,8 @@
       ),
       definitions: [],
       phonetic:
-        cleanPhonetic(remoteData?.phonetic) ||
-        cleanPhonetic(localData?.phonetic),
+        isUsablePhonetic(remoteData?.phonetic) ||
+        isUsablePhonetic(localData?.phonetic),
       remoteChecked: true,
     };
   }
@@ -747,9 +758,9 @@
     if (
       existing?.meaning &&
       existing.meaning !== "查看上下文理解用法" &&
-      cleanPhonetic(existing.phonetic)
+      isUsablePhonetic(existing.phonetic)
     ) {
-      elements.wordPanelPhonetic.textContent = existing.phonetic || "暂无音标";
+      renderPanelPhonetic(existing.phonetic);
       elements.wordLookupStatus.textContent = "已从阅读生词本读取释义";
       renderMeanings([existing.meaning]);
       activeWord.item = { ...existing };
@@ -763,7 +774,7 @@
         ? {
             translations: [existing.meaning],
             definitions: [],
-            phonetic: cleanPhonetic(existing.phonetic),
+            phonetic: isUsablePhonetic(existing.phonetic),
           }
         : null;
     try {
@@ -781,17 +792,18 @@
           ),
           definitions: [],
           phonetic:
-            cleanPhonetic(localEntry.phonetic) ||
-            cleanPhonetic(localData?.phonetic),
+            isUsablePhonetic(localEntry.phonetic) ||
+            isUsablePhonetic(localData?.phonetic),
           source: localEntry.source,
         };
         if (localData.phonetic) {
           const meanings = localData.translations;
           activeWord.meanings = meanings;
           activeWord.item.phonetic =
-            localData.phonetic || activeWord.item.phonetic;
+            isUsablePhonetic(localData.phonetic) ||
+            isUsablePhonetic(activeWord.item.phonetic);
           activeWord.item.meaning = getCombinedMeaning(meanings, "");
-          elements.wordPanelPhonetic.textContent = localData.phonetic;
+          renderPanelPhonetic(localData.phonetic);
           elements.wordLookupStatus.textContent = `已从本地词库读取释义与音标（${localEntry.source}）`;
           renderMeanings(meanings);
           return;
@@ -808,10 +820,12 @@
         const meanings = merged.translations;
         activeWord.meanings = meanings.slice(0, 8);
         activeWord.item.phonetic =
-          merged.phonetic || activeWord.item.phonetic;
+          isUsablePhonetic(merged.phonetic) ||
+          isUsablePhonetic(activeWord.item.phonetic);
         activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
-        elements.wordPanelPhonetic.textContent =
-          merged.phonetic || activeWord.item.phonetic || "暂无音标";
+        renderPanelPhonetic(
+          isUsablePhonetic(merged.phonetic) || activeWord.item.phonetic,
+        );
         elements.wordLookupStatus.textContent = merged.phonetic
           ? "本地词库释义，在线词典已补充音标"
           : "本地词库释义；在线词典暂未提供音标";
@@ -825,10 +839,13 @@
       ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
 
       activeWord.meanings = meanings.slice(0, 8);
-      activeWord.item.phonetic = data.phonetic || activeWord.item.phonetic;
+      activeWord.item.phonetic =
+        isUsablePhonetic(data.phonetic) ||
+        isUsablePhonetic(activeWord.item.phonetic);
       activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
-      elements.wordPanelPhonetic.textContent =
-        data.phonetic || activeWord.item.phonetic || "暂无音标";
+      renderPanelPhonetic(
+        isUsablePhonetic(data.phonetic) || activeWord.item.phonetic,
+      );
       elements.wordLookupStatus.textContent = meanings.length
         ? "已查询到释义"
         : "词典没有返回释义";
@@ -841,17 +858,18 @@
         const meanings = localData.translations || [];
         activeWord.meanings = meanings;
         activeWord.item.phonetic =
-          localData.phonetic || activeWord.item.phonetic;
+          isUsablePhonetic(localData.phonetic) ||
+          isUsablePhonetic(activeWord.item.phonetic);
         activeWord.item.meaning = getCombinedMeaning(meanings, "");
-        elements.wordPanelPhonetic.textContent =
-          localData.phonetic || activeWord.item.phonetic || "暂无音标";
+        renderPanelPhonetic(
+          isUsablePhonetic(localData.phonetic) || activeWord.item.phonetic,
+        );
         elements.wordLookupStatus.textContent =
           "已读取本地释义；在线音标暂时不可用";
         renderMeanings(meanings);
         return;
       }
-      elements.wordPanelPhonetic.textContent =
-        activeWord.item.phonetic || "暂无音标";
+      renderPanelPhonetic(activeWord.item.phonetic);
       elements.wordLookupStatus.textContent = `${error.message || "查询失败"}，可手动补充释义`;
       renderMeanings(activeWord.meanings);
     }
@@ -920,8 +938,8 @@
         "查看上下文理解用法",
       addedAt: activeWord.item.addedAt || Date.now(),
       phonetic:
-        cleanPhonetic(activeWord.item.phonetic) ||
-        cleanPhonetic(elements.wordPanelPhonetic.textContent),
+        isUsablePhonetic(activeWord.item.phonetic) ||
+        isUsablePhonetic(elements.wordPanelPhonetic.textContent),
     };
 
     const words = document.words.filter((word) => word.id !== item.id);
