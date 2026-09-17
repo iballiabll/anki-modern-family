@@ -875,6 +875,16 @@ body.has-word-panel .reading-shell {
   gap: 9px;
 }
 
+.word-panel-head + .word-actions {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.word-panel-head + .word-actions + .word-panel-footnote {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
 .mark-button {
   border: 1px solid transparent;
 }

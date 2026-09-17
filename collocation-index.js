@@ -300,6 +300,7 @@
     load,
     lookup,
     findInText,
+    formsFor,
     tokenize,
     levelsForMask,
     get ready() {

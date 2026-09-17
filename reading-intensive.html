@@ -7,25 +7,25 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#2b2338" />
+    <meta name="theme-color" content="#0b2925" />
     <meta
       name="description"
-      content="美剧台词精读：完整台词、逐句精翻、日常替换说法，标注四级、六级、考研单词与固定搭配。"
+      content="2022 至 2026 年四级阅读全文精读：仔细阅读、段落匹配、选词填空的翻译、解析、技巧与四六级考研词库替换。"
     />
-    <title>美剧台词精读 · iball的小屋</title>
+    <title>四级阅读全文精读 · iball的小屋</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232b2338'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="./intensive.css" />
-    <link rel="stylesheet" href="./movie.css" />
+    <link rel="stylesheet" href="./reading-intensive.css" />
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
     <script src="./collocation-index.js" defer></script>
-    <script src="./movie-data/index.js" defer></script>
-    <script src="./movie.js" defer></script>
+    <script src="./reading-papers.js" defer></script>
+    <script src="./reading-intensive.js" defer></script>
   </head>
-  <body class="movie-page">
+  <body class="reading-intensive-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 
     <header class="intensive-topbar">
@@ -33,18 +33,18 @@
       <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
         <span class="brand-mark" aria-hidden="true">ib</span>
         <span class="brand-copy">
-          <strong>台词精读</strong>
-          <small>IBALL'S SCREENPLAY CABIN</small>
+          <strong>阅读精读</strong>
+          <small>IBALL'S READING CABIN</small>
         </span>
       </a>
       <a
         id="sourceLink"
         class="topbar-link topbar-source"
-        href="./index.html"
+        href="https://english-exam.lazynote.cn/"
         target="_blank"
         rel="noopener noreferrer"
       >
-        剧集素材
+        原文出处
       </a>
     </header>
 
@@ -52,18 +52,38 @@
       <section class="intensive-hero" aria-labelledby="pageTitle">
         <div class="hero-inner">
           <div class="hero-copy">
-            <p class="hero-eyebrow">SCREENPLAY INTENSIVE</p>
-            <h1 id="pageTitle">美剧台词精读</h1>
+            <p class="hero-eyebrow">CET-4 READING</p>
+            <h1 id="pageTitle">四级阅读全文精读</h1>
             <p class="hero-description">
-              完整台词逐句精翻，指出固定搭配与日常更自然的说法，点击单词优先查站内词库。
+              仔细阅读、段落匹配、选词填空三类题型，逐段对照翻译，标注答案位置，点词看释义、固定搭配与四六级考研替换。
             </p>
-            <div id="heroStats" class="hero-stats" aria-label="剧集内容统计"></div>
+            <div id="heroStats" class="hero-stats" aria-label="精读内容统计"></div>
           </div>
 
           <div class="hero-tools" aria-label="阅读设置">
             <div class="setting-group">
-              <label class="setting-label" for="episodeSelect">选择剧集</label>
-              <select id="episodeSelect" class="paper-select"></select>
+              <label class="setting-label" for="yearSelect">年份</label>
+              <select id="yearSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="monthSelect">月份</label>
+              <select id="monthSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="setSelect">套数</label>
+              <select id="setSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="kindSelect">题型</label>
+              <select id="kindSelect" class="paper-select">
+                <option value="all">全部题型</option>
+                <option value="cloze">选词填空</option>
+                <option value="matching">段落匹配</option>
+                <option value="careful">仔细阅读</option>
+              </select>
             </div>
 
             <div class="setting-group">
@@ -85,42 +105,34 @@
                 >
                   只看英文
                 </button>
-                <button
-                  class="segment-button"
-                  type="button"
-                  data-display-mode="chinese"
-                  aria-pressed="false"
-                >
-                  只看中文
-                </button>
               </div>
             </div>
 
             <div class="tool-actions">
-              <button id="levelToggleButton" class="tool-button" type="button">
-                隐藏考试词标记
+              <button id="cueToggleButton" class="tool-button" type="button">
+                隐藏答案提示
               </button>
-              <button id="alternativeToggleButton" class="tool-button" type="button">
-                隐藏替换说法
+              <button id="answerToggleButton" class="tool-button" type="button">
+                一键显示全部答案
               </button>
               <button id="readAllButton" class="tool-button is-primary" type="button">
-                全集播放
+                全文播放
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      <div id="movieLayout" class="intensive-layout">
+      <div id="readingIntensiveLayout" class="intensive-layout">
         <nav
-          id="sceneNavigation"
+          id="pieceNavigation"
           class="piece-navigation"
-          aria-label="分场导航"
+          aria-label="阅读篇目导航"
         ></nav>
 
-        <section id="movieContent" class="intensive-content">
+        <section id="readingIntensiveContent" class="intensive-content">
           <div class="loading-state">
-            <strong>正在读取台词</strong>
+            <strong>正在读取精读内容</strong>
             <span>请稍候。</span>
           </div>
         </section>
@@ -133,7 +145,7 @@
           hidden
         >
           <div class="word-panel-head">
-            <span>台词生词</span>
+            <span>阅读生词</span>
             <button id="closeWordPanelButton" class="icon-button" type="button">
               关闭
             </button>
@@ -149,7 +161,7 @@
           </div>
 
           <p class="word-panel-footnote">
-            标记后进入电影不会卡组，复习页可按分类单独查看。
+            标记后进入四级 / 四级阅读精读卡组，手机端可直接滑动复习。
           </p>
 
           <div class="word-heading">
@@ -168,9 +180,9 @@
             <div id="wordPhrases" class="word-phrases"></div>
           </section>
 
-          <section id="wordExampleSection" class="word-block" hidden>
-            <span class="word-block-label">例句</span>
-            <div id="wordExamples" class="word-examples"></div>
+          <section id="wordSynonymSection" class="word-block" hidden>
+            <span class="word-block-label">四六级考研替换词</span>
+            <div id="wordSynonyms" class="word-synonyms"></div>
           </section>
 
           <div class="word-context">

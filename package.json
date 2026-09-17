@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node scripts/build-manifest.mjs",
     "build:collocations": "node scripts/build-collocation-index.mjs",
-    "check": "node --check deck-data.js && node --check vocab-index.js && node --check collocation-index.js && node --check app.js && node --check review.js && node --check intensive-papers.js && node --check intensive.js && node --check reading.js && node --check movie.js && node --check scripts/build-intensive-library.mjs && node --check scripts/build-movie-library.mjs && node --check scripts/build-vocabulary-library.mjs && node --check scripts/build-collocation-index.mjs && node --check api/auth.js && node --check api/word.js && node --check api/translate.js && node scripts/build-manifest.mjs --check"
+    "dev": "node scripts/dev-server.mjs",
+    "check": "node --check deck-data.js && node --check vocab-index.js && node --check collocation-index.js && node --check app.js && node --check review.js && node --check intensive-papers.js && node --check intensive.js && node --check reading.js && node --check reading-papers.js && node --check reading-intensive.js && node --check movie.js && node --check scripts/dev-server.mjs && node --check scripts/build-intensive-library.mjs && node --check scripts/build-movie-library.mjs && node --check scripts/build-reading-library.mjs && node --check scripts/build-vocabulary-library.mjs && node --check scripts/build-collocation-index.mjs && node --check api/auth.js && node --check api/word.js && node --check api/translate.js && node scripts/build-manifest.mjs --check"
   },
   "engines": {
     "node": ">=20"

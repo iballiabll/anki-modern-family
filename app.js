@@ -41,6 +41,9 @@ const INTENSIVE_ENTRY_SEARCH_TEXT =
 const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
 const READING_ENTRY_SEARCH_TEXT =
   "上传四六级考研题目翻译阅读背单词真题精读";
+const READING_INTENSIVE_ENTRY_CATEGORIES = ["四级"];
+const READING_INTENSIVE_ENTRY_SEARCH_TEXT =
+  "四级阅读全文精读仔细阅读段落匹配选词填空完形翻译解析技巧替换词固定搭配2022至2026真题";
 const AMERICAN_VOICE_NAMES = {
   female: [
     "aria",
@@ -6879,6 +6882,15 @@ function matchesReadingEntryQuery(query) {
   return Boolean(compactQuery) && searchable.includes(compactQuery);
 }
 
+function matchesReadingIntensiveEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(READING_INTENSIVE_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
 function createReadingEntry(categoryName) {
   const link = document.createElement("a");
   link.className = "resource-button is-reading-entry";
@@ -6946,6 +6958,41 @@ function createIntensiveEntry(categoryName) {
   meta.textContent = isMovie
     ? "摩登家庭 S01E01 · 逐句精翻 · 考试词与固定搭配"
     : "2022-2026 年共 14 套 · 逐句翻译 · 答案位置提示";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createReadingIntensiveEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-reading-intensive-entry";
+  link.href = "./reading-intensive.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.readingIntensiveEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开四级阅读全文精读、逐段翻译与答案位置提示，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "阅";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "四级阅读全文精读";
+
+  const meta = document.createElement("span");
+  meta.textContent = "2022-2026 年共 28 套 · 仔细阅读 / 段落匹配 / 选词填空";
 
   const count = document.createElement("span");
   count.className = "resource-count";
@@ -7198,6 +7245,11 @@ function renderResourceList() {
     const showReadingEntry =
       READING_ENTRY_CATEGORIES.includes(category.name) &&
       (!query || categoryNameMatches || matchesReadingEntryQuery(query));
+    const showReadingIntensiveEntry =
+      READING_INTENSIVE_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query ||
+        categoryNameMatches ||
+        matchesReadingIntensiveEntryQuery(query));
     const visibleResources = categoryResources.filter(
       (resource) =>
         !query || categoryNameMatches || matchesMaterialQuery(resource, query),
@@ -7233,7 +7285,8 @@ function renderResourceList() {
       visibleResources.length === 0 &&
       visibleSections.length === 0 &&
       !showIntensiveEntry &&
-      !showReadingEntry
+      !showReadingEntry &&
+      !showReadingIntensiveEntry
     ) {
       return;
     }
@@ -7254,7 +7307,8 @@ function renderResourceList() {
     headingCount.textContent = String(
       visibleResources.length +
         (showIntensiveEntry ? 1 : 0) +
-        (showReadingEntry ? 1 : 0),
+        (showReadingEntry ? 1 : 0) +
+        (showReadingIntensiveEntry ? 1 : 0),
     );
 
     heading.append(headingName, headingCount);
@@ -7262,6 +7316,10 @@ function renderResourceList() {
 
     if (showReadingEntry) {
       group.append(createReadingEntry(category.name));
+    }
+
+    if (showReadingIntensiveEntry) {
+      group.append(createReadingIntensiveEntry(category.name));
     }
 
     if (showIntensiveEntry) {

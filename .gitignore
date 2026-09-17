@@ -1,3 +1,5 @@
 .vercel
+.cache/
 public/
 preview-*.log
+tmp-*

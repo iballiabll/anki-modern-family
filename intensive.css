@@ -1684,6 +1684,16 @@ body.is-cues-hidden .cue-count {
   gap: 9px;
 }
 
+.word-panel-head + .word-actions {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.word-panel-head + .word-actions + .word-panel-footnote {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
 .mark-button {
   min-height: 40px;
   padding: 8px 15px;
