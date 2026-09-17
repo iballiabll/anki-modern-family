@@ -176,6 +176,30 @@
     return PHONETIC_PLACEHOLDERS.has(text) ? "" : text;
   }
 
+  function isUsablePhonetic(value) {
+    const text = cleanPhonetic(value);
+    return text && text !== "-" ? text : "";
+  }
+
+  function hasUsableWordResult(value) {
+    if (!value) {
+      return false;
+    }
+    return Boolean(
+      isUsablePhonetic(value.phonetic) ||
+        (Array.isArray(value.translations) && value.translations.length) ||
+        (Array.isArray(value.definitions) && value.definitions.length),
+    );
+  }
+
+  function renderPanelPhonetic(value) {
+    if (!elements.wordPanelPhonetic) {
+      return;
+    }
+    elements.wordPanelPhonetic.textContent =
+      isUsablePhonetic(value) || "暂无音标";
+  }
+
   function makeWordId(phrase, sentence, kind = "word") {
     const prefix = kind === "phrase" ? "phrase" : "word";
     return `${prefix}-${hashReadingValue(
@@ -1437,8 +1461,8 @@
       meaning: meaning || activeWord.item.meaning || "查看上下文理解用法",
       addedAt: activeWord.item.addedAt || Date.now(),
       phonetic:
-        cleanPhonetic(activeWord.item.phonetic) ||
-        cleanPhonetic(elements.wordPanelPhonetic?.textContent),
+        isUsablePhonetic(activeWord.item.phonetic) ||
+        isUsablePhonetic(elements.wordPanelPhonetic?.textContent),
     };
 
     const shell = getMovieDocumentShell();
@@ -1597,7 +1621,8 @@
       elements.wordPanelTitle.textContent = phrase;
     }
     if (elements.wordPanelPhonetic) {
-      elements.wordPanelPhonetic.textContent = item.phonetic || "音标查询中";
+      elements.wordPanelPhonetic.textContent =
+        isUsablePhonetic(item.phonetic) || "音标查询中";
     }
     renderWordLevelBadges(item.levels || []);
     if (elements.wordLookupStatus) {
@@ -1645,7 +1670,9 @@
     ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
 
     activeWord.meanings = meanings.slice(0, 8);
-    activeWord.item.phonetic = data.phonetic || activeWord.item.phonetic;
+    activeWord.item.phonetic =
+      isUsablePhonetic(data.phonetic) ||
+      isUsablePhonetic(activeWord.item.phonetic);
     activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
     activeWord.item.phrases = Array.isArray(data.phrases) ? data.phrases : [];
     if (Array.isArray(data.levels) && data.levels.length) {
@@ -1653,10 +1680,9 @@
       renderWordLevelBadges(data.levels);
     }
 
-    if (elements.wordPanelPhonetic) {
-      elements.wordPanelPhonetic.textContent =
-        data.phonetic || activeWord.item.phonetic || "暂无音标";
-    }
+    renderPanelPhonetic(
+      isUsablePhonetic(data.phonetic) || activeWord.item.phonetic,
+    );
     if (elements.wordLookupStatus) {
       elements.wordLookupStatus.textContent = meanings.length
         ? statusText
@@ -1739,7 +1765,8 @@
       translations: mergeList(localData?.translations, remoteData?.translations),
       definitions: mergeList(localData?.definitions, remoteData?.definitions),
       phonetic:
-        cleanPhonetic(remoteData?.phonetic) || cleanPhonetic(localData?.phonetic),
+        isUsablePhonetic(remoteData?.phonetic) ||
+        isUsablePhonetic(localData?.phonetic),
       phrases: Array.isArray(remoteData?.phrases) ? remoteData.phrases : [],
       examples: Array.isArray(remoteData?.examples) ? remoteData.examples : [],
       levels: localData?.levels || [],
@@ -1767,7 +1794,12 @@
 
     const cacheKey = `${activeWord.kind}|${normalizeWord(activeWord.phrase)}`;
     const cached = state.lookupCache.get(cacheKey);
-    if (cached && (cached.remoteChecked || cleanPhonetic(cached.phonetic))) {
+    if (
+      cached &&
+      cached.remoteChecked &&
+      !cached.remoteFailed &&
+      hasUsableWordResult(cached)
+    ) {
       applyWordResult(activeWord, cached, "已从本次缓存读取释义");
       return;
     }
@@ -1785,7 +1817,7 @@
         return;
       }
 
-      if (localData?.phonetic && localData.translations.length) {
+      if (isUsablePhonetic(localData?.phonetic) && localData.translations.length) {
         state.lookupCache.set(cacheKey, localData);
         applyWordResult(
           activeWord,
@@ -1813,8 +1845,19 @@
         return;
       }
 
-      state.lookupCache.set(cacheKey, { ...data, remoteChecked: true });
-      applyWordResult(activeWord, data, "已查询在线词典释义与固定搭配");
+      const remoteReady = hasUsableWordResult(data);
+      state.lookupCache.set(cacheKey, {
+        ...data,
+        remoteChecked: remoteReady,
+        remoteFailed: !remoteReady,
+      });
+      applyWordResult(
+        activeWord,
+        data,
+        remoteReady
+          ? "已查询在线词典释义与固定搭配"
+          : "在线词典暂时没有返回释义，可手动补充",
+      );
     } catch (error) {
       if (run !== state.lookupRun || state.activeWord !== activeWord) {
         return;
@@ -1828,8 +1871,7 @@
         return;
       }
       if (elements.wordPanelPhonetic) {
-        elements.wordPanelPhonetic.textContent =
-          activeWord.item.phonetic || "暂无音标";
+        renderPanelPhonetic(activeWord.item.phonetic);
       }
       if (elements.wordLookupStatus) {
         elements.wordLookupStatus.textContent = `${

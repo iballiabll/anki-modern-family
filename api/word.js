@@ -343,12 +343,9 @@ function formatDictionary(data, fallbackWord) {
 
 module.exports = async function handler(request, response) {
   response.setHeader("Content-Type", "application/json; charset=utf-8");
-  response.setHeader(
-    "Cache-Control",
-    "public, s-maxage=604800, stale-while-revalidate=86400",
-  );
 
   if (request.method !== "GET") {
+    response.setHeader("Cache-Control", "no-store");
     response.status(405).json({ ok: false, message: "不支持的请求方式" });
     return;
   }
@@ -363,6 +360,7 @@ module.exports = async function handler(request, response) {
     word.length > MAX_WORD_LENGTH ||
     !/^[a-z]+(?:['’-][a-z]+)*(?: [a-z]+(?:['’-][a-z]+)*){0,4}$/.test(word)
   ) {
+    response.setHeader("Cache-Control", "no-store");
     response
       .status(400)
       .json({ ok: false, message: "请输入有效的英文单词或短语" });
@@ -427,6 +425,8 @@ module.exports = async function handler(request, response) {
     result.definitions.length > 0;
 
   if (!hasContent) {
+    // 失败结果不能进 CDN 缓存，否则一次超时会被放大成整周查不到词。
+    response.setHeader("Cache-Control", "no-store");
     response.status(youdaoFailed ? 502 : 404).json({
       ok: false,
       message: youdaoFailed
@@ -436,5 +436,9 @@ module.exports = async function handler(request, response) {
     return;
   }
 
+  response.setHeader(
+    "Cache-Control",
+    "public, s-maxage=604800, stale-while-revalidate=86400",
+  );
   response.status(200).json({ ok: true, ...result, sources });
 };
