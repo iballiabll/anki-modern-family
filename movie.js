@@ -61,6 +61,11 @@
       className: "is-card",
       hint: "来自本机 Anki 词卡",
     },
+    reviewed: {
+      label: "精翻",
+      className: "is-curated",
+      hint: "逐句人工校对",
+    },
     machine: {
       label: "机翻补全",
       className: "is-machine",
@@ -624,6 +629,11 @@
             keyPhrase: cleanReadingText(segment.keyPhrase, 120),
             meaning: cleanReadingText(segment.meaning, 400),
             phonetic: cleanPhonetic(segment.phonetic),
+            grammarNotes: (
+              Array.isArray(segment.grammarNotes) ? segment.grammarNotes : []
+            )
+              .map((note) => cleanReadingText(note, 500))
+              .filter(Boolean),
             blocks: (Array.isArray(segment.blocks) ? segment.blocks : []).map(
               (block) => ({
                 i: Number(block.i) || 0,
@@ -657,14 +667,22 @@
       return;
     }
     const stats = data?.translationStats || {};
-    const human = (Number(stats.curated) || 0) + (Number(stats.card) || 0);
+    const human =
+      (Number(stats.curated) || 0) +
+      (Number(stats.card) || 0) +
+      (Number(stats.reviewed) || 0);
     const chips = [
       { value: data?.blockCount || 0, label: "句台词" },
       { value: data?.sceneCount || 0, label: "个场景" },
       { value: data?.wordCount || 0, label: "个英文词" },
-      { value: human, label: "句精讲翻译" },
-      { value: Number(stats.machine) || 0, label: "句机翻补全" },
+      { value: human, label: "句逐句精翻" },
     ];
+    if (Number(stats.machine) > 0) {
+      chips.push({
+        value: Number(stats.machine),
+        label: "句机翻补全",
+      });
+    }
     elements.heroStats.replaceChildren(
       ...chips.map((chip) => createStat(chip.value, chip.label)),
     );
@@ -1114,6 +1132,11 @@
       body.append(translation);
     }
 
+    const grammarNotes = createGrammarNotes(view);
+    if (grammarNotes) {
+      body.append(grammarNotes);
+    }
+
     const foot = document.createElement("div");
     foot.className = "movie-line-foot";
 
@@ -1270,6 +1293,31 @@
     });
 
     return row;
+  }
+
+  function createGrammarNotes(view) {
+    const notes = Array.isArray(view.grammarNotes) ? view.grammarNotes : [];
+    if (!notes.length) {
+      return null;
+    }
+
+    const block = document.createElement("div");
+    block.className = "movie-grammar-notes";
+
+    const label = document.createElement("span");
+    label.className = "movie-grammar-label";
+    label.textContent = "语法 / 考点";
+
+    const list = document.createElement("ul");
+    list.className = "movie-grammar-list";
+    notes.forEach((note) => {
+      const item = document.createElement("li");
+      item.textContent = note;
+      list.append(item);
+    });
+
+    block.append(label, list);
+    return block;
   }
 
   function createAlternativeBlock(view) {

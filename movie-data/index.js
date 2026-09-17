@@ -11,7 +11,8 @@ window.IBALL_MOVIE_EPISODES = [
     "translationStats": {
       "curated": 85,
       "card": 12,
-      "machine": 218,
+      "reviewed": 218,
+      "machine": 0,
       "missing": 0
     }
   }

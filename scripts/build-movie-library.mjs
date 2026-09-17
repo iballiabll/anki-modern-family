@@ -5,6 +5,7 @@
  *   - The structured transcript produced by build-movie-script.mjs
  *   - The user's Anki CSV cards, when present
  *   - The curated markdown word list, when present
+ *   - The reviewed full-script translation and grammar-note files, when present
  *
  * Usage:
  *   node scripts/build-movie-library.mjs S01E01
@@ -34,6 +35,14 @@ const manifestPath = path.join(outputDirectory, "index.js");
 const machineCachePath = path.join(
   outputDirectory,
   `${episode.toLowerCase()}-machine-translations.json`,
+);
+const reviewedTranslationsPath = path.join(
+  showDirectory,
+  `${episode.toLowerCase()}-reviewed-translations.json`,
+);
+const grammarNotesPath = path.join(
+  showDirectory,
+  `${episode.toLowerCase()}-grammar-notes.json`,
 );
 
 const GOOGLE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
@@ -796,7 +805,19 @@ async function fillMachineTranslations(uncoveredBlocks, cache) {
   return cache;
 }
 
-function buildSegments(blocks, selected, machineCache) {
+function collectGrammarNotes(rangeBlocks, grammarNotes) {
+  return rangeBlocks
+    .map((block) => cleanText(grammarNotes[String(block.i)]))
+    .filter(Boolean);
+}
+
+function buildSegments(
+  blocks,
+  selected,
+  machineCache,
+  reviewedTranslations,
+  grammarNotes,
+) {
   const segments = [];
   const covered = new Set();
 
@@ -817,6 +838,7 @@ function buildSegments(blocks, selected, machineCache) {
       phonetic: candidate.phonetic,
       sourceId: candidate.sourceId,
       sourceText: candidate.sourceText,
+      grammarNotes: collectGrammarNotes(rangeBlocks, grammarNotes),
       alternatives: collectAlternatives(
         rangeBlocks.map((block) => block.text).join(" "),
       ),
@@ -828,18 +850,27 @@ function buildSegments(blocks, selected, machineCache) {
     if (covered.has(block.i)) {
       return;
     }
-    const translation = cleanText(machineCache[String(block.i)]);
+    const reviewedTranslation = cleanText(
+      reviewedTranslations[String(block.i)],
+    );
+    const translation =
+      reviewedTranslation || cleanText(machineCache[String(block.i)]);
     segments.push({
       start: block.i,
       end: block.i,
       translation,
-      translationSource: translation ? "machine" : "missing",
+      translationSource: reviewedTranslation
+        ? "reviewed"
+        : translation
+          ? "machine"
+          : "missing",
       matchScore: null,
       keyPhrase: "",
       meaning: "",
       phonetic: "",
       sourceId: "",
       sourceText: block.text,
+      grammarNotes: collectGrammarNotes([block], grammarNotes),
       alternatives: collectAlternatives(block.text),
       blocks: [{ ...block }],
     });
@@ -869,6 +900,20 @@ async function readOptional(filePath) {
   }
 }
 
+function parseJsonObject(raw, filePath) {
+  if (!raw.trim()) {
+    return {};
+  }
+  try {
+    const value = JSON.parse(raw);
+    return value && typeof value === "object" && !Array.isArray(value)
+      ? value
+      : {};
+  } catch {
+    throw new Error(`Invalid JSON object in ${filePath}`);
+  }
+}
+
 async function main() {
   const transcript = JSON.parse(await fs.readFile(sourceLinesPath, "utf8"));
   const blocks = Array.isArray(transcript.blocks) ? transcript.blocks : [];
@@ -876,12 +921,19 @@ async function main() {
     throw new Error(`No dialogue blocks found in ${sourceLinesPath}`);
   }
 
-  const [cardsRaw, markdownRaw] = await Promise.all([
+  const [cardsRaw, markdownRaw, reviewedRaw, grammarRaw] = await Promise.all([
     readOptional(sourceCardsPath),
     readOptional(sourceMarkdownPath),
+    readOptional(reviewedTranslationsPath),
+    readOptional(grammarNotesPath),
   ]);
   const cards = cardsRaw ? parseAnkiCards(cardsRaw) : [];
   const entries = markdownRaw ? parseCuratedEntries(markdownRaw) : [];
+  const reviewedTranslations = parseJsonObject(
+    reviewedRaw,
+    reviewedTranslationsPath,
+  );
+  const grammarNotes = parseJsonObject(grammarRaw, grammarNotesPath);
   const humanCandidates = makeHumanCandidates(blocks, cards, entries);
   const selected = selectNonOverlapping(humanCandidates, blocks.length);
   const covered = new Set();
@@ -897,8 +949,17 @@ async function main() {
 
   const uncoveredBlocks = blocks.filter((block) => !covered.has(block.i));
   const machineCache = await loadMachineCache();
-  await fillMachineTranslations(uncoveredBlocks, machineCache);
-  const segments = buildSegments(blocks, selected, machineCache);
+  const translationFallbackBlocks = uncoveredBlocks.filter(
+    (block) => !cleanText(reviewedTranslations[String(block.i)]),
+  );
+  await fillMachineTranslations(translationFallbackBlocks, machineCache);
+  const segments = buildSegments(
+    blocks,
+    selected,
+    machineCache,
+    reviewedTranslations,
+    grammarNotes,
+  );
   const scenes = buildScenes(segments);
 
   const translatedCount = segments.filter(
@@ -909,6 +970,9 @@ async function main() {
   ).length;
   const cardCount = segments.filter(
     (segment) => segment.translationSource === "card",
+  ).length;
+  const reviewedCount = segments.filter(
+    (segment) => segment.translationSource === "reviewed",
   ).length;
   const machineCount = segments.filter(
     (segment) => segment.translationSource === "machine",
@@ -929,6 +993,7 @@ async function main() {
     translationStats: {
       curated: curatedCount,
       card: cardCount,
+      reviewed: reviewedCount,
       machine: machineCount,
       missing: missingCount,
     },
@@ -981,7 +1046,7 @@ async function main() {
     `${episode}: ${blocks.length} blocks, ${segments.length} segments, ${scenes.length} scenes`,
   );
   console.log(
-    `Translations: curated ${curatedCount}, card ${cardCount}, machine ${machineCount}, missing ${missingCount}`,
+    `Translations: curated ${curatedCount}, card ${cardCount}, reviewed ${reviewedCount}, machine ${machineCount}, missing ${missingCount}`,
   );
   console.log(
     `Wrote ${path.relative(root, outputPath)} and ${path.relative(root, manifestPath)}`,
