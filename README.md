@@ -100,6 +100,30 @@ Anki CSV 的 `#columns` 需要包含 `Front,Back`。
 是 `vocab-index.json`，命中词库时不消耗有道接口额度；只有词库未收录的词
 才会通过 `api/word.js` 请求在线词典。
 
+### 精读与抽卡页面
+
+素材导航里每个一级分类会多出 1-3 个入口，点开后是新标签页：
+
+- 四级 / 六级 / 电影分类下的“四级听力全文翻译 + 出题点精读”和
+  “美剧台词逐句精读”：`intensive.html`、`movie.html`。
+- 四级分类下的“四级阅读全文精读”：`reading-intensive.html`，包含
+  2022-2026 年共 28 套试卷的仔细阅读、段落匹配、选词填空。
+- 四级 / 六级 / 考研分类下的“上传题目 · 翻译阅读”：`reading.html`，
+  可上传自己的真题截图或文本后再点词背诵。
+
+阅读精读的数据按试卷拆分存放在 `reading-data/`，索引用 `reading-papers.js`；
+需要重新生成时运行 `node scripts/build-reading-library.mjs`。
+
+本地预览：
+
+```powershell
+$env:APP_USERNAME="wzh"; $env:SESSION_SECRET="local-preview-secret"
+npm run dev
+```
+
+然后打开 http://127.0.0.1:4175/ 。`npm run dev` 会用本地脚本模拟 Vercel
+的 `api/*.js`，因此查词、翻译和登录都能在本地直接测试，不用等线上部署。
+
 ## 口语跟读
 
 进入任意素材后点“口语练习”，或直接点词汇卡片上的“跟读”。练习默认使用
