@@ -1359,6 +1359,17 @@ p {
   letter-spacing: 0.06em;
 }
 
+.word-popover-source {
+  justify-self: start;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(31, 122, 108, 0.1);
+  color: #1f7a6c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
 .word-popover-meaning {
   margin: 0;
   color: #354a42;

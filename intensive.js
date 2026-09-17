@@ -1,26 +1,93 @@
-(() => {
+(function () {
   "use strict";
 
-  const data = window.IBALL_INTENSIVE_DATA;
+  const Deck = window.IballDeck;
+  if (!Deck) {
+    const fallback = document.querySelector("#intensiveContent");
+    if (fallback) {
+      fallback.textContent = "精读数据加载失败，请刷新页面。";
+    }
+    return;
+  }
+
+  const {
+    STORAGE_KEYS,
+    cleanReadingText,
+    getItemKey,
+    getReadingDocuments,
+    hashReadingValue,
+    persistSet,
+    restoreSet,
+    saveReadingDocument,
+  } = Deck;
+
+  const papers = Array.isArray(window.IBALL_INTENSIVE_PAPERS)
+    ? window.IBALL_INTENSIVE_PAPERS.slice()
+    : [];
+  const library = (window.IBALL_INTENSIVE_LIBRARY =
+    window.IBALL_INTENSIVE_LIBRARY || {});
+  const WORD_PATTERN = /[A-Za-z]+(?:['’\-][A-Za-z]+)*/g;
+  const PHONETIC_PLACEHOLDERS = new Set(["暂无音标", "音标查询中"]);
+  const INTENSIVE_CATEGORY = "四级";
+  const INTENSIVE_SECTION = "四级听力精读";
+  const PAPER_STORAGE_KEY = "iball-intensive-paper";
+  const CUE_STORAGE_KEY = "iball-intensive-cues";
+  const DISPLAY_STORAGE_KEY = "iball-intensive-display-mode";
+  const ANSWER_STORAGE_KEY = "iball-intensive-answers";
+
+  const state = {
+    paperId: "",
+    data: null,
+    openRun: 0,
+    lookupRun: 0,
+    activeWord: null,
+    paragraphIndex: new Map(),
+    lookupCache: new Map(),
+    unknown: restoreSet(STORAGE_KEYS.unknown),
+    known: restoreSet(STORAGE_KEYS.known),
+    toastTimer: 0,
+    speechRun: 0,
+    allSpeaking: false,
+    showCues: true,
+    answers: readStoredAnswers(),
+    questionIndex: new Map(),
+  };
+
   const elements = {
     readingProgress: document.querySelector("#readingProgress"),
     sourceLink: document.querySelector("#sourceLink"),
     heroStats: document.querySelector("#heroStats"),
+    heroEyebrow: document.querySelector(".hero-eyebrow"),
+    heroDescription: document.querySelector(".hero-description"),
+    layout: document.querySelector("#intensiveLayout"),
+    paperSelect: document.querySelector("#paperSelect"),
     pieceNavigation: document.querySelector("#pieceNavigation"),
     content: document.querySelector("#intensiveContent"),
+    cueToggleButton: document.querySelector("#cueToggleButton"),
     grammarToggleButton: document.querySelector("#grammarToggleButton"),
     readAllButton: document.querySelector("#readAllButton"),
     toast: document.querySelector("#toast"),
     displayModeButtons: document.querySelectorAll("[data-display-mode]"),
-    heroEyebrow: document.querySelector(".hero-eyebrow"),
-    heroDescription: document.querySelector(".hero-description"),
+    wordPanel: document.querySelector("#wordPanel"),
+    wordPanelTitle: document.querySelector("#wordPanelTitle"),
+    wordPanelPhonetic: document.querySelector("#wordPanelPhonetic"),
+    speakWordButton: document.querySelector("#speakWordButton"),
+    wordLookupStatus: document.querySelector("#wordLookupStatus"),
+    wordMeanings: document.querySelector("#wordMeanings"),
+    wordPhraseSection: document.querySelector("#wordPhraseSection"),
+    wordPhrases: document.querySelector("#wordPhrases"),
+    wordExampleSection: document.querySelector("#wordExampleSection"),
+    wordExamples: document.querySelector("#wordExamples"),
+    wordContextSentence: document.querySelector("#wordContextSentence"),
+    wordContextTranslation: document.querySelector("#wordContextTranslation"),
+    wordNoteInput: document.querySelector("#wordNoteInput"),
+    markUnknownButton: document.querySelector("#markUnknownButton"),
+    markKnownButton: document.querySelector("#markKnownButton"),
+    closeWordPanelButton: document.querySelector("#closeWordPanelButton"),
   };
 
-  let toastTimer = 0;
-  let speechRun = 0;
   let activeSpeechButton = null;
   let activeSequenceButton = null;
-  let allSpeaking = false;
   let voices = [];
   let scrollFrame = 0;
 
@@ -29,13 +96,78 @@
       return;
     }
 
-    window.clearTimeout(toastTimer);
+    window.clearTimeout(state.toastTimer);
     elements.toast.textContent = message;
     elements.toast.classList.add("is-visible");
-    toastTimer = window.setTimeout(() => {
+    state.toastTimer = window.setTimeout(() => {
       elements.toast.classList.remove("is-visible");
-    }, 2200);
+    }, 2600);
   }
+
+  function readStoredValue(key) {
+    try {
+      return window.localStorage.getItem(key) || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function writeStoredValue(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch {
+      // 存储不可用时其余功能照常工作。
+    }
+  }
+
+  function readStoredAnswers() {
+    try {
+      const parsed = JSON.parse(readStoredValue(ANSWER_STORAGE_KEY) || "{}");
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed
+        : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function persistAnswers() {
+    writeStoredValue(ANSWER_STORAGE_KEY, JSON.stringify(state.answers));
+  }
+
+  function getAnswerKey(number) {
+    return `${state.paperId}|${number}`;
+  }
+
+  function normalizeWord(value) {
+    return String(value || "")
+      .toLocaleLowerCase("en-US")
+      .replace(/[’]/g, "'");
+  }
+
+  function cleanPhonetic(value) {
+    const text = String(value || "").trim();
+    return PHONETIC_PLACEHOLDERS.has(text) ? "" : text;
+  }
+
+  function makeWordId(phrase, sentence, kind = "word") {
+    const prefix = kind === "phrase" ? "phrase" : "word";
+    return `${prefix}-${hashReadingValue(
+      `${normalizeWord(phrase)}|${cleanReadingText(sentence, 1200)}`,
+    )}`;
+  }
+
+  function getCombinedMeaning(meanings, note) {
+    return [
+      ...new Set(
+        [...meanings, note].map((value) => String(value || "").trim()).filter(Boolean),
+      ),
+    ]
+      .join("；")
+      .slice(0, 800);
+  }
+
+  /* ---------------------------------------------------------------- speech */
 
   function refreshVoices() {
     if (!("speechSynthesis" in window)) {
@@ -90,14 +222,14 @@
     if (!elements.readAllButton) {
       return;
     }
-    elements.readAllButton.classList.toggle("is-playing", allSpeaking);
-    elements.readAllButton.textContent = allSpeaking ? "停止播放" : "全文播放";
-    elements.readAllButton.setAttribute("aria-pressed", String(allSpeaking));
+    elements.readAllButton.classList.toggle("is-playing", state.allSpeaking);
+    elements.readAllButton.textContent = state.allSpeaking ? "停止播放" : "全文播放";
+    elements.readAllButton.setAttribute("aria-pressed", String(state.allSpeaking));
   }
 
   function stopSpeech() {
-    speechRun += 1;
-    allSpeaking = false;
+    state.speechRun += 1;
+    state.allSpeaking = false;
     if (activeSpeechButton) {
       setSpeechButtonState(activeSpeechButton, false);
     }
@@ -115,7 +247,7 @@
   function speakText(text, runId, onDone, onError) {
     const speakable = String(text || "").trim();
     if (
-      runId !== speechRun ||
+      runId !== state.speechRun ||
       !speakable ||
       !("speechSynthesis" in window) ||
       typeof window.SpeechSynthesisUtterance !== "function"
@@ -142,7 +274,7 @@
     utterance.onend = finish;
     utterance.onerror = (event) => {
       if (
-        runId === speechRun &&
+        runId === state.speechRun &&
         event.error !== "canceled" &&
         event.error !== "interrupted"
       ) {
@@ -163,14 +295,14 @@
     }
 
     stopSpeech();
-    const runId = speechRun;
+    const runId = state.speechRun;
     setSpeechButtonState(button, true);
 
     const started = speakText(
       text,
       runId,
       () => {
-        if (runId === speechRun) {
+        if (runId === state.speechRun) {
           setSpeechButtonState(button, false);
         }
       },
@@ -184,7 +316,7 @@
   }
 
   function playSequence(texts, triggerButton) {
-    if (allSpeaking) {
+    if (state.allSpeaking) {
       stopSpeech();
       showToast("已停止播放");
       return;
@@ -200,9 +332,9 @@
       return;
     }
 
-    const runId = speechRun;
+    const runId = state.speechRun;
     let index = 0;
-    allSpeaking = true;
+    state.allSpeaking = true;
     if (triggerButton) {
       activeSequenceButton = triggerButton;
       triggerButton.classList.add("is-playing");
@@ -210,10 +342,10 @@
     updateReadAllButton();
 
     const finish = (message = "") => {
-      if (runId !== speechRun) {
+      if (runId !== state.speechRun) {
         return;
       }
-      allSpeaking = false;
+      state.allSpeaking = false;
       if (activeSequenceButton) {
         activeSequenceButton.classList.remove("is-playing");
         activeSequenceButton = null;
@@ -225,7 +357,7 @@
     };
 
     const playNext = () => {
-      if (runId !== speechRun || !allSpeaking) {
+      if (runId !== state.speechRun || !state.allSpeaking) {
         return;
       }
       if (index >= texts.length) {
@@ -253,6 +385,8 @@
     playNext();
   }
 
+  /* ------------------------------------------------------------- settings */
+
   function setDisplayMode(mode) {
     const englishOnly = mode === "english";
     document.body.classList.toggle("is-english-only", englishOnly);
@@ -263,14 +397,20 @@
       button.setAttribute("aria-pressed", String(active));
     });
 
-    try {
-      window.localStorage.setItem(
-        "iball-intensive-display-mode",
-        englishOnly ? "english" : "bilingual",
-      );
-    } catch {
-      // Reading mode still works when storage is unavailable.
+    writeStoredValue(DISPLAY_STORAGE_KEY, englishOnly ? "english" : "bilingual");
+  }
+
+  function setCueVisibility(visible) {
+    state.showCues = visible;
+    document.body.classList.toggle("is-cues-hidden", !visible);
+    if (elements.cueToggleButton) {
+      elements.cueToggleButton.textContent = visible
+        ? "隐藏答案提示"
+        : "显示答案提示";
+      elements.cueToggleButton.setAttribute("aria-pressed", String(!visible));
+      elements.cueToggleButton.classList.toggle("is-muted", !visible);
     }
+    writeStoredValue(CUE_STORAGE_KEY, visible ? "shown" : "hidden");
   }
 
   function getGrammarNotes() {
@@ -281,16 +421,12 @@
 
   function updateGrammarToggle() {
     const notes = getGrammarNotes();
-    const allOpen =
-      notes.length > 0 && notes.every((note) => note.open);
+    const allOpen = notes.length > 0 && notes.every((note) => note.open);
     if (elements.grammarToggleButton) {
       elements.grammarToggleButton.textContent = allOpen
         ? "收起全部语法"
         : "展开全部语法";
-      elements.grammarToggleButton.setAttribute(
-        "aria-pressed",
-        String(allOpen),
-      );
+      elements.grammarToggleButton.setAttribute("aria-pressed", String(allOpen));
     }
   }
 
@@ -302,6 +438,626 @@
     });
     updateGrammarToggle();
   }
+
+  /* ------------------------------------------------------- intensive data */
+
+  function getPaperMeta(paperId) {
+    return papers.find((paper) => paper.id === paperId) || null;
+  }
+
+  function loadPaperData(paperId) {
+    const meta = getPaperMeta(paperId);
+    if (!meta) {
+      return Promise.reject(new Error("没有找到这份试卷。"));
+    }
+
+    if (library[meta.id]) {
+      return Promise.resolve(library[meta.id]);
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = meta.file;
+      script.async = true;
+      script.dataset.paperSource = meta.id;
+      script.addEventListener("load", () => {
+        const data = window.IBALL_INTENSIVE_LIBRARY?.[meta.id];
+        if (data) {
+          resolve(data);
+        } else {
+          reject(new Error("试卷数据为空。"));
+        }
+      });
+      script.addEventListener("error", () => {
+        reject(new Error("试卷数据下载失败，请检查网络后重试。"));
+      });
+      document.head.append(script);
+    });
+  }
+
+  function getPaperFromLocation() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("paper") || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function setPaperInLocation(paperId, push) {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("paper", paperId);
+      const next = `${url.pathname}${url.search}${url.hash}`;
+      if (push) {
+        window.history.pushState({ paper: paperId }, "", next);
+      } else {
+        window.history.replaceState({ paper: paperId }, "", next);
+      }
+    } catch {
+      // 地址栏更新失败不影响阅读。
+    }
+  }
+
+  function populatePaperSelect() {
+    if (!elements.paperSelect) {
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    const groups = new Map();
+    papers.forEach((paper) => {
+      const match = /^(\d{4})-(\d{2})-(\d+)$/.exec(paper.id || "");
+      const year = match?.[1] || "";
+      const month = match?.[2] || "";
+      const set = match?.[3] || "";
+      const groupLabel = match ? `${year} 年 ${month} 月` : "其他年份";
+      if (!groups.has(groupLabel)) {
+        groups.set(groupLabel, []);
+      }
+      groups.get(groupLabel).push({ paper, set });
+    });
+
+    groups.forEach((items, groupLabel) => {
+      const group = document.createElement("optgroup");
+      group.label = groupLabel;
+      items.forEach(({ paper, set }) => {
+        const option = document.createElement("option");
+        option.value = paper.id;
+        option.textContent = set
+          ? `第 ${set} 套${
+              Number.isFinite(paper.questionCount)
+                ? ` · ${paper.questionCount} 题`
+                : ""
+            }`
+          : paper.label || paper.title || paper.id;
+        group.append(option);
+      });
+      fragment.append(group);
+    });
+    elements.paperSelect.replaceChildren(fragment);
+  }
+
+  function showLoading(meta) {
+    if (!elements.content) {
+      return;
+    }
+    const wrapper = document.createElement("div");
+    wrapper.className = "loading-state";
+
+    const title = document.createElement("strong");
+    title.textContent = `正在读取${meta?.label || "精读内容"}`;
+
+    const copy = document.createElement("span");
+    copy.textContent = "首次打开需要几秒，请稍候。";
+
+    wrapper.append(title, copy);
+    elements.content.replaceChildren(wrapper);
+    elements.pieceNavigation?.replaceChildren();
+  }
+
+  async function openPaper(paperId, options = {}) {
+    const meta = getPaperMeta(paperId);
+    if (!meta) {
+      renderError("没有找到这份试卷。");
+      return;
+    }
+
+    const run = ++state.openRun;
+    showLoading(meta);
+    stopSpeech();
+    closeWordPanel();
+
+    try {
+      const data = await loadPaperData(meta.id);
+      if (run !== state.openRun) {
+        return;
+      }
+      state.paperId = meta.id;
+      state.data = data;
+      state.lookupCache.clear();
+      if (elements.paperSelect) {
+        elements.paperSelect.value = meta.id;
+      }
+      setPaperInLocation(meta.id, Boolean(options.push));
+      writeStoredValue(PAPER_STORAGE_KEY, meta.id);
+      renderPage();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    } catch (error) {
+      if (run !== state.openRun) {
+        return;
+      }
+      console.error(error);
+      renderError(error?.message || "精读内容加载失败，请刷新后重试。");
+    }
+  }
+
+  /* ------------------------------------------------------------- marking */
+
+  function getIntensiveDocumentId() {
+    return `intensive-${state.paperId}`;
+  }
+
+  function getIntensiveDocument() {
+    const id = getIntensiveDocumentId();
+    return (
+      getReadingDocuments().find((document) => document.id === id) || null
+    );
+  }
+
+  function getIntensiveDocumentShell() {
+    const existing = getIntensiveDocument();
+    if (existing) {
+      return existing;
+    }
+
+    const meta = state.data?.meta || {};
+    return {
+      id: getIntensiveDocumentId(),
+      title: `${meta.title || state.paperId} 听力生词`,
+      category: INTENSIVE_CATEGORY,
+      section: INTENSIVE_SECTION,
+      createdAt: Date.now(),
+      paragraphs: [],
+      words: [],
+    };
+  }
+
+  function getStoredWord(phrase, sentence, kind = "word") {
+    const document = getIntensiveDocument();
+    if (!document) {
+      return null;
+    }
+    const id = makeWordId(phrase, sentence, kind);
+    return document.words.find((word) => word.id === id) || null;
+  }
+
+  function updateTokenMarks() {
+    const documentId = getIntensiveDocumentId();
+    elements.content?.querySelectorAll(".word-token").forEach((token) => {
+      const key = getItemKey(documentId, { id: token.dataset.wordId });
+      token.classList.toggle("is-unknown-token", state.unknown.has(key));
+      token.classList.toggle("is-known-token", state.known.has(key));
+    });
+  }
+
+  function updateWordPanelMarkState() {
+    const activeWord = state.activeWord;
+    if (!activeWord) {
+      return;
+    }
+    const key = getItemKey(getIntensiveDocumentId(), activeWord.item);
+    const isUnknown = state.unknown.has(key);
+    const isKnown = state.known.has(key);
+    elements.markUnknownButton?.classList.toggle("is-active", isUnknown);
+    elements.markKnownButton?.classList.toggle("is-active", isKnown);
+    elements.markUnknownButton?.setAttribute("aria-pressed", String(isUnknown));
+    elements.markKnownButton?.setAttribute("aria-pressed", String(isKnown));
+  }
+
+  function saveActiveWordMark(mark) {
+    const activeWord = state.activeWord;
+    if (!activeWord) {
+      return;
+    }
+
+    const note = String(elements.wordNoteInput?.value || "").trim();
+    const meanings = activeWord.meanings || [];
+    const phraseText = (activeWord.item.phrases || [])
+      .filter((item) => item?.phrase)
+      .slice(0, 4)
+      .map((item) =>
+        item.meaning ? `${item.phrase}（${item.meaning}）` : item.phrase,
+      )
+      .join("；");
+    const meaning = [
+      getCombinedMeaning(meanings, note),
+      phraseText ? `固定搭配：${phraseText}` : "",
+    ]
+      .filter(Boolean)
+      .join("；");
+
+    const item = {
+      ...activeWord.item,
+      id:
+        activeWord.item.id ||
+        makeWordId(activeWord.phrase, activeWord.sentence, activeWord.kind),
+      phrase: activeWord.phrase,
+      sentence: activeWord.sentence,
+      translation: activeWord.translation,
+      meaning:
+        meaning ||
+        activeWord.item.meaning ||
+        "查看上下文理解用法",
+      addedAt: activeWord.item.addedAt || Date.now(),
+      phonetic:
+        cleanPhonetic(activeWord.item.phonetic) ||
+        cleanPhonetic(elements.wordPanelPhonetic?.textContent),
+    };
+
+    const shell = getIntensiveDocumentShell();
+    const words = shell.words.filter((word) => word.id !== item.id);
+    words.push(item);
+    const saved = saveReadingDocument({ ...shell, words });
+    if (!saved) {
+      showToast("保存失败，请检查浏览器存储空间");
+      return;
+    }
+
+    const key = getItemKey(saved.id, item);
+    if (mark === "unknown") {
+      state.known.delete(key);
+      state.unknown.add(key);
+    } else {
+      state.unknown.delete(key);
+      state.known.add(key);
+    }
+    persistSet(STORAGE_KEYS.known, state.known);
+    persistSet(STORAGE_KEYS.unknown, state.unknown);
+    state.activeWord.item = item;
+    updateTokenMarks();
+    updateWordPanelMarkState();
+    showToast(
+      mark === "unknown"
+        ? `${item.phrase} 已加入四级不会`
+        : `${item.phrase} 已标记为掌握`,
+    );
+  }
+
+  /* --------------------------------------------------------- word panel */
+
+  function getParagraphById(paragraphId) {
+    return state.paragraphIndex.get(paragraphId) || null;
+  }
+
+  function renderMeanings(meanings) {
+    if (!elements.wordMeanings) {
+      return;
+    }
+    elements.wordMeanings.replaceChildren();
+    if (!meanings.length) {
+      return;
+    }
+    const list = document.createElement("ul");
+    meanings.forEach((meaning) => {
+      const item = document.createElement("li");
+      item.textContent = meaning;
+      list.append(item);
+    });
+    elements.wordMeanings.append(list);
+  }
+
+  function renderPhrases(phrases) {
+    if (!elements.wordPhrases || !elements.wordPhraseSection) {
+      return;
+    }
+    elements.wordPhrases.replaceChildren();
+    const usable = (Array.isArray(phrases) ? phrases : []).filter(
+      (item) => item?.phrase,
+    );
+    elements.wordPhraseSection.hidden = usable.length === 0;
+    if (!usable.length) {
+      return;
+    }
+
+    const list = document.createElement("ul");
+    usable.slice(0, 8).forEach((item) => {
+      const entry = document.createElement("li");
+
+      const phrase = document.createElement("strong");
+      phrase.lang = "en";
+      phrase.textContent = item.phrase;
+
+      entry.append(phrase);
+      const meaning = String(item.meaning || "").trim();
+      if (meaning) {
+        const copy = document.createElement("span");
+        copy.textContent = meaning;
+        entry.append(copy);
+      }
+      list.append(entry);
+    });
+    elements.wordPhrases.append(list);
+  }
+
+  function renderExamples(examples) {
+    if (!elements.wordExamples || !elements.wordExampleSection) {
+      return;
+    }
+    elements.wordExamples.replaceChildren();
+    const usable = (Array.isArray(examples) ? examples : []).filter(
+      (item) => item?.english,
+    );
+    elements.wordExampleSection.hidden = usable.length === 0;
+    if (!usable.length) {
+      return;
+    }
+
+    usable.slice(0, 3).forEach((item) => {
+      const entry = document.createElement("div");
+      entry.className = "word-example";
+
+      const english = document.createElement("p");
+      english.lang = "en";
+      english.textContent = item.english;
+      entry.append(english);
+
+      const chinese = String(item.chinese || "").trim();
+      if (chinese) {
+        const copy = document.createElement("p");
+        copy.textContent = chinese;
+        entry.append(copy);
+      }
+      elements.wordExamples.append(entry);
+    });
+  }
+
+  function openWordPanel(phrase, paragraph, item, kind = "word") {
+    state.activeWord = {
+      phrase,
+      kind,
+      sentence: paragraph?.english || phrase,
+      translation: paragraph?.chinese || "",
+      item: { ...item },
+      meanings: [],
+    };
+
+    if (elements.wordPanelTitle) {
+      elements.wordPanelTitle.textContent = phrase;
+    }
+    if (elements.wordPanelPhonetic) {
+      elements.wordPanelPhonetic.textContent = item.phonetic || "音标查询中";
+    }
+    if (elements.wordLookupStatus) {
+      elements.wordLookupStatus.textContent = "正在查询词典…";
+    }
+    elements.wordMeanings?.replaceChildren();
+    renderPhrases([]);
+    renderExamples([]);
+    if (elements.wordContextSentence) {
+      elements.wordContextSentence.textContent = paragraph?.english || phrase;
+    }
+    if (elements.wordContextTranslation) {
+      elements.wordContextTranslation.textContent =
+        paragraph?.chinese || "当前段落暂无翻译。";
+    }
+    if (elements.wordNoteInput) {
+      elements.wordNoteInput.value =
+        item.meaning && item.meaning !== "查看上下文理解用法"
+          ? item.meaning
+          : "";
+    }
+
+    updateWordPanelMarkState();
+    if (elements.wordPanel) {
+      elements.wordPanel.hidden = false;
+      elements.wordPanel.setAttribute("aria-hidden", "false");
+    }
+    elements.layout?.classList.add("has-word-panel");
+  }
+
+  function closeWordPanel() {
+    state.lookupRun += 1;
+    state.activeWord = null;
+    if (elements.wordPanel) {
+      elements.wordPanel.hidden = true;
+      elements.wordPanel.setAttribute("aria-hidden", "true");
+    }
+    elements.layout?.classList.remove("has-word-panel");
+  }
+
+  function applyWordResult(activeWord, data, statusText) {
+    const meanings = [
+      ...(Array.isArray(data.translations) ? data.translations : []),
+      ...(Array.isArray(data.definitions) ? data.definitions : []),
+    ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
+
+    activeWord.meanings = meanings.slice(0, 8);
+    activeWord.item.phonetic = data.phonetic || activeWord.item.phonetic;
+    activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
+    activeWord.item.phrases = Array.isArray(data.phrases) ? data.phrases : [];
+
+    if (elements.wordPanelPhonetic) {
+      elements.wordPanelPhonetic.textContent =
+        data.phonetic || activeWord.item.phonetic || "暂无音标";
+    }
+    if (elements.wordLookupStatus) {
+      elements.wordLookupStatus.textContent = meanings.length
+        ? statusText
+        : "词典没有返回释义，可手动补充";
+    }
+    renderMeanings(activeWord.meanings);
+    renderPhrases(activeWord.item.phrases);
+    renderExamples(Array.isArray(data.examples) ? data.examples : []);
+  }
+
+  async function lookupLocalEntry(value) {
+    const index = window.VocabIndex;
+    if (!index || typeof index.lookup !== "function") {
+      return null;
+    }
+    return index.lookup(value).catch(() => null);
+  }
+
+  function mergeWordData(localData, remoteData) {
+    const localTranslations = Array.isArray(localData?.translations)
+      ? localData.translations
+      : [];
+    const remoteTranslations = Array.isArray(remoteData?.translations)
+      ? remoteData.translations
+      : [];
+    const localDefinitions = Array.isArray(localData?.definitions)
+      ? localData.definitions
+      : [];
+    const remoteDefinitions = Array.isArray(remoteData?.definitions)
+      ? remoteData.definitions
+      : [];
+    const remotePhrases = Array.isArray(remoteData?.phrases)
+      ? remoteData.phrases
+      : [];
+    const remoteExamples = Array.isArray(remoteData?.examples)
+      ? remoteData.examples
+      : [];
+
+    return {
+      translations: [...localTranslations, ...remoteTranslations].filter(
+        (meaning, index, list) => meaning && list.indexOf(meaning) === index,
+      ),
+      definitions: [...localDefinitions, ...remoteDefinitions].filter(
+        (meaning, index, list) => meaning && list.indexOf(meaning) === index,
+      ),
+      phonetic:
+        cleanPhonetic(remoteData?.phonetic) ||
+        cleanPhonetic(localData?.phonetic),
+      phrases: remotePhrases,
+      examples: remoteExamples,
+      remoteChecked: true,
+    };
+  }
+
+  async function fetchWordData(value) {
+    const response = await fetch(
+      `./api/word?word=${encodeURIComponent(normalizeWord(value))}`,
+      { credentials: "same-origin" },
+    );
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "暂时没有查到这个词");
+    }
+    return data;
+  }
+
+  async function lookupActiveWord() {
+    const activeWord = state.activeWord;
+    if (!activeWord) {
+      return;
+    }
+
+    const cacheKey = normalizeWord(activeWord.phrase);
+    const cached = state.lookupCache.get(cacheKey);
+    if (
+      cached &&
+      (cached.remoteChecked || cleanPhonetic(cached.phonetic))
+    ) {
+      applyWordResult(activeWord, cached, "已从本次缓存读取释义");
+      return;
+    }
+
+    const run = ++state.lookupRun;
+    let localData = null;
+    try {
+      const localEntry = await lookupLocalEntry(activeWord.phrase);
+      if (run !== state.lookupRun || state.activeWord !== activeWord) {
+        return;
+      }
+      if (localEntry?.meaning) {
+        localData = {
+          translations: [localEntry.meaning],
+          definitions: [],
+          phonetic: cleanPhonetic(localEntry.phonetic),
+          phrases: [],
+          examples: [],
+        };
+        if (localData.phonetic) {
+          state.lookupCache.set(cacheKey, localData);
+          applyWordResult(
+            activeWord,
+            localData,
+            `已从本地词库读取释义与音标（${localEntry.source}）`,
+          );
+          return;
+        }
+      }
+
+      const data = await fetchWordData(activeWord.phrase);
+      if (run !== state.lookupRun || state.activeWord !== activeWord) {
+        return;
+      }
+
+      if (localData) {
+        const merged = mergeWordData(localData, data);
+        state.lookupCache.set(cacheKey, merged);
+        applyWordResult(
+          activeWord,
+          merged,
+          merged.phonetic
+            ? "本地词库释义，在线词典已补充音标与固定搭配"
+            : "本地词库释义；在线词典暂未提供音标",
+        );
+        return;
+      }
+
+      state.lookupCache.set(cacheKey, { ...data, remoteChecked: true });
+      applyWordResult(activeWord, data, "已查询到释义与固定搭配");
+    } catch (error) {
+      if (run !== state.lookupRun || state.activeWord !== activeWord) {
+        return;
+      }
+      if (localData) {
+        applyWordResult(
+          activeWord,
+          localData,
+          "已读取本地释义；在线音标暂时不可用",
+        );
+        return;
+      }
+      if (elements.wordPanelPhonetic) {
+        elements.wordPanelPhonetic.textContent =
+          activeWord.item.phonetic || "暂无音标";
+      }
+      if (elements.wordLookupStatus) {
+        elements.wordLookupStatus.textContent = `${error.message || "查询失败"}，可手动补充释义`;
+      }
+      renderMeanings(activeWord.meanings || []);
+      renderPhrases([]);
+      renderExamples([]);
+    }
+  }
+
+  function openWordFromTrigger(button) {
+    const phrase = button.dataset.word;
+    if (!phrase) {
+      return;
+    }
+    const kind = button.dataset.wordKind === "phrase" ? "phrase" : "word";
+    const paragraph = getParagraphById(button.dataset.paragraphId);
+    const existing = getStoredWord(phrase, paragraph?.english || "", kind);
+    const item = existing
+      ? { ...existing }
+      : {
+          id: makeWordId(phrase, paragraph?.english || "", kind),
+          phrase,
+          meaning: "",
+          phonetic: "",
+        };
+    if (existing) {
+      item.id = existing.id;
+    }
+    openWordPanel(phrase, paragraph, item, kind);
+    lookupActiveWord();
+  }
+
+  /* ------------------------------------------------------------ rendering */
 
   function createStat(value, label) {
     const chip = document.createElement("span");
@@ -331,10 +1087,27 @@
     copy.className = "navigation-copy";
 
     const title = document.createElement("strong");
-    title.textContent = piece.title;
+    title.textContent = piece.title || piece.type || `第 ${index + 1} 篇`;
 
     const meta = document.createElement("span");
-    meta.textContent = `${piece.section} · ${piece.questionRange}`;
+    const metaParts = [];
+    if (piece.section) {
+      metaParts.push(piece.section);
+    }
+    if (piece.questionRange) {
+      metaParts.push(piece.questionRange);
+    }
+    const questionTotal = Array.isArray(piece.questions)
+      ? piece.questions.filter((question) => question?.stem).length
+      : 0;
+    if (questionTotal) {
+      metaParts.push(`${questionTotal} 题`);
+      link.dataset.questionTargets = piece.questions
+        .filter((question) => question?.stem)
+        .map((question) => question.number)
+        .join(",");
+    }
+    meta.textContent = metaParts.join(" · ");
 
     copy.append(title, meta);
     link.append(number, copy);
@@ -354,8 +1127,7 @@
     tag.textContent = "语法";
 
     const sentence = document.createElement("strong");
-    sentence.textContent =
-      item.sentence || item.location || "点击查看语法拆解";
+    sentence.textContent = item.sentence || item.location || "点击查看语法拆解";
 
     const body = document.createElement("div");
     body.className = "grammar-body";
@@ -374,12 +1146,685 @@
     return details;
   }
 
-  function createParagraphRow(paragraph, piece) {
+  function appendEnglishText(container, text, paragraphId) {
+    const source = String(text || "");
+    let lastIndex = 0;
+    let match = WORD_PATTERN.exec(source);
+
+    while (match) {
+      if (match.index > lastIndex) {
+        container.append(
+          document.createTextNode(source.slice(lastIndex, match.index)),
+        );
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "word-token";
+      button.dataset.word = match[0];
+      button.dataset.paragraphId = paragraphId;
+      button.dataset.wordId = makeWordId(match[0], source);
+      button.textContent = match[0];
+      button.setAttribute(
+        "aria-label",
+        `查看单词 ${match[0]} 的释义与固定搭配`,
+      );
+      container.append(button);
+
+      lastIndex = match.index + match[0].length;
+      match = WORD_PATTERN.exec(source);
+    }
+
+    if (lastIndex < source.length) {
+      container.append(document.createTextNode(source.slice(lastIndex)));
+    }
+  }
+
+  function createCueBlock(paragraph) {
+    const cues = (Array.isArray(paragraph.cues) ? paragraph.cues : []).filter(
+      (cue) => cue?.label || cue?.tip,
+    );
+    if (!cues.length) {
+      return null;
+    }
+
+    const block = document.createElement("div");
+    block.className = "cue-block";
+
+    const head = document.createElement("div");
+    head.className = "cue-head";
+
+    const kicker = document.createElement("span");
+    kicker.className = "cue-kicker";
+    kicker.textContent = "答案高发";
+    head.append(kicker);
+
+    const labels = new Set();
+    cues.forEach((cue) => {
+      const label = String(cue.label || "").trim();
+      if (!label || labels.has(label)) {
+        return;
+      }
+      labels.add(label);
+      const chip = document.createElement("span");
+      chip.className = "cue-chip";
+      chip.textContent = label;
+      head.append(chip);
+    });
+    block.append(head);
+
+    const tips = [];
+    const seenTips = new Set();
+    cues.forEach((cue) => {
+      const tip = String(cue.tip || "").trim();
+      if (!tip || seenTips.has(tip)) {
+        return;
+      }
+      seenTips.add(tip);
+      tips.push(tip);
+    });
+
+    if (tips.length) {
+      const list = document.createElement("ul");
+      list.className = "cue-tip-list";
+      tips.forEach((tip) => {
+        const item = document.createElement("li");
+        item.textContent = tip;
+        list.append(item);
+      });
+      block.append(list);
+    }
+
+    return block;
+  }
+
+  function createKeyWordRow(paragraph, paragraphId) {
+    const words = (Array.isArray(paragraph.keyWords) ? paragraph.keyWords : [])
+      .map((word) => String(word || "").trim())
+      .filter(Boolean)
+      .slice(0, 6);
+    if (!words.length) {
+      return null;
+    }
+
+    const row = document.createElement("div");
+    row.className = "key-word-row";
+
+    const label = document.createElement("span");
+    label.className = "key-word-label";
+    label.textContent = "重点词";
+    row.append(label);
+
+    words.forEach((word) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "key-word-chip";
+      button.dataset.word = word;
+      button.dataset.paragraphId = paragraphId;
+      button.textContent = word;
+      button.setAttribute("aria-label", `查看 ${word} 的释义与固定搭配`);
+      row.append(button);
+    });
+
+    return row;
+  }
+
+  function createPhraseRow(paragraph, paragraphId) {
+    const phrases = (Array.isArray(paragraph.phrases) ? paragraph.phrases : [])
+      .map((phrase) => String(phrase || "").trim())
+      .filter(Boolean)
+      .slice(0, 16);
+    if (!phrases.length) {
+      return null;
+    }
+
+    const row = document.createElement("div");
+    row.className = "key-word-row phrase-row";
+
+    const label = document.createElement("span");
+    label.className = "key-word-label";
+    label.textContent = "固定搭配";
+    row.append(label);
+
+    phrases.forEach((phrase) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "key-word-chip phrase-chip";
+      button.dataset.word = phrase;
+      button.dataset.wordKind = "phrase";
+      button.dataset.paragraphId = paragraphId;
+      button.textContent = phrase;
+      button.setAttribute("aria-label", `查看固定搭配 ${phrase} 的释义`);
+      row.append(button);
+    });
+
+    return row;
+  }
+
+  function createTipBlock(piece) {
+    const tips = (Array.isArray(piece.tips) ? piece.tips : [])
+      .map((tip) => String(tip || "").trim())
+      .filter(Boolean);
+    if (!tips.length) {
+      return null;
+    }
+
+    const block = document.createElement("section");
+    block.className = "tip-block";
+
+    const head = document.createElement("div");
+    head.className = "tip-head";
+
+    const kicker = document.createElement("span");
+    kicker.className = "tip-kicker";
+    kicker.textContent = "本篇技巧";
+
+    const type = document.createElement("span");
+    type.className = "tip-type";
+    type.textContent = piece.type || "";
+
+    head.append(kicker);
+    if (piece.type) {
+      head.append(type);
+    }
+
+    const list = document.createElement("ul");
+    list.className = "tip-list";
+    tips.forEach((tip) => {
+      const item = document.createElement("li");
+      item.textContent = tip;
+      list.append(item);
+    });
+
+    block.append(head, list);
+    return block;
+  }
+
+  /* --------------------------------------------------------- 逐题验证 */
+
+  function getQuestionContext(question, piece) {
+    const paragraphId = question.paragraphNumber
+      ? `${piece.id}-p${question.paragraphNumber}`
+      : "";
+    const paragraph = paragraphId
+      ? state.paragraphIndex.get(paragraphId)
+      : null;
+    if (paragraph) {
+      return { id: paragraphId, paragraph };
+    }
+
+    const fallbackId = `${piece.id}-q${question.number}`;
+    if (!state.paragraphIndex.has(fallbackId)) {
+      state.paragraphIndex.set(fallbackId, {
+        number: question.number,
+        english: question.stem,
+        chinese: question.stemTranslation,
+      });
+    }
+    return { id: fallbackId, paragraph: state.paragraphIndex.get(fallbackId) };
+  }
+
+  function createAnalysisRow(label) {
+    const row = document.createElement("div");
+    row.className = "analysis-row";
+
+    const tag = document.createElement("span");
+    tag.className = "analysis-label";
+    tag.textContent = label;
+
+    const body = document.createElement("div");
+    body.className = "analysis-body";
+
+    row.append(tag, body);
+    return { row, body };
+  }
+
+  function createQuestionAnalysis(question) {
+    const block = document.createElement("div");
+    block.className = "question-analysis";
+    block.hidden = true;
+
+    const answer = createAnalysisRow("答案");
+    const answerLine = document.createElement("p");
+    answerLine.className = "analysis-answer";
+
+    const letter = document.createElement("strong");
+    letter.lang = "en";
+    letter.textContent = question.answer || "—";
+    answerLine.append(letter);
+
+    if (question.answerText) {
+      const text = document.createElement("span");
+      text.lang = "en";
+      text.textContent = question.answerText;
+      answerLine.append(text);
+    }
+    if (question.type) {
+      const type = document.createElement("span");
+      type.className = "analysis-type";
+      type.textContent = question.type;
+      answerLine.append(type);
+    }
+    answer.body.append(answerLine);
+    block.append(answer.row);
+
+    if (question.locateEnglish || question.locateChinese) {
+      const locate = createAnalysisRow(
+        question.paragraphNumber ? `定位 P${question.paragraphNumber}` : "定位",
+      );
+      if (question.locateEnglish) {
+        const english = document.createElement("p");
+        english.lang = "en";
+        english.textContent = question.locateEnglish;
+        locate.body.append(english);
+      }
+      if (question.locateChinese) {
+        const chinese = document.createElement("p");
+        chinese.lang = "zh-CN";
+        chinese.textContent = question.locateChinese;
+        locate.body.append(chinese);
+      }
+      block.append(locate.row);
+    }
+
+    if (question.signalCore || question.signalDetail) {
+      const signal = createAnalysisRow("信号");
+      if (question.signalCore) {
+        const core = document.createElement("p");
+        core.className = "analysis-signal";
+        core.textContent = question.signalCore;
+        signal.body.append(core);
+      }
+      if (question.signalDetail) {
+        const detail = document.createElement("p");
+        detail.textContent = question.signalDetail;
+        signal.body.append(detail);
+      }
+      block.append(signal.row);
+    }
+
+    const pairs = (Array.isArray(question.pairs) ? question.pairs : []).filter(
+      (pair) => pair.origin || pair.option,
+    );
+    if (pairs.length) {
+      const replace = createAnalysisRow("替换");
+      const list = document.createElement("ul");
+      list.className = "analysis-pairs";
+      pairs.forEach((pair) => {
+        const item = document.createElement("li");
+        const origin = document.createElement("span");
+        origin.lang = "en";
+        origin.textContent = pair.origin || "—";
+        const arrow = document.createElement("span");
+        arrow.className = "analysis-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "↔";
+        const option = document.createElement("span");
+        option.lang = "en";
+        option.textContent = pair.option || "—";
+        item.append(origin, arrow, option);
+        if (pair.why) {
+          const why = document.createElement("em");
+          why.textContent = pair.why;
+          item.append(why);
+        }
+        list.append(item);
+      });
+      replace.body.append(list);
+      block.append(replace.row);
+    }
+
+    const verdicts = (
+      Array.isArray(question.verdicts) ? question.verdicts : []
+    ).filter((verdict) => verdict.reason);
+    if (verdicts.length) {
+      const exclude = createAnalysisRow("排除");
+      const list = document.createElement("ul");
+      list.className = "analysis-verdicts";
+      verdicts.forEach((verdict) => {
+        const item = document.createElement("li");
+
+        const head = document.createElement("div");
+        head.className = "verdict-head";
+        const letter = document.createElement("span");
+        letter.className = "verdict-letter";
+        letter.lang = "en";
+        letter.textContent = verdict.letter ? `${verdict.letter})` : "";
+        head.append(letter);
+        if (verdict.flag) {
+          const flag = document.createElement("span");
+          flag.className = "verdict-flag";
+          flag.textContent = verdict.flag;
+          head.append(flag);
+        }
+        item.append(head);
+
+        const reason = document.createElement("p");
+        reason.className = "verdict-reason";
+        reason.textContent = verdict.reason;
+        item.append(reason);
+
+        if (verdict.source) {
+          const source = document.createElement("p");
+          source.className = "verdict-source";
+          source.lang = "en";
+          source.textContent = verdict.source;
+          item.append(source);
+        }
+        list.append(item);
+      });
+      exclude.body.append(list);
+      block.append(exclude.row);
+    }
+
+    return block;
+  }
+
+  function applyQuestionCardState(card, question) {
+    const selected = state.answers[getAnswerKey(question.number)] || "";
+    const revealed = card.dataset.revealed === "true";
+    const correct = Boolean(selected) && selected === question.answer;
+
+    card.classList.toggle("is-answered", Boolean(selected));
+    card.classList.toggle("is-revealed", revealed);
+
+    card.querySelectorAll(".question-option").forEach((button) => {
+      const letter = button.dataset.letter;
+      button.classList.toggle("is-selected", Boolean(selected) && letter === selected);
+      button.classList.toggle("is-correct", revealed && letter === question.answer);
+      button.classList.toggle(
+        "is-wrong",
+        revealed && Boolean(selected) && letter === selected && letter !== question.answer,
+      );
+      button.setAttribute("aria-pressed", String(Boolean(selected) && letter === selected));
+    });
+
+    const analysis = card.querySelector(".question-analysis");
+    if (analysis) {
+      analysis.hidden = !revealed;
+    }
+    const toggle = card.querySelector(".question-analysis-toggle");
+    if (toggle) {
+      toggle.textContent = revealed ? "收起解析" : "查看解析";
+    }
+
+    const feedback = card.querySelector(".question-feedback");
+    if (feedback) {
+      const suffix = question.type ? ` · ${question.type}` : "";
+      if (!revealed) {
+        feedback.className = "question-feedback";
+        feedback.textContent = selected
+          ? `已选择 ${selected}，点“提交答案”验证。`
+          : "";
+      } else if (!selected) {
+        feedback.className = "question-feedback is-revealed";
+        feedback.textContent = `正确答案 ${question.answer}${suffix}`;
+      } else if (correct) {
+        feedback.className = "question-feedback is-correct";
+        feedback.textContent = `答对了 · 正确答案 ${question.answer}${suffix}`;
+      } else {
+        feedback.className = "question-feedback is-wrong";
+        feedback.textContent = `选错了：你选了 ${selected}，正确答案是 ${question.answer}${suffix}`;
+      }
+    }
+  }
+
+  function createQuestionCard(question, piece, context) {
+    const card = document.createElement("article");
+    card.className = "question-card";
+    card.id = `question-${question.number}`;
+    card.dataset.questionNumber = String(question.number);
+    card.dataset.revealed = state.answers[getAnswerKey(question.number)]
+      ? "true"
+      : "false";
+
+    const head = document.createElement("header");
+    head.className = "question-head";
+
+    const number = document.createElement("span");
+    number.className = "question-number";
+    number.textContent = `第 ${question.number} 题`;
+    head.append(number);
+
+    if (question.type) {
+      const type = document.createElement("span");
+      type.className = "question-type";
+      type.textContent = question.type;
+      head.append(type);
+    }
+
+    if (question.paragraphNumber) {
+      const locate = document.createElement("a");
+      locate.className = "question-locate";
+      locate.href = `#${piece.id}-p${question.paragraphNumber}`;
+      locate.textContent = `定位 P${question.paragraphNumber}`;
+      head.append(locate);
+    }
+
+    const stem = document.createElement("p");
+    stem.className = "question-stem";
+    stem.lang = "en";
+    appendEnglishText(stem, question.stem, context.id);
+
+    const options = document.createElement("div");
+    options.className = "question-options";
+    options.setAttribute("role", "group");
+    options.setAttribute("aria-label", `第 ${question.number} 题选项`);
+
+    question.choices.forEach((choice) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "question-option";
+      button.dataset.letter = choice.letter;
+
+      const letter = document.createElement("span");
+      letter.className = "option-letter";
+      letter.lang = "en";
+      letter.textContent = choice.letter;
+
+      const text = document.createElement("span");
+      text.className = "option-text";
+      text.lang = "en";
+      text.textContent = choice.text;
+
+      button.append(letter, text);
+      button.addEventListener("click", () => {
+        state.answers[getAnswerKey(question.number)] = choice.letter;
+        persistAnswers();
+        applyQuestionCardState(card, question);
+        updateQuestionProgress();
+      });
+      options.append(button);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "question-actions";
+
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.className = "question-submit";
+    submit.textContent = "提交答案";
+    submit.addEventListener("click", () => {
+      if (!state.answers[getAnswerKey(question.number)]) {
+        showToast("先选一个选项再提交");
+        return;
+      }
+      card.dataset.revealed = "true";
+      applyQuestionCardState(card, question);
+      updateQuestionProgress();
+    });
+
+    const translationToggle = document.createElement("button");
+    translationToggle.type = "button";
+    translationToggle.className = "question-translation-toggle";
+    translationToggle.textContent = "显示译文";
+
+    const analysisToggle = document.createElement("button");
+    analysisToggle.type = "button";
+    analysisToggle.className = "question-analysis-toggle";
+    analysisToggle.textContent = "查看解析";
+    analysisToggle.addEventListener("click", () => {
+      card.dataset.revealed =
+        card.dataset.revealed === "true" ? "false" : "true";
+      applyQuestionCardState(card, question);
+    });
+
+    actions.append(submit, translationToggle, analysisToggle);
+
+    const feedback = document.createElement("p");
+    feedback.className = "question-feedback";
+    feedback.setAttribute("role", "status");
+
+    const translation = document.createElement("div");
+    translation.className = "question-translation";
+    translation.hidden = true;
+    if (question.stemTranslation) {
+      const stemCopy = document.createElement("p");
+      stemCopy.className = "question-stem-translation";
+      stemCopy.lang = "zh-CN";
+      stemCopy.textContent = question.stemTranslation;
+      translation.append(stemCopy);
+    }
+    const translationList = document.createElement("ul");
+    question.choices.forEach((choice) => {
+      if (!choice.translation) {
+        return;
+      }
+      const item = document.createElement("li");
+      const letter = document.createElement("span");
+      letter.lang = "en";
+      letter.textContent = `${choice.letter})`;
+      const text = document.createElement("span");
+      text.lang = "zh-CN";
+      text.textContent = choice.translation;
+      item.append(letter, text);
+      translationList.append(item);
+    });
+    if (translationList.childElementCount) {
+      translation.append(translationList);
+    }
+
+    translationToggle.addEventListener("click", () => {
+      translation.hidden = !translation.hidden;
+      translationToggle.textContent = translation.hidden ? "显示译文" : "隐藏译文";
+    });
+
+    const analysis = createQuestionAnalysis(question);
+
+    card.append(head, stem, options, actions, feedback, translation, analysis);
+    return card;
+  }
+
+  function createQuestionSection(piece) {
+    const questions = (Array.isArray(piece.questions) ? piece.questions : [])
+      .filter((question) => question?.stem && Array.isArray(question.choices))
+      .slice()
+      .sort((left, right) => left.number - right.number);
+    if (!questions.length) {
+      return null;
+    }
+
+    const section = document.createElement("section");
+    section.className = "question-section";
+    section.dataset.pieceId = piece.id;
+
+    const head = document.createElement("div");
+    head.className = "question-section-head";
+
+    const title = document.createElement("h3");
+    title.textContent = "逐题验证";
+
+    const progress = document.createElement("span");
+    progress.className = "question-progress";
+    progress.dataset.questionProgress = questions
+      .map((question) => question.number)
+      .join(",");
+
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "question-reset";
+    reset.textContent = "重做本篇";
+    reset.addEventListener("click", () => {
+      questions.forEach((question) => {
+        delete state.answers[getAnswerKey(question.number)];
+      });
+      persistAnswers();
+      section.querySelectorAll(".question-card").forEach((card) => {
+        const number = Number.parseInt(card.dataset.questionNumber || "", 10);
+        const question = state.questionIndex.get(number);
+        if (!question) {
+          return;
+        }
+        card.dataset.revealed = "false";
+        const translation = card.querySelector(".question-translation");
+        if (translation) {
+          translation.hidden = true;
+        }
+        const translationToggle = card.querySelector(
+          ".question-translation-toggle",
+        );
+        if (translationToggle) {
+          translationToggle.textContent = "显示译文";
+        }
+        applyQuestionCardState(card, question);
+      });
+      updateQuestionProgress();
+      showToast("已清空本篇作答记录");
+    });
+
+    head.append(title, progress, reset);
+
+    const list = document.createElement("div");
+    list.className = "question-list";
+    questions.forEach((question) => {
+      const context = getQuestionContext(question, piece);
+      const card = createQuestionCard(question, piece, context);
+      state.questionIndex.set(question.number, question);
+      applyQuestionCardState(card, question);
+      list.append(card);
+    });
+
+    section.append(head, list);
+    return section;
+  }
+
+  function updateQuestionProgress() {
+    elements.content
+      ?.querySelectorAll("[data-question-progress]")
+      .forEach((node) => {
+        const numbers = String(node.dataset.questionProgress || "")
+          .split(",")
+          .map((value) => Number.parseInt(value, 10))
+          .filter((value) => Number.isFinite(value));
+        let answered = 0;
+        let correct = 0;
+        numbers.forEach((number) => {
+          const selected = state.answers[getAnswerKey(number)];
+          if (!selected) {
+            return;
+          }
+          answered += 1;
+          const question = state.questionIndex.get(number);
+          if (question && selected === question.answer) {
+            correct += 1;
+          }
+        });
+        node.textContent = answered
+          ? `已作答 ${answered}/${numbers.length} · 正确 ${correct}`
+          : `共 ${numbers.length} 题`;
+      });
+  }
+
+  function createParagraphRow(paragraph, piece, paragraphId) {
+    const grammar = Array.isArray(paragraph.grammar) ? paragraph.grammar : [];
+    const cues = Array.isArray(paragraph.cues) ? paragraph.cues : [];
+
     const row = document.createElement("div");
     row.className = "paragraph-row";
-    row.classList.toggle("has-grammar", paragraph.grammar.length > 0);
+    row.classList.toggle("has-grammar", grammar.length > 0);
+    row.classList.toggle("has-cue", cues.length > 0);
     row.dataset.paragraphNumber = String(paragraph.number);
-    row.dataset.grammarCount = String(paragraph.grammar.length);
+    row.dataset.grammarCount = String(grammar.length);
 
     const number = document.createElement("span");
     number.className = "paragraph-number";
@@ -389,20 +1834,22 @@
     const toolbar = document.createElement("div");
     toolbar.className = "paragraph-toolbar";
 
+    if (cues.length) {
+      const cueCount = document.createElement("span");
+      cueCount.className = "cue-count";
+      cueCount.textContent = `${cues.length} 处出题点`;
+      toolbar.append(cueCount);
+    }
+
     const grammarCount = document.createElement("span");
     grammarCount.className = "grammar-count";
-    grammarCount.textContent = paragraph.grammar.length
-      ? `${paragraph.grammar.length} 处语法`
-      : "";
+    grammarCount.textContent = grammar.length ? `${grammar.length} 处语法` : "";
 
     const playButton = document.createElement("button");
     playButton.type = "button";
     playButton.className = "paragraph-play-button";
     playButton.textContent = "播放本段";
-    playButton.setAttribute(
-      "aria-label",
-      `播放第 ${paragraph.number} 段英文`,
-    );
+    playButton.setAttribute("aria-label", `播放第 ${paragraph.number} 段英文`);
     playButton.addEventListener("click", () => {
       playParagraph(paragraph.english, playButton);
     });
@@ -410,20 +1857,35 @@
     const english = document.createElement("p");
     english.className = "paragraph-english";
     english.lang = "en";
-    english.textContent = paragraph.english;
+    appendEnglishText(english, paragraph.english, paragraphId);
 
     const chinese = document.createElement("p");
     chinese.className = "paragraph-chinese";
     chinese.lang = "zh-CN";
-    chinese.textContent = paragraph.chinese;
+    chinese.textContent = paragraph.chinese || "";
 
     toolbar.append(grammarCount, playButton);
     row.append(number, toolbar, english, chinese);
 
-    if (paragraph.grammar.length) {
+    const keyWords = createKeyWordRow(paragraph, paragraphId);
+    if (keyWords) {
+      row.append(keyWords);
+    }
+
+    const phraseRow = createPhraseRow(paragraph, paragraphId);
+    if (phraseRow) {
+      row.append(phraseRow);
+    }
+
+    const cueBlock = createCueBlock(paragraph);
+    if (cueBlock) {
+      row.append(cueBlock);
+    }
+
+    if (grammar.length) {
       const grammarList = document.createElement("div");
       grammarList.className = "grammar-list";
-      paragraph.grammar.forEach((item) => {
+      grammar.forEach((item) => {
         grammarList.append(createGrammarNote(item));
       });
       row.append(grammarList);
@@ -439,6 +1901,11 @@
     section.id = piece.id;
     section.dataset.pieceId = piece.id;
 
+    const paragraphs = Array.isArray(piece.paragraphs) ? piece.paragraphs : [];
+    const extensionGrammar = Array.isArray(piece.extensionGrammar)
+      ? piece.extensionGrammar
+      : [];
+
     const head = document.createElement("header");
     head.className = "piece-head";
 
@@ -449,57 +1916,69 @@
     kicker.className = "piece-kicker";
 
     const sectionName = document.createElement("span");
-    sectionName.textContent = piece.section;
+    sectionName.textContent = piece.section || "";
 
     const type = document.createElement("span");
     type.className = "piece-type";
-    const sectionKey = piece.section.match(/[ABC]$/)?.[0]?.toLowerCase();
+    const sectionKey = String(piece.section || "").match(/[ABC]$/)?.[0]?.toLowerCase();
     if (sectionKey) {
       type.classList.add(`is-section-${sectionKey}`);
     }
-    type.textContent = piece.type;
+    type.textContent = piece.type || "";
 
     const questionRange = document.createElement("span");
-    questionRange.textContent = piece.questionRange;
+    questionRange.textContent = piece.questionRange || "";
     kicker.append(sectionName, type, questionRange);
 
     const title = document.createElement("h2");
-    title.textContent = piece.title;
+    title.textContent = piece.title || piece.type || `第 ${index + 1} 篇`;
 
-    const paragraphGrammarCount = piece.paragraphs.reduce(
-      (total, paragraph) => total + paragraph.grammar.length,
+    const paragraphGrammarCount = paragraphs.reduce(
+      (total, paragraph) =>
+        total + (Array.isArray(paragraph.grammar) ? paragraph.grammar.length : 0),
       0,
     );
-    const grammarTotal =
-      paragraphGrammarCount + piece.extensionGrammar.length;
+    const grammarTotal = paragraphGrammarCount + extensionGrammar.length;
     const meta = document.createElement("p");
     meta.className = "piece-meta";
-    meta.textContent = `${String(index + 1).padStart(2, "0")} · ${piece.paragraphs.length} 段 · ${grammarTotal} 处语法`;
+    meta.textContent = `${String(index + 1).padStart(2, "0")} · ${paragraphs.length} 段 · ${grammarTotal} 处语法`;
 
     const playButton = document.createElement("button");
     playButton.type = "button";
     playButton.className = "piece-play-button";
     playButton.textContent = "播放本篇";
-    playButton.setAttribute("aria-label", `播放${piece.title}英文全文`);
+    playButton.setAttribute("aria-label", `播放第 ${index + 1} 篇英文全文`);
     playButton.addEventListener("click", () => {
       playSequence(
-        piece.paragraphs.map((paragraph) => paragraph.english),
+        paragraphs.map((paragraph) => paragraph.english),
         playButton,
       );
     });
 
     copy.append(kicker, title, meta);
     head.append(copy, playButton);
+    section.append(head);
+
+    const tipBlock = createTipBlock(piece);
+    if (tipBlock) {
+      section.append(tipBlock);
+    }
 
     const paragraphList = document.createElement("div");
     paragraphList.className = "paragraph-list";
-    piece.paragraphs.forEach((paragraph) => {
-      paragraphList.append(createParagraphRow(paragraph, piece));
+    paragraphs.forEach((paragraph) => {
+      const paragraphId = `${piece.id}-p${paragraph.number}`;
+      state.paragraphIndex.set(paragraphId, paragraph);
+      paragraphList.append(createParagraphRow(paragraph, piece, paragraphId));
     });
+    section.append(paragraphList);
 
-    section.append(head, paragraphList);
+    const questionSection = createQuestionSection(piece);
+    if (questionSection) {
+      section.append(questionSection);
+    }
 
-    if (piece.extensionGrammar.length) {
+    if (extensionGrammar.length) {
       const extension = document.createElement("section");
       extension.className = "extension-section";
 
@@ -510,11 +1989,11 @@
       headingTitle.textContent = "延伸语法";
 
       const headingMeta = document.createElement("span");
-      headingMeta.textContent = `${piece.extensionGrammar.length} 处补充`;
+      headingMeta.textContent = `${extensionGrammar.length} 处补充`;
 
       heading.append(headingTitle, headingMeta);
       extension.append(heading);
-      piece.extensionGrammar.forEach((item) => {
+      extensionGrammar.forEach((item) => {
         extension.append(createGrammarNote(item));
       });
       section.append(extension);
@@ -528,8 +2007,8 @@
       return;
     }
 
-    const state = document.createElement("div");
-    state.className = "error-state";
+    const state_ = document.createElement("div");
+    state_.className = "error-state";
 
     const title = document.createElement("strong");
     title.textContent = "精读内容暂时无法显示";
@@ -537,8 +2016,8 @@
     const copy = document.createElement("span");
     copy.textContent = message;
 
-    state.append(title, copy);
-    elements.content.replaceChildren(state);
+    state_.append(title, copy);
+    elements.content.replaceChildren(state_);
     elements.pieceNavigation?.replaceChildren();
     elements.heroStats?.replaceChildren();
   }
@@ -548,15 +2027,13 @@
     const maxScroll =
       documentElement.scrollHeight - documentElement.clientHeight;
     const ratio =
-      maxScroll > 0
-        ? Math.min(1, Math.max(0, window.scrollY / maxScroll))
-        : 0;
+      maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
 
     if (elements.readingProgress) {
       elements.readingProgress.style.transform = `scaleX(${ratio})`;
     }
 
-    const pieces = data?.pieces || [];
+    const pieces = state.data?.pieces || [];
     const marker = window.innerWidth <= 640 ? 92 : 124;
     let activeId = pieces[0]?.id || "";
 
@@ -595,6 +2072,7 @@
   }
 
   function renderPage() {
+    const data = state.data;
     if (!data || !Array.isArray(data.pieces) || data.pieces.length === 0) {
       renderError("没有读取到听力精读数据。");
       return;
@@ -602,39 +2080,79 @@
 
     const pieces = data.pieces;
     const paragraphCount = pieces.reduce(
-      (total, piece) => total + piece.paragraphs.length,
+      (total, piece) =>
+        total + (Array.isArray(piece.paragraphs) ? piece.paragraphs.length : 0),
       0,
     );
     const grammarCount = pieces.reduce(
       (total, piece) =>
         total +
-        piece.paragraphs.reduce(
-          (subtotal, paragraph) => subtotal + paragraph.grammar.length,
+        (Array.isArray(piece.paragraphs) ? piece.paragraphs : []).reduce(
+          (subtotal, paragraph) =>
+            subtotal +
+            (Array.isArray(paragraph.grammar) ? paragraph.grammar.length : 0),
           0,
         ) +
-        piece.extensionGrammar.length,
+        (Array.isArray(piece.extensionGrammar)
+          ? piece.extensionGrammar.length
+          : 0),
+      0,
+    );
+    const cueCount = pieces.reduce(
+      (total, piece) =>
+        total +
+        (Array.isArray(piece.paragraphs) ? piece.paragraphs : []).reduce(
+          (subtotal, paragraph) =>
+            subtotal + (Array.isArray(paragraph.cues) ? paragraph.cues.length : 0),
+          0,
+        ),
+      0,
+    );
+    const phraseCount = pieces.reduce(
+      (total, piece) =>
+        total +
+        (Array.isArray(piece.paragraphs) ? piece.paragraphs : []).reduce(
+          (subtotal, paragraph) =>
+            subtotal +
+            (Array.isArray(paragraph.phrases) ? paragraph.phrases.length : 0),
+          0,
+        ),
+      0,
+    );
+    const questionCount = pieces.reduce(
+      (total, piece) =>
+        total + (Array.isArray(piece.questions) ? piece.questions.length : 0),
       0,
     );
 
-    document.title = `${data.meta?.title || "听力全文"} · 语法精读 · iball的小屋`;
+    document.title = `${data.meta?.title || "四级听力"} · 听力精读 · iball的小屋`;
     if (elements.heroEyebrow) {
       elements.heroEyebrow.textContent =
-        data.meta?.title || "CET-4 LISTENING INTENSIVE";
+        data.meta?.title || "CET-4 LISTENING";
     }
     if (elements.heroDescription) {
       elements.heroDescription.textContent =
         data.meta?.subtitle ||
-        "逐段对照翻译，难点句子点击展开语法拆解。";
+        "逐段对照翻译，标注爱出答案的位置，点击单词看释义与固定搭配。";
     }
-    if (elements.sourceLink && data.meta?.sourceUrl) {
-      elements.sourceLink.href = data.meta.sourceUrl;
+    if (elements.sourceLink) {
+      if (data.meta?.sourceUrl) {
+        elements.sourceLink.href = data.meta.sourceUrl;
+      }
+      elements.sourceLink.textContent = "原文出处";
     }
 
     elements.heroStats?.replaceChildren(
       createStat(pieces.length, "篇听力"),
       createStat(paragraphCount, "段原文"),
+      createStat(questionCount, "道选择题"),
+      createStat(phraseCount, "个固定搭配"),
+      createStat(cueCount, "处出题点"),
       createStat(grammarCount, "处语法"),
     );
+
+    state.paragraphIndex.clear();
+    state.questionIndex.clear();
 
     const navigation = document.createDocumentFragment();
     const heading = document.createElement("div");
@@ -652,18 +2170,17 @@
     });
     elements.content?.replaceChildren(content);
 
-    try {
-      const savedMode = window.localStorage.getItem(
-        "iball-intensive-display-mode",
-      );
-      setDisplayMode(savedMode === "english" ? "english" : "bilingual");
-    } catch {
-      setDisplayMode("bilingual");
-    }
+    setDisplayMode(
+      readStoredValue(DISPLAY_STORAGE_KEY) === "english" ? "english" : "bilingual",
+    );
+    setCueVisibility(readStoredValue(CUE_STORAGE_KEY) !== "hidden");
 
     updateGrammarToggle();
+    updateTokenMarks();
     updateReadingState();
   }
+
+  /* --------------------------------------------------------------- events */
 
   elements.displayModeButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -671,14 +2188,35 @@
     });
   });
 
+  elements.cueToggleButton?.addEventListener("click", () => {
+    setCueVisibility(!state.showCues);
+  });
+
   elements.grammarToggleButton?.addEventListener("click", toggleAllGrammar);
+
   elements.readAllButton?.addEventListener("click", () => {
     playSequence(
-      (data?.pieces || []).flatMap((piece) =>
-        piece.paragraphs.map((paragraph) => paragraph.english),
+      (state.data?.pieces || []).flatMap((piece) =>
+        (Array.isArray(piece.paragraphs) ? piece.paragraphs : []).map(
+          (paragraph) => paragraph.english,
+        ),
       ),
       elements.readAllButton,
     );
+  });
+
+  elements.paperSelect?.addEventListener("change", (event) => {
+    const paperId = event.target.value;
+    if (paperId && paperId !== state.paperId) {
+      openPaper(paperId, { push: true });
+    }
+  });
+
+  elements.content?.addEventListener("click", (event) => {
+    const trigger = event.target.closest(".word-token, .key-word-chip");
+    if (trigger instanceof HTMLElement) {
+      openWordFromTrigger(trigger);
+    }
   });
 
   elements.content?.addEventListener(
@@ -691,21 +2229,71 @@
     true,
   );
 
+  elements.closeWordPanelButton?.addEventListener("click", closeWordPanel);
+  elements.markUnknownButton?.addEventListener("click", () => {
+    saveActiveWordMark("unknown");
+  });
+  elements.markKnownButton?.addEventListener("click", () => {
+    saveActiveWordMark("known");
+  });
+  elements.speakWordButton?.addEventListener("click", () => {
+    const activeWord = state.activeWord;
+    if (activeWord) {
+      playParagraph(activeWord.phrase, elements.speakWordButton);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeWordPanel();
+    }
+  });
+
+  window.addEventListener("popstate", () => {
+    const paperId = getPaperFromLocation();
+    if (paperId && paperId !== state.paperId) {
+      openPaper(paperId, { push: false });
+    }
+  });
+
   window.addEventListener("scroll", requestReadingStateUpdate, {
     passive: true,
   });
   window.addEventListener("resize", requestReadingStateUpdate);
-  window.addEventListener("beforeunload", stopSpeech);
+  window.addEventListener("pagehide", stopSpeech);
 
   if ("speechSynthesis" in window) {
     refreshVoices();
     window.speechSynthesis.addEventListener?.("voiceschanged", refreshVoices);
   }
 
-  try {
-    renderPage();
-  } catch (error) {
-    console.error(error);
-    renderError("页面初始化时发生错误，请刷新后重试。");
+  function initialize() {
+    if (!papers.length) {
+      renderError("没有找到可用的听力精读试卷。");
+      return;
+    }
+
+    populatePaperSelect();
+    setCueVisibility(readStoredValue(CUE_STORAGE_KEY) !== "hidden");
+
+    const requested = getPaperFromLocation();
+    const stored = readStoredValue(PAPER_STORAGE_KEY);
+    const initialId = getPaperMeta(requested)
+      ? requested
+      : getPaperMeta(stored)
+        ? stored
+        : papers[0].id;
+
+    openPaper(initialId, { push: false });
   }
+
+  window.intensiveReading = {
+    state,
+    elements,
+    openPaper,
+    renderPage,
+    saveActiveWordMark,
+  };
+
+  initialize();
 })();

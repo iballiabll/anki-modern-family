@@ -167,7 +167,7 @@
     const phoneticIndex = findColumn("音标", "IPA");
     const partOfSpeechIndex = findColumn("词性");
     const meaningIndex = findColumn("中文释义", "释义", "Back");
-    const sentenceIndex = findColumn("英文例句", "例句");
+    const sentenceIndex = findColumn("英文例句", "例句", "英文释义");
 
     if (phraseIndex < 0) {
       return [];

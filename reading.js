@@ -689,6 +689,49 @@
       .slice(0, 800);
   }
 
+  async function lookupLocalEntry(value) {
+    const index = window.VocabIndex;
+    if (!index || typeof index.lookup !== "function") {
+      return null;
+    }
+    return index.lookup(value).catch(() => null);
+  }
+
+  function mergeWordData(localData, remoteData) {
+    const localMeanings = Array.isArray(localData?.translations)
+      ? localData.translations
+      : [];
+    const remoteMeanings = [
+      ...(Array.isArray(remoteData?.translations)
+        ? remoteData.translations
+        : []),
+      ...(Array.isArray(remoteData?.definitions) ? remoteData.definitions : []),
+    ];
+
+    return {
+      translations: [...localMeanings, ...remoteMeanings].filter(
+        (meaning, index, list) => meaning && list.indexOf(meaning) === index,
+      ),
+      definitions: [],
+      phonetic:
+        cleanPhonetic(remoteData?.phonetic) ||
+        cleanPhonetic(localData?.phonetic),
+      remoteChecked: true,
+    };
+  }
+
+  async function fetchWordData(value) {
+    const response = await fetch(
+      `./api/word?word=${encodeURIComponent(normalizeWord(value))}`,
+      { credentials: "same-origin" },
+    );
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "暂时没有查到这个词");
+    }
+    return data;
+  }
+
   async function lookupActiveWord() {
     const activeWord = state.activeWord;
     const document = getActiveDocument();
@@ -701,7 +744,11 @@
       activeWord.phrase,
       activeWord.sentence,
     );
-    if (existing?.meaning && existing.meaning !== "查看上下文理解用法") {
+    if (
+      existing?.meaning &&
+      existing.meaning !== "查看上下文理解用法" &&
+      cleanPhonetic(existing.phonetic)
+    ) {
       elements.wordPanelPhonetic.textContent = existing.phonetic || "暂无音标";
       elements.wordLookupStatus.textContent = "已从阅读生词本读取释义";
       renderMeanings([existing.meaning]);
@@ -711,17 +758,65 @@
     }
 
     const run = ++state.lookupRun;
+    let localData =
+      existing?.meaning && existing.meaning !== "查看上下文理解用法"
+        ? {
+            translations: [existing.meaning],
+            definitions: [],
+            phonetic: cleanPhonetic(existing.phonetic),
+          }
+        : null;
     try {
-      const response = await fetch(
-        `./api/word?word=${encodeURIComponent(normalizeWord(activeWord.phrase))}`,
-        { credentials: "same-origin" },
-      );
-      const data = await response.json().catch(() => ({}));
+      const localEntry = await lookupLocalEntry(activeWord.phrase);
       if (run !== state.lookupRun || state.activeWord !== activeWord) {
         return;
       }
-      if (!response.ok || !data.ok) {
-        throw new Error(data.message || "暂时没有查到这个词");
+      if (localEntry?.meaning) {
+        localData = {
+          translations: [
+            ...(localData?.translations || []),
+            localEntry.meaning,
+          ].filter(
+            (meaning, index, list) => meaning && list.indexOf(meaning) === index,
+          ),
+          definitions: [],
+          phonetic:
+            cleanPhonetic(localEntry.phonetic) ||
+            cleanPhonetic(localData?.phonetic),
+          source: localEntry.source,
+        };
+        if (localData.phonetic) {
+          const meanings = localData.translations;
+          activeWord.meanings = meanings;
+          activeWord.item.phonetic =
+            localData.phonetic || activeWord.item.phonetic;
+          activeWord.item.meaning = getCombinedMeaning(meanings, "");
+          elements.wordPanelPhonetic.textContent = localData.phonetic;
+          elements.wordLookupStatus.textContent = `已从本地词库读取释义与音标（${localEntry.source}）`;
+          renderMeanings(meanings);
+          return;
+        }
+      }
+
+      const data = await fetchWordData(activeWord.phrase);
+      if (run !== state.lookupRun || state.activeWord !== activeWord) {
+        return;
+      }
+
+      if (localData) {
+        const merged = mergeWordData(localData, data);
+        const meanings = merged.translations;
+        activeWord.meanings = meanings.slice(0, 8);
+        activeWord.item.phonetic =
+          merged.phonetic || activeWord.item.phonetic;
+        activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
+        elements.wordPanelPhonetic.textContent =
+          merged.phonetic || activeWord.item.phonetic || "暂无音标";
+        elements.wordLookupStatus.textContent = merged.phonetic
+          ? "本地词库释义，在线词典已补充音标"
+          : "本地词库释义；在线词典暂未提供音标";
+        renderMeanings(activeWord.meanings);
+        return;
       }
 
       const meanings = [
@@ -740,6 +835,19 @@
       renderMeanings(activeWord.meanings);
     } catch (error) {
       if (run !== state.lookupRun || state.activeWord !== activeWord) {
+        return;
+      }
+      if (localData) {
+        const meanings = localData.translations || [];
+        activeWord.meanings = meanings;
+        activeWord.item.phonetic =
+          localData.phonetic || activeWord.item.phonetic;
+        activeWord.item.meaning = getCombinedMeaning(meanings, "");
+        elements.wordPanelPhonetic.textContent =
+          localData.phonetic || activeWord.item.phonetic || "暂无音标";
+        elements.wordLookupStatus.textContent =
+          "已读取本地释义；在线音标暂时不可用";
+        renderMeanings(meanings);
         return;
       }
       elements.wordPanelPhonetic.textContent =

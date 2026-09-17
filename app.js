@@ -33,9 +33,10 @@ const PRACTICE_HISTORY_STORAGE_KEY =
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
 const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
+const LARGE_DECK_UNIT_THRESHOLD = 300;
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
 const INTENSIVE_ENTRY_SEARCH_TEXT =
-  "四级听力全文翻译语法精读2022年6月第1套";
+  "四级听力全文翻译语法精读出题点技巧原文2022至2026";
 const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
 const READING_ENTRY_SEARCH_TEXT =
   "上传四六级考研题目翻译阅读背单词真题精读";
@@ -5673,6 +5674,69 @@ function setWordButtonExpanded(button, expanded) {
   }
 }
 
+async function lookupLocalLibraryWord(normalizedWord) {
+  const index = window.VocabIndex;
+  if (!index || typeof index.lookup !== "function") {
+    return null;
+  }
+
+  const entry = await index.lookup(normalizedWord).catch(() => null);
+  if (!entry || !entry.meaning) {
+    return null;
+  }
+
+  return {
+    ok: true,
+    word: entry.word,
+    phonetic: entry.phonetic,
+    translations: [entry.meaning],
+    definitions: [],
+    localSource: entry.source,
+    localKind: entry.kind,
+  };
+}
+
+function mergeWordLookupResults(localResult, remoteResult) {
+  const translations = [
+    ...(Array.isArray(localResult?.translations)
+      ? localResult.translations
+      : []),
+    ...(Array.isArray(remoteResult?.translations)
+      ? remoteResult.translations
+      : []),
+  ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
+  const definitions = [
+    ...(Array.isArray(localResult?.definitions)
+      ? localResult.definitions
+      : []),
+    ...(Array.isArray(remoteResult?.definitions)
+      ? remoteResult.definitions
+      : []),
+  ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
+
+  return {
+    ...remoteResult,
+    translations,
+    definitions,
+    phonetic: remoteResult?.phonetic || localResult?.phonetic || "",
+    localSource: localResult?.localSource || "",
+    localKind: localResult?.localKind || "",
+    remoteChecked: true,
+  };
+}
+
+async function fetchWordLookupResult(normalizedWord) {
+  const response = await fetch(
+    `${WORD_API_PATH}?word=${encodeURIComponent(normalizedWord)}`,
+    { cache: "no-store" },
+  );
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.ok) {
+    throw new Error(result.message || "暂时没有查到这个词");
+  }
+  return result;
+}
+
 function closeWordPopover() {
   wordLookupRequestId += 1;
   elements.wordPopover.hidden = true;
@@ -5719,6 +5783,15 @@ function renderWordPopoverContent(result) {
   const definitions = Array.isArray(result.definitions)
     ? result.definitions
     : [];
+
+  if (result.localSource) {
+    const source = document.createElement("span");
+    source.className = "word-popover-source";
+    source.textContent = `本地词库 · ${result.localSource}${
+      result.localKind === "phrase" ? " · 短语" : ""
+    }`;
+    content.append(source);
+  }
 
   if (translations.length > 0) {
     const label = document.createElement("span");
@@ -5784,16 +5857,25 @@ async function lookupWord(word, anchor) {
   try {
     let result = wordLookupCache.get(normalizedWord);
     if (!result) {
-      const response = await fetch(
-        `${WORD_API_PATH}?word=${encodeURIComponent(normalizedWord)}`,
-        { cache: "no-store" },
-      );
-      result = await response.json().catch(() => ({}));
-
-      if (!response.ok || !result.ok) {
-        throw new Error(result.message || "暂时没有查到这个词");
+      result = await lookupLocalLibraryWord(normalizedWord);
+    }
+    if (result && !result.phonetic) {
+      try {
+        result = mergeWordLookupResults(
+          result,
+          await fetchWordLookupResult(normalizedWord),
+        );
+      } catch {
+        // 本地释义仍然可用，音标查询失败时直接展示已有内容。
       }
-
+    }
+    if (!result) {
+      result = await fetchWordLookupResult(normalizedWord);
+    }
+    if (
+      result &&
+      (result.phonetic || result.remoteChecked || !result.localSource)
+    ) {
       if (wordLookupCache.size >= 300) {
         wordLookupCache.delete(wordLookupCache.keys().next().value);
       }
@@ -6840,7 +6922,7 @@ function createIntensiveEntry(categoryName) {
   link.dataset.intensiveEntry = categoryName;
   link.setAttribute(
     "aria-label",
-    `打开四级听力全文翻译与语法精读，位于${categoryName}分类`,
+    `打开四级听力全文翻译、出题点与语法精读，位于${categoryName}分类`,
   );
 
   const badge = document.createElement("span");
@@ -6852,10 +6934,10 @@ function createIntensiveEntry(categoryName) {
   copy.className = "resource-copy";
 
   const title = document.createElement("strong");
-  title.textContent = "四级听力全文翻译 + 语法精读";
+  title.textContent = "四级听力全文翻译 + 出题点精读";
 
   const meta = document.createElement("span");
-  meta.textContent = "2022 年 6 月 · 第 1 套 · 逐句翻译";
+  meta.textContent = "2022-2026 年共 14 套 · 逐句翻译 · 答案位置提示";
 
   const count = document.createElement("span");
   count.className = "resource-count";
@@ -7011,6 +7093,8 @@ function scrollToLibraryNavigation() {
 
 function activateResource(resource, unitIndex = null) {
   const sameDeck = resource.id === state.activeResourceId;
+  const oversizedDeck =
+    getResourceItems(resource).length > LARGE_DECK_UNIT_THRESHOLD;
   stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.practiceActive = false;
@@ -7020,7 +7104,13 @@ function activateResource(resource, unitIndex = null) {
   state.reviewRevealed = false;
   state.practiceResult = null;
   state.activeUnitIndex =
-    unitIndex === null ? (sameDeck ? state.activeUnitIndex : -1) : unitIndex;
+    unitIndex === null
+      ? sameDeck
+        ? state.activeUnitIndex
+        : oversizedDeck
+          ? 1
+          : -1
+      : unitIndex;
   state.activeResourceId = resource.id;
   state.view = "all";
   state.query = "";
@@ -7299,6 +7389,8 @@ function createCard(entry, index) {
     translation.textContent = item.translation;
     sentence.append(translation);
   }
+
+  sentence.hidden = !String(item.sentence || "").trim() && !item.translation;
 
   const answerPanel = document.createElement("div");
   const meaningVisible = isMeaningVisible(itemKey);

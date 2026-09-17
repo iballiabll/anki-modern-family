@@ -12,9 +12,10 @@ const staticEntries = [
   "app.js",
   "deck-data.js",
   "index.html",
-  "intensive-data.js",
+  "intensive-data",
   "intensive.css",
   "intensive.html",
+  "intensive-papers.js",
   "intensive.js",
   "reading.css",
   "reading.html",
@@ -24,6 +25,8 @@ const staticEntries = [
   "review.html",
   "review.js",
   "styles.css",
+  "vocab-index.js",
+  "vocab-index.json",
   "materials",
 ];
 const categoryOrder = ["0基础", "四级", "六级", "考研", "电影", "其他"];
