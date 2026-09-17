@@ -32,6 +32,7 @@ const PRACTICE_HISTORY_STORAGE_KEY =
   "iball-listening-cabin-speaking-history";
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
+const WELCOME_OVERLAY_STORAGE_KEY = "iball-listening-cabin-welcome-seen";
 const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
 const LARGE_DECK_UNIT_THRESHOLD = 300;
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
@@ -7801,6 +7802,7 @@ function showLogin(message = "") {
 async function showApp(user) {
   state.user = user;
   elements.userLabel.textContent = user;
+  removeWelcomeOverlay();
   elements.loginView.hidden = true;
   elements.appView.hidden = false;
 
@@ -7828,6 +7830,7 @@ async function checkSession() {
   try {
     const { response, data } = await requestAuth({}, "GET");
     if (response.ok && data.authenticated) {
+      removeWelcomeOverlay();
       await showApp(data.user || "用户");
       return;
     }
@@ -7835,6 +7838,7 @@ async function checkSession() {
     // The login form will report connection problems after submission.
   }
   showLogin();
+  showWelcomeOverlay();
 }
 
 async function loadLibrary() {
@@ -8280,7 +8284,7 @@ mobileLibraryMediaQuery.addEventListener?.("change", syncLibraryDisclosure);
 
 function dismissWelcomeOverlay() {
   const overlay = elements.welcomeOverlay;
-  if (!overlay) {
+  if (!overlay || overlay.hidden) {
     return;
   }
 
@@ -8299,6 +8303,37 @@ function dismissWelcomeOverlay() {
   );
 }
 
+function removeWelcomeOverlay() {
+  elements.welcomeOverlay?.remove();
+}
+
+function welcomeOverlaySeen() {
+  try {
+    return window.sessionStorage.getItem(WELCOME_OVERLAY_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markWelcomeOverlaySeen() {
+  try {
+    window.sessionStorage.setItem(WELCOME_OVERLAY_STORAGE_KEY, "1");
+  } catch {
+    // Storage can be unavailable; the curtain then simply reappears once more.
+  }
+}
+
+function showWelcomeOverlay() {
+  const overlay = elements.welcomeOverlay;
+  if (!overlay || welcomeOverlaySeen()) {
+    return;
+  }
+
+  markWelcomeOverlaySeen();
+  overlay.hidden = false;
+  dismissWelcomeOverlay();
+}
+
 if ("speechSynthesis" in window) {
   refreshSpeechVoiceCache();
   window.speechSynthesis.addEventListener("voiceschanged", () => {
@@ -8314,5 +8349,4 @@ restorePracticeHistory();
 restorePracticeSettings();
 restoreReviewData();
 syncLibraryDisclosure();
-dismissWelcomeOverlay();
 checkSession();

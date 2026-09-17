@@ -3575,6 +3575,10 @@ p {
   animation: welcome-out 900ms ease-in forwards;
 }
 
+.welcome-overlay[hidden] {
+  display: none;
+}
+
 .welcome-inner {
   max-width: 640px;
   display: grid;
