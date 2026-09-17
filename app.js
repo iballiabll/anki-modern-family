@@ -14,7 +14,9 @@ const {
   getReviewDayKey,
   restoreSet,
   persistSet,
-  fetchLibrary,
+  fetchLibraryManifest,
+  fetchLibraryDeck,
+  materialRequestUrl,
   buildReviewQueue,
 } = window.IballDeck;
 
@@ -33,6 +35,8 @@ const PRACTICE_HISTORY_STORAGE_KEY =
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
 const WELCOME_OVERLAY_STORAGE_KEY = "iball-listening-cabin-welcome-seen";
+const COLLAPSED_CATEGORIES_STORAGE_KEY =
+  "iball-listening-cabin-collapsed-categories";
 const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
 const LARGE_DECK_UNIT_THRESHOLD = 300;
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
@@ -1538,6 +1542,14 @@ const state = {
   resources: [],
   categories: [],
   decks: new Map(),
+  deckPromises: new Map(),
+  deckErrors: new Map(),
+  decksReady: false,
+  decksError: "",
+  backgroundPreloadStarted: false,
+  resourceActivationToken: 0,
+  collapsedCategories: new Set(),
+  collapseOverrides: new Map(),
   activeResourceId: "",
   activeUnitIndex: -1,
   known: new Set(),
@@ -1625,12 +1637,18 @@ const elements = {
   loginError: document.querySelector("#loginError"),
   username: document.querySelector("#username"),
   password: document.querySelector("#password"),
+  passwordVisibilityButton: document.querySelector(
+    "#passwordVisibilityButton",
+  ),
   appView: document.querySelector("#appView"),
   userLabel: document.querySelector("#userLabel"),
   logoutButton: document.querySelector("#logoutButton"),
   libraryPanel: document.querySelector(".library-panel"),
   libraryToggleButton: document.querySelector("#libraryToggleButton"),
   libraryToggleMeta: document.querySelector("#libraryToggleMeta"),
+  libraryCollapseAllButton: document.querySelector(
+    "#libraryCollapseAllButton",
+  ),
   resourceCount: document.querySelector("#resourceCount"),
   materialSearchInput: document.querySelector("#materialSearchInput"),
   resourceList: document.querySelector("#resourceList"),
@@ -1852,6 +1870,54 @@ function restoreMarks() {
   state.unknown = restoreSet(UNKNOWN_STORAGE_KEY);
 }
 
+function restoreLibraryCollapse() {
+  state.collapsedCategories = restoreSet(COLLAPSED_CATEGORIES_STORAGE_KEY);
+}
+
+function persistLibraryCollapse() {
+  persistSet(COLLAPSED_CATEGORIES_STORAGE_KEY, state.collapsedCategories);
+}
+
+function isCategoryCollapsed(name) {
+  return state.collapsedCategories.has(String(name || ""));
+}
+
+function isCategoryCollapsedInView(name, searching) {
+  const categoryName = String(name || "");
+  if (searching && state.collapseOverrides.has(categoryName)) {
+    return Boolean(state.collapseOverrides.get(categoryName));
+  }
+  return searching ? false : isCategoryCollapsed(categoryName);
+}
+
+function setCategoryCollapsed(name, collapsed) {
+  const categoryName = String(name || "");
+  if (!categoryName) {
+    return;
+  }
+  if (collapsed) {
+    state.collapsedCategories.add(categoryName);
+  } else {
+    state.collapsedCategories.delete(categoryName);
+  }
+  persistLibraryCollapse();
+}
+
+function setCategoriesCollapsed(names, collapsed) {
+  names.forEach((name) => {
+    const categoryName = String(name || "");
+    if (!categoryName) {
+      return;
+    }
+    if (collapsed) {
+      state.collapsedCategories.add(categoryName);
+    } else {
+      state.collapsedCategories.delete(categoryName);
+    }
+  });
+  persistLibraryCollapse();
+}
+
 function getItemMark(itemKey) {
   if (state.known.has(itemKey)) {
     return "known";
@@ -2000,6 +2066,122 @@ function getActiveResource() {
   return state.resources.find(
     (resource) => resource.id === state.activeResourceId,
   );
+}
+
+function isDeckLoaded(resource) {
+  return Boolean(resource && state.decks.has(resource.id));
+}
+
+function isDeckLoading(resource) {
+  return Boolean(resource && state.deckPromises.has(resource.id));
+}
+
+function getDeckError(resource) {
+  return resource ? state.deckErrors.get(resource.id) || "" : "";
+}
+
+function getResourceIndex(resource) {
+  return Math.max(0, state.resources.indexOf(resource));
+}
+
+function loadDeck(resource) {
+  if (!resource || resource.attachment) {
+    return Promise.resolve([]);
+  }
+  if (isDeckLoaded(resource)) {
+    return Promise.resolve(state.decks.get(resource.id));
+  }
+  if (state.deckPromises.has(resource.id)) {
+    return state.deckPromises.get(resource.id);
+  }
+
+  const promise = fetchLibraryDeck(resource, getResourceIndex(resource))
+    .then((items) => {
+      state.decks.set(resource.id, Array.isArray(items) ? items : []);
+      state.deckErrors.delete(resource.id);
+      if (state.activeResourceId === resource.id) {
+        state.decksError = "";
+      }
+      return state.decks.get(resource.id);
+    })
+    .catch((error) => {
+      state.deckErrors.set(
+        resource.id,
+        error?.message || `${resource.title} 加载失败。`,
+      );
+      throw error;
+    })
+    .finally(() => {
+      state.deckPromises.delete(resource.id);
+      if (elements.resourceList && state.resources.length > 0) {
+        renderResourceList();
+      }
+    });
+
+  state.deckPromises.set(resource.id, promise);
+  return promise;
+}
+
+async function preloadRemainingDecks(excludedResourceId = "") {
+  const queue = state.resources.filter(
+    (resource) =>
+      !resource.attachment && resource.id !== excludedResourceId,
+  );
+  let cursor = 0;
+  const workerCount = Math.min(2, queue.length);
+
+  async function worker() {
+    while (cursor < queue.length) {
+      const resource = queue[cursor];
+      cursor += 1;
+      try {
+        await loadDeck(resource);
+      } catch {
+        // A failed background request stays retryable from its resource button.
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: workerCount }, () => worker()),
+  );
+}
+
+function scheduleBackgroundDeckPreload(excludedResourceId = "") {
+  if (state.backgroundPreloadStarted) {
+    return;
+  }
+  state.backgroundPreloadStarted = true;
+
+  const start = () => {
+    void preloadRemainingDecks(excludedResourceId);
+  };
+
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(start, { timeout: 1800 });
+  } else {
+    window.setTimeout(start, 650);
+  }
+}
+
+function getDeckResources() {
+  return state.resources.filter((resource) => !resource.attachment);
+}
+
+function areAllDecksLoaded() {
+  return getDeckResources().every((resource) => isDeckLoaded(resource));
+}
+
+async function ensureResourcesLoaded(resources) {
+  await Promise.allSettled(
+    (Array.isArray(resources) ? resources : [])
+      .filter((resource) => !resource.attachment)
+      .map((resource) => loadDeck(resource)),
+  );
+}
+
+async function ensureAllDecksLoaded() {
+  await ensureResourcesLoaded(getDeckResources());
 }
 
 function getResourceItems(resource) {
@@ -5997,7 +6179,7 @@ function getCategoryDefinitions() {
     }));
 }
 
-function getAnkiExportEntries(
+function getAnkiExportResources(
   categoryName = state.ankiExportCategory,
   sectionName = state.ankiExportSection,
 ) {
@@ -6013,13 +6195,19 @@ function getAnkiExportEntries(
         sectionName === "all" ||
         resourceSection === sectionName
       );
-    })
-    .flatMap((resource) =>
+    });
+}
+
+function getAnkiExportEntries(
+  categoryName = state.ankiExportCategory,
+  sectionName = state.ankiExportSection,
+) {
+  return getAnkiExportResources(categoryName, sectionName).flatMap((resource) =>
       (state.decks.get(resource.id) || []).map((item) => ({
         item,
         resource,
       })),
-    );
+  );
 }
 
 function getAnkiExportScopeLabel() {
@@ -6180,11 +6368,26 @@ function renderAnkiExport() {
   );
 }
 
-function openAnkiExport() {
+async function openAnkiExport() {
   elements.ankiExportPanel.hidden = false;
   elements.ankiExportButton.setAttribute("aria-expanded", "true");
+  setAnkiExportStatus("正在读取所选范围…");
   renderAnkiExport();
-  elements.ankiExportCategory.focus();
+
+  const resources = getAnkiExportResources();
+  await ensureResourcesLoaded(resources);
+  const failedResources = resources.filter((resource) => getDeckError(resource));
+  setAnkiExportStatus(
+    failedResources.length
+      ? `${failedResources.length} 个素材暂时加载失败，可关闭后重试。`
+      : "",
+    failedResources.length ? "error" : "",
+  );
+  renderAnkiExport();
+
+  if (!elements.ankiExportPanel.hidden) {
+    elements.ankiExportCategory.focus();
+  }
 }
 
 function closeAnkiExport({ restoreFocus = false } = {}) {
@@ -6195,7 +6398,8 @@ function closeAnkiExport({ restoreFocus = false } = {}) {
   }
 }
 
-function downloadAnkiExport() {
+async function downloadAnkiExport() {
+  await ensureResourcesLoaded(getAnkiExportResources());
   const entries = getAnkiExportEntries();
   if (entries.length === 0) {
     setAnkiExportStatus("当前范围没有可导出的词卡。", "error");
@@ -7005,7 +7209,7 @@ function createReadingIntensiveEntry(categoryName) {
 
 function openResourceAttachment(resource) {
   const link = document.createElement("a");
-  link.href = resource.file;
+  link.href = materialRequestUrl(resource) || resource.file;
   link.rel = "noopener noreferrer";
 
   if (resource.format === "html-page") {
@@ -7055,11 +7259,21 @@ function createResourceButton(resource, index) {
 
   const count = document.createElement("span");
   count.className = "resource-count";
-  count.textContent = resource.attachment
-    ? resource.format === "html-page"
-      ? "打开"
-      : "下载"
-    : String((state.decks.get(resource.id) || []).length);
+  if (resource.attachment) {
+    count.textContent = resource.format === "html-page" ? "打开" : "下载";
+  } else if (isDeckLoading(resource)) {
+    count.textContent = "…";
+    count.classList.add("is-loading");
+    count.title = "正在加载";
+  } else if (isDeckLoaded(resource)) {
+    count.textContent = String(getResourceItems(resource).length);
+  } else if (getDeckError(resource)) {
+    count.textContent = "重试";
+    count.title = getDeckError(resource);
+  } else {
+    count.textContent = "加载";
+    count.title = "点击加载这个素材";
+  }
 
   button.append(badge, copy, count);
   button.addEventListener("click", () => {
@@ -7098,6 +7312,47 @@ function updateLibraryToggleMeta() {
         activeResource ? ` · ${activeResource.title}` : ""
       }`
     : "按分类浏览素材";
+}
+
+function updateLibraryCollapseAllMeta() {
+  const button = elements.libraryCollapseAllButton;
+  if (!button || !elements.resourceList) {
+    return;
+  }
+
+  const groups = [
+    ...elements.resourceList.querySelectorAll(".resource-group"),
+  ];
+  button.hidden = groups.length === 0;
+  const allCollapsed =
+    groups.length > 0 &&
+    groups.every((group) => group.classList.contains("is-collapsed"));
+  button.textContent = allCollapsed ? "展开全部" : "收起全部";
+  button.dataset.mode = allCollapsed ? "expand" : "collapse";
+  button.setAttribute(
+    "aria-label",
+    allCollapsed ? "展开全部分类" : "收起全部分类",
+  );
+}
+
+function toggleAllLibraryGroups() {
+  if (!elements.resourceList) {
+    return;
+  }
+
+  const groups = [
+    ...elements.resourceList.querySelectorAll(".resource-group"),
+  ];
+  const allCollapsed =
+    groups.length > 0 &&
+    groups.every((group) => group.classList.contains("is-collapsed"));
+
+  state.collapseOverrides.clear();
+  setCategoriesCollapsed(
+    groups.map((group) => group.dataset.category),
+    !allCollapsed,
+  );
+  renderResourceList();
 }
 
 function syncLibraryDisclosure() {
@@ -7146,10 +7401,16 @@ function scrollToLibraryNavigation() {
   });
 }
 
-function activateResource(resource, unitIndex = null) {
+async function activateResource(resource, unitIndex = null) {
+  if (!resource || resource.attachment) {
+    return;
+  }
+
+  const activationToken = state.resourceActivationToken + 1;
+  state.resourceActivationToken = activationToken;
   const sameDeck = resource.id === state.activeResourceId;
-  const oversizedDeck =
-    getResourceItems(resource).length > LARGE_DECK_UNIT_THRESHOLD;
+  const previousUnitIndex = state.activeUnitIndex;
+  const wasLoaded = isDeckLoaded(resource);
   stopRealtimeConversation("", { silent: true });
   cancelPracticeRecognition();
   state.practiceActive = false;
@@ -7160,11 +7421,9 @@ function activateResource(resource, unitIndex = null) {
   state.practiceResult = null;
   state.activeUnitIndex =
     unitIndex === null
-      ? sameDeck
-        ? state.activeUnitIndex
-        : oversizedDeck
-          ? 1
-          : -1
+      ? sameDeck && wasLoaded
+        ? previousUnitIndex
+        : -1
       : unitIndex;
   state.activeResourceId = resource.id;
   state.view = "all";
@@ -7172,6 +7431,37 @@ function activateResource(resource, unitIndex = null) {
   state.favoriteCategory = "all";
   state.unknownCategory = "all";
   elements.searchInput.value = "";
+  render();
+
+  if (!wasLoaded) {
+    try {
+      await loadDeck(resource);
+    } catch (error) {
+      if (activationToken !== state.resourceActivationToken) {
+        return;
+      }
+      state.decksError =
+        error?.message || `${resource.title} 加载失败。`;
+      render();
+      return;
+    }
+  }
+
+  if (activationToken !== state.resourceActivationToken) {
+    return;
+  }
+
+  const oversizedDeck =
+    getResourceItems(resource).length > LARGE_DECK_UNIT_THRESHOLD;
+  state.activeUnitIndex =
+    unitIndex === null
+      ? sameDeck && wasLoaded
+        ? previousUnitIndex
+        : oversizedDeck
+          ? 1
+          : -1
+      : unitIndex;
+  state.decksError = "";
   render();
 
   if (isMobileLibraryLayout()) {
@@ -7294,24 +7584,55 @@ function renderResourceList() {
     visibleCategoryCount += 1;
     visibleResourceCount += visibleResources.length;
 
+    const collapsed = isCategoryCollapsedInView(category.name, Boolean(query));
+    const groupItemCount =
+      visibleResources.length +
+      (showIntensiveEntry ? 1 : 0) +
+      (showReadingEntry ? 1 : 0) +
+      (showReadingIntensiveEntry ? 1 : 0);
+
     const group = document.createElement("section");
     group.className = "resource-group";
+    group.classList.toggle("is-collapsed", collapsed);
+    group.dataset.category = category.name;
 
-    const heading = document.createElement("div");
+    const heading = document.createElement("button");
+    heading.type = "button";
     heading.className = "resource-group-heading";
+    heading.dataset.category = category.name;
+    heading.setAttribute("aria-expanded", String(!collapsed));
+    heading.title = collapsed
+      ? `展开“${category.name}”`
+      : `收起“${category.name}”`;
+
+    const headingLabel = document.createElement("span");
+    headingLabel.className = "resource-group-label";
+
+    const headingChevron = document.createElement("span");
+    headingChevron.className = "resource-group-chevron";
+    headingChevron.setAttribute("aria-hidden", "true");
+    headingChevron.textContent = "⌄";
 
     const headingName = document.createElement("strong");
     headingName.textContent = category.name;
+    headingLabel.append(headingChevron, headingName);
 
     const headingCount = document.createElement("span");
-    headingCount.textContent = String(
-      visibleResources.length +
-        (showIntensiveEntry ? 1 : 0) +
-        (showReadingEntry ? 1 : 0) +
-        (showReadingIntensiveEntry ? 1 : 0),
-    );
+    headingCount.className = "resource-group-count";
+    headingCount.textContent = String(groupItemCount);
 
-    heading.append(headingName, headingCount);
+    heading.addEventListener("click", () => {
+      const next = !collapsed;
+      if (query) {
+        state.collapseOverrides.set(category.name, next);
+      } else {
+        state.collapseOverrides.delete(category.name);
+        setCategoryCollapsed(category.name, next);
+      }
+      renderResourceList();
+    });
+
+    heading.append(headingLabel, headingCount);
     group.append(heading);
 
     if (showReadingEntry) {
@@ -7385,6 +7706,7 @@ function renderResourceList() {
   elements.resourceCount.textContent = String(
     query ? visibleResourceCount : state.resources.length,
   );
+  updateLibraryCollapseAllMeta();
   updateLibraryToggleMeta();
 }
 
@@ -7714,6 +8036,11 @@ function render() {
   closeWordPopover();
   renderAnkiExport();
   const resource = getActiveResource();
+  const activeResourceLoaded = isDeckLoaded(resource);
+  const visibleEntriesReady =
+    state.view === "favorites" || state.view === "unknown"
+      ? areAllDecksLoaded()
+      : activeResourceLoaded;
   const visibleEntries = getVisibleEntries();
 
   if (state.reviewActive) {
@@ -7786,7 +8113,9 @@ function render() {
   });
 
   elements.cardGrid.replaceChildren(fragment);
-  elements.visibleCount.textContent = String(visibleEntries.length);
+  elements.visibleCount.textContent = visibleEntriesReady
+    ? String(visibleEntries.length)
+    : "…";
   elements.cardGrid.hidden = visibleEntries.length === 0;
 
   if (state.view === "favorites") {
@@ -7814,7 +8143,7 @@ function render() {
       ? `${description} · ${unit.detail}`
       : description;
     elements.footerResource.textContent = `${resource.title}${unitLabel} · ${
-      getActiveItems().length
+      activeResourceLoaded ? getActiveItems().length : "加载中"
     } 条`;
   }
 
@@ -7827,6 +8156,15 @@ function render() {
     if (state.query) {
       title.textContent = "没有找到匹配内容";
       copy.textContent = "换一个关键词，或切换到其他视图。";
+    } else if (
+      (state.view === "favorites" || state.view === "unknown") &&
+      !visibleEntriesReady
+    ) {
+      title.textContent =
+        state.view === "favorites"
+          ? "正在整理收藏集"
+          : "正在整理不会分类";
+      copy.textContent = "正在后台读取全部素材，完成后会自动刷新。";
     } else if (state.view === "favorites") {
       title.textContent =
         state.favoriteCategory === "all"
@@ -7836,6 +8174,17 @@ function render() {
     } else if (state.view === "unknown") {
       title.textContent = `${resolveUnknownCategory()}还没有标记不会的单词`;
       copy.textContent = "遇到不熟的词汇时点“不会”，之后可在这里集中复习。";
+    } else if (resource && !activeResourceLoaded) {
+      title.textContent = "正在读取词卡";
+      copy.textContent = isDeckLoading(resource)
+        ? "正在加载这个素材，其他素材会在后台继续读取。"
+        : "点击左侧素材按钮后读取它的词卡。";
+    } else if (resource && getDeckError(resource)) {
+      title.textContent = "词卡加载失败";
+      copy.textContent = getDeckError(resource);
+    } else if (!state.decksReady) {
+      title.textContent = "正在读取素材清单";
+      copy.textContent = "素材列表就绪后，点击具体模块即可开始学习。";
     } else {
       title.textContent = "素材里还没有卡片";
       copy.textContent = "请检查对应 CSV 文件是否已经上传。";
@@ -7850,11 +8199,28 @@ function render() {
 }
 
 function showLogin(message = "") {
+  setPasswordVisibility(false);
   elements.loginView.hidden = false;
   elements.appView.hidden = true;
   elements.loginError.textContent = message;
   elements.loginError.hidden = !message;
   elements.username.focus();
+}
+
+function setPasswordVisibility(visible) {
+  const show = Boolean(visible);
+  elements.password.type = show ? "text" : "password";
+  if (elements.passwordVisibilityButton) {
+    elements.passwordVisibilityButton.textContent = show ? "隐藏" : "显示";
+    elements.passwordVisibilityButton.setAttribute(
+      "aria-pressed",
+      String(show),
+    );
+    elements.passwordVisibilityButton.setAttribute(
+      "aria-label",
+      show ? "隐藏密码" : "显示密码",
+    );
+  }
 }
 
 async function showApp(user) {
@@ -7902,14 +8268,20 @@ async function checkSession() {
 async function loadLibrary() {
   elements.activeTitle.textContent = "正在加载素材";
   elements.activeDescription.textContent =
-    "正在读取素材清单和对应的词汇文件。";
+    "正在读取素材清单。";
   elements.emptyState.hidden = false;
 
   try {
-    const library = await fetchLibrary(MANIFEST_PATH);
+    const library = await fetchLibraryManifest(MANIFEST_PATH);
     state.categories = library.categories;
     state.resources = library.resources;
-    state.decks = library.decks;
+    state.decks = new Map();
+    state.deckPromises = new Map();
+    state.deckErrors = new Map();
+    state.decksReady = false;
+    state.decksError = "";
+    state.backgroundPreloadStarted = false;
+    state.resourceActivationToken += 1;
 
     if (!state.activeResourceId) {
       const firstDeck = state.resources.find(
@@ -7917,11 +8289,36 @@ async function loadLibrary() {
       );
       state.activeResourceId = firstDeck?.id || "";
     }
+
+    // Paint the navigation from the manifest first. The active material gets
+    // priority; the remaining files are fetched in the background so a click
+    // never waits on the whole library.
     render();
+
+    const firstDeck = state.resources.find(
+      (resource) => resource.id === state.activeResourceId,
+    );
+    if (firstDeck) {
+      try {
+        await loadDeck(firstDeck);
+      } catch (error) {
+        state.decksError =
+          error?.message || "词汇文件加载失败。";
+        console.error(error);
+      }
+    }
+
+    state.decksReady = true;
+    render();
+    scheduleBackgroundDeckPreload(firstDeck?.id || "");
   } catch (error) {
     state.categories = [];
     state.resources = [];
     state.decks = new Map();
+    state.deckPromises = new Map();
+    state.deckErrors = new Map();
+    state.decksReady = true;
+    state.decksError = "";
     elements.activeTitle.textContent = "素材加载失败";
     elements.activeDescription.textContent =
       "请检查 materials 目录和素材文件是否已经上传。";
@@ -8208,8 +8605,17 @@ elements.practiceVoice.addEventListener("change", (event) => {
 });
 elements.materialSearchInput.addEventListener("input", (event) => {
   state.materialQuery = event.target.value;
+  state.collapseOverrides.clear();
   renderResourceList();
 });
+elements.passwordVisibilityButton?.addEventListener("click", () => {
+  setPasswordVisibility(elements.password.type !== "text");
+  elements.password.focus({ preventScroll: true });
+});
+elements.libraryCollapseAllButton?.addEventListener(
+  "click",
+  toggleAllLibraryGroups,
+);
 elements.libraryToggleButton.addEventListener("click", () => {
   setLibraryPanelExpanded(!state.mobileLibraryExpanded);
 });
@@ -8403,6 +8809,7 @@ if ("speechSynthesis" in window) {
 }
 
 restoreMarks();
+restoreLibraryCollapse();
 restorePracticeHistory();
 restorePracticeSettings();
 restoreReviewData();

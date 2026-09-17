@@ -3,6 +3,9 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+process.env.APP_USERNAME ||= "iball";
+process.env.SESSION_SECRET ||= "local-preview-secret";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const port = Number(process.env.PORT || 4175);
 const host = process.env.HOST || "127.0.0.1";
@@ -106,7 +109,7 @@ async function runApi(request, response, pathname) {
   return true;
 }
 
-async function serveStatic(response, pathname) {
+async function serveStatic(response, pathname, request) {
   let filePath = resolveWithinRoot(pathname);
   if (!filePath) {
     response.writeHead(403);
@@ -114,10 +117,12 @@ async function serveStatic(response, pathname) {
     return;
   }
 
+  let info;
   try {
-    const info = await stat(filePath);
+    info = await stat(filePath);
     if (info.isDirectory()) {
       filePath = path.join(filePath, "index.html");
+      info = await stat(filePath);
     }
   } catch {
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
@@ -130,10 +135,27 @@ async function serveStatic(response, pathname) {
     const contentType =
       MIME_TYPES[path.extname(filePath).toLowerCase()] ||
       "application/octet-stream";
-    response.writeHead(200, {
-      "cache-control": "no-store",
+    // Mirrors the deployed behaviour: content-hashed URLs stay in the browser
+    // cache, everything else is revalidated with an ETag.
+    const versioned = new URL(request.url, `http://${host}`).searchParams.has(
+      "v",
+    );
+    const etag = `W/"${info.size}-${Math.floor(info.mtimeMs).toString(36)}"`;
+    const headers = {
+      etag,
+      "cache-control": versioned
+        ? "public, max-age=31536000, immutable"
+        : "no-cache",
       "content-type": contentType,
-    });
+    };
+
+    if (!versioned && request.headers["if-none-match"] === etag) {
+      response.writeHead(304, headers);
+      response.end();
+      return;
+    }
+
+    response.writeHead(200, headers);
     response.end(body);
   } catch {
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
@@ -147,7 +169,7 @@ const server = http.createServer(async (request, response) => {
     if (pathname.startsWith("/api/") && (await runApi(request, response, pathname))) {
       return;
     }
-    await serveStatic(response, pathname);
+    await serveStatic(response, pathname, request);
   } catch (error) {
     console.error(error);
     if (!response.headersSent) {

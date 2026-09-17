@@ -698,21 +698,8 @@
     return [...byName.values()];
   }
 
-  async function fetchLibrary(manifestPath = MANIFEST_PATH) {
-    const manifestResponse = await fetch(manifestPath, { cache: "no-store" });
-    if (!manifestResponse.ok) {
-      throw new Error(`资源清单加载失败：${manifestResponse.status}`);
-    }
-
-    const manifest = await manifestResponse.json();
-    const categories = Array.isArray(manifest.categories)
-      ? manifest.categories
-      : [];
-    const staticResources = Array.isArray(manifest.resources)
-      ? manifest.resources
-      : [];
-    const readingDocuments = getReadingDocuments();
-    const readingResources = readingDocuments.map((document) => ({
+  function readingResource(document) {
+    return {
       id: document.id,
       title: document.title,
       category: document.category,
@@ -725,31 +712,91 @@
       format: "reading-upload",
       attachment: false,
       reading: true,
-    }));
-    const resources = [...staticResources, ...readingResources];
-    const deckEntries = await Promise.all(
-      staticResources.map(async (resource, index) => {
-        if (resource.attachment) {
-          return [resource.id, []];
-        }
-        const response = await fetch(resource.file, { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error(`${resource.title} 加载失败：${response.status}`);
-        }
-        const text = await response.text();
-        return [resource.id, parseDeck(text, resource, index)];
-      }),
-    );
+    };
+  }
 
-    readingDocuments.forEach((document) => {
-      deckEntries.push([document.id, buildReadingItems(document)]);
-    });
+  /**
+   * Reads only the material manifest so the navigation can render right away,
+   * before any vocabulary file is downloaded.
+   */
+  async function fetchLibraryManifest(manifestPath = MANIFEST_PATH) {
+    const manifestResponse = await fetch(manifestPath, { cache: "no-store" });
+    if (!manifestResponse.ok) {
+      throw new Error(`资源清单加载失败：${manifestResponse.status}`);
+    }
+
+    const manifest = await manifestResponse.json();
+    const categories = Array.isArray(manifest.categories)
+      ? manifest.categories
+      : [];
+    const staticResources = Array.isArray(manifest.resources)
+      ? manifest.resources
+      : [];
+    const readingResources = getReadingDocuments().map(readingResource);
+    const resources = [...staticResources, ...readingResources];
 
     return {
       categories: mergeLibraryCategories(categories, resources),
       resources,
-      decks: new Map(deckEntries),
     };
+  }
+
+  /**
+   * Material files are requested with their content hash so browsers can keep
+   * them in the HTTP cache instead of downloading them on every visit.
+   */
+  function materialRequestUrl(resource) {
+    if (!resource?.file) {
+      return "";
+    }
+    return resource.hash
+      ? `${resource.file}?v=${encodeURIComponent(resource.hash)}`
+      : resource.file;
+  }
+
+  async function fetchLibraryDeck(resource, index = 0) {
+    if (!resource || typeof resource !== "object") {
+      return [];
+    }
+
+    if (resource.reading) {
+      const document = getReadingDocuments().find(
+        (item) => item.id === resource.id,
+      );
+      return document ? buildReadingItems(document) : [];
+    }
+
+    if (resource.attachment || !resource.file) {
+      return [];
+    }
+
+    const response = await fetch(materialRequestUrl(resource), {
+      cache: resource.hash ? "force-cache" : "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`${resource.title} 加载失败：${response.status}`);
+    }
+
+    const text = await response.text();
+    return parseDeck(text, resource, index);
+  }
+
+  async function fetchLibraryDecks(resources) {
+    const list = Array.isArray(resources) ? resources : [];
+    const deckEntries = await Promise.all(
+      list.map(async (resource, index) => [
+        resource.id,
+        await fetchLibraryDeck(resource, index),
+      ]),
+    );
+
+    return new Map(deckEntries);
+  }
+
+  async function fetchLibrary(manifestPath = MANIFEST_PATH) {
+    const { categories, resources } = await fetchLibraryManifest(manifestPath);
+    const decks = await fetchLibraryDecks(resources);
+    return { categories, resources, decks };
   }
 
   /**
@@ -830,6 +877,10 @@
     deleteReadingDocument,
     buildReadingItems,
     fetchLibrary,
+    fetchLibraryManifest,
+    fetchLibraryDeck,
+    fetchLibraryDecks,
+    materialRequestUrl,
     buildReviewQueue,
   };
 })(window);

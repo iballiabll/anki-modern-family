@@ -4,7 +4,9 @@ const COOKIE_NAME = "iball_cabin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 const PASSWORD_SHA256 =
   "481f6cc0511143ccdd7e2d1b1b94faf0a700a8b49cd13922a70b5ae28acaa8c5";
-const SESSION_SIGNING_REVISION = "password-2026-09-16";
+const SESSION_SIGNING_REVISION = "username-iball-password-2026-09-17";
+const DEFAULT_USERNAME = "iball";
+const LEGACY_USERNAMES = new Set(["wzh"]);
 
 function base64UrlEncode(value) {
   return Buffer.from(value).toString("base64url");
@@ -45,6 +47,13 @@ function getSignature(payload) {
 
 function hashPassword(password) {
   return crypto.createHash("sha256").update(String(password)).digest("hex");
+}
+
+function getConfiguredUsername() {
+  const configured = String(process.env.APP_USERNAME || "").trim();
+  return !configured || LEGACY_USERNAMES.has(configured)
+    ? DEFAULT_USERNAME
+    : configured;
 }
 
 function createSession(username) {
@@ -149,14 +158,13 @@ module.exports = async function handler(request, response) {
     return;
   }
 
-  const configured =
-    Boolean(process.env.APP_USERNAME) &&
-    Boolean(process.env.SESSION_SECRET);
+  const configuredUsername = getConfiguredUsername();
+  const configured = Boolean(process.env.SESSION_SECRET);
 
   if (!configured) {
     response.status(503).json({
       ok: false,
-      message: "登录服务尚未配置，请先在 Vercel 中设置账号和密码。",
+      message: "登录服务尚未配置，请先在 Vercel 中设置会话密钥。",
     });
     return;
   }
@@ -164,7 +172,7 @@ module.exports = async function handler(request, response) {
   const username = String(body.username || "").trim();
   const password = String(body.password || "");
   const credentialsMatch =
-    safeEqual(username, process.env.APP_USERNAME) &&
+    safeEqual(username, configuredUsername) &&
     safeEqual(hashPassword(password), PASSWORD_SHA256);
 
   if (!credentialsMatch) {

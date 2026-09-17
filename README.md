@@ -117,7 +117,7 @@ Anki CSV 的 `#columns` 需要包含 `Front,Back`。
 本地预览：
 
 ```powershell
-$env:APP_USERNAME="wzh"; $env:SESSION_SECRET="local-preview-secret"
+$env:APP_USERNAME="iball"; $env:SESSION_SECRET="local-preview-secret"
 npm run dev
 ```
 
@@ -187,12 +187,13 @@ Chat API 的模型名称支持直接输入，也可从 `v4flash`、`v4pro`、`gp
 
 Vercel 项目需要设置以下 Production 环境变量：
 
-- `APP_USERNAME`
-- `APP_PASSWORD`
+- `APP_USERNAME=iball`
 - `SESSION_SECRET`（至少 32 字节随机字符串）
 
-登录接口位于 `api/auth.js`，使用签名 HttpOnly Cookie 保存会话，不需要额外数据库。
-同一账号可以在两个浏览器中同时登录，单个浏览器退出不会让另一个浏览器掉线。
+登录密码在 `api/auth.js` 中以 SHA-256 哈希保存。历史环境变量 `wzh`
+会自动迁移为 `iball`，避免旧部署继续使用错误账号。登录接口使用签名
+HttpOnly Cookie 保存会话，不需要额外数据库。同一账号可以在两个浏览器中
+同时登录，单个浏览器退出不会让另一个浏览器掉线。
 
 口语练习的交互思路参考了 MIT 许可的
 [SpeakHub](https://github.com/yin-yizhen/SpeakHub)。

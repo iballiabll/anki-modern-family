@@ -181,7 +181,7 @@ async function buildCategories() {
     }));
 }
 
-function buildResource(absolutePath) {
+async function buildResource(absolutePath) {
   const relativePath = toPosixPath(path.relative(materialsRoot, absolutePath));
   const pathParts = relativePath.split("/");
   const fileName = pathParts.pop();
@@ -190,6 +190,7 @@ function buildResource(absolutePath) {
   const folderParts = pathParts.map(cleanFolderName).filter(Boolean);
   const category = folderParts[0] || "未分类素材";
   const section = folderParts.slice(1).join(" / ");
+  const contents = await fs.readFile(absolutePath);
 
   return {
     id: makeId(relativePath),
@@ -201,6 +202,8 @@ function buildResource(absolutePath) {
     file: `./materials/${encodeAssetPath(relativePath)}`,
     format: supportedExtensions.get(extension),
     attachment: attachmentExtensions.has(extension),
+    bytes: contents.byteLength,
+    hash: createHash("sha1").update(contents).digest("hex").slice(0, 12),
   };
 }
 
@@ -239,7 +242,7 @@ async function buildPublicDirectory() {
 
 await fs.mkdir(materialsRoot, { recursive: true });
 const files = await walk(materialsRoot);
-const resources = files.map(buildResource);
+const resources = await Promise.all(files.map(buildResource));
 const categories = await buildCategories();
 const nextManifest = serializeManifest(resources, categories);
 

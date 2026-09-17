@@ -74,14 +74,25 @@
             />
 
             <label for="password">密码</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              placeholder="请输入密码"
-              required
-            />
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="请输入密码"
+                required
+              />
+              <button
+                id="passwordVisibilityButton"
+                class="password-visibility-button"
+                type="button"
+                aria-label="显示密码"
+                aria-pressed="false"
+              >
+                显示
+              </button>
+            </div>
 
             <button id="loginButton" class="primary-button" type="submit">
               登录
@@ -112,8 +123,18 @@
         </div>
 
         <div class="library-heading">
-          <span>素材分类</span>
-          <strong id="resourceCount">0</strong>
+          <span class="library-heading-label">
+            <span>素材分类</span>
+            <strong id="resourceCount">0</strong>
+          </span>
+          <button
+            id="libraryCollapseAllButton"
+            class="library-collapse-all-button"
+            type="button"
+            hidden
+          >
+            收起全部
+          </button>
         </div>
         <button
           id="libraryToggleButton"

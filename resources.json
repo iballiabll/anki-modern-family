@@ -44,7 +44,9 @@
       "description": "0基础 · Level 1-2 · 零基础词汇讲义Level1-2 词汇表",
       "file": "./materials/0%E5%9F%BA%E7%A1%80/Level%201-2/%E9%9B%B6%E5%9F%BA%E7%A1%80%E8%AF%8D%E6%B1%87%E8%AE%B2%E4%B9%89Level1-2_%E8%AF%8D%E6%B1%87%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 180297,
+      "hash": "5e903c62cb86"
     },
     {
       "id": "0-level-1-2-level1-2-ec8db2e1",
@@ -55,7 +57,9 @@
       "description": "0基础 · Level 1-2 · 零基础词汇讲义Level1-2 词汇表",
       "file": "./materials/0%E5%9F%BA%E7%A1%80/Level%201-2/%E9%9B%B6%E5%9F%BA%E7%A1%80%E8%AF%8D%E6%B1%87%E8%AE%B2%E4%B9%89Level1-2_%E8%AF%8D%E6%B1%87%E8%A1%A8.docx",
       "format": "download-only",
-      "attachment": true
+      "attachment": true,
+      "bytes": 157580,
+      "hash": "f0c5550eb0e8"
     },
     {
       "id": "s01e01-50-37ed3d0b",
@@ -66,7 +70,9 @@
       "description": "电影 · 摩登家庭 · S01E01 精选 50",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01%20%E7%B2%BE%E9%80%89%2050.md",
       "format": "markdown-table",
-      "attachment": false
+      "attachment": false,
+      "bytes": 9723,
+      "hash": "821a7d6f12ea"
     },
     {
       "id": "s01e01-100-4570f530",
@@ -77,7 +83,9 @@
       "description": "电影 · 摩登家庭 · S01E01 完整 100",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01%20%E5%AE%8C%E6%95%B4%20100.md",
       "format": "markdown-table",
-      "attachment": false
+      "attachment": false,
+      "bytes": 24179,
+      "hash": "a3724437d572"
     },
     {
       "id": "s01e01-anki-1546aef8",
@@ -88,7 +96,9 @@
       "description": "电影 · 摩登家庭 · S01E01-Anki词卡",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01-Anki%E8%AF%8D%E5%8D%A1.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 49034,
+      "hash": "c2bda4134060"
     },
     {
       "id": "s01e02-100-35e7541f",
@@ -99,7 +109,9 @@
       "description": "电影 · 摩登家庭 · S01E02 完整 100",
       "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E02%20%E5%AE%8C%E6%95%B4%20100.md",
       "format": "markdown-table",
-      "attachment": false
+      "attachment": false,
+      "bytes": 19564,
+      "hash": "39eec007ac93"
     },
     {
       "id": "material-26f19d1b",
@@ -110,7 +122,9 @@
       "description": "考研 · 词库 · 考研单词表",
       "file": "./materials/%E8%80%83%E7%A0%94/%E8%AF%8D%E5%BA%93/%E8%80%83%E7%A0%94%E5%8D%95%E8%AF%8D%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 896602,
+      "hash": "16e5e18d4219"
     },
     {
       "id": "material-b8f267c7",
@@ -121,7 +135,9 @@
       "description": "考研 · 词库 · 考研短语表",
       "file": "./materials/%E8%80%83%E7%A0%94/%E8%AF%8D%E5%BA%93/%E8%80%83%E7%A0%94%E7%9F%AD%E8%AF%AD%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 152137,
+      "hash": "af182b24731a"
     },
     {
       "id": "material-11c366e7",
@@ -132,7 +148,9 @@
       "description": "六级 · 词库 · 六级单词表",
       "file": "./materials/%E5%85%AD%E7%BA%A7/%E8%AF%8D%E5%BA%93/%E5%85%AD%E7%BA%A7%E5%8D%95%E8%AF%8D%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 987658,
+      "hash": "a45428cb64dc"
     },
     {
       "id": "material-1dc40903",
@@ -143,7 +161,9 @@
       "description": "六级 · 词库 · 六级短语表",
       "file": "./materials/%E5%85%AD%E7%BA%A7/%E8%AF%8D%E5%BA%93/%E5%85%AD%E7%BA%A7%E7%9F%AD%E8%AF%AD%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 181150,
+      "hash": "8dee15dad29b"
     },
     {
       "id": "2022-6-2026-09-16-cet4-2022-06-2-62c6facb",
@@ -154,7 +174,9 @@
       "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第2套-手机版",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC2%E5%A5%97-%E6%89%8B%E6%9C%BA%E7%89%88.html",
       "format": "html-page",
-      "attachment": true
+      "attachment": true,
+      "bytes": 208906,
+      "hash": "74e84969b957"
     },
     {
       "id": "2022-6-2026-09-16-cet4-2022-06-2-0d3e404a",
@@ -165,7 +187,9 @@
       "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第2套",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC2%E5%A5%97.md",
       "format": "markdown-table",
-      "attachment": false
+      "attachment": false,
+      "bytes": 47537,
+      "hash": "e1913d2c23b3"
     },
     {
       "id": "2022-6-2026-09-16-cet4-2022-06-3-8bc3613e",
@@ -176,7 +200,9 @@
       "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第3套-手机版",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC3%E5%A5%97-%E6%89%8B%E6%9C%BA%E7%89%88.html",
       "format": "html-page",
-      "attachment": true
+      "attachment": true,
+      "bytes": 217324,
+      "hash": "3ac8bd1cccfb"
     },
     {
       "id": "2022-6-2026-09-16-cet4-2022-06-3-cf57962f",
@@ -187,7 +213,9 @@
       "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-第3套",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E7%AC%AC3%E5%A5%97.md",
       "format": "markdown-table",
-      "attachment": false
+      "attachment": false,
+      "bytes": 51876,
+      "hash": "cb9d9f6ef33f"
     },
     {
       "id": "2022-6-2026-09-16-cet4-2022-06-9338e526",
@@ -198,7 +226,9 @@
       "description": "四级 · 2022年6月听力 · CET4-2022年06月听力-手机版",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B-%E6%89%8B%E6%9C%BA%E7%89%88.html",
       "format": "html-page",
-      "attachment": true
+      "attachment": true,
+      "bytes": 219335,
+      "hash": "74c91f0b676d"
     },
     {
       "id": "2022-6-2026-09-16-cet4-2022-06-8cbf3851",
@@ -209,7 +239,9 @@
       "description": "四级 · 2022年6月听力 · CET4-2022年06月听力",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/2022%E5%B9%B46%E6%9C%88%E5%90%AC%E5%8A%9B/2026-09-16-CET4-2022%E5%B9%B406%E6%9C%88%E5%90%AC%E5%8A%9B.md",
       "format": "markdown-table",
-      "attachment": false
+      "attachment": false,
+      "bytes": 52657,
+      "hash": "b1e37d8f4e43"
     },
     {
       "id": "material-66c1b035",
@@ -220,7 +252,9 @@
       "description": "四级 · 词库 · 四级单词表",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/%E8%AF%8D%E5%BA%93/%E5%9B%9B%E7%BA%A7%E5%8D%95%E8%AF%8D%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 739504,
+      "hash": "ff02275321d7"
     },
     {
       "id": "material-54d13b57",
@@ -231,7 +265,9 @@
       "description": "四级 · 词库 · 四级短语表",
       "file": "./materials/%E5%9B%9B%E7%BA%A7/%E8%AF%8D%E5%BA%93/%E5%9B%9B%E7%BA%A7%E7%9F%AD%E8%AF%AD%E8%A1%A8.csv",
       "format": "anki-csv",
-      "attachment": false
+      "attachment": false,
+      "bytes": 127848,
+      "hash": "cf2995da7a45"
     }
   ]
 }
