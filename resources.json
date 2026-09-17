@@ -80,6 +80,17 @@
       "attachment": false
     },
     {
+      "id": "s01e01-anki-1546aef8",
+      "title": "S01E01-Anki词卡",
+      "category": "电影",
+      "section": "摩登家庭",
+      "group": "电影",
+      "description": "电影 · 摩登家庭 · S01E01-Anki词卡",
+      "file": "./materials/%E7%94%B5%E5%BD%B1/%E6%91%A9%E7%99%BB%E5%AE%B6%E5%BA%AD/S01E01-Anki%E8%AF%8D%E5%8D%A1.csv",
+      "format": "anki-csv",
+      "attachment": false
+    },
+    {
       "id": "s01e02-100-35e7541f",
       "title": "S01E02 完整 100",
       "category": "电影",

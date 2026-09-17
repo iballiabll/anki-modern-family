@@ -36,7 +36,7 @@ const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其�
 const LARGE_DECK_UNIT_THRESHOLD = 300;
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
 const INTENSIVE_ENTRY_SEARCH_TEXT =
-  "四级听力全文翻译语法精读出题点技巧原文2022至2026";
+  "四级听力全文翻译语法精读出题点技巧原文2022至2026美剧台词摩登家庭精翻固定搭配";
 const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
 const READING_ENTRY_SEARCH_TEXT =
   "上传四六级考研题目翻译阅读背单词真题精读";
@@ -6914,30 +6914,37 @@ function createReadingEntry(categoryName) {
 }
 
 function createIntensiveEntry(categoryName) {
+  const isMovie = categoryName === "电影";
   const link = document.createElement("a");
   link.className = "resource-button is-intensive-entry";
-  link.href = "./intensive.html";
+  link.href = isMovie ? "./movie.html" : "./intensive.html";
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.dataset.intensiveEntry = categoryName;
   link.setAttribute(
     "aria-label",
-    `打开四级听力全文翻译、出题点与语法精读，位于${categoryName}分类`,
+    isMovie
+      ? `打开美剧台词精读、逐句精翻与固定搭配，位于${categoryName}分类`
+      : `打开四级听力全文翻译、出题点与语法精读，位于${categoryName}分类`,
   );
 
   const badge = document.createElement("span");
   badge.className = "resource-index";
   badge.setAttribute("aria-hidden", "true");
-  badge.textContent = "精";
+  badge.textContent = isMovie ? "剧" : "精";
 
   const copy = document.createElement("span");
   copy.className = "resource-copy";
 
   const title = document.createElement("strong");
-  title.textContent = "四级听力全文翻译 + 出题点精读";
+  title.textContent = isMovie
+    ? "美剧台词逐句精读"
+    : "四级听力全文翻译 + 出题点精读";
 
   const meta = document.createElement("span");
-  meta.textContent = "2022-2026 年共 14 套 · 逐句翻译 · 答案位置提示";
+  meta.textContent = isMovie
+    ? "摩登家庭 S01E01 · 逐句精翻 · 考试词与固定搭配"
+    : "2022-2026 年共 14 套 · 逐句翻译 · 答案位置提示";
 
   const count = document.createElement("span");
   count.className = "resource-count";
