@@ -123,6 +123,21 @@ async function firstPaint(page, url, selector, timeout = 15000) {
   return Date.now() - started;
 }
 
+/**
+ * 题目分片走网络时会有几百毫秒的加载窗口，等它落地再操作，
+ * 免得把"题目还没到"当成"点了没反应"。
+ */
+function waitPromptReady(page, timeout = 20000) {
+  return page.waitForFunction(
+    () => {
+      const meta = document.querySelector("#taskMeta")?.textContent || "";
+      const status = document.querySelector("#gradeStatus")?.textContent || "";
+      return !/正在加载|正在读取题目/.test(`${meta}${status}`);
+    },
+    { timeout },
+  );
+}
+
 async function overflow(page) {
   return page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
@@ -242,6 +257,15 @@ async function verifyVocab(browser, base, out) {
 
   await page.locator(".vocab-row").first().click();
   await page.waitForSelector("#wordPanel:not([hidden])", { timeout: 10000 });
+  await page
+    .waitForFunction(
+      () => {
+        const text = document.querySelector("#wordDetail")?.innerText || "";
+        return text.length > 40 && !/正在取这个词/.test(text);
+      },
+      { timeout: 15000 },
+    )
+    .catch(() => {});
   const detail = await page.locator("#wordDetail").innerText();
   check("点词出音标", /\/.+\//.test(detail), detail.split("\n").slice(0, 2).join(" / "));
   check(
@@ -334,7 +358,7 @@ async function verifyWriting(browser, base, out) {
   check("作文题目按分片加载", shardCount > 0 && shardCount <= 6, `${shardCount} 份 writing-data`);
 
   await page.locator(".writing-prompt-row").first().click();
-  await page.waitForTimeout(400);
+  await waitPromptReady(page);
   const taskTitle = await page.locator("#taskTitle").innerText();
   check("选中题目后显示题干", taskTitle.trim().length > 0, taskTitle.trim());
 
@@ -377,6 +401,7 @@ async function verifyWriting(browser, base, out) {
   });
   await firstPaint(fallback.page, `${base}/writing.html`, ".writing-prompt-row");
   await fallback.page.locator(".writing-prompt-row").first().click();
+  await waitPromptReady(fallback.page);
   await fallback.page.fill("#essayInput", ESSAY);
   await fallback.page.click("#gradeButton");
   await fallback.page.waitForFunction(

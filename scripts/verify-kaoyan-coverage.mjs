@@ -502,7 +502,7 @@ async function main() {
     if (item.errors.length) {
       item.errors.forEach((message) => lines.push(`- ❌ ${message}`));
     } else {
-      lines.push("- ✅ 五年年题型齐全，选项 / 答案 / 参考译文 / 写作题干校验通过");
+      lines.push("- ✅ 本年题型齐全，选项 / 答案 / 参考译文 / 写作题干校验通过");
     }
     lines.push("");
   });

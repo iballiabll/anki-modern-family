@@ -36,6 +36,8 @@
     draftOnly: false,
     activeId: "",
     activePrompt: null,
+    promptPromise: null,
+    editorTouched: false,
     shards: new Map(),
     shardPromises: new Map(),
     grade: null,
@@ -387,15 +389,16 @@
     }
     state.activeId = id;
     state.activePrompt = null;
+    state.editorTouched = false;
     storageSet(LAST_PROMPT_KEY, id);
     renderPromptList();
     renderTaskLoading(item);
     setStatus("正在读取题目…");
 
-    loadShard(item.shard)
+    const task = loadShard(item.shard)
       .then((shard) => {
         if (state.activeId !== id) {
-          return;
+          return null;
         }
         const prompt = (shard.prompts || []).find((entry) => entry.id === id);
         if (!prompt) {
@@ -403,17 +406,27 @@
         }
         state.activePrompt = prompt;
         renderTask(prompt, item);
-        loadDraftIntoEditor(prompt);
+        // 题目分片可能比用户手速慢，先敲下的内容不能被空草稿盖掉。
+        loadDraftIntoEditor(prompt, { keepUserText: state.editorTouched });
         renderCachedGrade(prompt);
         setStatus("");
+        return prompt;
       })
       .catch((error) => {
         if (state.activeId !== id) {
-          return;
+          return null;
         }
         renderTaskError(error);
         setStatus(error.message || "题目加载失败，请重试", true);
+        return null;
       });
+
+    state.promptPromise = task;
+    task.finally(() => {
+      if (state.promptPromise === task) {
+        state.promptPromise = null;
+      }
+    });
   }
 
   function renderTaskLoading(item) {
@@ -535,8 +548,15 @@
     return window.IBALL_WRITING_GRADE?.MAX_SCORES?.[exam] || 15;
   }
 
-  function loadDraftIntoEditor(prompt) {
+  function loadDraftIntoEditor(prompt, options = {}) {
     const draft = readJson(draftKey(prompt.id));
+    if (options.keepUserText) {
+      state.grade = null;
+      updateWordMeter();
+      scheduleDraftSave();
+      setDraftStatus("题目刚加载完，已保留你先写下的内容");
+      return;
+    }
     els.essayInput.value = draft?.text || "";
     state.grade = null;
     updateWordMeter();
@@ -662,8 +682,13 @@
       .finally(() => window.clearTimeout(timer));
   }
 
-  function runGrade() {
-    const prompt = state.activePrompt;
+  async function runGrade() {
+    let prompt = state.activePrompt;
+    if (!prompt && state.promptPromise) {
+      // 题目分片还在路上时点“批改”，等它回来再继续，别误报“没选题”。
+      setStatus("正在读取题目…");
+      prompt = await state.promptPromise;
+    }
     if (!prompt) {
       setStatus("先从左边的题目列表里选一道题。", true);
       return;
@@ -1082,6 +1107,7 @@
       state.year = "";
       state.activeId = "";
       state.activePrompt = null;
+      state.editorTouched = false;
       state.grade = null;
       els.examTabs.querySelectorAll("[data-exam]").forEach((tab) => {
         const active = tab === button;
@@ -1124,6 +1150,7 @@
       storageRemove(draftKey(state.activePrompt.id));
       storageRemove(gradeKey(state.activePrompt.id));
       els.essayInput.value = "";
+      state.editorTouched = false;
       state.grade = null;
       clearResult();
       updateWordMeter();
@@ -1132,6 +1159,7 @@
     });
 
     els.essayInput?.addEventListener("input", () => {
+      state.editorTouched = true;
       updateWordMeter();
       scheduleDraftSave();
     });

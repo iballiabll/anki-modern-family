@@ -560,6 +560,35 @@ body.hides-levels .word-token[data-levels] {
   border-bottom-color: rgba(66, 109, 128, 0.46);
 }
 
+/* ------------------------------------------------------------ 开源说明 */
+
+.movie-attribution {
+  width: min(1240px, calc(100% - 44px));
+  margin: 22px auto 44px;
+  padding: 20px 22px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #3f554d;
+}
+
+.movie-attribution h2 {
+  margin: 0 0 9px;
+  font-size: 16px;
+  color: var(--movie-accent-deep);
+}
+
+.movie-attribution p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.movie-attribution a {
+  color: var(--movie-accent);
+  text-underline-offset: 3px;
+}
+
 /* ------------------------------------------------------------ 响应式 */
 
 @media (max-width: 1080px) {
@@ -605,5 +634,10 @@ body.hides-levels .word-token[data-levels] {
 
   .movie-translation {
     font-size: 12.5px;
+  }
+
+  .movie-attribution {
+    width: calc(100% - 24px);
+    padding: 17px 16px;
   }
 }

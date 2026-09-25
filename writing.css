@@ -616,6 +616,42 @@
   color: #38544d;
 }
 
+/* ------------------------------------------------------- 开源说明 */
+
+.writing-attribution {
+  width: min(1240px, calc(100% - 44px));
+  margin: 22px auto 44px;
+  padding: 20px 22px;
+  background: #ffffff;
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius);
+  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.06);
+  color: #38544d;
+}
+
+.writing-attribution h2 {
+  margin: 0 0 9px;
+  font-size: 16px;
+  color: #153c35;
+}
+
+.writing-attribution ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+}
+
+.writing-attribution li {
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.writing-attribution a {
+  color: #256a58;
+  text-underline-offset: 3px;
+}
+
 /* ------------------------------------------------------------ 移动端 */
 
 @media (max-width: 980px) {
@@ -654,5 +690,10 @@
 
   .writing-score-value strong {
     font-size: 22px;
+  }
+
+  .writing-attribution {
+    width: calc(100% - 24px);
+    padding: 17px 16px;
   }
 }
