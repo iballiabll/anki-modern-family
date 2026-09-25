@@ -407,10 +407,59 @@ async function verifyWriting(browser, base, out) {
     traceable,
     `${sentenceOriginals.length} 句，例：${(sentenceOriginals[0] || "(无)").slice(0, 48)}`,
   );
+  const shortestWalkthrough = sentenceOriginals.length
+    ? Math.min(
+        ...sentenceOriginals.map((line) => line.trim().split(/\s+/).length),
+      )
+    : 0;
+  check(
+    "逐句讲解不拿客套短句凑数",
+    sentenceOriginals.length > 0 && shortestWalkthrough >= 6,
+    `${sentenceOriginals.length} 句，最短 ${shortestWalkthrough} 词`,
+  );
+
+  // 逐句升格只能套用语法上安全的替换规则，不能把名词 help 改成 assist / facilitate。
+  const rewriteGuards = await page.evaluate(() => {
+    const engine = window.IBALL_WRITING_GRADE;
+    const grade = (text) =>
+      engine.grade({ text, prompt: { exam: "english-i" } });
+    const nounHelp = grade(
+      "Dear Professor Smith, I am writing to express my sincere gratitude for your help during my research project. I also help students in need, and I think people should help others.",
+    );
+    const chinglish = grade(
+      "I very like it and I very appreciate your help.",
+    );
+    const preposition = grade("The robot looks very like a human.");
+    return {
+      nounHelp: JSON.stringify(nounHelp),
+      chinglishLabels: chinglish.issues.map((issue) => issue.label),
+      prepositionLabels: preposition.issues.map((issue) => issue.label),
+    };
+  });
+  check(
+    "名词 your help 不会被改写成 assist / facilitate",
+    !/your (assist|facilitate)/i.test(rewriteGuards.nounHelp),
+    "your help 保持原样",
+  );
+  check(
+    "中式语序 very + 动词 能被抓出来",
+    rewriteGuards.chinglishLabels.filter((label) => label === "中式语序")
+      .length >= 2,
+    rewriteGuards.chinglishLabels.join("、") || "(没报错)",
+  );
+  check(
+    "介词用法 very like a human 不误报",
+    rewriteGuards.prepositionLabels.length === 0,
+    rewriteGuards.prepositionLabels.join("、") || "(无告警)",
+  );
   const status = await page.locator("#gradeStatus").innerText();
   note(`批改状态：${status.trim() || "(空)"}`);
 
   await page.screenshot({ path: path.join(out, "study-writing-desktop.png") });
+  await page
+    .locator(".writing-lesson")
+    .screenshot({ path: path.join(out, "study-writing-lesson.png") })
+    .catch(() => {});
   check("作文页无脚本报错", errors.length === 0, errors.slice(0, 3).join(" | "));
   await context.close();
 

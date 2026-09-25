@@ -151,9 +151,12 @@
       reason: "more and more 是中式高频套话，用 an increasing number of 更贴合阅卷语域。",
     },
     {
-      pattern: /\bvery\s+(?=\w)/gi,
+      // 排除 very much 和 very + 动词：这两类换成 particularly 会写出病句，
+      // 动词用法交给下面的“中式语序”规则单独处理。
+      pattern: /\bvery\s+(?!(?:much|like|love|enjoy|hate|want|need|hope|appreciate|miss|care)\b)(?=\w)/gi,
       to: "particularly / remarkably",
       reason: "very + 形容词偏弱，用程度副词或更强的形容词提升表达力度。",
+      safeRewrite: true,
     },
     {
       pattern: /\bgood\b/gi,
@@ -174,6 +177,7 @@
       pattern: /\bimportant\b/gi,
       to: "significant / crucial",
       reason: "important 使用过度，轮换 significant / crucial 可加分。",
+      safeRewrite: true,
     },
     {
       pattern: /\bi think\b/gi,
@@ -184,6 +188,7 @@
       pattern: /\bpeople\b/gi,
       to: "individuals / the public",
       reason: "people 高频重复，轮换 individuals / the public 更书面。",
+      safeRewrite: true,
     },
     {
       pattern: /\bthing(s)?\b/gi,
@@ -201,9 +206,13 @@
       reason: "get 偏口语，正式写作可用 obtain / acquire。",
     },
     {
-      pattern: /\bhelp\b/gi,
-      to: "facilitate / contribute to",
-      reason: "help 使用过度时可换成 facilitate / contribute to。",
+      // 只标“help + 人”的动词用法；your help / the help of 这类名词用法
+      // 换成 facilitate 会直接写错，宁可少报。
+      pattern: /\bhelp\b(?=\s+(?:me|us|you|him|her|them|people|students|others|children|readers|society)\b)/gi,
+      to: "assist / support",
+      reason: "help + 人 可换成 assist / support；名词的 help 用 assistance。",
+      // 该 pattern 已限定为 help + 人 的动词结构，直接替换不会破坏语法。
+      safeRewrite: true,
     },
     {
       pattern: /\bshow\b/gi,
@@ -214,6 +223,7 @@
       pattern: /\bmany\b/gi,
       to: "numerous / a large number of",
       reason: "many 高频重复，可轮换 numerous / a large number of。",
+      safeRewrite: true,
     },
     {
       pattern: /\buse\b/gi,
@@ -224,6 +234,7 @@
       pattern: /\bproblem\b/gi,
       to: "challenge / issue",
       reason: "problem 可轮换 challenge / issue 提升表达多样性。",
+      safeRewrite: true,
     },
     {
       pattern: /\bso\b/gi,
@@ -588,6 +599,38 @@
       },
     },
     {
+      id: "very-verb",
+      label: "中式语序",
+      // “I very like it”是最典型的中文直译；very 不能直接修饰动词。
+      // like 单列一条并强制带宾语，避免把 “very like a human” 这种介词用法误判。
+      pattern: /\bvery\s+like(?=\s+(?:it|this|that|these|those|them|him|her|you|me|us|the)\b)/gi,
+      explanation: "very 不能直接修饰动词，要么用 really，要么把 very much 放到动词后面。",
+      build(match) {
+        return {
+          start: match.index,
+          end: match.index + match[0].length,
+          original: match[0],
+          suggestion: "really like",
+          explanation: `“${match[0]}”是中文语序，英语写成 really like 或 like ... very much。`,
+        };
+      },
+    },
+    {
+      id: "very-verb-plain",
+      label: "中式语序",
+      pattern: /\bvery\s+(love|enjoy|hate|want|need|hope|appreciate|miss|care)\b/gi,
+      explanation: "very 不能直接修饰动词，用 really 或把 very much 放到动词后面。",
+      build(match) {
+        return {
+          start: match.index,
+          end: match.index + match[0].length,
+          original: match[0],
+          suggestion: `really ${match[1].toLowerCase()}`,
+          explanation: `“${match[0]}”是中文语序，英语写成 really ${match[1].toLowerCase()} 或 ${match[1].toLowerCase()} ... very much。`,
+        };
+      },
+    },
+    {
       id: "missing-space",
       label: "标点格式",
       pattern: /\b[a-z]{2,}[,;:][A-Za-z]/g,
@@ -663,6 +706,11 @@
         to: rule.to,
         count: hit.length,
         reason: rule.reason,
+        // 带上原正则，逐句讲解里才能复用同一套句型限制。
+        source: rule.pattern.source,
+        flags: rule.pattern.flags,
+        // 只有语法上确认安全的规则才允许被逐句改写直接套用。
+        safeRewrite: Boolean(rule.safeRewrite),
       });
     });
     return items.sort((left, right) => right.count - left.count);
@@ -1181,7 +1229,18 @@
       }
     }
 
-    const ranked = candidates
+    // 短句（Yours sincerely / Li Ming 之类）上的标点小问题不值得占一张讲解卡；
+    // 只有真的存在硬错误时才让短句进卡，否则交给后面的补句逻辑讲长句。
+    const contentCandidates = candidates.filter(
+      (item) => countWords(item.sentence.text) >= 6,
+    );
+    const shortWithError = candidates.filter(
+      (item) =>
+        countWords(item.sentence.text) < 6 &&
+        item.issues.some((issue) => issue.severity === "error"),
+    );
+    const ranked = contentCandidates
+      .concat(shortWithError)
       .sort(
         (left, right) =>
           right.priority - left.priority ||
@@ -1230,6 +1289,31 @@
             "回扣题干关键词，最后半句给出明确的态度、请求或结果，替换掉纯客套话。",
         },
       ];
+      // 中间句的讲法按顺序轮换：论证 → 举例 → 条件让步，避免整页都是同一句话。
+      const argumentTips = [
+        structuralTips[1],
+        {
+          title: "举例句点评",
+          detail:
+            "这句话在讲道理，但还没有例子支撑。补一个人、一件事或一个数字，读者才会信。",
+          note: "抽象判断后面紧跟一个具体例子，是备考作文里性价比最高的补法。",
+          upgrade: "保留这句作主句，再用 for example / such as 接一个具体案例。",
+        },
+        {
+          title: "条件句点评",
+          detail:
+            "这句下了结论，却没有交代结论在什么条件下成立。补一个条件或让步，论证会稳很多。",
+          note: "先让步再给结论（Although ... , ...），比直接下结论更站得住。",
+          upgrade:
+            "把结论放进主句，用 Although / Even if 从句先承认一种相反情况。",
+        },
+      ];
+      let argumentCursor = 0;
+      const pickArgumentTip = () => {
+        const tip = argumentTips[argumentCursor % argumentTips.length];
+        argumentCursor += 1;
+        return tip;
+      };
       const openings = (paragraphDetails || [])
         .map((paragraph, index) => {
           const sentence = sentences.find(
@@ -1258,7 +1342,8 @@
                     sentence.text,
                   )
                 ? structuralTips[2]
-                : structuralTips[1],
+                : // 中间句轮换不同讲法，避免每张卡都是同一句“补一个具体细节”。
+                  pickArgumentTip(),
         })),
       ];
       pool.forEach((entry) => {
@@ -1303,6 +1388,7 @@
       正式语域: "考试作文尽量用完整形式，缩写和口语词都会拉低正式度。",
       拼写易混: "its 表示“它的”，it's 才是 it is，检查时先还原缩写。",
       语义重复: "观点表达保留一个就够，把多余词组换成具体论证。",
+      中式语序: "very 不能直接修饰动词，程度要么用 really，要么用 … very much。",
       标点格式: "英文标点后留一个空格，句末必须有终止标点。",
       句首大写: "每个完整句的首字母都要大写，缩写句也要检查。",
     };
@@ -1345,23 +1431,28 @@
         // 才退回写法建议，避免每张卡片都是同一句套话。
         const escapeRule = (value) =>
           String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        // 规则自带句型限制（例如 help 必须是 help + 人），逐句判断和替换
+        // 都要沿用原正则，否则不同句子里的名词用法会被误改。
+        const hitRegex = (rule) =>
+          rule.source
+            ? new RegExp(rule.source, rule.flags || "i")
+            : new RegExp(escapeRule(rule.from), "i");
         const hit = (replacements || []).find(
           (rule) =>
             rule.from &&
-            new RegExp(escapeRule(rule.from), "i").test(original),
+            // 只自动套用 safeRewrite 规则，避免把名词 help 改成 facilitate 这类病句。
+            rule.safeRewrite &&
+            hitRegex(rule).test(original),
         );
         let polished = "";
         if (hit) {
-          const matched = original.match(new RegExp(escapeRule(hit.from), "i"))[0];
+          const matched = original.match(hitRegex(hit))[0];
           // 规则里的 to 常写成“A / B”两个备选，直接套用会得到
           // “particularly / remarkablyimportant”这种脏结果，这里只取第一个
           // 备选，并在规则本身吃掉空格时把空格补回来。
           const first = String(hit.to).split("/")[0].trim();
           const joiner = /\s$/.test(matched) ? " " : "";
-          polished = original.replace(
-            new RegExp(escapeRule(hit.from), "i"),
-            `${first}${joiner}`,
-          );
+          polished = original.replace(hitRegex(hit), `${first}${joiner}`);
         }
         upgrade =
           polished ||
