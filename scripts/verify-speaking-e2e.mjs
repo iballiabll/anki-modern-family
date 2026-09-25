@@ -15,6 +15,7 @@
  */
 
 import fs from "node:fs/promises";
+import http from "node:http";
 import path from "node:path";
 import { createRequire } from "node:module";
 
@@ -169,6 +170,74 @@ async function verifyAccountIsolation() {
 const BAD_API_URL = "http://127.0.0.1:45999/v1";
 const BAD_API_HOST = "127.0.0.1:45999";
 
+/**
+ * 用户自己填的接口地址不能只存进 localStorage 就算数，得真的被调用过。
+ * 这里起一个最小的 OpenAI 兼容 mock：/chat/completions 返回一句可识别的回复，
+ * 其它路径按语音转写格式返回 text，顺便把收到的请求留给断言用。
+ */
+const MOCK_REPLY_MARKER = "Mock endpoint picked up your question about weekend plans.";
+const MOCK_TRANSCRIPT = "This transcript came from the mock speech endpoint.";
+
+async function startMockApi() {
+  const calls = [];
+  const server = http.createServer((req, res) => {
+    const headers = {
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "authorization,content-type,x-api-key",
+      "access-control-allow-methods": "POST,OPTIONS",
+      "content-type": "application/json",
+    };
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, headers);
+      res.end();
+      return;
+    }
+
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => {
+      calls.push({
+        url: req.url || "",
+        method: req.method || "",
+        authorization: req.headers.authorization || "",
+        xApiKey: req.headers["x-api-key"] || "",
+        body: Buffer.concat(chunks).toString("utf8"),
+      });
+      const payload = (req.url || "").endsWith("/chat/completions")
+        ? {
+            choices: [
+              {
+                message: {
+                  content: JSON.stringify({
+                    reply_en: MOCK_REPLY_MARKER,
+                    reply_zh: "这是 mock 接口返回的回复。",
+                    corrected_text: "",
+                    corrections: [],
+                    better_expression: "",
+                    ielts_tip: "",
+                  }),
+                },
+              },
+            ],
+          }
+        : { text: MOCK_TRANSCRIPT };
+      res.writeHead(200, headers);
+      res.end(JSON.stringify(payload));
+    });
+  });
+
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", resolve);
+  });
+
+  return {
+    url: `http://127.0.0.1:${server.address().port}/v1`,
+    calls,
+    close: () => new Promise((resolve) => server.close(resolve)),
+  };
+}
+
 function attachDiagnostics(page) {
   const errors = [];
   const requests = [];
@@ -210,11 +279,25 @@ async function openPracticeStudio(page) {
 /**
  * 首页有「欢迎回来」遮罩，先走一遍真实注册流程再进小屋；
  * 注册走的是页面上的表单，和用户手动操作完全一致。
+ *
+ * 注册接口按来源 IP 限流（每 IP 每小时 6 次），反复跑验收时回环地址很快
+ * 就用完了配额。这里和接口层用例一样按代理语义换一个来源 IP，其余表单
+ * 交互保持原样。
  */
 async function enterCabin(page, username) {
   const password = "Test-Passw0rd!";
   const overlay = page.locator("#welcomeOverlay");
+  let trickle = null;
   if (await overlay.isVisible().catch(() => false)) {
+    const forwardedFor = `198.51.100.${Math.floor(Math.random() * 200) + 1}`;
+    trickle = (route) =>
+      route.continue({
+        headers: {
+          ...route.request().headers(),
+          "x-forwarded-for": forwardedFor,
+        },
+      });
+    await page.route("**/api/auth", trickle);
     await page.click("#authModeRegister");
     await page.fill("#username", username);
     await page.fill("#password", password);
@@ -225,6 +308,9 @@ async function enterCabin(page, username) {
     await page.click("#loginButton");
   }
   await page.waitForSelector("#appView:not([hidden])", { timeout: 20000 });
+  if (trickle) {
+    await page.unroute("**/api/auth", trickle);
+  }
 }
 
 async function answerTextarea(page, selector, submitSelector, text) {
@@ -236,7 +322,7 @@ async function answerTextarea(page, selector, submitSelector, text) {
 const SAMPLE_ANSWER =
   "I usually start my day with a short walk, because it helps me clear my head before work.";
 
-async function verifyPracticeStudio(page, { mobile = false } = {}) {
+async function verifyPracticeStudio(page, { mobile = false, mockApi } = {}) {
   const tag = mobile ? "移动端" : "桌面端";
   const { errors, requests } = attachDiagnostics(page);
   const started = Date.now();
@@ -472,6 +558,114 @@ async function verifyPracticeStudio(page, { mobile = false } = {}) {
     `${fallback.replace(/\s+/g, " ").slice(0, 48)}；回复 ${assistantBefore} -> ${assistantAfter}`,
   );
 
+  // 换成用户自己填的、能通的接口：配置要落盘、刷新还在，而且请求真的打到那里。
+  const mockUrl = mockApi.url;
+  await page.selectOption("#freeChatMode", "api");
+  await page.fill("#freeChatApiUrl", mockUrl);
+  await page.fill("#freeChatApiModel", "mock-chat-model");
+  await page.fill("#freeChatApiKey", "mock-key");
+  await page.selectOption("#freeChatApiAuth", "bearer");
+  await page.click("#freeChatApiSaveButton");
+  await page.waitForFunction(
+    (url) =>
+      document.querySelector("#freeChatApiUrl")?.value === url &&
+      /已保存/.test(
+        document.querySelector("#freeChatApiStatus")?.textContent || "",
+      ),
+    mockUrl,
+    { timeout: 8000 },
+  );
+
+  const storedSettings = await page.evaluate(() =>
+    window.localStorage.getItem("iball-listening-cabin-speaking-settings"),
+  );
+  let parsedSettings = {};
+  try {
+    parsedSettings = JSON.parse(storedSettings || "{}");
+  } catch {
+    parsedSettings = {};
+  }
+  check(
+    `${tag}：自定义 Chat 接口写入浏览器配置`,
+    parsedSettings.freeChatApiUrl === mockUrl &&
+      parsedSettings.freeChatApiKey === "mock-key",
+    `url=${parsedSettings.freeChatApiUrl || "空"}`,
+  );
+
+  await page.reload({ waitUntil: "load", timeout: 30000 });
+  await openPracticeStudio(page);
+  await page.click("#practiceFreeTab");
+  await page.waitForSelector("#freeAnswerInput", { timeout: 10000 });
+  const restoredUrl = await page.locator("#freeChatApiUrl").inputValue();
+  const restoredMode = await page.locator("#freeChatMode").inputValue();
+  check(
+    `${tag}：刷新后自定义接口配置还在`,
+    restoredUrl === mockUrl && restoredMode === "api",
+    `mode=${restoredMode} url=${restoredUrl}`,
+  );
+
+  const callsBefore = mockApi.calls.length;
+  await answerTextarea(
+    page,
+    "#freeAnswerInput",
+    "#freeSubmitButton",
+    SAMPLE_ANSWER,
+  );
+  await page
+    .waitForFunction(
+      (marker) => (document.body.textContent || "").includes(marker),
+      MOCK_REPLY_MARKER,
+      { timeout: 20000 },
+    )
+    .catch(() => {});
+  const chatCall = mockApi.calls
+    .slice(callsBefore)
+    .find((item) => item.url.endsWith("/chat/completions"));
+  check(
+    `${tag}：自由对话真的请求了自定义接口`,
+    Boolean(chatCall) &&
+      chatCall.authorization === "Bearer mock-key" &&
+      chatCall.body.includes("mock-chat-model"),
+    chatCall
+      ? `${chatCall.url} auth=${chatCall.authorization || "无"}`
+      : "没有收到请求",
+  );
+  const mockReply = await page
+    .locator(".free-message.is-assistant:not(.is-loading) .free-message-en")
+    .last()
+    .textContent();
+  check(
+    `${tag}：自定义接口的回复显示在对话里`,
+    (mockReply || "").includes(MOCK_REPLY_MARKER),
+    (mockReply || "").replace(/\s+/g, " ").slice(0, 56),
+  );
+
+  // 语音识别接口（练习台）同样是用户自己填的，配置也要跨刷新保留。
+  await page.click("#practiceDialogueTab");
+  await page.selectOption("#practiceMode", "api");
+  await page.fill("#practiceApiUrl", mockUrl);
+  await page.fill("#practiceApiModel", "mock-whisper-model");
+  await page.fill("#practiceApiKey", "mock-key");
+  await page.click("#practiceApiSaveButton");
+  await page.waitForTimeout(200);
+  const practiceStatus = await page.locator("#practiceApiStatus").textContent();
+  check(
+    `${tag}：语音识别接口配置可保存`,
+    /已保存/.test(practiceStatus || ""),
+    (practiceStatus || "").trim().slice(0, 40),
+  );
+
+  await page.reload({ waitUntil: "load", timeout: 30000 });
+  await openPracticeStudio(page);
+  await page.click("#practiceDialogueTab");
+  const practiceUrlAfter = await page.locator("#practiceApiUrl").inputValue();
+  const practiceModeAfter = await page.locator("#practiceMode").inputValue();
+  check(
+    `${tag}：语音接口配置刷新后仍在`,
+    practiceUrlAfter === mockUrl && practiceModeAfter === "api",
+    `mode=${practiceModeAfter} url=${practiceUrlAfter}`,
+  );
+
   // 收尾截图 + 溢出检查。
   await page.evaluate(() =>
     window.scrollTo({ top: 0, behavior: "instant" }),
@@ -560,13 +754,14 @@ async function main() {
   await verifyAccountIsolation();
 
   const executablePath = await findBrowser();
+  const mockApi = await startMockApi();
   const browser = await chromium.launch({ executablePath, headless: true });
   try {
     const desktop = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       deviceScaleFactor: 1,
     });
-    await verifyPracticeStudio(await desktop.newPage());
+    await verifyPracticeStudio(await desktop.newPage(), { mockApi });
     await desktop.close();
 
     const mobile = await browser.newContext({
@@ -575,7 +770,10 @@ async function main() {
       isMobile: true,
       hasTouch: true,
     });
-    await verifyPracticeStudio(await mobile.newPage(), { mobile: true });
+    await verifyPracticeStudio(await mobile.newPage(), {
+      mobile: true,
+      mockApi,
+    });
     await mobile.close();
 
     const listen = await browser.newContext({
@@ -586,6 +784,7 @@ async function main() {
     await listen.close();
   } finally {
     await browser.close();
+    await mockApi.close();
   }
 
   const passed = results.filter(Boolean).length;
