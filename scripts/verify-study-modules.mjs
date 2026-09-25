@@ -387,6 +387,26 @@ async function verifyWriting(browser, base, out) {
   check("提交后真的返回批改", result.length > 80, `${result.length} 字`);
   check("批改结果含总分", /\d+(\.\d+)?\s*\/\s*\d+|\d+(\.\d+)?\s*分/.test(result), result.split("\n")[0]);
   check("走 /api/grade 接口", gradedApi, gradedApi ? "已请求" : "没有请求");
+
+  const lessonText = await page
+    .locator(".writing-lesson")
+    .innerText()
+    .catch(() => "");
+  check(
+    "批改结果含作文讲解",
+    /作文讲解/.test(lessonText) && /逐句/.test(lessonText),
+    lessonText ? `${lessonText.length} 字讲解` : "(没有讲解区)",
+  );
+  const sentenceOriginals = await page.locator(".writing-sentence-original").allInnerTexts();
+  const essayFlat = ESSAY.replace(/\s+/g, " ").trim();
+  const traceable =
+    sentenceOriginals.length > 0 &&
+    sentenceOriginals.every((line) => essayFlat.includes(line.trim()));
+  check(
+    "逐句讲解原句逐字来自我的作文",
+    traceable,
+    `${sentenceOriginals.length} 句，例：${(sentenceOriginals[0] || "(无)").slice(0, 48)}`,
+  );
   const status = await page.locator("#gradeStatus").innerText();
   note(`批改状态：${status.trim() || "(空)"}`);
 
@@ -411,6 +431,15 @@ async function verifyWriting(browser, base, out) {
   const fallbackText = await fallback.page.locator("#gradeResult").innerText();
   const fallbackStatus = await fallback.page.locator("#gradeStatus").innerText();
   check("接口挂了仍然出批改结果", fallbackText.length > 80, `${fallbackText.length} 字`);
+  const fallbackLesson = await fallback.page
+    .locator(".writing-lesson")
+    .innerText()
+    .catch(() => "");
+  check(
+    "回退批改仍然带作文讲解",
+    /作文讲解/.test(fallbackLesson),
+    fallbackLesson ? `${fallbackLesson.length} 字讲解` : "(没有讲解区)",
+  );
   note(`回退提示：${fallbackStatus.trim() || "(空)"}`);
   await fallback.context.close();
 

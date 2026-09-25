@@ -571,6 +571,326 @@
   color: #5d746c;
 }
 
+/* ------------------------------------------------------- 作文讲解 */
+
+.writing-lesson {
+  display: grid;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid rgba(21, 60, 53, 0.16);
+  border-radius: var(--writing-radius);
+  background: #fbfdfc;
+}
+
+.writing-lesson-overview {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--forest);
+  border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
+  background: #f3f8f6;
+  color: #223d37;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.writing-lesson-focus {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(209, 165, 72, 0.42);
+  border-radius: var(--writing-radius);
+  background: #fffaf0;
+  color: #6d511b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.writing-lesson-focus strong {
+  color: #8a6520;
+}
+
+.writing-lesson-block {
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.writing-lesson-block > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 12px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--forest-deep);
+}
+
+.writing-lesson-block > summary::-webkit-details-marker {
+  display: none;
+}
+
+.writing-lesson-block > summary::before {
+  content: "+";
+  width: 18px;
+  color: var(--forest);
+  font-size: 15px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.writing-lesson-block[open] > summary::before {
+  content: "-";
+}
+
+.writing-lesson-block > summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.writing-lesson-block[open] > summary {
+  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+  background: #f7faf9;
+}
+
+.writing-lesson-block-title {
+  margin-right: auto;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.writing-lesson-block-hint {
+  color: #6a7f77;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.writing-lesson-block-body {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.writing-lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 9px;
+}
+
+.writing-lesson-card {
+  display: grid;
+  gap: 7px;
+  padding: 10px 11px;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  border-radius: var(--writing-radius);
+  background: #fbfdfc;
+}
+
+.writing-lesson-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.writing-lesson-card-head strong {
+  color: var(--forest-deep);
+  font-size: 13px;
+}
+
+.writing-lesson-card p {
+  margin: 0;
+  color: #4d6861;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.writing-lesson-status {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.writing-lesson-status.is-good {
+  background: var(--writing-ok-soft);
+  color: var(--writing-ok);
+}
+
+.writing-lesson-status.is-warn {
+  background: #fff2cf;
+  color: #97651b;
+}
+
+.writing-lesson-status.is-weak {
+  background: var(--writing-danger-soft);
+  color: var(--writing-danger);
+}
+
+.writing-paragraph-list,
+.writing-sentence-list,
+.writing-strategy-list {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-paragraph-item,
+.writing-sentence-item,
+.writing-strategy-list > li {
+  display: grid;
+  gap: 7px;
+  padding: 11px 12px;
+  border: 1px solid rgba(11, 41, 37, 0.11);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
+  background: #ffffff;
+}
+
+.writing-paragraph-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.writing-paragraph-head strong {
+  color: var(--forest-deep);
+  font-size: 13px;
+}
+
+.writing-paragraph-head span {
+  color: #6a7f77;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.writing-paragraph-item p,
+.writing-sentence-item p,
+.writing-strategy-list p {
+  margin: 0;
+  color: #38544d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.writing-paragraph-item p strong,
+.writing-sentence-item p strong {
+  color: #24453d;
+}
+
+.writing-sentence-original {
+  padding: 9px 11px;
+  border-radius: var(--writing-radius);
+  background: #f2f6f4;
+  color: #1f3833 !important;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  overflow-wrap: anywhere;
+}
+
+.writing-sentence-upgrade {
+  padding: 9px 11px;
+  border-radius: var(--writing-radius);
+  background: var(--writing-ok-soft);
+  color: #235c45 !important;
+}
+
+.writing-strategy-list > li {
+  border-left-color: var(--forest);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 9px;
+}
+
+.writing-strategy-priority {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.writing-strategy-list em {
+  align-self: center;
+  color: var(--writing-ok);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.writing-pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 9px;
+}
+
+.writing-pattern-card {
+  display: grid;
+  gap: 7px;
+  padding: 11px;
+  border: 1px solid rgba(11, 41, 37, 0.11);
+  border-radius: var(--writing-radius);
+  background: #fbfdfc;
+}
+
+.writing-pattern-card code {
+  color: var(--forest-deep);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.writing-pattern-card p {
+  margin: 0;
+  color: #5d746c;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.writing-pattern-example {
+  padding-top: 6px;
+  border-top: 1px dashed rgba(11, 41, 37, 0.14);
+  color: #38544d !important;
+}
+
+.writing-checklist {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-checklist label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #38544d;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.writing-checklist input {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: var(--forest);
+}
+
 .writing-model {
   display: grid;
   gap: 10px;
@@ -681,6 +1001,29 @@
 
   .writing-editor-actions .tool-button {
     flex: 1 1 auto;
+  }
+
+  .writing-lesson {
+    padding: 11px;
+  }
+
+  .writing-lesson-grid,
+  .writing-pattern-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .writing-lesson-block-hint {
+    width: 100%;
+    padding-left: 26px;
+  }
+
+  .writing-strategy-list > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .writing-strategy-priority,
+  .writing-strategy-list em {
+    justify-self: start;
   }
 
   .writing-score-value {

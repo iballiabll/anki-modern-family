@@ -5,7 +5,7 @@
  *  1. 纯本地、零依赖，断网也能给出完整批改结果；
  *  2. 只报高置信度问题，宁可少报也不要误报，避免误导备考；
  *  3. 输出结构固定：总分 / 分项 / 语法问题（带字符区间便于标红）/ 词汇替换 /
- *     句式建议 / 下一步动作，供 api/grade.js 与 writing.js 复用。
+ *     句式建议 / 逐段逐句讲解 / 下一步动作，供 api/grade.js 与 writing.js 复用。
  *
  * 语法规则参考了站内 refs/zh-en-translation-polish 的 chinglish_scan 思路：
  * 每条规则只针对一个高频中式英语/一致性错误，给出可直接替换的写法。
@@ -26,6 +26,13 @@
     "english-ii": 25,
     cet4: 15,
     cet6: 15,
+  };
+
+  const EXAM_LABELS = {
+    "english-i": "考研英语一",
+    "english-ii": "考研英语二",
+    cet4: "大学英语四级",
+    cet6: "大学英语六级",
   };
 
   const DIMENSIONS = [
@@ -271,11 +278,30 @@
     return sentences;
   }
 
+  function splitParagraphDetails(text) {
+    const source = String(text || "");
+    const details = [];
+    const regex = /[^\n]+/g;
+    let match;
+    while ((match = regex.exec(source))) {
+      const value = match[0].trim();
+      if (!value) {
+        continue;
+      }
+      const offset = match[0].indexOf(value);
+      const start = match.index + Math.max(0, offset);
+      details.push({
+        index: details.length + 1,
+        text: value,
+        start,
+        end: start + value.length,
+      });
+    }
+    return details;
+  }
+
   function splitParagraphs(text) {
-    return String(text || "")
-      .split(/\n\s*\n|\n/)
-      .map((item) => item.trim())
-      .filter(Boolean);
+    return splitParagraphDetails(text).map((paragraph) => paragraph.text);
   }
 
   function tokens(text) {
@@ -846,6 +872,779 @@
     };
   }
 
+  function shorten(value, limit) {
+    const text = String(value || "")
+      .replace(/\s+/g, " ")
+      .trim();
+    return text.length > limit ? `${text.slice(0, limit)}...` : text;
+  }
+
+  function uniqueStrings(values) {
+    const seen = new Set();
+    return (values || []).filter((value) => {
+      const text = String(value || "").trim();
+      if (!text || seen.has(text)) {
+        return false;
+      }
+      seen.add(text);
+      return true;
+    });
+  }
+
+  function normalizeSuggestion(value) {
+    const suggestion = String(value || "").trim();
+    if (!suggestion) {
+      return "";
+    }
+    if (/^（删去.*）$|^\(delete.*\)$/i.test(suggestion)) {
+      return "";
+    }
+    return suggestion;
+  }
+
+  function applyIssueFixes(text, offset, issues) {
+    const edits = (issues || [])
+      .map((issue) => ({
+        start: Number(issue.start) - offset,
+        end: Number(issue.end) - offset,
+        original: String(issue.original || ""),
+        replacement: normalizeSuggestion(issue.suggestion),
+      }))
+      .filter(
+        (edit) =>
+          Number.isFinite(edit.start) &&
+          Number.isFinite(edit.end) &&
+          edit.start >= 0 &&
+          edit.end > edit.start &&
+          edit.end <= String(text).length,
+      )
+      .sort((left, right) => right.start - left.start);
+
+    let output = String(text || "");
+    let nextStart = output.length + 1;
+    edits.forEach((edit) => {
+      if (edit.end > nextStart) {
+        return;
+      }
+      const current = output.slice(edit.start, edit.end);
+      if (edit.original && current !== edit.original) {
+        return;
+      }
+      if (edit.replacement === current) {
+        nextStart = edit.start;
+        return;
+      }
+      output = `${output.slice(0, edit.start)}${edit.replacement}${output.slice(edit.end)}`;
+      nextStart = edit.start;
+    });
+    return output;
+  }
+
+  function buildTaskBreakdown(context) {
+    const {
+      task,
+      structure,
+      language,
+      lexis,
+      prompt,
+      words,
+      paragraphs,
+    } = context;
+    const min = Number(prompt?.wordLimitMin) || 0;
+    const max = Number(prompt?.wordLimitMax) || 0;
+    const items = [];
+
+    if (min || max) {
+      const within = words >= min * 0.9 && words <= max * 1.1;
+      const near = words >= min * 0.75 && words <= max * 1.3;
+      items.push({
+        label: "字数要求",
+        status: within ? "good" : near ? "warn" : "weak",
+        detail: `当前 ${words} 词，要求 ${prompt?.wordLimit || `${min || "?"}-${max || "?"} 词`}。`,
+      });
+    } else {
+      items.push({
+        label: "篇幅完整度",
+        status: words >= 100 ? "good" : words >= 70 ? "warn" : "weak",
+        detail: `本题没有明确词数限制，当前 ${words} 词，重点看论证是否完整。`,
+      });
+    }
+
+    const promptKeywords = task.keywords || [];
+    const hits = task.hits || [];
+    const coverage = promptKeywords.length ? hits.length / promptKeywords.length : 1;
+    items.push({
+      label: "内容扣题",
+      status: coverage >= 0.7 ? "good" : coverage >= 0.5 ? "warn" : "weak",
+      detail: hits.length
+        ? `题干关键词命中：${hits.join("、")}。每段都要回到这个主题，不能只在开头提一次。`
+        : "题干核心词在正文中复现较少，先补一个与题目直接相关的中心句。",
+    });
+
+    items.push({
+      label: "段落结构",
+      status: paragraphs >= 3 ? "good" : paragraphs === 2 ? "warn" : "weak",
+      detail:
+        paragraphs >= 3
+          ? `共有 ${paragraphs} 段，段落数量符合常见考试作文结构。`
+          : `只有 ${paragraphs} 段，建议按“引入观点 - 分点论证 - 总结回扣”重新分段。`,
+    });
+
+    const transitionTarget = Math.max(1, Math.ceil(paragraphs / 2));
+    items.push({
+      label: "衔接手段",
+      status:
+        structure.transitionCount >= transitionTarget
+          ? "good"
+          : structure.transitionCount > 0
+            ? "warn"
+            : "weak",
+      detail: `检出 ${structure.transitionCount} 处显性衔接。连接词要表达真实逻辑，不要为了凑分机械堆砌。`,
+    });
+
+    items.push({
+      label: "语言准确",
+      status:
+        language.errors === 0 && language.warnings <= 2
+          ? "good"
+          : language.errors === 0
+            ? "warn"
+            : "weak",
+      detail: `明确错误 ${language.errors} 处，可优化表达 ${language.warnings} 处。先修错误，再润色。`,
+    });
+
+    items.push({
+      label: "词汇表达",
+      status:
+        lexis.score >= 80 ? "good" : lexis.score >= 65 ? "warn" : "weak",
+      detail: `词汇多样性约 ${Math.round(lexis.diversity * 100)}%，优先替换重复出现且语义空泛的词。`,
+    });
+
+    return items.slice(0, 6);
+  }
+
+  function buildParagraphMap(context) {
+    const { paragraphDetails, sentences, issues, prompt } = context;
+    const promptKeyword = (context.task.keywords || [])[0] || "题目主题";
+    const total = paragraphDetails.length;
+
+    return paragraphDetails.map((paragraph, offset) => {
+      const relatedIssues = issues.filter(
+        (issue) => issue.end > paragraph.start && issue.start < paragraph.end,
+      );
+      const relatedSentences = sentences.filter(
+        (sentence) =>
+          sentence.end > paragraph.start && sentence.start < paragraph.end,
+      );
+      const lower = paragraph.text.toLowerCase();
+      const paragraphWords = countWords(paragraph.text);
+      const transition = TRANSITIONS.find((word) => lower.includes(word)) || "";
+      const errors = relatedIssues.filter(
+        (issue) => issue.severity === "error",
+      ).length;
+      const warnings = relatedIssues.length - errors;
+      const role =
+        total === 1
+          ? "整篇"
+          : offset === 0
+            ? "引入段"
+            : offset === total - 1
+              ? "结论段"
+              : "论证段";
+      const thesisCue =
+        /\b(?:i (?:believe|think|argue)|in my (?:view|opinion)|it is (?:clear|evident|important)|should|must|need to)\b/i.test(
+          paragraph.text,
+        );
+      const evidenceCue =
+        /\b(?:for example|for instance|such as|because|therefore|as a result|take .* as an example)\b/i.test(
+          paragraph.text,
+        );
+      const conclusionCue =
+        /\b(?:in conclusion|to sum up|overall|in short|therefore|ultimately|only by)\b/i.test(
+          paragraph.text,
+        );
+
+      const strengths = [];
+      if (!errors) {
+        strengths.push("没有检出明确语法错误");
+      }
+      if (transition) {
+        strengths.push(`有显性衔接（${transition}）`);
+      }
+      if (relatedSentences.length >= 2) {
+        strengths.push("信息展开比较完整");
+      }
+      if (role === "引入段" && thesisCue) {
+        strengths.push("中心观点比较明确");
+      }
+      if (role === "论证段" && evidenceCue) {
+        strengths.push("有例证或因果支撑");
+      }
+      if (role === "结论段" && conclusionCue) {
+        strengths.push("收束和回扣比较明显");
+      }
+
+      const weaknesses = [];
+      if (errors) {
+        weaknesses.push(`有 ${errors} 处明确错误`);
+      }
+      if (warnings) {
+        weaknesses.push(`有 ${warnings} 处可优化表达`);
+      }
+      if (!transition && total > 1) {
+        weaknesses.push("缺少段内或段首衔接");
+      }
+      if (paragraphWords < 18) {
+        weaknesses.push("本段篇幅偏薄");
+      }
+      if (role === "引入段" && !thesisCue) {
+        weaknesses.push("中心观点不够明确");
+      }
+      if (role === "论证段" && !evidenceCue) {
+        weaknesses.push("还停留在观点，缺少例子或原因");
+      }
+      if (role === "结论段" && !conclusionCue) {
+        weaknesses.push("结论没有明显收束");
+      }
+
+      let action = "保留本段有效表达，把其中一个简单句改成含从句的复合句。";
+      if (errors) {
+        action = `先改掉${uniqueStrings(
+          relatedIssues
+            .filter((issue) => issue.severity === "error")
+            .map((issue) => issue.label),
+        ).join("、")}，再把本段完整读一遍，确认主谓和标点接通。`;
+      } else if (warnings) {
+        action = "先处理可优化表达，再给本段补一个更准确的书面词或连接语。";
+      } else if (!transition && total > 1) {
+        action = "在段首补一个与上一段真实逻辑相符的连接语，再做一次顺读检查。";
+      } else if (paragraphWords < 18) {
+        action = "补一个具体例子、原因或结果，至少增加 1 句有效支撑。";
+      } else if (role === "引入段" && !thesisCue) {
+        action = "在段末补一句明确立场，让阅卷老师一眼看到你的中心观点。";
+      } else if (role === "论证段" && !evidenceCue) {
+        action = "按“观点 - 原因或例子 - 回扣主题”补全本段。";
+      } else if (role === "结论段" && !conclusionCue) {
+        action = `补一句总结，并回扣题目核心词“${promptKeyword}”。`;
+      }
+
+      return {
+        paragraph: paragraph.index,
+        role,
+        summary: `${paragraphWords} 词，${relatedSentences.length} 句，从“${shorten(paragraph.text, 64)}”展开。`,
+        strength: strengths.join("；") || "能看出本段的基本写作意图。",
+        weakness: weaknesses.join("；") || "暂时没有结构性硬伤。",
+        action,
+      };
+    });
+  }
+
+  function buildSentenceWalkthrough(context) {
+    const { sentences, issues, sentenceTips, replacements, paragraphDetails } =
+      context;
+    const candidates = [];
+
+    sentences.forEach((sentence) => {
+      const relatedIssues = issues.filter(
+        (issue) => issue.end > sentence.start && issue.start < sentence.end,
+      );
+      if (relatedIssues.length) {
+        candidates.push({
+          sentence,
+          issues: relatedIssues,
+          tip: null,
+          priority: relatedIssues.some((issue) => issue.severity === "error")
+            ? 2
+            : 1,
+        });
+      }
+    });
+
+    const longTip = (sentenceTips || []).find(
+      (tip) => tip.title === "长句拆分" && tip.excerpt,
+    );
+    if (longTip) {
+      const excerpt = String(longTip.excerpt).slice(0, 32);
+      const sentence = sentences.find((item) =>
+        item.text.slice(0, 32).startsWith(excerpt),
+      );
+      if (
+        sentence &&
+        !candidates.some((item) => item.sentence.start === sentence.start)
+      ) {
+        candidates.push({
+          sentence,
+          issues: [],
+          tip: longTip,
+          priority: 0,
+        });
+      }
+    }
+
+    const ranked = candidates
+      .sort(
+        (left, right) =>
+          right.priority - left.priority ||
+          right.issues.length - left.issues.length ||
+          left.sentence.start - right.sentence.start,
+      )
+      .slice(0, 5);
+
+    // 逐句讲解至少覆盖 3 句，否则一篇十几句的作文只讲一句，看起来像没讲完。
+    // 先补每段开头句，再补其余句子；字数太短的（Yours sincerely 之类）跳过。
+    const target = Math.min(Math.max(3, Math.ceil(sentences.length / 4)), 6);
+    const selected = ranked.slice(0, target);
+    if (selected.length < target && sentences.length) {
+      const taken = new Set(selected.map((item) => item.sentence.start));
+      const structuralTips = [
+        {
+          title: "开头句点评",
+          detail:
+            "开头句要第一时间交代写作目的或立场。检查它是否让读者立刻知道这封信或这篇文章要解决什么。",
+          note: "把开头句压到一句，目的或观点放在主句里，背景放从句。",
+          upgrade:
+            "把背景压缩成短语或从句放到句首，主句只保留“我写这封信 / 这篇文章要做什么”。",
+        },
+        {
+          title: "论证句点评",
+          detail:
+            "论证句要靠具体证据支撑。补一个时间、数字、人名或亲历场景，判断才站得住。",
+          note: "每写一个判断，先问自己“凭什么”，再把答案写进同一段。",
+          upgrade:
+            "先保留判断句作主句，再在后面补一个具体细节（时间、数字或亲历场景）作为证据。",
+        },
+        {
+          title: "衔接句点评",
+          detail:
+            "衔接句负责交代两句之间的关系。检查连接词是否真的表达因果、转折或递进。",
+          note: "把连接词前后各读一遍，逻辑不成立就换一个。",
+          upgrade:
+            "把真实关系写出来：因果用 because / therefore，转折用 although / however，然后整段读一遍确认逻辑成立。",
+        },
+        {
+          title: "收束句点评",
+          detail:
+            "收束句要回扣题干关键词，并给出明确的态度、请求或结果，不要只留客套话。",
+          note: "把题干核心词搬进收束句，再做一次同义替换。",
+          upgrade:
+            "回扣题干关键词，最后半句给出明确的态度、请求或结果，替换掉纯客套话。",
+        },
+      ];
+      const openings = (paragraphDetails || [])
+        .map((paragraph, index) => {
+          const sentence = sentences.find(
+            (item) =>
+              item.start >= paragraph.start && item.end <= paragraph.end,
+          );
+          return sentence
+            ? {
+                sentence,
+                tip: {
+                  ...structuralTips[0],
+                  title: `第 ${index + 1} 段开头句`,
+                },
+              }
+            : null;
+        })
+        .filter(Boolean);
+      const pool = [
+        ...openings,
+        ...sentences.map((sentence) => ({
+          sentence,
+          tip:
+            sentence.start === sentences[sentences.length - 1].start
+              ? structuralTips[3]
+              : /\b(however|therefore|moreover|furthermore|because|although|while|as a result|for example|first|second|finally)\b/i.test(
+                    sentence.text,
+                  )
+                ? structuralTips[2]
+                : structuralTips[1],
+        })),
+      ];
+      pool.forEach((entry) => {
+        if (selected.length >= target || taken.has(entry.sentence.start)) {
+          return;
+        }
+        if (countWords(entry.sentence.text) < 6) {
+          return;
+        }
+        taken.add(entry.sentence.start);
+        selected.push({
+          sentence: entry.sentence,
+          issues: [],
+          tip: entry.tip,
+          priority: -1,
+        });
+      });
+    }
+
+    if (!selected.length && sentences.length) {
+      const longest = [...sentences].sort(
+        (left, right) =>
+          countWords(right.text) - countWords(left.text) ||
+          left.start - right.start,
+      )[0];
+      selected.push({
+        sentence: longest,
+        issues: [],
+        tip: {
+          title: "升格示范",
+          detail:
+            "这是全文信息量较大的句子，先保证主谓宾清楚，再把背景或补充信息放到从句、后置修饰或下一句。",
+        },
+        priority: 0,
+      });
+    }
+
+    const noteMap = {
+      主谓一致: "找主语时先跳过介词短语和修饰语，谓语只跟主语中心词一致。",
+      冠词: "判断用 a 还是 an 看的是发音，不是只看首字母。",
+      连词重复: "一个从句只保留一个主从连接词，中文的“因为……所以……”不能逐字搬进英语。",
+      正式语域: "考试作文尽量用完整形式，缩写和口语词都会拉低正式度。",
+      拼写易混: "its 表示“它的”，it's 才是 it is，检查时先还原缩写。",
+      语义重复: "观点表达保留一个就够，把多余词组换成具体论证。",
+      标点格式: "英文标点后留一个空格，句末必须有终止标点。",
+      句首大写: "每个完整句的首字母都要大写，缩写句也要检查。",
+    };
+
+    return selected.map((item) => {
+      const labels = uniqueStrings(item.issues.map((issue) => issue.label));
+      const errors = item.issues.filter(
+        (issue) => issue.severity === "error",
+      ).length;
+      const warnings = item.issues.length - errors;
+      const explanations = uniqueStrings(
+        item.issues.map((issue) => issue.explanation),
+      );
+      const original = item.sentence.text;
+      let upgrade = applyIssueFixes(
+        original,
+        item.sentence.start,
+        item.issues,
+      );
+      let diagnosis = "";
+      let why = "";
+      let note = "";
+
+      if (item.issues.length) {
+        diagnosis = errors
+          ? `这句有 ${errors} 处明确错误${warnings ? `、${warnings} 处可优化表达` : ""}（${labels.join("、")}）。`
+          : `这句没有硬错误，但有 ${warnings} 处表达可以更书面、更准确（${labels.join("、")}）。`;
+        why =
+          explanations.join(" ") ||
+          "问题集中在句子内部搭配和正式语域，需要在不改变原意的前提下重写。";
+        note =
+          noteMap[item.issues[0].label] ||
+          "改完后把整句读一遍，确认主语、谓语和补充信息没有互相遮挡。";
+      } else {
+        diagnosis = `${item.tip?.title || "升格示范"}：这句没有硬错误，重点看信息是否具体、衔接是否清楚。`;
+        why =
+          item.tip?.detail ||
+          "句子本身没有错误，但信息层次还可以更清楚，适合用来练习从句和衔接。";
+        // 没有硬错误的句子优先给一个看得见的替换示范，实在没有可替换词时
+        // 才退回写法建议，避免每张卡片都是同一句套话。
+        const escapeRule = (value) =>
+          String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const hit = (replacements || []).find(
+          (rule) =>
+            rule.from &&
+            new RegExp(escapeRule(rule.from), "i").test(original),
+        );
+        let polished = "";
+        if (hit) {
+          const matched = original.match(new RegExp(escapeRule(hit.from), "i"))[0];
+          // 规则里的 to 常写成“A / B”两个备选，直接套用会得到
+          // “particularly / remarkablyimportant”这种脏结果，这里只取第一个
+          // 备选，并在规则本身吃掉空格时把空格补回来。
+          const first = String(hit.to).split("/")[0].trim();
+          const joiner = /\s$/.test(matched) ? " " : "";
+          polished = original.replace(
+            new RegExp(escapeRule(hit.from), "i"),
+            `${first}${joiner}`,
+          );
+        }
+        upgrade =
+          polished ||
+          item.tip?.upgrade ||
+          "保留原句意思，把主干先写完整，再把时间、原因或例子放进从句或下一句，避免一个句子承担太多信息。";
+        note =
+          item.tip?.note ||
+          "升格不是把词换难，而是让主干、逻辑和修饰关系更清楚。";
+      }
+
+      return {
+        original,
+        diagnosis,
+        why,
+        upgrade,
+        note,
+      };
+    });
+  }
+
+  function buildScoreStrategy(context) {
+    const {
+      dimensions,
+      language,
+      task,
+      structure,
+      lexis,
+      replacements,
+      sentenceTips,
+      paragraphDetails,
+      maxScore,
+      words,
+      prompt,
+    } = context;
+    const dimension = (key) =>
+      dimensions.find((item) => item.key === key) || {
+        score: 70,
+        weight: 0.2,
+      };
+    const gainFor = (key) => {
+      const item = dimension(key);
+      const gap = Math.max(0, 100 - Number(item.score || 0));
+      const gain = (gap / 100) * Number(item.weight || 0.2) * maxScore;
+      return Math.max(0.5, Math.round(gain * 2) / 2);
+    };
+    const gainText = (key) => `+${gainFor(key)} 分左右`;
+    const candidates = [];
+    const min = Number(prompt?.wordLimitMin) || 0;
+    const max = Number(prompt?.wordLimitMax) || 0;
+    const promptKeywords = task.keywords || [];
+    const hits = task.hits || [];
+    const coverage = promptKeywords.length ? hits.length / promptKeywords.length : 1;
+    const missingTransitions = paragraphDetails
+      .filter(
+        (paragraph) =>
+          !TRANSITIONS.some((word) =>
+            paragraph.text.toLowerCase().includes(word),
+          ),
+      )
+      .slice(0, 2)
+      .map((paragraph) => `第 ${paragraph.index} 段`);
+
+    if (language.errors) {
+      candidates.push({
+        order: 10,
+        dimensionKey: "language",
+        action: `先处理 ${language.errors} 处明确错误（${uniqueStrings(
+          context.issues
+            .filter((issue) => issue.severity === "error")
+            .map((issue) => issue.label),
+        ).join("、")}）。每改一处都把这句完整读一遍，避免只换单词没改结构。`,
+      });
+    }
+
+    if (task.score < 80 || (min && words < min) || (max && words > max)) {
+      const wordAdvice =
+        min && words < min
+          ? `先把字数补到 ${min} 词以上，新增内容必须是原因、例子或结果。`
+          : max && words > max
+            ? `把字数压回 ${max} 词以内，优先删掉重复解释和空泛套话。`
+            : "把每段的中心句写得更明确，保证段落都在回答题目。";
+      candidates.push({
+        order: 20,
+        dimensionKey: "task",
+        action: wordAdvice,
+      });
+    }
+
+    if (structure.score < 85) {
+      candidates.push({
+        order: 30,
+        dimensionKey: "structure",
+        action: `给${missingTransitions.join("、") || "段首"}补一个真实逻辑连接语，再检查每段是否只承担一个任务。`,
+      });
+    }
+
+    if (coverage < 0.6) {
+      candidates.push({
+        order: 40,
+        dimensionKey: "task",
+        action: `把题干关键词${promptKeywords.slice(0, 3).map((word) => `“${word}”`).join("、")}分别写进引入段和结论段，避免通用模板。`,
+      });
+    }
+
+    if (replacements.length) {
+      const top = replacements[0];
+      candidates.push({
+        order: 60,
+        dimensionKey: "lexis",
+        action: `先替换最明显的低分表达：${top.from} → ${top.to}。整篇最多替换 ${Math.min(
+          top.count,
+          3,
+        )} 次，保留原意最重要。`,
+      });
+    } else if (lexis.score < 80) {
+      candidates.push({
+        order: 65,
+        dimensionKey: "lexis",
+        action: "从每段挑一个语义空泛的词，换成更准确的名词或动词，不追求生僻词。",
+      });
+    }
+
+    if (sentenceTips.length) {
+      candidates.push({
+        order: 70,
+        dimensionKey: "structure",
+        action: `优先完成“${sentenceTips[0].title}”：${sentenceTips[0].detail}`,
+      });
+    }
+
+    if (!candidates.length) {
+      candidates.push({
+        order: 80,
+        dimensionKey: "lexis",
+        action: "全文已经比较稳。下一版只做两个动作：把一个简单句升格为复合句，再换一次重复词。",
+      });
+      candidates.push({
+        order: 90,
+        dimensionKey: "task",
+        action: "在结论段补一个具体行动或建议，让文章从“观点正确”提升到“论证充分”。",
+      });
+    }
+
+    return candidates
+      .sort((left, right) => left.order - right.order)
+      .slice(0, 4)
+      .map((item, index) => ({
+        priority: index + 1,
+        action: item.action,
+        expectedGain: gainText(item.dimensionKey),
+      }));
+  }
+
+  function buildPatterns(exam, task) {
+    const topic = (task.keywords || [])[0] || "the issue";
+    const patterns = [
+      {
+        pattern: "From my perspective, ... is not merely ..., but ...",
+        usage: "用来把中心观点写得更具体，不改变原意，只增加层次。",
+        example: `From my perspective, ${topic} is not merely a personal choice, but a matter that deserves public attention.`,
+      },
+      {
+        pattern: "This phenomenon can be attributed to two factors: ... and ...",
+        usage: "原因分析段的主题句，后面必须接两个具体原因，不能只报句式。",
+        example:
+          "This phenomenon can be attributed to two factors: limited awareness and insufficient practical guidance.",
+      },
+      {
+        pattern: "While it is true that ..., ...",
+        usage: "让步转折句，用来避免观点绝对化，适合中段展开。",
+        example: `While it is true that ${topic} brings convenience, it also requires responsibility and sound judgment.`,
+      },
+      {
+        pattern: "Only by ... can we ...",
+        usage: "结论段强调条件和行动，注意倒装后的语序。",
+        example:
+          "Only by combining education with practical action can we turn awareness into lasting change.",
+      },
+    ];
+
+    if (exam === "english-ii") {
+      patterns.unshift({
+        pattern: "The chart illustrates a marked change in ..., from ... to ...",
+        usage: "图表作文第一段先写对象、时间、单位和趋势，不要直接空谈观点。",
+        example:
+          "The chart illustrates a marked change in online learning, from 30% in 2020 to 65% in 2024.",
+      });
+    }
+
+    return patterns.slice(0, 3);
+  }
+
+  function buildChecklist(context) {
+    const {
+      language,
+      replacements,
+      sentenceTips,
+      words,
+      paragraphs,
+      prompt,
+      task,
+    } = context;
+    const min = Number(prompt?.wordLimitMin) || 0;
+    const max = Number(prompt?.wordLimitMax) || 0;
+    const checklist = [
+      min || max
+        ? `复写前确认全文落在 ${min || "?"}-${max || "?"} 词之间，当前 ${words} 词。`
+        : `复写前确认全文至少 ${Math.max(100, words)} 词，并保留清晰的引入、论证和结论。`,
+      `确认全文有 ${Math.max(3, paragraphs)} 段，每段只承担一个中心任务。`,
+      "每段至少有一个真实逻辑连接语，不要为了凑衔接而堆 however / moreover。",
+    ];
+
+    if (language.errors) {
+      checklist.push(
+        `优先消灭 ${language.errors} 处明确错误，再检查句首大写和句末标点。`,
+      );
+    } else {
+      checklist.push("全文已无明显硬错误，复写时继续检查主谓一致和冠词。");
+    }
+
+    if (replacements.length) {
+      checklist.push(
+        `至少完成一次重点替换：${replacements[0].from} → ${replacements[0].to}。`,
+      );
+    } else {
+      checklist.push("从每段挑一个空泛词，替换成更准确但不生僻的表达。");
+    }
+
+    if (sentenceTips.length) {
+      checklist.push(`按“${sentenceTips[0].title}”改写 1-2 句，并在复写后朗读一遍。`);
+    } else {
+      checklist.push("把一个简单句升格为复合句，并保证逻辑关系真实存在。");
+    }
+
+    checklist.push(
+      `结论段回扣题干核心词“${(task.keywords || [])[0] || "题目主题"}”，写清一个具体行动或结果。`,
+    );
+    return checklist.slice(0, 7);
+  }
+
+  function buildLesson(context) {
+    const {
+      exam,
+      score,
+      maxScore,
+      band,
+      words,
+      paragraphs,
+      sentences,
+      dimensions,
+      language,
+      replacements,
+      prompt,
+    } = context;
+    const sortedDimensions = [...dimensions].sort(
+      (left, right) => left.score - right.score,
+    );
+    const weakest = sortedDimensions[0] || {
+      label: "语言准确",
+      score: 0,
+    };
+    const strongest = sortedDimensions[sortedDimensions.length - 1] || {
+      label: "任务完成",
+      score: 0,
+    };
+    const priorityAction = language.errors
+      ? `先改掉 ${language.errors} 处明确错误`
+      : replacements.length
+        ? `先把“${replacements[0].from}”替换成更准确的表达`
+        : `先把“${weakest.label}”从 ${weakest.score} 分往上拉`;
+
+    return {
+      overview: `这道题属于${EXAM_LABELS[exam] || exam}。你这篇作文共 ${words} 词、${paragraphs} 段、${sentences.length} 句，当前 ${score} / ${maxScore} 分（${band.label}）。${strongest.label}是相对优势，${weakest.label}是最需要补的短板。讲解按“审题 - 段落 - 逐句 - 升格 - 复写”展开，所有原句都取自你这篇作文。`,
+      focus: priorityAction + "；改完后再处理段落展开和词汇升级。",
+      taskBreakdown: buildTaskBreakdown(context),
+      paragraphMap: buildParagraphMap(context),
+      sentenceWalkthrough: buildSentenceWalkthrough(context),
+      scoreStrategy: buildScoreStrategy(context),
+      patterns: buildPatterns(exam, context.task),
+      checklist: buildChecklist(context),
+    };
+  }
+
   function grade(input) {
     const text = String(input?.text || "").trim();
     const prompt = input?.prompt || {};
@@ -853,7 +1652,8 @@
     const maxScore = MAX_SCORES[exam] || MAX_SCORES.cet6;
 
     const sentences = splitSentences(text);
-    const paragraphs = splitParagraphs(text);
+    const paragraphDetails = splitParagraphDetails(text);
+    const paragraphs = paragraphDetails.map((paragraph) => paragraph.text);
     const grammarIssues = [
       ...scanRules(text, GRAMMAR_RULES),
       ...collectSentenceIssues(text),
@@ -884,6 +1684,27 @@
       scaled: Math.round(ratio * maxScore * 10) / 10,
       note: (parts[dimension.key].notes || []).join(" "),
     }));
+
+    const lesson = buildLesson({
+      text,
+      prompt,
+      exam,
+      maxScore,
+      score,
+      band,
+      words: countWords(text),
+      paragraphs: paragraphs.length,
+      paragraphDetails,
+      sentences,
+      dimensions,
+      issues: grammarIssues,
+      replacements,
+      sentenceTips,
+      task,
+      structure,
+      language,
+      lexis,
+    });
 
     const feedback = [];
     feedback.push(
@@ -927,6 +1748,7 @@
       sentenceTips,
       feedback,
       nextSteps,
+      lesson,
       keywords: task.keywords,
       keywordHits: task.hits,
       diversity: Math.round(lexis.diversity * 100) / 100,

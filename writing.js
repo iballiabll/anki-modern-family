@@ -810,6 +810,254 @@
     return heading;
   }
 
+  function lessonStatusLabel(status) {
+    if (status === "good") {
+      return "已达标";
+    }
+    if (status === "weak") {
+      return "优先处理";
+    }
+    return "需加强";
+  }
+
+  function renderLesson(result) {
+    const lesson = result?.lesson;
+    if (!lesson || typeof lesson !== "object") {
+      return null;
+    }
+    const hasContent =
+      lesson.overview ||
+      lesson.focus ||
+      (lesson.taskBreakdown || []).length ||
+      (lesson.paragraphMap || []).length ||
+      (lesson.sentenceWalkthrough || []).length ||
+      (lesson.scoreStrategy || []).length ||
+      (lesson.patterns || []).length ||
+      (lesson.checklist || []).length;
+    if (!hasContent) {
+      return null;
+    }
+
+    const section = document.createElement("section");
+    section.className = "writing-lesson";
+    section.append(
+      sectionTitle("作文讲解", "针对你的原文：审题 → 段落 → 逐句 → 升格 → 复写"),
+    );
+
+    if (lesson.overview) {
+      const overview = document.createElement("p");
+      overview.className = "writing-lesson-overview";
+      overview.textContent = lesson.overview;
+      section.append(overview);
+    }
+
+    if (lesson.focus) {
+      const focus = document.createElement("p");
+      focus.className = "writing-lesson-focus";
+      const label = document.createElement("strong");
+      label.textContent = "下一版优先：";
+      focus.append(label, document.createTextNode(lesson.focus));
+      section.append(focus);
+    }
+
+    const addBlock = (title, hint, open) => {
+      const details = document.createElement("details");
+      details.className = "writing-lesson-block";
+      if (open) {
+        details.open = true;
+      }
+      const summary = document.createElement("summary");
+      const label = document.createElement("span");
+      label.className = "writing-lesson-block-title";
+      label.textContent = title;
+      const note = document.createElement("span");
+      note.className = "writing-lesson-block-hint";
+      note.textContent = hint || "";
+      summary.append(label, note);
+      const body = document.createElement("div");
+      body.className = "writing-lesson-block-body";
+      details.append(summary, body);
+      section.append(details);
+      return body;
+    };
+
+    if ((lesson.taskBreakdown || []).length) {
+      const body = addBlock(
+        "审题与评分重点",
+        `${lesson.taskBreakdown.length} 个检查项`,
+        true,
+      );
+      const grid = document.createElement("div");
+      grid.className = "writing-lesson-grid";
+      lesson.taskBreakdown.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "writing-lesson-card";
+        const head = document.createElement("div");
+        head.className = "writing-lesson-card-head";
+        const label = document.createElement("strong");
+        label.textContent = item.label || "检查项";
+        const status = document.createElement("span");
+        status.className = `writing-lesson-status is-${item.status || "warn"}`;
+        status.textContent = lessonStatusLabel(item.status);
+        head.append(label, status);
+        const detail = document.createElement("p");
+        detail.textContent = item.detail || "";
+        card.append(head, detail);
+        grid.append(card);
+      });
+      body.append(grid);
+    }
+
+    if ((lesson.paragraphMap || []).length) {
+      const body = addBlock(
+        "逐段讲解",
+        `${lesson.paragraphMap.length} 段，按你的段落顺序`,
+        true,
+      );
+      const list = document.createElement("ol");
+      list.className = "writing-paragraph-list";
+      lesson.paragraphMap.forEach((item) => {
+        const card = document.createElement("li");
+        card.className = "writing-paragraph-item";
+        const head = document.createElement("div");
+        head.className = "writing-paragraph-head";
+        const title = document.createElement("strong");
+        title.textContent = `第 ${item.paragraph || "?"} 段 · ${item.role || "段落"}`;
+        const summary = document.createElement("span");
+        summary.textContent = item.summary || "";
+        head.append(title, summary);
+        card.append(head);
+        [
+          ["做得好的", item.strength],
+          ["具体短板", item.weakness],
+          ["本段改法", item.action],
+        ].forEach(([label, value]) => {
+          if (!value) {
+            return;
+          }
+          const row = document.createElement("p");
+          const strong = document.createElement("strong");
+          strong.textContent = `${label}：`;
+          row.append(strong, document.createTextNode(value));
+          card.append(row);
+        });
+        list.append(card);
+      });
+      body.append(list);
+    }
+
+    if ((lesson.sentenceWalkthrough || []).length) {
+      const body = addBlock(
+        "逐句讲解",
+        `${lesson.sentenceWalkthrough.length} 句，原句均来自你的作文`,
+        true,
+      );
+      const list = document.createElement("ol");
+      list.className = "writing-sentence-list";
+      lesson.sentenceWalkthrough.forEach((item) => {
+        const card = document.createElement("li");
+        card.className = "writing-sentence-item";
+        const original = document.createElement("p");
+        original.className = "writing-sentence-original";
+        original.textContent = item.original || "";
+        card.append(original);
+        [
+          ["诊断", item.diagnosis],
+          ["为什么", item.why],
+          ["升格写法", item.upgrade],
+          ["检查方法", item.note],
+        ].forEach(([label, value]) => {
+          if (!value) {
+            return;
+          }
+          const row = document.createElement("p");
+          if (label === "升格写法") {
+            row.className = "writing-sentence-upgrade";
+          }
+          const strong = document.createElement("strong");
+          strong.textContent = `${label}：`;
+          row.append(strong, document.createTextNode(value));
+          card.append(row);
+        });
+        list.append(card);
+      });
+      body.append(list);
+    }
+
+    if ((lesson.scoreStrategy || []).length) {
+      const body = addBlock(
+        "提分优先级",
+        "按投入产出排序，先做前面的",
+        false,
+      );
+      const list = document.createElement("ol");
+      list.className = "writing-strategy-list";
+      lesson.scoreStrategy.forEach((item) => {
+        const row = document.createElement("li");
+        const priority = document.createElement("span");
+        priority.className = "writing-strategy-priority";
+        priority.textContent = `优先 ${item.priority || ""}`;
+        const action = document.createElement("p");
+        action.textContent = item.action || "";
+        row.append(priority, action);
+        if (item.expectedGain) {
+          const gain = document.createElement("em");
+          gain.textContent = `预计 ${item.expectedGain}`;
+          row.append(gain);
+        }
+        list.append(row);
+      });
+      body.append(list);
+    }
+
+    if ((lesson.patterns || []).length) {
+      const body = addBlock(
+        "可迁移句式",
+        "先理解逻辑，再换成自己的内容",
+        false,
+      );
+      const grid = document.createElement("div");
+      grid.className = "writing-pattern-grid";
+      lesson.patterns.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "writing-pattern-card";
+        const pattern = document.createElement("code");
+        pattern.textContent = item.pattern || "";
+        const usage = document.createElement("p");
+        usage.textContent = item.usage || "";
+        card.append(pattern, usage);
+        if (item.example) {
+          const example = document.createElement("p");
+          example.className = "writing-pattern-example";
+          example.textContent = `Example: ${item.example}`;
+          card.append(example);
+        }
+        grid.append(card);
+      });
+      body.append(grid);
+    }
+
+    if ((lesson.checklist || []).length) {
+      const body = addBlock("复写清单", "下一版交卷前逐项打勾", false);
+      const list = document.createElement("ul");
+      list.className = "writing-checklist";
+      lesson.checklist.forEach((item) => {
+        const row = document.createElement("li");
+        const label = document.createElement("label");
+        const box = document.createElement("input");
+        box.type = "checkbox";
+        const text = document.createElement("span");
+        text.textContent = String(item || "");
+        label.append(box, text);
+        row.append(label);
+        list.append(row);
+      });
+      body.append(list);
+    }
+
+    return section;
+  }
+
   function renderGrade(result, options = {}) {
     if (!els.gradeResult) {
       return;
@@ -845,8 +1093,16 @@
     if (options.cached) {
       const hint = document.createElement("p");
       hint.className = "writing-panel-hint";
-      hint.textContent = "这是本机保存的上次批改结果，改动作文后重新点“批改作文”即可刷新。";
+      // 旧缓存（讲解功能上线前保存的）没有 lesson，提示用户重新批改一次。
+      hint.textContent = result.lesson
+        ? "这是本机保存的上次批改结果，改动作文后重新点“批改作文”即可刷新。"
+        : "这是本机保存的旧版批改结果，还没有逐段逐句讲解；重新点“批改作文”即可生成。";
       fragment.append(hint);
+    }
+
+    const lesson = renderLesson(result);
+    if (lesson) {
+      fragment.append(lesson);
     }
 
     if ((result.dimensions || []).length) {
