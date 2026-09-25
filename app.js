@@ -1678,6 +1678,8 @@ const elements = {
   authModeLogin: document.querySelector("#authModeLogin"),
   authModeRegister: document.querySelector("#authModeRegister"),
   authNotice: document.querySelector("#authNotice"),
+  authMirror: document.querySelector("#authMirror"),
+  authMirrorLink: document.querySelector("#authMirrorLink"),
   emailField: document.querySelector("#emailField"),
   email: document.querySelector("#email"),
   forgotPasswordButton: document.querySelector("#forgotPasswordButton"),
@@ -8746,6 +8748,33 @@ function renderAuthNotice(text = "", tone = "info") {
   elements.authNotice.textContent = text;
   elements.authNotice.dataset.tone = tone;
   elements.authNotice.hidden = !text;
+  renderMirrorNotice();
+}
+
+/** 有账号服务的正式入口；只读镜像上所有登录／注册动作都指向这里。 */
+const MAIN_SITE_URL = "https://app.iball.top/";
+
+/**
+ * 只读镜像判定：接口在，但服务器没有可写账号目录（典型是 Vercel 那份部署）。
+ * 这种站点登录、注册都写不进去，必须把用户引到主站，否则只会反复撞「账号或密码不正确」。
+ */
+function isReadOnlyMirror() {
+  return Boolean(
+    state.sessionMode === "server" &&
+      state.registration &&
+      state.registration.storageReady === false,
+  );
+}
+
+function renderMirrorNotice() {
+  if (!elements.authMirror) {
+    return;
+  }
+  const mirror = isReadOnlyMirror();
+  elements.authMirror.hidden = !mirror;
+  if (mirror && elements.authMirrorLink) {
+    elements.authMirrorLink.href = MAIN_SITE_URL;
+  }
 }
 
 function setAuthMode(mode, message = "") {
@@ -8796,6 +8825,7 @@ function showLogin(message = "") {
   elements.loginView.hidden = false;
   elements.appView.hidden = true;
   setAuthMode(state.authMode, message);
+  renderMirrorNotice();
   elements.username.focus();
 }
 
@@ -9007,6 +9037,14 @@ async function handleAuthSubmit(event) {
   elements.loginButton.textContent = copy.pending;
   elements.loginError.hidden = true;
 
+  // 只读镜像没有可写账号目录，注册必然失败，直接给出可执行的下一步。
+  if (isReadOnlyMirror() && mode === "register") {
+    elements.loginButton.disabled = false;
+    elements.loginButton.textContent = copy.button;
+    showLogin(`这里是只读镜像，不能注册账号。请到主站 ${MAIN_SITE_URL} 注册。`);
+    return;
+  }
+
   try {
     const payload =
       mode === "register"
@@ -9038,7 +9076,12 @@ async function handleAuthSubmit(event) {
     // 注册成功后服务端已经下发会话，直接进入小屋。
     await showApp(data.user || username);
   } catch (error) {
-    showLogin(error.message || "登录服务暂时不可用");
+    const reason = error.message || "登录服务暂时不可用";
+    showLogin(
+      isReadOnlyMirror()
+        ? `${reason} 当前是只读镜像，账号在主站 ${MAIN_SITE_URL}。`
+        : reason,
+    );
   } finally {
     elements.loginButton.disabled = false;
     elements.loginButton.textContent = AUTH_MODE_COPY[state.authMode].button;

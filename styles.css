@@ -399,6 +399,24 @@ p {
   border-color: #f2c6c1;
 }
 
+.auth-mirror {
+  margin: -8px 0 18px;
+  padding: 10px 12px;
+  color: #24504a;
+  background: #e8f4f0;
+  border: 1px solid #bcdcd3;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.auth-mirror a {
+  color: #17635a;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .auth-extra-field {
   display: grid;
   gap: 10px;
