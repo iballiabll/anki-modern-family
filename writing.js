@@ -14,13 +14,16 @@
   "use strict";
 
   const INDEX_URL = "./writing-data/index.json";
+  const TEMPLATE_INDEX_URL = "./writing-data/templates/index.json";
   const SHARD_CACHE_PREFIX = "iball-writing-shard:";
+  const TEMPLATE_CACHE_PREFIX = "iball-writing-template:";
   const DRAFT_PREFIX = "iball-writing-draft:";
   const GRADE_PREFIX = "iball-writing-grade:";
   const LAST_PROMPT_KEY = "iball-writing-last-prompt";
   const API_TIMEOUT_MS = 20000;
   const MIN_WORDS = 1;
   const EXAM_ORDER = ["cet4", "cet6", "english-i", "english-ii"];
+  const TEMPLATE_KIND_ORDER = ["all", "small", "large"];
   const EXAM_LABELS = {
     cet4: "四级",
     cet6: "六级",
@@ -40,6 +43,15 @@
     editorTouched: false,
     shards: new Map(),
     shardPromises: new Map(),
+    templateIndex: null,
+    templateExam: "cet4",
+    templateKind: "all",
+    templateActiveId: "",
+    templateShards: new Map(),
+    templatePromises: new Map(),
+    templateIndexPromise: null,
+    templateLoadPromise: null,
+    templateObserver: null,
     grade: null,
     grading: false,
     saveTimer: 0,
@@ -70,6 +82,13 @@
       "speakModelButton",
       "gradeStatus",
       "gradeResult",
+      "templateSection",
+      "templateMeta",
+      "templateExamTabs",
+      "templateKindTabs",
+      "templateList",
+      "templateDetail",
+      "templateJumpLink",
     ].forEach((id) => {
       els[id] = document.getElementById(id);
     });
@@ -146,6 +165,10 @@
 
   function shardCacheKey(name) {
     return `${SHARD_CACHE_PREFIX}${name}`;
+  }
+
+  function templateCacheKey(name) {
+    return `${TEMPLATE_CACHE_PREFIX}${name}`;
   }
 
   function hasDraft(id) {
@@ -380,6 +403,621 @@
       });
     state.shardPromises.set(name, promise);
     return promise;
+  }
+
+  function templateExamConfig(exam) {
+    return state.templateIndex?.exams?.[exam] || null;
+  }
+
+  function loadTemplateIndex() {
+    if (state.templateIndex) {
+      return Promise.resolve(state.templateIndex);
+    }
+    if (state.templateIndexPromise) {
+      return state.templateIndexPromise;
+    }
+    const promise = fetch(TEMPLATE_INDEX_URL, {
+      headers: { Accept: "application/json" },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`模板索引加载失败（${response.status}）`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!data || typeof data !== "object" || !data.exams) {
+          throw new Error("模板索引格式不正确");
+        }
+        state.templateIndex = data;
+        state.templateIndexPromise = null;
+        return data;
+      })
+      .catch((error) => {
+        state.templateIndexPromise = null;
+        throw error;
+      });
+    state.templateIndexPromise = promise;
+    return promise;
+  }
+
+  function loadTemplateShard(exam) {
+    if (state.templateShards.has(exam)) {
+      return Promise.resolve(state.templateShards.get(exam));
+    }
+    if (state.templatePromises.has(exam)) {
+      return state.templatePromises.get(exam);
+    }
+    const cached = readJson(templateCacheKey(exam));
+    if (cached && Array.isArray(cached.templates)) {
+      state.templateShards.set(exam, cached);
+      return Promise.resolve(cached);
+    }
+    if (!state.templateIndex) {
+      return loadTemplateIndex().then(() => {
+        if (state.templateShards.has(exam)) {
+          return state.templateShards.get(exam);
+        }
+        return loadTemplateShard(exam);
+      });
+    }
+    const url = templateExamConfig(exam)?.url;
+    if (!url) {
+      return Promise.reject(new Error(`缺少模板分片地址：${exam}`));
+    }
+    const promise = fetch(url, { headers: { Accept: "application/json" } })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`模板数据加载失败（${response.status}）`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!data || !Array.isArray(data.templates)) {
+          throw new Error("模板数据格式不正确");
+        }
+        state.templateShards.set(exam, data);
+        state.templatePromises.delete(exam);
+        writeJson(templateCacheKey(exam), data);
+        return data;
+      })
+      .catch((error) => {
+        state.templatePromises.delete(exam);
+        throw error;
+      });
+    state.templatePromises.set(exam, promise);
+    return promise;
+  }
+
+  function syncTemplateTabs() {
+    els.templateExamTabs?.querySelectorAll("[data-exam]").forEach((tab) => {
+      const active = tab.dataset.exam === state.templateExam;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-pressed", String(active));
+    });
+    els.templateKindTabs?.querySelectorAll("[data-kind]").forEach((tab) => {
+      const active = tab.dataset.kind === state.templateKind;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  function visibleTemplates() {
+    const templates = state.templateShards.get(state.templateExam)?.templates || [];
+    if (state.templateKind === "all") {
+      return templates;
+    }
+    return templates.filter((template) => template.kind === state.templateKind);
+  }
+
+  function renderTemplateMeta() {
+    if (!els.templateMeta) {
+      return;
+    }
+    const config = templateExamConfig(state.templateExam);
+    const count = visibleTemplates().length;
+    const label = config?.examLabel || EXAM_LABELS[state.templateExam] || "模板";
+    const target = config?.wordTarget ? ` · ${config.wordTarget}` : "";
+    els.templateMeta.textContent = `${label} · ${count} 个模板${target}`;
+  }
+
+  function makeTemplateTag(text, extraClass) {
+    const tag = document.createElement("span");
+    tag.className = `writing-template-tag ${extraClass || ""}`.trim();
+    tag.textContent = text;
+    return tag;
+  }
+
+  function createTemplateCard(template) {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "writing-template-card";
+    card.dataset.templateId = template.id;
+    card.setAttribute("role", "listitem");
+    if (template.id === state.templateActiveId) {
+      card.classList.add("is-active");
+      card.setAttribute("aria-current", "true");
+    }
+
+    const title = document.createElement("strong");
+    title.textContent = template.title || template.genre || "作文模板";
+    const meta = document.createElement("span");
+    meta.textContent = template.kindLabel || "";
+    const tags = document.createElement("span");
+    tags.className = "writing-template-tags";
+    if (template.kind) {
+      tags.append(
+        makeTemplateTag(template.kind === "small" ? "小作文" : "大作文", "is-kind"),
+      );
+    }
+    if (template.genre) {
+      tags.append(makeTemplateTag(template.genre, "is-genre"));
+    }
+
+    card.append(title, meta, tags);
+    card.addEventListener("click", () => selectTemplate(template.id));
+    return card;
+  }
+
+  function appendSlotText(container, text) {
+    const value = String(text || "");
+    const slotPattern = /\{[^{}]+\}/g;
+    let lastIndex = 0;
+    let match = slotPattern.exec(value);
+    while (match) {
+      if (match.index > lastIndex) {
+        container.append(document.createTextNode(value.slice(lastIndex, match.index)));
+      }
+      const slot = document.createElement("span");
+      slot.className = "writing-template-slot";
+      slot.textContent = match[0];
+      container.append(slot);
+      lastIndex = match.index + match[0].length;
+      match = slotPattern.exec(value);
+    }
+    if (lastIndex < value.length) {
+      container.append(document.createTextNode(value.slice(lastIndex)));
+    }
+  }
+
+  function makeTemplateBlock(title, hint) {
+    const block = document.createElement("section");
+    block.className = "writing-template-block";
+    const heading = document.createElement("h4");
+    heading.textContent = title;
+    if (hint) {
+      const note = document.createElement("span");
+      note.textContent = hint;
+      heading.append(note);
+    }
+    block.append(heading);
+    return block;
+  }
+
+  function makeTemplateNote(title, items, extraClass) {
+    const note = document.createElement("section");
+    note.className = `writing-template-note ${extraClass || ""}`.trim();
+    const heading = document.createElement("h5");
+    heading.textContent = title;
+    note.append(heading);
+    const list = document.createElement("ul");
+    (items || []).forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      list.append(li);
+    });
+    note.append(list);
+    return note;
+  }
+
+  function speakTemplateLines(lines, label) {
+    const content = (lines || []).filter(Boolean);
+    if (!content.length) {
+      return;
+    }
+    if (!window.IballSpeech?.speakSequence) {
+      els.templateMeta && (els.templateMeta.textContent = "当前浏览器不支持朗读。");
+      return;
+    }
+    window.IballSpeech.speakSequence(
+      content.map((text) => ({ text, lang: "en-US" })),
+      { label, rate: 0.88 },
+    );
+  }
+
+  function templateSkeletonText(template) {
+    return (template.skeleton || [])
+      .map((step) =>
+        [step.section, step.en, step.zh, step.note].filter(Boolean).join("\n"),
+      )
+      .join("\n\n");
+  }
+
+  function fallbackCopyText(text) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "readonly");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.append(area);
+    area.select();
+    let copied = false;
+    try {
+      copied = document.execCommand("copy");
+    } catch {
+      copied = false;
+    }
+    area.remove();
+    return copied;
+  }
+
+  function copyTemplateSkeleton(template, button) {
+    const text = templateSkeletonText(template);
+    const done = () => {
+      if (!button) {
+        return;
+      }
+      const original = button.textContent;
+      button.textContent = "已复制";
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 1200);
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(done)
+        .catch(() => {
+          if (fallbackCopyText(text)) {
+            done();
+          }
+        });
+      return;
+    }
+    if (fallbackCopyText(text)) {
+      done();
+    }
+  }
+
+  function createTemplateActions(template) {
+    const actions = document.createElement("div");
+    actions.className = "writing-template-actions";
+
+    const speakSkeleton = document.createElement("button");
+    speakSkeleton.type = "button";
+    speakSkeleton.className = "tool-button";
+    speakSkeleton.textContent = "朗读骨架";
+    speakSkeleton.addEventListener("click", () =>
+      speakTemplateLines(
+        (template.skeleton || []).map((step) => step.en),
+        "模板骨架朗读",
+      ),
+    );
+
+    const speakDemo = document.createElement("button");
+    speakDemo.type = "button";
+    speakDemo.className = "tool-button";
+    speakDemo.textContent = "朗读示例";
+    speakDemo.addEventListener("click", () =>
+      speakTemplateLines(template.demo?.paragraphs, "模板示例朗读"),
+    );
+
+    const copy = document.createElement("button");
+    copy.type = "button";
+    copy.className = "tool-button";
+    copy.textContent = "复制骨架";
+    copy.addEventListener("click", () => copyTemplateSkeleton(template, copy));
+
+    actions.append(speakSkeleton, speakDemo, copy);
+    return actions;
+  }
+
+  function renderTemplateDetail(template) {
+    if (!els.templateDetail) {
+      return;
+    }
+    els.templateDetail.textContent = "";
+    if (!template) {
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = "挑一个模板，这里会显示段落骨架、功能句、示例与自查清单。";
+      els.templateDetail.append(empty);
+      return;
+    }
+
+    const head = document.createElement("div");
+    head.className = "writing-template-head";
+    const title = document.createElement("h3");
+    title.textContent = template.title || template.genre || "作文模板";
+    const scenario = document.createElement("p");
+    scenario.className = "writing-template-scenario";
+    scenario.textContent = template.scenario || "";
+    head.append(title, scenario);
+    els.templateDetail.append(head, createTemplateActions(template));
+
+    const skeletonBlock = makeTemplateBlock(
+      "段落骨架",
+      "先替换花括号槽位，再按题目补充具体信息",
+    );
+    const skeleton = document.createElement("div");
+    skeleton.className = "writing-template-skeleton";
+    (template.skeleton || []).forEach((step) => {
+      const item = document.createElement("article");
+      item.className = "writing-template-step";
+      const section = document.createElement("span");
+      section.className = "writing-template-step-section";
+      section.textContent = step.section || "";
+      const en = document.createElement("p");
+      en.className = "writing-template-step-en";
+      appendSlotText(en, step.en);
+      const zh = document.createElement("p");
+      zh.className = "writing-template-step-zh";
+      zh.textContent = step.zh || "";
+      item.append(section, en, zh);
+      if (step.note) {
+        const note = document.createElement("p");
+        note.className = "writing-template-step-note";
+        note.textContent = `提示：${step.note}`;
+        item.append(note);
+      }
+      skeleton.append(item);
+    });
+    skeletonBlock.append(skeleton);
+    els.templateDetail.append(skeletonBlock);
+
+    const phraseBlock = makeTemplateBlock(
+      "可替换功能句",
+      "按功能挑句子，不要原样堆满整篇",
+    );
+    const phrases = document.createElement("ul");
+    phrases.className = "writing-template-phrases";
+    (template.phrases || []).forEach((phrase) => {
+      const item = document.createElement("li");
+      item.className = "writing-template-phrase";
+      const fn = document.createElement("strong");
+      fn.textContent = phrase.function || "功能句";
+      const en = document.createElement("em");
+      en.textContent = phrase.en || "";
+      const zh = document.createElement("span");
+      zh.textContent = phrase.zh || "";
+      item.append(fn, en, zh);
+      phrases.append(item);
+    });
+    phraseBlock.append(phrases);
+    els.templateDetail.append(phraseBlock);
+
+    const demoBlock = makeTemplateBlock(
+      "示例段落",
+      "压缩版示例，考场按目标词数扩写",
+    );
+    const demo = document.createElement("div");
+    demo.className = "writing-template-demo";
+    if (template.demo?.topic) {
+      const topic = document.createElement("p");
+      topic.className = "writing-template-demo-topic";
+      topic.textContent = `题目：${template.demo.topic}`;
+      demo.append(topic);
+    }
+    const paragraphs = template.demo?.paragraphs || [];
+    paragraphs.forEach((paragraph, index) => {
+      const item = document.createElement("div");
+      item.className = "writing-template-demo-paragraph";
+      const en = document.createElement("p");
+      en.className = "writing-template-demo-en";
+      en.textContent = paragraph;
+      item.append(en);
+      const translation = template.demo?.translation?.[index];
+      if (translation) {
+        const zh = document.createElement("p");
+        zh.className = "writing-template-demo-zh";
+        zh.textContent = translation;
+        item.append(zh);
+      }
+      demo.append(item);
+    });
+    if (!paragraphs.length) {
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = "这个模板暂时没有示例段落，先按骨架和功能句练习。";
+      demo.append(empty);
+    }
+    if (template.demo?.note) {
+      const note = document.createElement("p");
+      note.className = "writing-template-demo-note";
+      note.textContent = template.demo.note;
+      demo.append(note);
+    }
+    demoBlock.append(demo);
+    els.templateDetail.append(demoBlock);
+
+    const notes = document.createElement("div");
+    notes.className = "writing-template-notes";
+    notes.append(
+      makeTemplateNote("避坑清单", template.pitfalls, "is-pitfall"),
+      makeTemplateNote("套用清单", template.adapt),
+    );
+    els.templateDetail.append(notes);
+
+    const foot = document.createElement("p");
+    foot.className = "writing-template-foot";
+    foot.textContent =
+      "模板只解决结构和衔接，内容分要靠题干关键词、真实例子与自己的表达。";
+    els.templateDetail.append(foot);
+  }
+
+  function renderTemplateList() {
+    if (!els.templateList) {
+      return;
+    }
+    const list = visibleTemplates();
+    els.templateList.textContent = "";
+    if (!list.length) {
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = "当前考试和类型下还没有模板，换一个筛选条件。";
+      els.templateList.append(empty);
+      renderTemplateDetail(null);
+      renderTemplateMeta();
+      return;
+    }
+    if (!list.some((template) => template.id === state.templateActiveId)) {
+      state.templateActiveId = list[0].id;
+    }
+    const fragment = document.createDocumentFragment();
+    list.forEach((template) => fragment.append(createTemplateCard(template)));
+    els.templateList.append(fragment);
+    renderTemplateDetail(
+      list.find((template) => template.id === state.templateActiveId) || list[0],
+    );
+    renderTemplateMeta();
+  }
+
+  function renderTemplateLibrary() {
+    syncTemplateTabs();
+    renderTemplateList();
+  }
+
+  function renderTemplateLoading(message) {
+    if (els.templateMeta) {
+      els.templateMeta.textContent = message || "正在读取模板…";
+    }
+    if (els.templateList) {
+      els.templateList.textContent = "";
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = message || "正在读取模板…";
+      els.templateList.append(empty);
+    }
+    if (els.templateDetail) {
+      els.templateDetail.textContent = "";
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = "模板加载完成后，这里会显示段落骨架、功能句、示例与自查清单。";
+      els.templateDetail.append(empty);
+    }
+  }
+
+  function renderTemplateError(error) {
+    const message = error?.message || "模板加载失败";
+    if (els.templateMeta) {
+      els.templateMeta.textContent = "模板加载失败";
+    }
+    if (els.templateList) {
+      els.templateList.textContent = "";
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = `${message}。可以重试，题库其它功能不受影响。`;
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "tool-button";
+      retry.textContent = "重新加载模板";
+      retry.addEventListener("click", () => {
+        renderTemplateLoading("正在重新读取模板…");
+        ensureTemplates();
+      });
+      empty.append(document.createElement("br"), retry);
+      els.templateList.append(empty);
+    }
+    if (els.templateDetail) {
+      els.templateDetail.textContent = "";
+      const empty = document.createElement("p");
+      empty.className = "writing-template-empty";
+      empty.textContent = "模板数据暂时没读到，不影响作文批改、范文和讲解。";
+      els.templateDetail.append(empty);
+    }
+  }
+
+  function ensureTemplates() {
+    if (state.templateLoadPromise) {
+      return state.templateLoadPromise;
+    }
+    state.templateLoadPromise = loadTemplateIndex()
+      .then(() => loadTemplateShard(state.templateExam))
+      .then(() => {
+        state.templateLoadPromise = null;
+        renderTemplateLibrary();
+      })
+      .catch((error) => {
+        state.templateLoadPromise = null;
+        renderTemplateError(error);
+      });
+    return state.templateLoadPromise;
+  }
+
+  function selectTemplate(id) {
+    state.templateActiveId = id;
+    renderTemplateList();
+  }
+
+  function switchTemplateExam(exam) {
+    if (!EXAM_ORDER.includes(exam) || exam === state.templateExam) {
+      return;
+    }
+    state.templateExam = exam;
+    state.templateActiveId = "";
+    syncTemplateTabs();
+    renderTemplateLoading(`正在读取${EXAM_LABELS[exam] || "模板"}模板…`);
+    loadTemplateShard(exam)
+      .then(() => {
+        if (state.templateExam === exam) {
+          renderTemplateLibrary();
+        }
+      })
+      .catch((error) => {
+        if (state.templateExam === exam) {
+          renderTemplateError(error);
+        }
+      });
+  }
+
+  function switchTemplateKind(kind) {
+    if (!TEMPLATE_KIND_ORDER.includes(kind) || kind === state.templateKind) {
+      return;
+    }
+    state.templateKind = kind;
+    syncTemplateTabs();
+    if (state.templateShards.has(state.templateExam)) {
+      renderTemplateLibrary();
+    } else {
+      renderTemplateLoading("正在读取模板…");
+      ensureTemplates();
+    }
+  }
+
+  function setupTemplateLazyLoad() {
+    const section = els.templateSection;
+    if (!section) {
+      return;
+    }
+    const load = () => {
+      if (EXAM_ORDER.includes(state.exam) && state.exam !== state.templateExam) {
+        state.templateExam = state.exam;
+        state.templateActiveId = "";
+        syncTemplateTabs();
+      }
+      ensureTemplates();
+    };
+    els.templateJumpLink?.addEventListener("click", load);
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) {
+            return;
+          }
+          observer.disconnect();
+          state.templateObserver = null;
+          load();
+        },
+        { rootMargin: "0px" },
+      );
+      observer.observe(section);
+      state.templateObserver = observer;
+      return;
+    }
+    const rect = section.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      load();
+    }
   }
 
   function selectPrompt(id) {
@@ -1437,6 +2075,22 @@
       }
       speakModel(paragraphs);
     });
+
+    els.templateExamTabs?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-exam]");
+      if (!button) {
+        return;
+      }
+      switchTemplateExam(button.dataset.exam);
+    });
+
+    els.templateKindTabs?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-kind]");
+      if (!button) {
+        return;
+      }
+      switchTemplateKind(button.dataset.kind);
+    });
   }
 
   function renderEmptyTask() {
@@ -1480,6 +2134,7 @@
   function init() {
     cacheDom();
     bindEvents();
+    setupTemplateLazyLoad();
     renderDraftCount();
     updateWordMeter();
     fetch(INDEX_URL, { headers: { Accept: "application/json" } })

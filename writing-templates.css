@@ -1,0 +1,445 @@
+/**
+ * 作文模板库样式。
+ *
+ * 所有选择器都挂在 .writing-templates 之下，不修改 writing.css 既有规则，
+ * 也不影响站内其它模块。模板数据按考试分片懒加载，样式只负责呈现骨架、
+ * 功能句、示例段落与自查清单四块内容。
+ */
+
+.writing-templates {
+  width: min(1240px, calc(100% - 44px));
+  margin: 18px auto 0;
+  background: #ffffff;
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius, 8px);
+  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.08);
+  overflow: hidden;
+}
+
+/* hero 区的“作文模板”跳转入口沿用 tool-button 外观，锚点需要自己对齐。 */
+#templateJumpLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.writing-templates-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #f6faf8;
+  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+}
+
+.writing-templates-head h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--forest-deep);
+}
+
+.writing-templates-intro {
+  max-width: 78ch;
+  margin: 0;
+  color: #4c635c;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.writing-templates-meta {
+  color: #5d746c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.writing-templates-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(11, 41, 37, 0.08);
+}
+
+.writing-templates-toolbar .segmented-control {
+  min-height: 42px;
+}
+
+.writing-templates-toolbar .segment-button {
+  min-height: 32px;
+}
+
+#templateExamTabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#templateKindTabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.writing-templates-body {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+  align-items: start;
+}
+
+/* ------------------------------------------------------------ 模板列表 */
+
+.writing-template-list {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  max-height: 620px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 2px;
+}
+
+.writing-template-card {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  background: #ffffff;
+  border: 1px solid rgba(11, 41, 37, 0.14);
+  border-radius: var(--writing-radius, 8px);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.writing-template-card:hover {
+  border-color: rgba(21, 60, 53, 0.42);
+  transform: translateY(-1px);
+}
+
+.writing-template-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.writing-template-card.is-active {
+  border-color: var(--forest);
+  background: var(--forest-soft);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.writing-template-card strong {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--forest-deep);
+}
+
+.writing-template-card span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #5d746c;
+}
+
+.writing-template-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.writing-template-tag {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #eef3f0;
+  color: #4a615a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.writing-template-tag.is-kind {
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.writing-template-tag.is-genre {
+  background: #f7efdc;
+  color: #8a6a1c;
+}
+
+.writing-template-empty {
+  margin: 0;
+  padding: 14px;
+  color: #5d746c;
+  background: #f7faf8;
+  border: 1px dashed rgba(11, 41, 37, 0.18);
+  border-radius: var(--writing-radius, 8px);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------ 模板详情 */
+
+.writing-template-detail {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.writing-template-head {
+  display: grid;
+  gap: 6px;
+}
+
+.writing-template-head h3 {
+  margin: 0;
+  font-size: 17px;
+  color: var(--forest-deep);
+}
+
+.writing-template-scenario {
+  margin: 0;
+  color: #4c635c;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.writing-template-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.writing-template-actions .tool-button {
+  min-height: 40px;
+}
+
+.writing-template-block {
+  display: grid;
+  gap: 10px;
+}
+
+.writing-template-block > h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--forest-deep);
+}
+
+.writing-template-block > h4 span {
+  color: #6a7f77;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.writing-template-skeleton {
+  display: grid;
+  gap: 8px;
+}
+
+.writing-template-step {
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px;
+  background: #fbfdfc;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  border-left: 3px solid var(--forest);
+  border-radius: 0 var(--writing-radius, 8px) var(--writing-radius, 8px) 0;
+}
+
+.writing-template-step-section {
+  color: #6a7f77;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.writing-template-step-en {
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.writing-template-slot {
+  padding: 0 3px;
+  background: #fbf0d5;
+  border-radius: 3px;
+  color: #7d5c10;
+  font-family: inherit;
+}
+
+.writing-template-step-zh,
+.writing-template-step-note {
+  color: #4c635c;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.writing-template-step-note {
+  color: #77887f;
+}
+
+.writing-template-phrases {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-template-phrase {
+  display: grid;
+  gap: 3px;
+  padding: 9px 12px;
+  background: #f4f8f6;
+  border-radius: var(--writing-radius, 8px);
+}
+
+.writing-template-phrase strong {
+  color: var(--forest);
+  font-size: 11px;
+}
+
+.writing-template-phrase em {
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.writing-template-phrase span {
+  color: #5d746c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.writing-template-demo {
+  display: grid;
+  gap: 10px;
+}
+
+.writing-template-demo-topic {
+  margin: 0;
+  color: #6a7f77;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.writing-template-demo-paragraph {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+
+.writing-template-demo-paragraph p {
+  margin: 0;
+  line-height: 1.75;
+}
+
+.writing-template-demo-en {
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.writing-template-demo-zh {
+  color: #5d746c;
+  font-size: 12.5px;
+}
+
+.writing-template-demo-note {
+  margin: 0;
+  color: #7d5c10;
+  background: #fbf0d5;
+  border-radius: var(--writing-radius, 8px);
+  padding: 8px 11px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.writing-template-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.writing-template-note {
+  padding: 12px;
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius, 8px);
+  background: #ffffff;
+}
+
+.writing-template-note h5 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-template-note ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.writing-template-note li {
+  color: #4c635c;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.writing-template-note.is-pitfall {
+  background: #fdf7f6;
+  border-color: rgba(180, 70, 59, 0.22);
+}
+
+.writing-template-note.is-pitfall h5 {
+  color: var(--writing-danger, #b4463b);
+}
+
+.writing-template-foot {
+  margin: 0;
+  color: #77887f;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------ 响应式 */
+
+@media (max-width: 900px) {
+  .writing-templates {
+    width: min(100% - 28px, 820px);
+  }
+
+  .writing-templates-toolbar,
+  .writing-templates-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .writing-template-list {
+    max-height: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .writing-templates-head,
+  .writing-templates-toolbar,
+  .writing-templates-body {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .writing-template-actions .tool-button {
+    flex: 1 1 140px;
+  }
+}

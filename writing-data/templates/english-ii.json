@@ -1,0 +1,604 @@
+{
+  "exam": "english-ii",
+  "examLabel": "考研英语二",
+  "wordTarget": "小作文约 100 词；大作文约 150 词",
+  "note": "本站原创整理的写作骨架与自查清单，用于和你自己的模板资料对照；不是官方范文，考场必须替换槽位来回应具体题目。",
+  "templates": [
+    {
+      "id": "english-ii-small-suggestion",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "建议信",
+      "title": "建议信 · 就服务或活动提建议",
+      "scenario": "给图书馆、食堂、社团或活动主办方写信，指出问题并提出可执行建议。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {收件人},",
+          "zh": "尊敬的……：",
+          "note": "英语二小作文同样按书信格式评分，称呼、落款一个都不能少。"
+        },
+        {
+          "section": "开篇点题",
+          "en": "I am writing to offer some suggestions regarding {事项}.",
+          "zh": "我写信是想就……提出几点建议。",
+          "note": "开篇一句进主题，英语二小作文只有约 100 词。"
+        },
+        {
+          "section": "建议一",
+          "en": "First of all, I suggest that {建议一} so as to {目的}.",
+          "zh": "首先，我建议……，以便……。",
+          "note": "suggest that 从句用动词原形，是高频语法考点。"
+        },
+        {
+          "section": "建议二",
+          "en": "In addition, it would be helpful to {建议二}.",
+          "zh": "此外，……会很有帮助。",
+          "note": "第二条建议换一个角度，不要和建议一同义重复。"
+        },
+        {
+          "section": "收尾与落款",
+          "en": "I would appreciate it if you could take my suggestions into account.\n\nYours sincerely,\nLi Ming",
+          "zh": "如果您能考虑我的建议，我将不胜感激。此致，李明。",
+          "note": "take ... into account 与 take ... into consideration 可互换使用。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "开篇",
+          "en": "I am writing to offer some suggestions regarding the canteen service.",
+          "zh": "我写信是想就食堂服务提出几点建议。"
+        },
+        {
+          "function": "提建议",
+          "en": "I suggest that more vegetarian dishes be provided.",
+          "zh": "我建议增加素食菜品的供应。"
+        },
+        {
+          "function": "说明好处",
+          "en": "This would make the canteen more attractive to students with different dietary habits.",
+          "zh": "这会让食堂对不同饮食习惯的学生更有吸引力。"
+        },
+        {
+          "function": "收尾",
+          "en": "I hope you will find these suggestions useful.",
+          "zh": "希望这些建议对您有用。"
+        }
+      ],
+      "demo": {
+        "topic": "向食堂负责人建议改善就餐体验",
+        "paragraphs": [
+          "Dear Sir or Madam,\nI am writing to offer some suggestions regarding the service of our canteen.",
+          "First of all, I suggest that more vegetarian dishes be provided so as to meet the needs of students with different dietary habits. In addition, it would be helpful to display the price of each dish more clearly, which would save us time when queuing.",
+          "I would appreciate it if you could take my suggestions into account.\n\nYours sincerely,\nLi Ming"
+        ],
+        "translation": [
+          "尊敬的先生/女士：我写信是想就食堂服务提出几点建议。",
+          "首先，我建议增加素食菜品，以满足不同饮食习惯学生的需要。此外，把每道菜的价格标得更清楚会很有帮助，能节省我们排队的时间。",
+          "如果您能考虑我的建议，我将不胜感激。此致，李明。"
+        ]
+      },
+      "pitfalls": [
+        "建议与题目要求不匹配：题目要求两条建议却写了三条泛泛而谈，重点被稀释。",
+        "从句动词形式错误：suggest that 后面误用 will be / is，应该用动词原形。",
+        "忘记落款：英语二小作文格式分同样严格。"
+      ],
+      "adapt": [
+        "把建议对象换成本题给定的场景，建议内容必须能落地，例如增加班次、调整时间、完善标识。",
+        "题目若要求说明问题，就在开篇后补一句 one problem is that ...，仍控制在一句内。",
+        "写完检查三条：称呼、目的句、落款。"
+      ]
+    },
+    {
+      "id": "english-ii-small-thanks",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "感谢信",
+      "title": "感谢信 · 致谢帮助、接待或指导",
+      "scenario": "感谢同学、老师、同事或接待方的帮助、照顾与指导。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {收件人},",
+          "zh": "尊敬的……：",
+          "note": "称呼与落款保持同一语域。"
+        },
+        {
+          "section": "开篇致谢",
+          "en": "I am writing to express my heartfelt thanks for {事由}.",
+          "zh": "我写信是为了对……表达衷心的感谢。",
+          "note": "heartfelt thanks for + 名词 / 动名词。"
+        },
+        {
+          "section": "具体回忆",
+          "en": "What impressed me most was {细节}.",
+          "zh": "最令我印象深刻的是……。",
+          "note": "用 what 主语从句写细节，比形容词堆砌更能体现语言能力。"
+        },
+        {
+          "section": "影响句",
+          "en": "Thanks to your help, I was able to {结果}.",
+          "zh": "多亏您的帮助，我才能够……。",
+          "note": "用 thanks to 明确因果，避免与 thanks for 混用。"
+        },
+        {
+          "section": "收尾与落款",
+          "en": "I wish you every success in the future.\n\nYours sincerely,\nLi Ming",
+          "zh": "祝您今后一切顺利。此致，李明。",
+          "note": "祝福语一句即可，不要重复致谢。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "开篇致谢",
+          "en": "I am writing to express my heartfelt thanks for your warm reception.",
+          "zh": "我写信是为了对您的热情接待表达衷心的感谢。"
+        },
+        {
+          "function": "写细节",
+          "en": "What impressed me most was the effort you made to arrange everything in advance.",
+          "zh": "最令我印象深刻的是您提前安排好一切所付出的努力。"
+        },
+        {
+          "function": "写影响",
+          "en": "Thanks to your help, I was able to adapt to the new environment quickly.",
+          "zh": "多亏您的帮助，我才能很快适应新环境。"
+        },
+        {
+          "function": "祝福",
+          "en": "I wish you every success in your work.",
+          "zh": "祝您工作一切顺利。"
+        }
+      ],
+      "demo": {
+        "topic": "感谢交换期间接待家庭的照顾",
+        "paragraphs": [
+          "Dear Mr. and Mrs. Brown,\nI am writing to express my heartfelt thanks for your warm reception during my exchange programme.",
+          "What impressed me most was the effort you made to introduce me to local culture, from cooking traditional dishes to visiting the town museum. Thanks to your help, I was able to adapt to the new environment quickly and felt at home far from home.",
+          "I wish you every success and happiness in the future.\n\nYours sincerely,\nLi Ming"
+        ],
+        "translation": [
+          "尊敬的布朗夫妇：我写信是为了对你们在我交换学习期间的盛情接待表达衷心的感谢。",
+          "最令我印象深刻的是你们为带我了解当地文化所做的努力：从做家乡菜到参观镇上博物馆。多亏你们的帮助，我才能很快适应新环境，在异乡感到如在家中。",
+          "祝你们今后一切顺利、幸福。此致，李明。"
+        ]
+      },
+      "pitfalls": [
+        "只写感谢不写帮助内容：任务完成度会明显不足。",
+        "thanks for 与 thanks to 混用：前者接感谢的事由，后者接原因。",
+        "语气过于随意：cheers、lots of love 这类口语表达不符合考场语域。"
+      ],
+      "adapt": [
+        "把事由换成本题场景，保留 what 主语从句写细节。",
+        "如果题目要求附一句邀请或建议，放在影响句之后、祝福之前。",
+        "词数不足时优先补充具体细节，而不是重复致谢。"
+      ]
+    },
+    {
+      "id": "english-ii-small-recommendation",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "推荐信",
+      "title": "推荐信 · 推荐某人或某物",
+      "scenario": "向对方推荐一位同学担任职位、一名候选人参加项目，或向朋友推荐一本书、一处景点。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {收件人},",
+          "zh": "尊敬的……：",
+          "note": "推荐信属于半正式文体，称呼随收件人身份调整。"
+        },
+        {
+          "section": "开篇说明推荐",
+          "en": "I am writing to recommend {对象} for {目的}.",
+          "zh": "我写信是为了推荐……担任/参加……。",
+          "note": "第一句就点明推荐关系，不要先讲背景。"
+        },
+        {
+          "section": "理由一",
+          "en": "First of all, {对象} has demonstrated {能力} in {经历}.",
+          "zh": "首先，……在……中展现出……能力。",
+          "note": "能力要用经历证明，这是推荐信最核心的写法。"
+        },
+        {
+          "section": "理由二",
+          "en": "In addition, {品质} makes {对象} a reliable choice.",
+          "zh": "此外，……使……成为可靠的人选。",
+          "note": "理由一写能力，理由二写品格，两个维度不重复。"
+        },
+        {
+          "section": "收尾与落款",
+          "en": "I am confident that {对象} will meet your expectations.\n\nYours sincerely,\nLi Ming",
+          "zh": "我确信……不会辜负您的期望。此致，李明。",
+          "note": "最后表达信心，不要写 I hope you can accept。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "开篇推荐",
+          "en": "I am writing to recommend my classmate Wang Fang for the position of volunteer coordinator.",
+          "zh": "我写信是想推荐我的同学王芳担任志愿者协调人。"
+        },
+        {
+          "function": "写能力",
+          "en": "She has demonstrated strong organizational skills in last year's charity sale.",
+          "zh": "她在去年的义卖活动中展现出很强的组织能力。"
+        },
+        {
+          "function": "写品格",
+          "en": "Her patience and sense of responsibility make her a reliable choice.",
+          "zh": "她的耐心与责任感使她成为可靠的人选。"
+        },
+        {
+          "function": "表达信心",
+          "en": "I am confident that she will meet your expectations.",
+          "zh": "我确信她不会辜负您的期望。"
+        }
+      ],
+      "demo": {
+        "topic": "推荐同学担任国际会议志愿者",
+        "paragraphs": [
+          "Dear Sir or Madam,\nI am writing to recommend my classmate Wang Fang for the position of volunteer coordinator at the international conference.",
+          "First of all, she has demonstrated strong organizational skills in last year's charity sale, where she arranged shifts for more than fifty students. In addition, her patience and sense of responsibility make her a reliable choice when problems arise.",
+          "I am confident that she will meet your expectations.\n\nYours sincerely,\nLi Ming"
+        ],
+        "translation": [
+          "尊敬的先生/女士：我写信是想推荐我的同学王芳担任国际会议的志愿者协调人。",
+          "首先，她在去年的义卖活动中展现出很强的组织能力，为五十多名学生安排了轮班。此外，她的耐心与责任感使她在问题出现时成为可靠的人选。",
+          "我确信她不会辜负您的期望。此致，李明。"
+        ]
+      },
+      "pitfalls": [
+        "推荐理由空泛：只写 She is excellent 而不给经历，说服力为零。",
+        "混淆推荐人与被推荐人：通篇 I have ... 会让阅卷人读不清在推荐谁。",
+        "忽略题目给定身份：题目若规定推荐自己，就不要虚构同学。"
+      ],
+      "adapt": [
+        "把推荐对象、目的、两条理由的槽位逐一替换，理由必须能从题目信息推出。",
+        "如题目要求推荐书籍或景点，理由改为内容价值与个人体验两点。",
+        "第三人称单数与时态要一致，写完专门检查一遍动词形式。"
+      ]
+    },
+    {
+      "id": "english-ii-large-bar",
+      "kind": "large",
+      "kindLabel": "大作文 · 约 150 词",
+      "genre": "图表 · 柱状图",
+      "title": "柱状图 · 数据变化与原因分析",
+      "scenario": "柱状图展示不同类别或不同年份的数值对比，要求描述数据、分析原因并给出结论。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 概述图表",
+          "en": "As is shown in the bar chart, {指标} differs considerably among {类别}.",
+          "zh": "如柱状图所示，……在……之间差异明显。",
+          "note": "首句交代图表类型与主题，不逐一点数所有柱子。"
+        },
+        {
+          "section": "第 1 段 · 抓关键数据",
+          "en": "The figure for {最高项} reaches {数值}, while that of {最低项} stands at {数值}.",
+          "zh": "……的数字达到……，而……为……。",
+          "note": "只挑最高、最低或变化最大的两组数据，通常两到三处就够。"
+        },
+        {
+          "section": "第 2 段 · 引出原因",
+          "en": "Several factors can account for this phenomenon.",
+          "zh": "这一现象可以归因于几个因素。",
+          "note": "过渡句把描述段和分析段分开，是图表作文最稳的结构信号。"
+        },
+        {
+          "section": "第 2 段 · 原因展开",
+          "en": "On the one hand, {原因一}. On the other hand, {原因二}.",
+          "zh": "一方面……。另一方面……。",
+          "note": "两个原因要分属不同层面，例如个人需求与社会环境。"
+        },
+        {
+          "section": "第 3 段 · 结论建议",
+          "en": "In conclusion, {趋势判断}. It is advisable for us to {建议}.",
+          "zh": "总之……。我们宜……。",
+          "note": "结论不要重复数据，给判断或建议才能体现分析能力。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "概述图表",
+          "en": "As is shown in the bar chart, the number of online courses taken by college students differs considerably among four majors.",
+          "zh": "如柱状图所示，大学生选修在线课程的数量在四个专业间差异明显。"
+        },
+        {
+          "function": "描述对比",
+          "en": "The figure for computer science majors reaches 68 percent, while that of history majors stands at 21 percent.",
+          "zh": "计算机专业学生的比例达到 68%，而历史专业仅为 21%。"
+        },
+        {
+          "function": "引出原因",
+          "en": "Several factors can account for this phenomenon.",
+          "zh": "这一现象可以归因于几个因素。"
+        },
+        {
+          "function": "给出建议",
+          "en": "It is advisable for universities to offer more guidance on online learning.",
+          "zh": "高校宜为在线学习提供更多指导。"
+        }
+      ],
+      "demo": {
+        "topic": "柱状图：四个专业学生使用在线课程的比例",
+        "paragraphs": [
+          "As is shown in the bar chart, the proportion of college students taking online courses differs considerably among four majors. The figure for computer science majors reaches 68 percent, while that of history majors stands at only 21 percent.",
+          "Several factors can account for this phenomenon. On the one hand, students in technical fields need to keep up with rapidly updated knowledge, which makes online platforms a natural choice. On the other hand, learners in the humanities may prefer discussion-based classes, where face-to-face interaction matters more than recorded lectures.",
+          "In conclusion, the gap reflects different learning needs rather than different levels of effort. It is advisable for universities to offer more guidance so that every student can benefit from online resources."
+        ],
+        "translation": [
+          "如柱状图所示，大学生选修在线课程的比例在四个专业间差异明显。计算机专业学生的比例达到 68%，而历史专业仅为 21%。",
+          "这一现象可以归因于几个因素。一方面，技术领域的学生需要跟上快速更新的知识，在线平台自然是首选。另一方面，人文学科的学习者可能更偏好讨论式课堂，面对面的互动比录播课更重要。",
+          "总之，这一差距反映的是不同的学习需求，而非努力程度的差别。高校宜提供更多指导，让每位学生都能从在线资源中受益。"
+        ]
+      },
+      "pitfalls": [
+        "逐条播报数据：把每根柱子都写一遍，既超词数又缺少分析。",
+        "只描述不分析：第 2 段仍然是数据罗列，拿不到内容分。",
+        "单位与百分比读错：percent、percentage point、figure 要区分使用。"
+      ],
+      "adapt": [
+        "先在图外写上图表类型与主题句，再圈出两组关键数据，其余不提。",
+        "原因段固定写两条：一条与主体需求相关，一条与外部环境相关。",
+        "结论段避免出现 new data，只写判断加建议。"
+      ]
+    },
+    {
+      "id": "english-ii-large-line",
+      "kind": "large",
+      "kindLabel": "大作文 · 约 150 词",
+      "genre": "图表 · 折线图",
+      "title": "折线图 · 趋势变化与趋势判断",
+      "scenario": "折线图展示某指标随时间上升、下降或波动，要求描述趋势、分析原因并给出判断。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 概述趋势",
+          "en": "As can be seen from the line graph, {指标} witnessed a {上升/下降} trend from {起始年} to {结束年}.",
+          "zh": "从折线图可以看出，……在……年到……年间呈……趋势。",
+          "note": "首句给整体趋势，避免一上来就报数字。"
+        },
+        {
+          "section": "第 1 段 · 关键节点",
+          "en": "It rose steadily from {数值} in {年份} to {数值} in {年份}.",
+          "zh": "它从……年的……稳步上升到……年的……。",
+          "note": "选起点、终点和转折点，用 rise / fall / level off 描述。"
+        },
+        {
+          "section": "第 2 段 · 原因分析",
+          "en": "This trend can be attributed to two major factors.",
+          "zh": "这一趋势可归因于两大因素。",
+          "note": "attributed to 后面接名词短语，不要接完整句子。"
+        },
+        {
+          "section": "第 2 段 · 因素展开",
+          "en": "For one thing, {因素一}. For another, {因素二}.",
+          "zh": "其一……。其二……。",
+          "note": "因素一多写外部条件，因素二写主体选择，层次清晰。"
+        },
+        {
+          "section": "第 3 段 · 趋势判断",
+          "en": "If the trend continues, {预测}. Therefore, {建议}.",
+          "zh": "如果这一趋势延续，……。因此……。",
+          "note": "用条件句做预测，再落到建议，避免空喊口号。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "概述趋势",
+          "en": "As can be seen from the line graph, the number of shared bikes witnessed a sharp rise from 2019 to 2023.",
+          "zh": "从折线图可以看出，共享单车数量在 2019 至 2023 年间急剧上升。"
+        },
+        {
+          "function": "描述变化",
+          "en": "It climbed from 2 million to 8 million, and then levelled off.",
+          "zh": "它从 200 万增长到 800 万，随后趋于平稳。"
+        },
+        {
+          "function": "分析原因",
+          "en": "This trend can be attributed to two major factors.",
+          "zh": "这一趋势可归因于两大因素。"
+        },
+        {
+          "function": "趋势判断",
+          "en": "If the trend continues, demand for repair services will keep growing.",
+          "zh": "如果这一趋势延续，维修服务需求将持续增长。"
+        }
+      ],
+      "demo": {
+        "topic": "折线图：某城市共享单车使用量变化",
+        "paragraphs": [
+          "As can be seen from the line graph, the number of shared bike trips in the city witnessed a sharp rise from 2019 to 2023. It climbed from two million to eight million a year, and then levelled off in the following two years.",
+          "This trend can be attributed to two major factors. For one thing, the expansion of bike lanes has made cycling safer and more convenient. For another, an increasing number of commuters choose bikes to avoid traffic jams and to save the cost of short taxi rides.",
+          "If the trend continues, demand for repair and parking services will keep growing. Therefore, local authorities should invest more in maintaining these public facilities."
+        ],
+        "translation": [
+          "从折线图可以看出，该市共享单车出行量在 2019 至 2023 年间急剧上升，从每年 200 万次增长到 800 万次，随后两年趋于平稳。",
+          "这一趋势可归因于两大因素。其一，自行车道的扩展让骑行更安全、更便利。其二，越来越多的通勤者选择骑车，以避开交通拥堵、节省短途打车费用。",
+          "如果这一趋势延续，维修与停放服务需求将持续增长。因此，地方政府应加大对这类公共设施维护的投入。"
+        ],
+        "note": "本段示例中 Para 2 数字为示意，考场请按图表实际数据替换。"
+      },
+      "pitfalls": [
+        "趋势词单调：全篇只用 increase，交替使用 rise、climb、grow、decline、level off。",
+        "忽略转折点：只写起点终点，丢掉图表中最有分析价值的节点。",
+        "预测过度：断言 will definitely double，缺少条件句支撑。"
+      ],
+      "adapt": [
+        "先给整条线起一个名词化标题，例如 the number of ... / the proportion of ...。",
+        "描述段固定写三个点：起点、转折点、终点，数字数量控制在三处以内。",
+        "原因段与结论段可跨话题复用，只替换主语与判断。"
+      ]
+    },
+    {
+      "id": "english-ii-large-pie",
+      "kind": "large",
+      "kindLabel": "大作文 · 约 150 词",
+      "genre": "图表 · 饼图",
+      "title": "饼图 · 构成比例与原因分析",
+      "scenario": "饼图展示某一整体的构成比例，要求描述占比、分析原因并给出建议。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 概述构成",
+          "en": "The pie chart illustrates the composition of {整体}.",
+          "zh": "饼图展示了……的构成。",
+          "note": "饼图核心是构成比例，首句锁定这一任务。"
+        },
+        {
+          "section": "第 1 段 · 两个占比",
+          "en": "It is worth noting that {项目一} accounts for {比例}, followed by {项目二} at {比例}.",
+          "zh": "值得注意的是，……占……，紧随其后的是……，占……。",
+          "note": "只写占比最大与次大的两项，其余用 respectively 概括。"
+        },
+        {
+          "section": "第 2 段 · 原因",
+          "en": "Two reasons may explain why {项目一} takes up such a large share.",
+          "zh": "有两个原因可以解释为什么……占比如此之高。",
+          "note": "原因紧扣占比最大的那一项，不平均用力。"
+        },
+        {
+          "section": "第 2 段 · 原因展开",
+          "en": "Firstly, {原因一}. Secondly, {原因二}.",
+          "zh": "第一……。第二……。",
+          "note": "两个原因分别落在需求端与供给端。"
+        },
+        {
+          "section": "第 3 段 · 建议",
+          "en": "In light of the figures above, it is necessary to {建议}.",
+          "zh": "基于以上数据，有必要……。",
+          "note": "建议要与占比结构呼应，例如优化资源分配。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "概述构成",
+          "en": "The pie chart illustrates the composition of household spending in a Chinese city.",
+          "zh": "饼图展示了中国某城市家庭支出的构成。"
+        },
+        {
+          "function": "描述占比",
+          "en": "Housing accounts for 32 percent, followed by education at 21 percent.",
+          "zh": "住房占 32%，其次是教育，占 21%。"
+        },
+        {
+          "function": "分析原因",
+          "en": "Two reasons may explain why housing takes up such a large share.",
+          "zh": "有两个原因可以解释为什么住房占比如此之高。"
+        },
+        {
+          "function": "给出建议",
+          "en": "It is necessary to adjust public spending to ease the burden on young families.",
+          "zh": "有必要调整公共支出，以减轻年轻家庭的负担。"
+        }
+      ],
+      "demo": {
+        "topic": "饼图：某城市家庭支出构成",
+        "paragraphs": [
+          "The pie chart illustrates the composition of household spending in a Chinese city. It is worth noting that housing accounts for 32 percent, followed by education at 21 percent, while the remaining items together make up less than half.",
+          "Two reasons may explain why housing takes up such a large share. Firstly, rapid urbanization has pushed up prices in urban areas, so families have to spend more on rent or loans. Secondly, people increasingly regard a stable home as the basis of a good life, which encourages them to invest in property even at the cost of other consumption.",
+          "In light of the figures above, it is necessary to adjust public spending and provide more affordable housing for young families."
+        ],
+        "translation": [
+          "饼图展示了中国某城市家庭支出的构成。值得注意的是，住房占 32%，其次是教育，占 21%，其余各项合计不到一半。",
+          "有两个原因可以解释为什么住房占比如此之高。第一，快速城市化推高了城市房价，家庭不得不在房租或房贷上花更多钱。第二，人们越来越把稳定的住所视为美好生活的基础，即使牺牲其他消费也愿意投入房产。",
+          "基于以上数据，有必要调整公共支出，为年轻家庭提供更多可负担住房。"
+        ]
+      },
+      "pitfalls": [
+        "把饼图当柱状图写：缺少对“构成”的整体概括，只比较大小。",
+        "占比表述错误：account for / make up / take up 后接比例，不要混用 number of。",
+        "建议与数据无关：结尾突然谈环保，与占比主题脱节。"
+      ],
+      "adapt": [
+        "先圈出占比最大的一项，原因段围绕它展开；其余项目一句带过。",
+        "占比数据用 percent，差值用 percentage points，避免混用。",
+        "建议句与占比最大项对应，形成数据到行动的闭环。"
+      ]
+    },
+    {
+      "id": "english-ii-large-table",
+      "kind": "large",
+      "kindLabel": "大作文 · 约 150 词",
+      "genre": "图表 · 表格",
+      "title": "表格 · 多组数据对比",
+      "scenario": "表格给出多行多列数据，要求提取对比关系、分析原因并得出结论。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 概述表格",
+          "en": "The table provides information about {主题} in terms of {维度}.",
+          "zh": "该表格提供了关于……在……方面的信息。",
+          "note": "表格维度多，首句先交代行列含义，避免读者迷失。"
+        },
+        {
+          "section": "第 1 段 · 对比关系",
+          "en": "It is clear that {维度一} is much higher than {维度二} across all categories.",
+          "zh": "很明显，……在所有类别中都远高于……。",
+          "note": "表格题的价值在于横向或纵向对比，不报单点数据。"
+        },
+        {
+          "section": "第 2 段 · 原因一",
+          "en": "The difference may result from {原因}.",
+          "zh": "这一差异可能源于……。",
+          "note": "result from 后接原因，result in 后接结果，注意区分。"
+        },
+        {
+          "section": "第 2 段 · 原因二 + 例证",
+          "en": "Another explanation is that {原因}. This is particularly true for {类别}.",
+          "zh": "另一种解释是……。这在……中尤为明显。",
+          "note": "用表格中的具体类别做例证，让分析落到数据上。"
+        },
+        {
+          "section": "第 3 段 · 结论",
+          "en": "To sum up, {结论}. It is advisable to {建议}.",
+          "zh": "总之……。宜……。",
+          "note": "结论回到最开始那条对比关系，形成闭环。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "概述表格",
+          "en": "The table provides information about time spent on three activities by different age groups.",
+          "zh": "该表格提供了不同年龄组在三类活动上所花时间的信息。"
+        },
+        {
+          "function": "描述对比",
+          "en": "It is clear that screen time is much higher than reading time across all age groups.",
+          "zh": "很明显，各年龄段的屏幕时间都远高于阅读时间。"
+        },
+        {
+          "function": "分析原因",
+          "en": "The difference may result from the growing supply of short videos.",
+          "zh": "这一差异可能源于短视频供给的不断增长。"
+        },
+        {
+          "function": "结论",
+          "en": "To sum up, digital entertainment is reshaping how people spend their leisure time.",
+          "zh": "总之，数字娱乐正在重塑人们的休闲方式。"
+        }
+      ],
+      "demo": {
+        "topic": "表格：不同年龄段每日屏幕时间与阅读时间",
+        "paragraphs": [
+          "The table provides information about time spent on screens and on reading by three age groups. It is clear that screen time is much higher than reading time across all categories, and the gap is widest among people under thirty.",
+          "The difference may result from the growing supply of short videos, which are designed to attract attention within seconds. Another explanation is that printed reading requires sustained concentration, which is harder to maintain after a long working day. This is particularly true for young employees who often relax with their phones.",
+          "To sum up, digital entertainment is reshaping how people spend their leisure time. It is advisable to set aside fixed reading hours so that the two habits can coexist."
+        ],
+        "translation": [
+          "该表格提供了三个年龄组花在屏幕和阅读上的时间信息。很明显，各类别的屏幕时间都远高于阅读时间，且三十岁以下人群的差距最大。",
+          "这一差异可能源于短视频供给的不断增长，它们被设计成在几秒内抓住注意力。另一种解释是，纸质阅读需要持续专注，而长时间工作后更难维持，对常用手机放松的年轻上班族尤其如此。",
+          "总之，数字娱乐正在重塑人们的休闲方式。宜设定固定的阅读时间，让两种习惯可以共存。"
+        ]
+      },
+      "pitfalls": [
+        "逐格报数：表格数据多，全写一遍必然超词数，应只抓对比关系。",
+        "混淆 result from 与 result in：会直接把因果关系写反。",
+        "结论脱离数据：结尾换成另一个话题，属于无关内容。"
+      ],
+      "adapt": [
+        "先在草稿上画一条对比主线（谁高谁低、差距最大在哪），全文围绕它展开。",
+        "数字最多出现三处，其余用 higher than / almost twice as much as 概括。",
+        "若表格是时间序列，按折线图思路写趋势；若是并列类别，按柱状图思路写对比。"
+      ]
+    }
+  ]
+}

@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./writing.css" />
+    <link rel="stylesheet" href="./writing-templates.css" />
     <script src="./speech-transport.js" defer></script>
     <script src="./writing-grade.js" defer></script>
     <script src="./writing.js" defer></script>
@@ -104,6 +105,9 @@
               <button id="clearDraftButton" class="tool-button" type="button">
                 清空本题草稿
               </button>
+              <a id="templateJumpLink" class="tool-button" href="#templateSection">
+                作文模板
+              </a>
             </div>
           </div>
         </div>
@@ -182,6 +186,73 @@
         </div>
       </section>
 
+      <section id="templateSection" class="writing-templates" aria-labelledby="templateTitle">
+        <div class="writing-templates-head">
+          <div>
+            <h2 id="templateTitle">作文模板库</h2>
+            <p class="writing-templates-intro">
+              按考试挑骨架：每套模板给出一句一槽的段落骨架、可替换的功能句、示例段落与自查清单。
+              骨架是本站原创整理，不是官方范文；套用后必须替换花括号内容并补足自己的例子。
+            </p>
+          </div>
+          <span id="templateMeta" class="writing-templates-meta" role="status" aria-live="polite">
+            滚动到这里时再加载模板
+          </span>
+        </div>
+
+        <div class="writing-templates-toolbar">
+          <div
+            id="templateExamTabs"
+            class="segmented-control"
+            role="group"
+            aria-label="模板对应的考试类型"
+          >
+            <button class="segment-button is-active" type="button" data-exam="cet4" aria-pressed="true">
+              四级
+            </button>
+            <button class="segment-button" type="button" data-exam="cet6" aria-pressed="false">
+              六级
+            </button>
+            <button class="segment-button" type="button" data-exam="english-i" aria-pressed="false">
+              考研一
+            </button>
+            <button class="segment-button" type="button" data-exam="english-ii" aria-pressed="false">
+              考研二
+            </button>
+          </div>
+          <div
+            id="templateKindTabs"
+            class="segmented-control"
+            role="group"
+            aria-label="模板类型"
+          >
+            <button class="segment-button is-active" type="button" data-kind="all" aria-pressed="true">
+              全部
+            </button>
+            <button class="segment-button" type="button" data-kind="small" aria-pressed="false">
+              小作文
+            </button>
+            <button class="segment-button" type="button" data-kind="large" aria-pressed="false">
+              大作文
+            </button>
+          </div>
+        </div>
+
+        <div class="writing-templates-body">
+          <div
+            id="templateList"
+            class="writing-template-list"
+            role="list"
+            aria-label="模板列表"
+          >
+            <p class="writing-template-empty">模板按考试分片懒加载，滚到此处后自动读取。</p>
+          </div>
+          <article id="templateDetail" class="writing-template-detail">
+            <p class="writing-template-empty">挑一个模板，这里会显示段落骨架、功能句、示例与自查清单。</p>
+          </article>
+        </div>
+      </section>
+
       <section class="writing-attribution" aria-labelledby="writingCreditTitle">
         <h2 id="writingCreditTitle">数据来源与开源借鉴</h2>
         <ul>
@@ -199,6 +270,12 @@
               rel="noopener noreferrer"
             >HoraceLuBFA/zh-en-translation-polish</a>
             的中式英语扫描（chinglish scan）写法。
+          </li>
+          <li>
+            作文模板库的段落骨架、功能句与自查清单按站内
+            <code>kaoyan-english</code>
+            skill 的任务完成、组织、语法、词汇等评分维度整理；模板均为本站原创整理，不是官方范文。
+            示例段落为压缩版，套用时必须替换花括号槽位、补充题目例子，并按考试目标词数扩写。
           </li>
           <li>
             题库结构参考

@@ -357,6 +357,70 @@ async function verifyWriting(browser, base, out) {
   const shardCount = new Set(requests.filter((url) => url.includes("/writing-data/"))).size;
   check("作文题目按分片加载", shardCount > 0 && shardCount <= 6, `${shardCount} 份 writing-data`);
 
+  // 模板库也按“索引 -> 分片”懒加载；滚到模板区后才允许发出模板请求。
+  await page.locator("#templateSection").scrollIntoViewIfNeeded();
+  await page.waitForSelector(".writing-template-card", { timeout: 20000 });
+  const initialTemplateCards = await page.locator(".writing-template-card").count();
+  check(
+    "模板库滚入视口后才渲染",
+    initialTemplateCards > 0,
+    `${initialTemplateCards} 个模板`,
+  );
+  await page.click('#templateExamTabs [data-exam="english-i"]');
+  await page.waitForFunction(
+    () => document.querySelectorAll(".writing-template-card").length === 8,
+    { timeout: 20000 },
+  );
+  const templateRequests = requests.filter((url) =>
+    url.includes("/writing-data/templates/"),
+  );
+  const templateCards = await page.locator(".writing-template-card").count();
+  const templateSteps = await page.locator(".writing-template-step").count();
+  const templatePhrases = await page.locator(".writing-template-phrase").count();
+  const templateDemos = await page
+    .locator(".writing-template-demo-paragraph")
+    .count();
+  const templateNotes = await page.locator(".writing-template-note").count();
+  const templateSlots = await page.locator(".writing-template-slot").count();
+  const templateCache = await page.evaluate(() =>
+    Object.keys(window.localStorage).filter((key) =>
+      key.startsWith("iball-writing-template:"),
+    ),
+  );
+  check(
+    "模板库按索引和分片懒加载",
+    templateRequests.length >= 2 && templateRequests.length <= 3,
+    `${templateRequests.length} 份模板数据`,
+  );
+  check(
+    "切到考研一后模板分片渲染",
+    templateCards === 8 && templateSteps > 0 && templatePhrases > 0,
+    `${templateCards} 个模板 / ${templateSteps} 条骨架 / ${templatePhrases} 条功能句`,
+  );
+  check(
+    "模板详情含示例、清单和槽位高亮",
+    templateDemos > 0 && templateNotes >= 2 && templateSlots > 0,
+    `${templateDemos} 段示例 / ${templateNotes} 份清单 / ${templateSlots} 个槽位`,
+  );
+  check(
+    "模板分片写入 localStorage",
+    templateCache.length > 0,
+    templateCache.join(", ") || "(没有模板缓存)",
+  );
+  await page.click('#templateKindTabs [data-kind="small"]');
+  await page.waitForTimeout(200);
+  const smallTemplateCards = await page.locator(".writing-template-card").count();
+  check(
+    "模板可按小作文筛选",
+    smallTemplateCards > 0 && smallTemplateCards < templateCards,
+    `${templateCards} -> ${smallTemplateCards} 个模板`,
+  );
+  await page.click('#templateKindTabs [data-kind="all"]');
+  await page.waitForTimeout(200);
+  await page
+    .locator("#templateSection")
+    .screenshot({ path: path.join(out, "study-writing-templates-desktop.png") });
+
   await page.locator(".writing-prompt-row").first().click();
   await waitPromptReady(page);
   const taskTitle = await page.locator("#taskTitle").innerText();
@@ -494,6 +558,8 @@ async function verifyWriting(browser, base, out) {
 
   const mobile = await openPage(browser, base, "/writing.html", MOBILE);
   await firstPaint(mobile.page, `${base}/writing.html`, ".writing-prompt-row");
+  await mobile.page.locator("#templateSection").scrollIntoViewIfNeeded();
+  await mobile.page.waitForSelector(".writing-template-card", { timeout: 20000 });
   const size = await overflow(mobile.page);
   check(
     "作文页移动端不横向溢出",
