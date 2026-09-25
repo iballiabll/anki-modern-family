@@ -190,6 +190,8 @@
     activeSpeechButton: null,
     allSpeaking: false,
     lookupCache: new Map(),
+    // 原文定位结果按「试卷 + 题号」缓存，切标签来回时不用重复计算。
+    locatorCache: new Map(),
     unknown: restoreSet(STORAGE_KEYS.unknown),
     known: restoreSet(STORAGE_KEYS.known),
     choices: readStoredMap(ANSWER_STORAGE_KEY),
@@ -474,6 +476,37 @@
         showToast(message);
       }
     };
+
+    // 交给全站朗读通道：整段一次排队，句与句之间不再插延时，
+    // 并且自动获得控制条上的暂停 / 继续 / 重播。
+    if (window.IballSpeech?.speakSequence) {
+      const started = window.IballSpeech.speakSequence(
+        list.map((text) => ({ text, rate: 0.94 })),
+        {
+          label: label || "真题朗读",
+          onFinish: (message) => {
+            if (run !== state.speechRun) {
+              return;
+            }
+            if (message === "已停止播放") {
+              finish("已停止朗读");
+              return;
+            }
+            finish(message || `${label || "本篇"}朗读完成`);
+          },
+          onError: () => {
+            if (run === state.speechRun) {
+              finish("朗读中断，请稍后重试");
+            }
+          },
+          onUnsupported: () => finish("当前浏览器不支持语音朗读"),
+        },
+      );
+      if (!started) {
+        finish("当前浏览器不支持语音朗读");
+      }
+      return;
+    }
 
     const playNext = (index) => {
       if (run !== state.speechRun) {
@@ -861,6 +894,225 @@
     return node;
   }
 
+  /* ------------------------------------------------------------ 答案解析层 */
+
+  // 停用词只用于「原文定位」的关键词提取，不参与判分，也不会改写任何题目内容。
+  const LOCATOR_STOPWORDS = new Set([
+    "about", "above", "after", "again", "against", "almost", "along", "also",
+    "although", "among", "another", "answer", "anyone", "anything", "because",
+    "become", "before", "behind", "being", "below", "besides", "better",
+    "between", "beyond", "both", "cannot", "could", "does", "doing", "done",
+    "down", "during", "each", "either", "else", "even", "ever", "every",
+    "first", "following", "from", "further", "given", "have", "having", "here",
+    "however", "instead", "into", "itself", "just", "least", "less", "like",
+    "made", "make", "many", "might", "more", "most", "much", "must", "near",
+    "need", "never", "next", "none", "nothing", "often", "once", "only",
+    "other", "others", "ought", "over", "own", "passage", "probably",
+    "question", "rather", "same", "says", "should", "since", "some", "still",
+    "such", "than", "that", "their", "them", "then", "there", "these", "they",
+    "this", "those", "though", "through", "thus", "under", "until", "upon",
+    "very", "were", "what", "when", "where", "whether", "which", "while",
+    "will", "with", "within", "without", "would", "your", "yours",
+  ]);
+
+  function locatorTokens(text) {
+    return String(text || "")
+      .toLowerCase()
+      .replace(/[\u2018\u2019]/g, "'")
+      .split(/[^a-z']+/)
+      .map((token) => token.replace(/^'+|'+$/g, ""))
+      .map((token) => token.replace(/ies$/, "y").replace(/(es|s|ed|ing)$/, ""))
+      .filter((token) => token.length >= 4 && !LOCATOR_STOPWORDS.has(token));
+  }
+
+  function splitSourceSentences(text) {
+    return String(text || "")
+      .split(/(?<=[.!?])\s+/)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+  }
+
+  // 用题干 + 正确选项的关键词在原文里找最接近的一句，属于可复核的机械定位，
+  // 不是人工撰写的解析，因此界面上标注为「机读定位」。
+  function locateSourceSentence(targets, paragraphs) {
+    const list = Array.isArray(paragraphs) ? paragraphs : [];
+    const wanted = [...new Set(locatorTokens(targets.filter(Boolean).join(" ")))];
+    if (!list.length || !wanted.length) {
+      return null;
+    }
+    let best = null;
+    list.forEach((paragraph, paragraphIndex) => {
+      splitSourceSentences(paragraph).forEach((sentence) => {
+        const available = new Set(locatorTokens(sentence));
+        let hits = 0;
+        wanted.forEach((token) => {
+          if (available.has(token)) {
+            hits += 1;
+          }
+        });
+        if (!hits) {
+          return;
+        }
+        const score = hits / wanted.length + Math.min(hits, 4) * 0.05;
+        if (!best || score > best.score) {
+          best = {
+            score,
+            hits,
+            sentence,
+            paragraphIndex,
+            coverage: hits / wanted.length,
+          };
+        }
+      });
+    });
+    if (!best) {
+      return null;
+    }
+    if (best.hits >= 2 || (wanted.length === 1 && best.hits === 1)) {
+      return { ...best, kind: "sentence" };
+    }
+    return null;
+  }
+
+  // 句子级没命中时退到段落级：统计各段的关键词命中数，给出回读区间。
+  function locateSourceParagraph(targets, paragraphs) {
+    const list = Array.isArray(paragraphs) ? paragraphs : [];
+    const wanted = [...new Set(locatorTokens(targets.filter(Boolean).join(" ")))];
+    if (!list.length || !wanted.length) {
+      return null;
+    }
+    let best = null;
+    list.forEach((paragraph, paragraphIndex) => {
+      const available = new Set(locatorTokens(paragraph));
+      let hits = 0;
+      wanted.forEach((token) => {
+        if (available.has(token)) {
+          hits += 1;
+        }
+      });
+      if (hits >= 2 && (!best || hits > best.hits)) {
+        best = { paragraphIndex, hits, kind: "paragraph" };
+      }
+    });
+    return best;
+  }
+
+  function answerOptionText(question, options, answer) {
+    const key = String(answer || "").trim().toUpperCase();
+    if (!key) {
+      return "";
+    }
+    const pool = Array.isArray(options?.pool) ? options.pool : [];
+    const fromQuestion = (question.options || []).find(
+      (option) => String(option.key).toUpperCase() === key,
+    );
+    if (fromQuestion?.text) {
+      return fromQuestion.text;
+    }
+    const fromPool = pool.find(
+      (option) => String(option.key).toUpperCase() === key,
+    );
+    return fromPool?.text || "";
+  }
+
+  function createAnalysisBlock(question, options) {
+    const answer = String(question.answer || "").trim();
+    const optionText = answerOptionText(question, options, answer);
+    const reference = String(question.reference || "").trim();
+    const cacheKey = questionKey(question.number);
+    let locator = state.locatorCache.get(cacheKey);
+    if (locator === undefined) {
+      const targets = [question.stem, optionText];
+      locator =
+        locateSourceSentence(targets, options?.paragraphs) ||
+        locateSourceParagraph(targets, options?.paragraphs) ||
+        null;
+      state.locatorCache.set(cacheKey, locator);
+    }
+    if (!answer && !reference && !locator) {
+      return null;
+    }
+
+    const details = createElement("details", "question-analysis");
+    details.append(createElement("summary", "question-analysis-summary", "答案解析"));
+    const body = createElement("div", "question-analysis-body");
+
+    if (answer) {
+      const answerLine = createElement("p", "question-analysis-answer");
+      answerLine.append(createElement("span", "question-analysis-label", "正确答案"));
+      answerLine.append(
+        document.createTextNode(
+          optionText ? `${answer}. ${optionText}` : answer,
+        ),
+      );
+      body.append(answerLine);
+    }
+
+    if (reference) {
+      const referenceLine = createElement("p", "question-analysis-reference");
+      referenceLine.append(
+        createElement("span", "question-analysis-label", "参考解析 / 译文"),
+      );
+      referenceLine.append(document.createTextNode(reference));
+      body.append(referenceLine);
+    }
+
+    if (locator?.kind === "sentence") {
+      const locatorLine = createElement("p", "question-analysis-locator");
+      locatorLine.append(
+        createElement(
+          "span",
+          "question-analysis-label",
+          `原文定位 P${locator.paragraphIndex + 1}`,
+        ),
+      );
+      const sentence = createElement("span", "question-analysis-sentence");
+      sentence.lang = "en";
+      sentence.textContent = locator.sentence;
+      locatorLine.append(sentence);
+      body.append(locatorLine);
+    } else if (locator?.kind === "paragraph") {
+      const locatorLine = createElement("p", "question-analysis-locator");
+      locatorLine.append(
+        createElement(
+          "span",
+          "question-analysis-label",
+          `段落定位 P${locator.paragraphIndex + 1}`,
+        ),
+      );
+      locatorLine.append(
+        document.createTextNode(
+          `题干与选项的关键词集中在第 ${locator.paragraphIndex + 1} 段（命中 ${locator.hits} 个），建议以该段为主要回读区间。`,
+        ),
+      );
+      body.append(locatorLine);
+    } else if (answer && optionText) {
+      const locatorLine = createElement("p", "question-analysis-locator");
+      locatorLine.append(
+        createElement("span", "question-analysis-label", "定位提示"),
+      );
+      locatorLine.append(
+        document.createTextNode(
+          "题干与选项都是原文的同义改写，机读未命中关键词，建议回读全文后结合正确选项复核。",
+        ),
+      );
+      body.append(locatorLine);
+    }
+
+    if (answer && optionText && options?.paragraphs?.length) {
+      body.append(
+        createElement(
+          "p",
+          "question-analysis-note",
+          "解析为基于真题原文的机读定位，仅用于快速回查原文；选项正误以官方答案为准。",
+        ),
+      );
+    }
+
+    details.append(body);
+    return details;
+  }
+
   /* -------------------------------------------------------------- 作答层 */
 
   function questionKey(number) {
@@ -930,6 +1182,10 @@
       if (!choice && !revealed) {
         feedback.textContent = "";
       }
+    }
+    const analysis = card.querySelector(".question-analysis");
+    if (analysis) {
+      analysis.open = revealed;
     }
   }
 
@@ -1045,6 +1301,10 @@
     actions.append(reset);
     card.append(actions);
     card.append(createElement("p", "question-feedback"));
+    const analysis = createAnalysisBlock(question, options);
+    if (analysis) {
+      card.append(analysis);
+    }
     refreshQuestionCard(card);
     return card;
   }
@@ -1185,7 +1445,11 @@
       createQuestionSection(
         (section.questions || []).map((question) => ({
           question,
-          config: { badge: "阅读", sectionId: section.id },
+          config: {
+            badge: "阅读",
+            sectionId: section.id,
+            paragraphs: section.paragraphs || [],
+          },
         })),
         { title: "阅读题目" },
       ),
@@ -1207,7 +1471,11 @@
       createQuestionSection(
         (section.questions || []).map((question) => ({
           question,
-          config: { badge: `第 ${question.number} 空`, sectionId: section.id },
+          config: {
+            badge: `第 ${question.number} 空`,
+            sectionId: section.id,
+            paragraphs: section.paragraphs || [],
+          },
         })),
         { title: "20 道完形填空", grid: true },
       ),
@@ -1248,6 +1516,7 @@
               sectionId: section.id,
               letterGrid: true,
               pool: section.options || [],
+              paragraphs: section.paragraphs || [],
             },
           })),
           { title: "段落匹配题目", grid: true },
@@ -1261,7 +1530,12 @@
       createQuestionSection(
         (section.questions || []).map((question) => ({
           question,
-          config: { badge: "判断正误", sectionId: section.id, truth: true },
+          config: {
+            badge: "判断正误",
+            sectionId: section.id,
+            truth: true,
+            paragraphs: section.paragraphs || [],
+          },
         })),
         { title: "判断正误题目", grid: true },
       ),

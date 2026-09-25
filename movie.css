@@ -302,6 +302,54 @@
   border-color: var(--coral);
 }
 
+.movie-loop-button {
+  min-height: 30px;
+  padding: 0 10px;
+  color: #5b5f8a;
+  background: #f2f2fa;
+  border: 1px solid #d9d9ec;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.movie-loop-button:hover {
+  border-color: #a9a9d3;
+}
+
+.movie-loop-button.is-playing {
+  color: #ffffff;
+  background: #5b5f8a;
+  border-color: #5b5f8a;
+}
+
+/* 播放中的台词：整行留一道底色，具体那一句再加一条竖线。 */
+.movie-line.is-speaking {
+  background: linear-gradient(90deg, rgba(232, 244, 238, 0.9), rgba(232, 244, 238, 0));
+  border-radius: 10px;
+}
+
+.movie-dialogue-line.is-speaking-line {
+  border-left: 3px solid var(--coral);
+  padding-left: 8px;
+  margin-left: -11px;
+}
+
+.movie-line.is-loop-range {
+  box-shadow: inset 3px 0 0 #5b5f8a;
+}
+
+.movie-line.is-loop-start {
+  box-shadow: inset 3px 0 0 var(--coral);
+}
+
+.tool-button.is-active {
+  color: #ffffff;
+  background: #5b5f8a;
+  border-color: #5b5f8a;
+}
+
 /* ------------------------------------------------------------ 逐句词汇 */
 
 .movie-sentence-vocab {

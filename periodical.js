@@ -60,6 +60,8 @@
     activeWord: null,
     lookupRun: 0,
     lookupCache: new Map(),
+    quickIndex: null,
+    quickIndexPromise: null,
     readingRun: 0,
     unknown: new Map(),
     picked: {},
@@ -575,7 +577,14 @@
     return String(text || "").trim();
   }
 
-  function appendEnglishTokens(target, text, sentence, issueId, paragraphIndex) {
+  function appendEnglishTokens(
+    target,
+    text,
+    sentence,
+    issueId,
+    paragraphIndex,
+    sentenceZh,
+  ) {
     const source = String(text || "");
     let cursor = 0;
     WORD_PATTERN.lastIndex = 0;
@@ -593,7 +602,8 @@
       }
       token.setAttribute("role", "button");
       token.setAttribute("tabindex", "0");
-      const open = () => openWordPanel(phrase, sentence, issueId, paragraphIndex);
+      const open = () =>
+        openWordPanel(phrase, sentence, issueId, paragraphIndex, sentenceZh);
       token.addEventListener("click", open);
       token.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -688,6 +698,7 @@
           buildSentenceFromParagraph(paragraph.en),
           data.meta.id,
           paragraph.index || order + 1,
+          paragraph.zh,
         );
         row.append(english);
 
@@ -1544,13 +1555,133 @@
     section.hidden = false;
   }
 
-  function openWordPanel(phrase, sentence, issueId, paragraphIndex) {
+  function renderExamples(examples) {
+    const section = elements.wordExampleSection;
+    const target = elements.wordExamples;
+    if (!section || !target) {
+      return;
+    }
+    target.textContent = "";
+    if (!examples.length) {
+      section.hidden = true;
+      return;
+    }
+    examples.slice(0, 3).forEach((example) => {
+      const item = el("p", "word-example-item", example.text);
+      item.lang = example.lang || "en";
+      if (example.zh) {
+        item.append(el("span", "word-example-zh", example.zh));
+      }
+      target.append(item);
+    });
+    section.hidden = false;
+  }
+
+  /* ------------------------------------------------- 本地词库优先（离线可用） */
+
+  const QUICK_INDEX_FILE = "./vocab-index/word-quick.json";
+  const QUICK_INDEX_KEY = "iball-periodical-quick-index-v1";
+
+  function readStoredQuickIndex() {
+    try {
+      const raw = window.localStorage.getItem(QUICK_INDEX_KEY);
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.words ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function loadQuickIndex() {
+    if (state.quickIndex !== null) {
+      return state.quickIndex;
+    }
+    if (state.quickIndexPromise) {
+      return state.quickIndexPromise;
+    }
+    const stored = readStoredQuickIndex();
+    if (stored) {
+      state.quickIndex = stored;
+      return stored;
+    }
+    state.quickIndexPromise = (async () => {
+      try {
+        const manifestResponse = await fetch("./vocab-index/lexemes.json", {
+          credentials: "same-origin",
+        });
+        const manifest = await manifestResponse.json().catch(() => ({}));
+        const response = await fetch(QUICK_INDEX_FILE, {
+          credentials: "same-origin",
+        });
+        const data = await response.json();
+        if (!data || !data.words) {
+          throw new Error("本地词库格式异常");
+        }
+        data.version = manifest.updatedAt || "";
+        state.quickIndex = data;
+        try {
+          window.localStorage.setItem(QUICK_INDEX_KEY, JSON.stringify(data));
+        } catch {
+          // 本地存储写满时忽略，查询仍然可用。
+        }
+        return data;
+      } catch {
+        state.quickIndex = false;
+        return false;
+      } finally {
+        state.quickIndexPromise = null;
+      }
+    })();
+    return state.quickIndexPromise;
+  }
+
+  /** 把「音标\t释义\t标签」的紧凑记录还原成词卡数据。 */
+  function parseQuickRecord(display, key, raw) {
+    if (!raw) {
+      return null;
+    }
+    const [phonetic, meaning, tags] = String(raw).split("\t");
+    const translations = String(meaning || "")
+      .split(/[；;]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    return {
+      word: display || key,
+      phonetic: phonetic || "",
+      translations: translations.length ? translations : [meaning].filter(Boolean),
+      definitions: [],
+      phrases: [],
+      tags: String(tags || "").split(/\s+/).filter(Boolean),
+      source: "local-vocab",
+    };
+  }
+
+  async function lookupActiveWordLocal(active) {
+    const index = await loadQuickIndex();
+    if (!index) {
+      return null;
+    }
+    const key = normalizeWord(active.phrase);
+    const record =
+      index.words?.[key] ??
+      index.phrases?.[key] ??
+      index.words?.[key.replace(/[^a-z]/g, "")] ??
+      null;
+    return parseQuickRecord(active.phrase, key, record);
+  }
+
+  function openWordPanel(phrase, sentence, issueId, paragraphIndex, sentenceZh) {
     state.activeWord = {
       phrase,
       sentence: sentence || phrase,
+      sentenceZh: sentenceZh || "",
       issueId,
       paragraphIndex,
     };
+    highlightActiveToken(phrase);
     if (elements.wordPanelTitle) {
       elements.wordPanelTitle.textContent = phrase;
     }
@@ -1564,27 +1695,58 @@
       elements.wordContextSentence.textContent = sentence || phrase;
     }
     if (elements.wordContextTranslation) {
-      elements.wordContextTranslation.textContent = "当前语境暂无译文。";
+      elements.wordContextTranslation.textContent =
+        sentenceZh || "当前语境暂无译文。";
     }
     renderMeanings([]);
     renderPhrases([]);
+    renderExamples([]);
     updateWordPanelMarkState();
     if (elements.wordPanel) {
       elements.wordPanel.hidden = false;
       elements.wordPanel.setAttribute("aria-hidden", "false");
     }
     elements.layout?.classList.add("has-word-panel");
+    revealWordPanel();
     lookupActiveWord();
   }
 
   function closeWordPanel() {
     state.lookupRun += 1;
     state.activeWord = null;
+    highlightActiveToken("");
     if (elements.wordPanel) {
       elements.wordPanel.hidden = true;
       elements.wordPanel.setAttribute("aria-hidden", "true");
     }
     elements.layout?.classList.remove("has-word-panel");
+  }
+
+  /** 给当前点击的单词加高亮，避免用户找不到查的是哪个词。 */
+  function highlightActiveToken(word) {
+    document
+      .querySelectorAll(".word-token.is-active-token")
+      .forEach((token) => token.classList.remove("is-active-token"));
+    if (!word) {
+      return;
+    }
+    const key = normalizeWord(word);
+    const target = document.querySelector(
+      `.word-token[data-word="${CSS.escape(key)}"]`,
+    );
+    target?.classList.add("is-active-token");
+  }
+
+  /** 侧栏在桌面端紧跟阅读位置；窄屏抽屉直接可见，不需要滚动。 */
+  function revealWordPanel() {
+    const panel = elements.wordPanel;
+    if (!panel || window.matchMedia("(max-width: 900px)").matches) {
+      return;
+    }
+    const top = panel.getBoundingClientRect().top;
+    if (top < 0 || top > window.innerHeight - 120) {
+      panel.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
   }
 
   async function lookupActiveWord() {
@@ -1596,6 +1758,16 @@
     const run = ++state.lookupRun;
     if (state.lookupCache.has(word)) {
       applyWordResult(state.lookupCache.get(word), "来自本地缓存");
+      return;
+    }
+    // 先查站内本地词库：命中就不用等在线词典，弱网也能查词。
+    const local = await lookupActiveWordLocal(active);
+    if (run !== state.lookupRun || !state.activeWord) {
+      return;
+    }
+    if (local && local.translations.length) {
+      state.lookupCache.set(word, local);
+      applyWordResult(local, "本地词库");
       return;
     }
     try {
@@ -1611,7 +1783,7 @@
         throw new Error(data.message || "暂时没有查到这个词");
       }
       state.lookupCache.set(word, data);
-      applyWordResult(data, "查询完成");
+      applyWordResult(data, "在线词典");
     } catch (error) {
       if (run !== state.lookupRun) {
         return;
@@ -1643,7 +1815,40 @@
     }
     renderMeanings(meanings.slice(0, 8));
     renderPhrases(Array.isArray(data.phrases) ? data.phrases : []);
+    renderExamples(buildWordExamples(data, state.activeWord));
     state.activeWord.meanings = meanings;
+  }
+
+  /** 例句优先用词典释义里的完整句，其次回退到当前外刊语境。 */
+  function buildWordExamples(data, active) {
+    const examples = [];
+    const candidates = [
+      ...(Array.isArray(data?.examples) ? data.examples : []),
+      ...(Array.isArray(data.definitions) ? data.definitions : []),
+    ];
+    candidates.forEach((item) => {
+      const text =
+        typeof item === "string" ? item : item?.text || item?.en || "";
+      const trimmed = String(text || "").trim();
+      if (trimmed.split(/\s+/).length < 5) {
+        return;
+      }
+      if (examples.some((entry) => entry.text === trimmed)) {
+        return;
+      }
+      examples.push({ text: trimmed, lang: "en" });
+    });
+    if (active?.sentence && examples.length < 2) {
+      const sentence = String(active.sentence).trim();
+      if (sentence && !examples.some((entry) => entry.text === sentence)) {
+        examples.unshift({
+          text: sentence,
+          zh: active.sentenceZh || "",
+          lang: "en",
+        });
+      }
+    }
+    return examples;
   }
 
   function markActiveWord(mode) {
@@ -1764,10 +1969,53 @@
         : (state.data.reading || []).flatMap((piece) =>
             (piece.paragraphs || []).map((paragraph) => paragraph.en),
           );
-    const text = paragraphs.filter(Boolean).join(" ");
-    if (!text) {
+    const texts = paragraphs
+      .map((paragraph) => String(paragraph || "").trim())
+      .filter(Boolean);
+    if (!texts.length) {
       return;
     }
+
+    /*
+     * 原来把整期正文拼成一个字符串再朗读，超过 2400 字会被截断，而且整段丢给浏览器
+     * 经常在中途哑掉。这里改成按段落整批排队：段落之间首尾相接，且不再截断。
+     */
+    if (typeof window.IballSpeech?.speakSequence === "function") {
+      const button = elements.readAllButton;
+      const finish = () => {
+        button?.classList.remove("is-playing");
+        button?.removeAttribute("aria-pressed");
+        if (button) {
+          button.textContent = "全文播放";
+        }
+      };
+      if (state.allSpeaking) {
+        window.IballSpeech.stop();
+        state.allSpeaking = false;
+        finish();
+        return;
+      }
+      const started = window.IballSpeech.speakSequence(texts, {
+        label: "外刊全文播放",
+        rate: 0.95,
+        onFinish: () => {
+          state.allSpeaking = false;
+          finish();
+        },
+        onUnsupported: () => showToast("当前浏览器不支持语音朗读"),
+      });
+      if (started) {
+        state.allSpeaking = true;
+        button?.classList.add("is-playing");
+        button?.setAttribute("aria-pressed", "true");
+        if (button) {
+          button.textContent = "停止播放";
+        }
+        return;
+      }
+    }
+
+    const text = texts.join(" ");
     state.readingRun += 1;
     speakText(text, null, elements.readAllButton, state.readingRun);
   }
@@ -1793,6 +2041,8 @@
     elements.wordMeanings = document.querySelector("#wordMeanings");
     elements.wordPhraseSection = document.querySelector("#wordPhraseSection");
     elements.wordPhrases = document.querySelector("#wordPhrases");
+    elements.wordExampleSection = document.querySelector("#wordExampleSection");
+    elements.wordExamples = document.querySelector("#wordExamples");
     elements.wordContextSentence = document.querySelector("#wordContextSentence");
     elements.wordContextTranslation = document.querySelector(
       "#wordContextTranslation",

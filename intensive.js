@@ -379,8 +379,11 @@
     }
 
     stopSpeech();
+    const speakables = (Array.isArray(texts) ? texts : [])
+      .map((text) => String(text || "").trim())
+      .filter(Boolean);
     if (
-      !texts.length ||
+      !speakables.length ||
       !("speechSynthesis" in window) ||
       typeof window.SpeechSynthesisUtterance !== "function"
     ) {
@@ -389,7 +392,6 @@
     }
 
     const runId = state.speechRun;
-    let index = 0;
     state.allSpeaking = true;
     if (triggerButton) {
       activeSequenceButton = triggerButton;
@@ -412,17 +414,36 @@
       }
     };
 
+    /*
+     * 整段一次交给统一播放通道：句子之间不再插 140ms 延时（那是断句感的主要来源），
+     * 暂停 / 继续 / 重播由右下角控制条接管。
+     */
+    if (typeof window.IballSpeech?.speakSequence === "function") {
+      const started = window.IballSpeech.speakSequence(speakables, {
+        label: "全文播放",
+        rate: 0.88,
+        onFinish: (message) => finish(message || "播放完成"),
+        onError: () => finish("播放中止，请稍后重试"),
+        onUnsupported: () => finish("当前浏览器不支持语音朗读"),
+      });
+      if (!started) {
+        finish("当前浏览器不支持语音朗读");
+      }
+      return;
+    }
+
+    let index = 0;
     const playNext = () => {
       if (runId !== state.speechRun || !state.allSpeaking) {
         return;
       }
-      if (index >= texts.length) {
+      if (index >= speakables.length) {
         finish("播放完成");
         return;
       }
 
       const started = speakText(
-        texts[index],
+        speakables[index],
         runId,
         () => {
           index += 1;

@@ -1215,6 +1215,35 @@
     elements.readAllButton.classList.add("is-playing");
     elements.readAllButton.textContent = "停止播放";
     elements.readAllButton.setAttribute("aria-pressed", "true");
+
+    const finishAll = (message) => {
+      if (run !== state.speechRun) {
+        return;
+      }
+      state.allSpeaking = false;
+      elements.readAllButton.classList.remove("is-playing");
+      elements.readAllButton.textContent = "全文播放";
+      elements.readAllButton.setAttribute("aria-pressed", "false");
+      if (message) {
+        showToast(message);
+      }
+    };
+
+    // 一次排队整段文本，段落之间不再插 120ms 延时，暂停 / 重播走统一控制条。
+    if (typeof window.IballSpeech?.speakSequence === "function") {
+      const started = window.IballSpeech.speakSequence(texts, {
+        label: "全文播放",
+        rate: 0.9,
+        onFinish: (message) => finishAll(message || "全文播放完成"),
+        onError: () => finishAll("全文播放中止，请稍后重试"),
+        onUnsupported: () => finishAll("当前浏览器不支持语音朗读"),
+      });
+      if (!started) {
+        finishAll("当前浏览器不支持语音朗读");
+      }
+      return;
+    }
+
     let index = 0;
 
     const next = () => {
@@ -1222,11 +1251,7 @@
         return;
       }
       if (index >= texts.length) {
-        state.allSpeaking = false;
-        elements.readAllButton.classList.remove("is-playing");
-        elements.readAllButton.textContent = "全文播放";
-        elements.readAllButton.setAttribute("aria-pressed", "false");
-        showToast("全文播放完成");
+        finishAll("全文播放完成");
         return;
       }
       const current = index;

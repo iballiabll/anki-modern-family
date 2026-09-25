@@ -1,0 +1,708 @@
+/**
+ * 跟读台样式，只作用于 body.shadow-page。
+ * 版式：固定顶部播放器 + 「当前句 / 跟读录音」两栏 + 可滚动句子列表。
+ */
+
+.shadow-page {
+  --shadow-radius: 8px;
+  --shadow-topbar: 64px;
+}
+
+/* --------------------------------------------------------- 顶部播放器 */
+
+.shadow-player {
+  position: sticky;
+  top: var(--shadow-topbar);
+  z-index: 30;
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+  padding: 14px 18px;
+  display: grid;
+  gap: 10px;
+  background: var(--forest-deep);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--shadow-radius);
+  box-shadow: 0 12px 30px rgba(11, 41, 37, 0.24);
+}
+
+.shadow-player.is-recording {
+  border-color: rgba(201, 90, 79, 0.75);
+  box-shadow: 0 12px 30px rgba(201, 90, 79, 0.28);
+}
+
+.shadow-player-main {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.shadow-progress {
+  color: #cfe3dc;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.shadow-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shadow-player .icon-button {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #e6f2ed;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  border-radius: var(--shadow-radius);
+}
+
+.shadow-player .icon-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.shadow-player .icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shadow-player .icon-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.shadow-play-button {
+  min-width: 148px;
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--forest-deep);
+  background: linear-gradient(180deg, #f6d98a, var(--gold));
+  border: 0;
+  border-radius: var(--shadow-radius);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.shadow-play-button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentcolor;
+  stroke: none;
+}
+
+.shadow-play-button.is-playing {
+  color: #ffffff;
+  background: linear-gradient(180deg, #d9695f, var(--coral));
+}
+
+.shadow-switch {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #cfe3dc;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shadow-switch input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+}
+
+.shadow-player-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #a8c4bb;
+  font-size: 12px;
+}
+
+.shadow-source-meta {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.shadow-timer {
+  flex: 0 0 auto;
+  color: #e6f2ed;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------------------------- 主体两栏 */
+
+.shadow-grid,
+.shadow-lines-panel {
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+}
+
+.shadow-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.shadow-script,
+.shadow-record,
+.shadow-lines-panel {
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--shadow-radius);
+  box-shadow: 0 8px 24px rgba(12, 43, 37, 0.06);
+}
+
+.shadow-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.shadow-panel-head h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.shadow-panel-hint {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.shadow-script-text {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.shadow-script-zh {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.shadow-focus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shadow-focus:empty {
+  display: none;
+}
+
+.shadow-focus span {
+  padding: 5px 9px;
+  color: var(--forest);
+  background: var(--forest-soft);
+  border-radius: var(--shadow-radius);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.shadow-notes {
+  display: grid;
+  gap: 6px;
+}
+
+.shadow-notes:empty {
+  display: none;
+}
+
+.shadow-notes p {
+  margin: 0;
+  padding-left: 12px;
+  color: #4c635b;
+  border-left: 2px solid var(--line-strong);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ----------------------------------------------------------- 录音面板 */
+
+.shadow-record-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.shadow-record-button {
+  min-width: 148px;
+  min-height: 52px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #ffffff;
+  background: var(--forest);
+  border: 0;
+  border-radius: var(--shadow-radius);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.shadow-record-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shadow-record-button.is-recording {
+  background: var(--coral);
+  animation: shadow-pulse 1.4s ease-in-out infinite;
+}
+
+.shadow-record-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes shadow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 90, 79, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(201, 90, 79, 0);
+  }
+}
+
+.shadow-record-side {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.shadow-record-timer {
+  color: var(--forest-deep);
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.shadow-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shadow-record-actions .compact-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.shadow-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shadow-meter-bar {
+  min-width: 20px;
+  height: 10px;
+  flex: 0 0 auto;
+  width: 0;
+  background: linear-gradient(90deg, var(--gold), var(--coral));
+  border-radius: var(--shadow-radius);
+  transition: width 0.12s linear;
+}
+
+.shadow-meter-text {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.shadow-result {
+  display: grid;
+  gap: 8px;
+}
+
+.shadow-result:empty {
+  display: none;
+}
+
+.shadow-score {
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+  background: #f7f8f3;
+  border: 1px solid var(--line);
+  border-radius: var(--shadow-radius);
+}
+
+.shadow-score-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.shadow-score-value {
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.shadow-score-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.shadow-diff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.shadow-diff span {
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.shadow-diff .is-hit {
+  color: #1f6b4f;
+  background: #e2f2e9;
+}
+
+.shadow-diff .is-miss {
+  color: #a53f36;
+  background: #fbe6e3;
+  text-decoration: line-through;
+}
+
+.shadow-diff .is-extra {
+  color: #8a6416;
+  background: #fdf1d8;
+  font-style: italic;
+}
+
+.shadow-heard {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #eef5f1;
+  border-left: 3px solid var(--forest);
+  border-radius: var(--shadow-radius);
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.shadow-heard strong {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.shadow-note-field {
+  display: grid;
+  gap: 7px;
+}
+
+.shadow-note-field span {
+  color: #6e8179;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.shadow-note-field textarea {
+  width: 100%;
+  min-height: 62px;
+  padding: 10px 12px;
+  resize: vertical;
+  color: var(--ink);
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: var(--shadow-radius);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.shadow-note-field textarea:focus {
+  border-color: #75a695;
+  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  outline: 0;
+}
+
+/* ----------------------------------------------------------- 句子列表 */
+
+.shadow-list {
+  max-height: min(52vh, 600px);
+  overflow: auto;
+  padding: 4px;
+  display: grid;
+  gap: 6px;
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: var(--shadow-radius);
+  overscroll-behavior: contain;
+}
+
+.shadow-list:focus-visible {
+  border-color: #75a695;
+}
+
+.shadow-line {
+  width: 100%;
+  padding: 9px 12px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  text-align: left;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--shadow-radius);
+  cursor: pointer;
+}
+
+.shadow-line:hover {
+  border-color: #8eada0;
+}
+
+.shadow-line.is-current {
+  background: #f2f8f5;
+  border-color: var(--forest);
+  box-shadow: inset 3px 0 0 var(--forest);
+}
+
+.shadow-line-index {
+  padding-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.shadow-line-text {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.shadow-line-badge {
+  padding: 3px 8px;
+  color: var(--muted);
+  background: #eef3f0;
+  border-radius: var(--shadow-radius);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.shadow-line-badge[data-state="good"] {
+  color: #1f6b4f;
+  background: #e2f2e9;
+}
+
+.shadow-line-badge[data-state="fair"] {
+  color: #8a6416;
+  background: #fdf1d8;
+}
+
+.shadow-line-badge[data-state="weak"] {
+  color: #a53f36;
+  background: #fbe6e3;
+}
+
+.shadow-line-badge[data-state="recorded"] {
+  color: #426d80;
+  background: #e6eff3;
+}
+
+/* --------------------------------------------------------- 借鉴声明 */
+
+.shadow-page .kaoyan-attribution {
+  width: min(1160px, calc(100% - 44px));
+  margin: 22px auto 46px;
+  padding: 22px 24px;
+  display: grid;
+  gap: 12px;
+  background: #f7f8f3;
+  border: 1px solid var(--line);
+  border-radius: var(--shadow-radius);
+}
+
+.shadow-page .kaoyan-attribution h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.shadow-page .kaoyan-attribution p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.shadow-page .kaoyan-attribution ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+  color: #4c635b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.shadow-page .kaoyan-attribution a {
+  color: var(--forest);
+  font-weight: 800;
+}
+
+.shadow-page .kaoyan-attribution code {
+  padding: 1px 5px;
+  background: #e7ede9;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------- 响应式 */
+
+@media (min-width: 1024px) {
+  .shadow-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+@media (max-width: 900px) {
+  .shadow-player,
+  .shadow-grid,
+  .shadow-lines-panel,
+  .shadow-page .kaoyan-attribution {
+    width: calc(100% - 32px);
+  }
+}
+
+@media (max-width: 640px) {
+  .shadow-page {
+    --shadow-topbar: 58px;
+  }
+
+  .shadow-player {
+    margin-top: 12px;
+    padding: 12px 14px;
+  }
+
+  .shadow-player-main {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 10px;
+  }
+
+  .shadow-progress {
+    order: -1;
+  }
+
+  .shadow-player-actions {
+    justify-content: center;
+  }
+
+  .shadow-play-button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .shadow-switch {
+    justify-self: center;
+  }
+
+  .shadow-script,
+  .shadow-record,
+  .shadow-lines-panel {
+    padding: 14px 14px 16px;
+  }
+
+  .shadow-script-text {
+    font-size: 18px;
+  }
+
+  .shadow-record-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .shadow-record-button {
+    width: 100%;
+  }
+
+  .shadow-record-side {
+    justify-items: center;
+  }
+
+  .shadow-record-actions {
+    justify-content: center;
+  }
+
+  .shadow-list {
+    max-height: min(46vh, 440px);
+  }
+
+  .shadow-line {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .shadow-line-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shadow-record-button.is-recording {
+    animation: none;
+  }
+
+  .shadow-meter-bar {
+    transition: none;
+  }
+}

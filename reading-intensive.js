@@ -436,6 +436,22 @@
       }
     };
 
+    // 统一播放通道一次排队整段，避免逐句 setTimeout 造成的断句感，
+    // 并把暂停 / 继续 / 重播交给右下角控制条。
+    if (typeof window.IballSpeech?.speakSequence === "function") {
+      const started = window.IballSpeech.speakSequence(speakables, {
+        label: "全文播放",
+        rate: 0.9,
+        onFinish: (message) => finish(message || "播放完成"),
+        onError: () => finish("播放中止，请稍后重试"),
+        onUnsupported: () => finish("当前浏览器不支持语音朗读"),
+      });
+      if (!started) {
+        finish("当前浏览器不支持语音朗读");
+      }
+      return;
+    }
+
     const playNext = () => {
       if (run !== state.speechRun || !state.allSpeaking) {
         return;

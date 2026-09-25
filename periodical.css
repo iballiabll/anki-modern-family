@@ -12,6 +12,125 @@
   align-items: start;
 }
 
+/* --------------------------------------------------- 点词查义侧栏（P0 修复） */
+/* 面板必须是 .periodical-layout 的第三个网格子元素，否则会被推到页面末尾。 */
+
+.periodical-layout.has-word-panel {
+  grid-template-columns: 238px minmax(0, 1fr) 336px;
+}
+
+.periodical-word-panel {
+  background: #fcfbf7;
+  border-color: var(--line-strong, #c8d4ce);
+  box-shadow: 0 16px 40px rgba(14, 49, 42, 0.1);
+  animation: periodical-panel-in 200ms ease-out;
+}
+
+.periodical-word-panel .word-heading h2 {
+  font-size: 30px;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-panel .word-meanings {
+  gap: 8px;
+}
+
+.periodical-word-panel .word-examples {
+  display: grid;
+  gap: 8px;
+}
+
+.periodical-word-panel .word-example-item {
+  padding: 9px 10px;
+  background: rgba(23, 84, 68, 0.05);
+  border-left: 2px solid var(--gold, #c9a227);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink, #16302a);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.periodical-word-panel .word-example-item[lang="en"] {
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+
+.periodical-word-panel .word-example-zh {
+  margin-top: 4px;
+  display: block;
+  color: var(--muted, #5c6f6a);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* 命中词高亮：查词时给被点击的单词加一圈动效。 */
+.word-token.is-active-token {
+  color: #0d3f34;
+  background: rgba(201, 162, 39, 0.22);
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.28);
+  animation: periodical-token-pulse 420ms ease-out;
+}
+
+@keyframes periodical-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes periodical-token-pulse {
+  0% {
+    background: rgba(201, 162, 39, 0.45);
+  }
+
+  100% {
+    background: rgba(201, 162, 39, 0.22);
+  }
+}
+
+@media (max-width: 1180px) {
+  .periodical-layout.has-word-panel {
+    grid-template-columns: 208px minmax(0, 1fr) 300px;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  /* 移动端沿用 intensive.css 的底部抽屉，这里只做外刊页的细节收敛。 */
+  .periodical-word-panel {
+    animation: periodical-panel-up 200ms ease-out;
+  }
+
+  .periodical-word-panel .word-heading h2 {
+    font-size: 26px;
+  }
+}
+
+@keyframes periodical-panel-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .periodical-word-panel,
+  .word-token.is-active-token {
+    animation: none;
+  }
+}
+
 .periodical-navigation {
   position: static;
   top: auto;

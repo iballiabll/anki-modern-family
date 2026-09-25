@@ -19,6 +19,8 @@
     />
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./movie.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
     <script src="./collocation-index.js" defer></script>
@@ -115,6 +117,15 @@
               </button>
               <button id="alternativeToggleButton" class="tool-button" type="button">
                 隐藏替换说法
+              </button>
+              <button
+                id="abLoopButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="先点这里，再点任意两句的“循环”，即可反复精听这一段"
+              >
+                A-B 选段循环
               </button>
               <button id="readAllButton" class="tool-button is-primary" type="button">
                 全集播放

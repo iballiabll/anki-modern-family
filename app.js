@@ -69,6 +69,18 @@ const KAOYAN_ENTRY_SEARCH_TEXT =
 const PERIODICAL_ENTRY_CATEGORIES = ["外刊"];
 const PERIODICAL_ENTRY_SEARCH_TEXT =
   "外刊经济学人卫报巴伦周刊精读原文检验题完形新题型答疑杂志排版生词时间轴主题导引50期";
+const VOCAB_ENTRY_CATEGORIES = ["0基础", "四级", "六级", "考研"];
+const VOCAB_ENTRY_SEARCH_TEXT =
+  "词汇库背单词生词本收藏音标释义例句词根词缀记忆法核心词零基础";
+const WRITING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
+const WRITING_ENTRY_SEARCH_TEXT =
+  "作文批改写作范文模板真题大作文小作文语法标注词汇替换句式优化评分";
+const LISTEN_ENTRY_CATEGORIES = ["四级", "六级"];
+const LISTEN_ENTRY_SEARCH_TEXT =
+  "听句精听听写听力练习逐句错题本答题区原文播放器定格";
+const SHADOW_ENTRY_CATEGORIES = ["电影", "四级", "六级"];
+const SHADOW_ENTRY_SEARCH_TEXT =
+  "跟读台跟读影子跟读录音发音评分慢速正常语速逐句原音连续跟读";
 const AMERICAN_VOICE_NAMES = {
   female: [
     "aria",
@@ -7151,6 +7163,33 @@ function matchesPeriodicalEntryQuery(query) {
   return Boolean(compactQuery) && searchable.includes(compactQuery);
 }
 
+function matchesVocabEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(VOCAB_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesWritingEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(WRITING_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesListenEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(LISTEN_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesShadowEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(SHADOW_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
 function createReadingEntry(categoryName) {
   const link = document.createElement("a");
   link.className = "resource-button is-reading-entry";
@@ -7355,6 +7394,150 @@ function createPeriodicalEntry(categoryName) {
   const meta = document.createElement("span");
   meta.textContent =
     "50 期 · 时间轴 / 主题导引 · 精读 / 原文 / 检验题 / 答疑 / 原件 · 单期懒加载";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createVocabEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-vocab-entry";
+  link.href = "./vocab.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.vocabEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开词汇库，按考试词库背单词并加入生词本，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "词";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "词汇库 · 生词本";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "考研一/二 · 四级 · 六级 · 音标释义例句 · 词根词缀与记忆法";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createWritingEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-writing-entry";
+  link.href = "./writing.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.writingEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开作文批改，按考试类型选真题写作并获取评分反馈，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "写";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "作文批改";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "历年真题题目 · 语法标注 · 词汇替换 · 句式优化 · 总分与范文";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createListenEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-listen-entry";
+  link.href = "./listen.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.listenEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开听句精听，逐句听写并自动收集错题，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "听";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "听句精听";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "顶部固定播放器 · 可滚动句子列表 · 答题区 · 错题本复习";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createShadowEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-shadow-entry";
+  link.href = "./shadow.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.shadowEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开跟读台，逐句听原音、录音跟读并查看发音评分，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "跟";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "跟读台";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "逐句原音 · 慢速/正常语速 · 录音跟读 · 发音评分 · 连续跟读";
 
   const count = document.createElement("span");
   count.className = "resource-count";
@@ -7785,6 +7968,18 @@ function renderResourceList() {
     const showPeriodicalEntry =
       PERIODICAL_ENTRY_CATEGORIES.includes(category.name) &&
       (!query || categoryNameMatches || matchesPeriodicalEntryQuery(query));
+    const showVocabEntry =
+      VOCAB_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesVocabEntryQuery(query));
+    const showWritingEntry =
+      WRITING_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesWritingEntryQuery(query));
+    const showListenEntry =
+      LISTEN_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesListenEntryQuery(query));
+    const showShadowEntry =
+      SHADOW_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesShadowEntryQuery(query));
     const visibleResources = categoryResources.filter(
       (resource) =>
         !query || categoryNameMatches || matchesMaterialQuery(resource, query),
@@ -7825,7 +8020,11 @@ function renderResourceList() {
       !showKaoyanEntry &&
       !showCet6Entry &&
       !showCet6ExtraEntry &&
-      !showPeriodicalEntry
+      !showPeriodicalEntry &&
+      !showVocabEntry &&
+      !showWritingEntry &&
+      !showListenEntry &&
+      !showShadowEntry
     ) {
       return;
     }
@@ -7842,7 +8041,11 @@ function renderResourceList() {
       (showKaoyanEntry ? 1 : 0) +
       (showCet6Entry ? 1 : 0) +
       (showCet6ExtraEntry ? 1 : 0) +
-      (showPeriodicalEntry ? 1 : 0);
+      (showPeriodicalEntry ? 1 : 0) +
+      (showVocabEntry ? 1 : 0) +
+      (showWritingEntry ? 1 : 0) +
+      (showListenEntry ? 1 : 0) +
+      (showShadowEntry ? 1 : 0);
 
     const group = document.createElement("section");
     group.className = "resource-group";
@@ -7916,6 +8119,22 @@ function renderResourceList() {
       group.append(createPeriodicalEntry(category.name));
     }
 
+    if (showVocabEntry) {
+      group.append(createVocabEntry(category.name));
+    }
+
+    if (showWritingEntry) {
+      group.append(createWritingEntry(category.name));
+    }
+
+    if (showListenEntry) {
+      group.append(createListenEntry(category.name));
+    }
+
+    if (showShadowEntry) {
+      group.append(createShadowEntry(category.name));
+    }
+
     const directResources = visibleResources.filter(
       (resource) => !resource.section,
     );
@@ -7957,6 +8176,10 @@ function renderResourceList() {
       !showCet6Entry &&
       !showCet6ExtraEntry &&
       !showPeriodicalEntry &&
+      !showVocabEntry &&
+      !showWritingEntry &&
+      !showListenEntry &&
+      !showShadowEntry &&
       !directResources.length &&
       !visibleSections.length
     ) {

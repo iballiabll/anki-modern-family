@@ -502,7 +502,8 @@ function parseCloze(markdown, answers, meta) {
 function findItemNumbers(text) {
   const numbers = [];
   const seen = new Set();
-  const pattern = /(?:\((\d{2})\)|(?:^|[\s.、])(\d{2})\.\s*(?=_{2,}|$|\s))/gm;
+  // 语料里半角 `(46)` 与全角 `（48）` 混用，两种括号都要认。
+  const pattern = /(?:[（(](\d{2})[）)]|(?:^|[\s.、])(\d{2})\.\s*(?=_{2,}|$|\s))/gm;
   let match = pattern.exec(text);
   while (match) {
     const number = Number(match[1] || match[2]);
@@ -516,11 +517,12 @@ function findItemNumbers(text) {
 }
 
 function describeMarker(text, number) {
-  const index = text.indexOf(`(${number})`);
+  // 全角/半角括号都可能出现，两种都要能定位。
+  const index = text.search(new RegExp(`[（(]${number}[）)]`));
   if (index === -1) {
     return "";
   }
-  const tail = text.slice(index + `(${number})`.length).replace(/^[\s_:]+/, "");
+  const tail = text.slice(index + 4).replace(/^[\s_:]+/, "");
   const firstLine = tail.split("\n")[0] || "";
   if (!firstLine || /^_{2,}/.test(tail)) {
     return "";
@@ -570,7 +572,7 @@ function collectNumberedStatements(lines, minNumber = 36, maxNumber = 52) {
     if (!current) {
       return;
     }
-    if (/^\[\s*[A-G]\s*\]/.test(line) || /^(?:\(\d{2}\)|\d{1,3}\.\s)/.test(line)) {
+    if (/^\[\s*[A-G]\s*\]/.test(line) || /^(?:[（(]\d{2}[）)]|\d{1,3}\.\s)/.test(line)) {
       current = null;
       return;
     }
@@ -623,7 +625,7 @@ function parseNewQuestionType(markdown, answers, meta) {
       currentOption &&
       !TERMINAL_RE.test(currentOption.text) &&
       !/^\d{1,3}\.\s/.test(line) &&
-      !/^(?:\(\d{2}\)|\d{1,3}\.\s*_{2,})/.test(line)
+      !/^(?:[（(]\d{2}[）)]|\d{1,3}\.\s*_{2,})/.test(line)
     ) {
       appendContinuation(currentOption, "text", line);
       return;
@@ -633,7 +635,7 @@ function parseNewQuestionType(markdown, answers, meta) {
   });
 
   const paragraphs = splitParagraphs(textLines, {
-    markerPattern: /^(?:\(\d{2}\)|\d{2}\.\s*_{2,})/,
+    markerPattern: /^(?:[（(]\d{2}[）)]|\d{2}\.\s*_{2,})/,
   });
   const bodyText = paragraphs.join("\n");
   const answerKeys = Object.keys(answers || {})
@@ -719,7 +721,7 @@ function parseTranslation(markdown, answers, meta, options = {}) {
   const paragraphs = splitParagraphs(body);
   const text = paragraphs.join("\n");
   const markers = [];
-  const markerPattern = /\((\d{2})\)/g;
+  const markerPattern = /[（(](\d{2})[）)]/g;
   let match = markerPattern.exec(text);
   while (match) {
     const number = Number(match[1]);
@@ -1002,6 +1004,23 @@ async function buildPaper(track, year, corpusRoot) {
       ),
     };
     warnings.push(...validateSection(section, sectionId).map((item) => `${sectionId}：${item}`));
+    // question-map.json 说这一题归属本篇、语料却没有题干：2025 英语二 Text 3
+    // 曾因漏号（32 后直接跳到 34）踩过这里，这里显式报警，不再静默放过。
+    const ownedNumbers = Object.entries(questionMap || {})
+      .filter(([, entry]) => entry && entry.section === sectionId)
+      .map(([key]) => Number(key))
+      .filter((value) => Number.isFinite(value));
+    if (ownedNumbers.length && section.questions.length) {
+      const parsedNumbers = new Set(section.questions.map((question) => question.number));
+      const missingNumbers = ownedNumbers
+        .filter((number) => !parsedNumbers.has(number))
+        .sort((left, right) => left - right);
+      if (missingNumbers.length) {
+        warnings.push(
+          `${sectionId}：question-map 标注第 ${missingNumbers.join("、")} 题归属本篇，但语料缺题干`,
+        );
+      }
+    }
     sections.push(section);
   }
 

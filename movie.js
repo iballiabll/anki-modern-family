@@ -108,6 +108,9 @@
     audioButton: null,
     audioCue: null,
     audioCleanup: null,
+    abArmed: false,
+    abStartId: "",
+    abEndId: "",
     activeSceneId: "",
     toastTimer: 0,
     scrollFrame: 0,
@@ -126,6 +129,7 @@
       "#sentenceVocabToggleButton",
     ),
     alternativeToggleButton: document.querySelector("#alternativeToggleButton"),
+    abLoopButton: document.querySelector("#abLoopButton"),
     readAllButton: document.querySelector("#readAllButton"),
     toast: document.querySelector("#toast"),
     displayModeButtons: document.querySelectorAll("[data-display-mode]"),
@@ -314,7 +318,9 @@
     elements.readAllButton.setAttribute("aria-pressed", String(state.allSpeaking));
   }
 
-  function stopSpeech() {
+  // 只把模块自己的状态复位，不碰浏览器语音引擎。
+  // 交给全站朗读通道时，停上一段由通道内部负责，避免同一个动作停两遍。
+  function resetSpeechState() {
     stopAudioPlayback();
     state.speechRun += 1;
     state.allSpeaking = false;
@@ -326,6 +332,13 @@
       activeSequenceButton = null;
     }
     updateReadAllButton();
+  }
+
+  function stopSpeech(options = {}) {
+    resetSpeechState();
+    if (options.skipEngine) {
+      return;
+    }
     if ("speechSynthesis" in window) {
       // 只调 cancel() 时部分 Windows 语音会继续说下去，朗读就会和上一句叠在一起。
       // 先 pause 再 cancel、最后 resume 复位，才算真正停下来。
@@ -387,7 +400,7 @@
       return;
     }
 
-    stopSpeech();
+    stopSpeech({ skipEngine: Boolean(window.IballSpeech?.speakSequence) });
     if (!supportsSpeech()) {
       showToast("当前浏览器不支持语音朗读");
       return;
@@ -406,6 +419,26 @@
         showToast(message);
       }
     };
+
+    // 走全站朗读通道：整段一次排队播完，句间不留空档，
+    // 并且控制条上可以随时暂停、继续、重播当前句。
+    if (window.IballSpeech?.speakSequence) {
+      const started = window.IballSpeech.speakSequence(
+        usable.map((text) => ({ text, rate: 0.9 })),
+        {
+          label: "台词朗读",
+          onFinish: (message) => {
+            finish(message === "已停止播放" ? "已停止朗读" : message);
+          },
+          onError: () => finish("朗读中止，请稍后重试"),
+          onUnsupported: () => finish("当前浏览器不支持语音朗读"),
+        },
+      );
+      if (!started) {
+        finish("当前浏览器不支持语音朗读");
+      }
+      return;
+    }
 
     const playNext = () => {
       if (runId !== state.speechRun) {
@@ -446,7 +479,7 @@
       return;
     }
 
-    stopSpeech();
+    stopSpeech({ skipEngine: Boolean(window.IballSpeech?.speakSequence) });
     if (!supportsSpeech()) {
       showToast("当前浏览器不支持语音朗读");
       return;
@@ -475,6 +508,28 @@
         showToast(message);
       }
     };
+
+    if (window.IballSpeech?.speakSequence) {
+      const started = window.IballSpeech.speakSequence(
+        usable.map((text) => ({ text, rate: 0.9 })),
+        {
+          label: "全集朗读",
+          onFinish: (message) => {
+            finish(
+              message === "已停止播放"
+                ? "已停止播放"
+                : message || "播放完成",
+            );
+          },
+          onError: () => finish("播放中止，请稍后重试"),
+          onUnsupported: () => finish("当前浏览器不支持语音朗读"),
+        },
+      );
+      if (!started) {
+        finish("当前浏览器不支持语音朗读");
+      }
+      return;
+    }
 
     const playNext = () => {
       if (runId !== state.speechRun || !state.allSpeaking) {
@@ -505,6 +560,97 @@
 
   let audioElement = null;
 
+  /**
+   * 播放中的台词高亮与自动滚动。
+   *
+   * 只说“正在播哪一句”还不够：整集几百句，用户视线早就跟丢了。
+   * 所以每切一句就把对应行标出来，并且只在它滑出可视区时才滚动，
+   * 免得用户自己翻页看语法的时候被强行拽回去。
+   */
+  function findLineRow(segmentId) {
+    if (!segmentId) {
+      return null;
+    }
+    const rows = document.querySelectorAll(".movie-line");
+    for (const row of rows) {
+      if (row.dataset.segmentId === segmentId) {
+        return row;
+      }
+    }
+    return null;
+  }
+
+  function clearSpeakingCue() {
+    document
+      .querySelectorAll(".movie-line.is-speaking")
+      .forEach((row) => row.classList.remove("is-speaking"));
+    document
+      .querySelectorAll(".movie-dialogue-line.is-speaking-line")
+      .forEach((line) => line.classList.remove("is-speaking-line"));
+  }
+
+  function setSpeakingCue(cue) {
+    clearSpeakingCue();
+    if (!cue) {
+      return;
+    }
+    const segmentId = String(cue.segmentId || cue.id || "");
+    const row = findLineRow(segmentId) || findLineRow(String(cue.id || ""));
+    if (!row) {
+      return;
+    }
+    row.classList.add("is-speaking");
+
+    const lineId = String(cue.id || "");
+    if (/^b\d+$/.test(lineId)) {
+      const line = row.querySelector(`[data-line-id="${lineId}"]`);
+      if (line) {
+        line.classList.add("is-speaking-line");
+      }
+    }
+
+    const rect = row.getBoundingClientRect();
+    const topLimit = 140;
+    const bottomLimit = window.innerHeight - 80;
+    if (rect.top < topLimit || rect.bottom > bottomLimit) {
+      row.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  function clearLoopMarks() {
+    document
+      .querySelectorAll(".movie-line.is-loop-range, .movie-line.is-loop-start")
+      .forEach((row) =>
+        row.classList.remove("is-loop-range", "is-loop-start"),
+      );
+  }
+
+  function resetAudioDecorations() {
+    clearSpeakingCue();
+    clearLoopMarks();
+    state.abArmed = false;
+    state.abStartId = "";
+    state.abEndId = "";
+    updateAbLoopButton();
+  }
+
+  function updateAbLoopButton() {
+    const button = elements.abLoopButton;
+    if (!button) {
+      return;
+    }
+    const active = Boolean(state.abArmed || state.abStartId);
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+    if (state.abStartId) {
+      button.textContent = "点句尾“循环”选 B 点";
+    } else if (state.abArmed) {
+      button.textContent = "点句尾“循环”选 A 点";
+    } else {
+      button.textContent = "A-B 选段循环";
+    }
+  }
+
   function getAudioElement() {
     if (!audioElement) {
       audioElement = new Audio();
@@ -526,6 +672,7 @@
     if (audioElement) {
       audioElement.pause();
     }
+    resetAudioDecorations();
     if (message) {
       showToast(message);
     }
@@ -535,7 +682,7 @@
     return run === state.audioRun;
   }
 
-  function playAudioCues(cues, button) {
+  function playAudioCues(cues, button, options = {}) {
     const usable = (Array.isArray(cues) ? cues : []).filter(
       (cue) =>
         cue &&
@@ -553,6 +700,12 @@
     }
 
     stopSpeech();
+    const loop = Boolean(options.loop);
+    if (loop && Array.isArray(options.loopIds)) {
+      options.loopIds.forEach((id) => {
+        findLineRow(String(id))?.classList.add("is-loop-range");
+      });
+    }
     const run = state.audioRun;
     const audio = getAudioElement();
     let index = 0;
@@ -583,6 +736,7 @@
         setSpeechButtonState(state.audioButton, false);
         state.audioButton = null;
       }
+      resetAudioDecorations();
     };
 
     /**
@@ -658,12 +812,18 @@
         return;
       }
       if (index >= usable.length) {
+        if (loop) {
+          index = 0;
+          playNext();
+          return;
+        }
         finish("原声播放完成");
         return;
       }
       clearWatcher();
       const cue = usable[index];
       state.audioCue = cue;
+      setSpeakingCue(cue);
       try {
         audio.currentTime = Math.max(0, Number(cue.start) || 0);
       } catch {
@@ -752,6 +912,95 @@
       .map((block) => map.get(`b${Number(block.i)}`))
       .filter(Boolean);
     return cues.length === blocks.length ? cues : [];
+  }
+
+  /**
+   * 取一句台词的首个可用原声标记。
+   * 精灵清单按 b1、b2… 切句，但个别行对不上，所以逐行回退到整段。
+   */
+  function findFirstCue(view) {
+    const cues = findAudioCues(view);
+    if (cues.length) {
+      return cues[0];
+    }
+    return findAudioCue(view);
+  }
+
+  function buildCueRange(startId, endId) {
+    const list = Array.isArray(state.audioManifest?.lineCues)
+      ? state.audioManifest.lineCues
+      : [];
+    const startIndex = list.findIndex((cue) => String(cue.id) === String(startId));
+    const endIndex = list.findIndex((cue) => String(cue.id) === String(endId));
+    if (startIndex < 0 || endIndex < 0) {
+      return [];
+    }
+    const from = Math.min(startIndex, endIndex);
+    const to = Math.max(startIndex, endIndex);
+    return list.slice(from, to + 1);
+  }
+
+  function startSingleLineLoop(view, button) {
+    const lineCues = findAudioCues(view);
+    const cues = lineCues.length ? lineCues : [findAudioCue(view)].filter(Boolean);
+    if (!cues.length) {
+      showToast("这一句暂时没有原声，可先用“播放”听朗读");
+      return;
+    }
+    playAudioCues(cues, button, { loop: true, loopIds: [view.id] });
+  }
+
+  /**
+   * 句尾“循环”按钮承担两种角色：
+   *  1. 平时=单句循环，反复听同一句；
+   *  2. 工具栏点了 A-B 之后，第一下设起点、第二下设终点并循环整段。
+   */
+  function handleRowLoop(view, button) {
+    const firstCue = findFirstCue(view);
+    const cueId = firstCue ? String(firstCue.id) : "";
+
+    if (!state.abArmed && !state.abStartId) {
+      startSingleLineLoop(view, button);
+      return;
+    }
+
+    if (!cueId) {
+      showToast("这一句暂时没有原声，换一句试试");
+      return;
+    }
+
+    if (!state.abStartId) {
+      state.abStartId = cueId;
+      findLineRow(view.id)?.classList.add("is-loop-start");
+      updateAbLoopButton();
+      showToast("已设 A 点，再点一句的“循环”设 B 点");
+      return;
+    }
+
+    if (state.abStartId === cueId) {
+      showToast("A、B 是同一句，请换一句设终点");
+      return;
+    }
+
+    const range = buildCueRange(state.abStartId, cueId);
+    state.abArmed = false;
+    state.abStartId = "";
+    state.abEndId = "";
+    if (!range.length) {
+      clearLoopMarks();
+      updateAbLoopButton();
+      showToast("选段原声不可用，换相邻的句子试试");
+      return;
+    }
+
+    const started = playAudioCues(range, button, {
+      loop: true,
+      loopIds: range.map((cue) => String(cue.segmentId || cue.id)),
+    });
+    updateAbLoopButton();
+    if (!started) {
+      showToast("选段原声播放失败，可先用“播放”听朗读");
+    }
   }
 
   function playSegmentEnglish(view, button) {
@@ -1588,6 +1837,8 @@
       const line = document.createElement("p");
       line.className = "movie-dialogue-line";
       line.lang = "en";
+      // 原声精灵是按 b1、b2… 逐句切好的，标出对应关系才能高亮到具体那一句。
+      line.dataset.lineId = `b${Number(block.i)}`;
       if (block.speaker) {
         const speaker = document.createElement("span");
         speaker.className = "movie-speaker";
@@ -1652,7 +1903,18 @@
     playButton.addEventListener("click", () => {
       playSegmentEnglish(view, playButton);
     });
-    foot.append(playButton);
+
+    const loopButton = document.createElement("button");
+    loopButton.type = "button";
+    loopButton.className = "movie-loop-button";
+    loopButton.textContent = "循环";
+    loopButton.setAttribute("aria-label", `循环播放第 ${view.number} 句英文`);
+    loopButton.title = "点一下单句循环；先用工具栏的 A-B 选段循环，再点两句可反复精听一段";
+    loopButton.addEventListener("click", () => {
+      handleRowLoop(view, loopButton);
+    });
+
+    foot.append(playButton, loopButton);
 
     body.append(foot);
 
@@ -2601,6 +2863,29 @@
       setAlternativeVisibility(!state.showAlternatives);
     });
 
+    elements.abLoopButton?.addEventListener("click", () => {
+      if (state.audioButton && state.audioCue) {
+        stopAudioPlayback("已停止选段循环");
+      }
+      if (state.abStartId) {
+        state.abStartId = "";
+        state.abEndId = "";
+        state.abArmed = false;
+        clearLoopMarks();
+        updateAbLoopButton();
+        showToast("已取消选段");
+        return;
+      }
+      state.abArmed = !state.abArmed;
+      clearLoopMarks();
+      updateAbLoopButton();
+      showToast(
+        state.abArmed
+          ? "点任意一句句尾的“循环”设 A 点"
+          : "已退出选段模式",
+      );
+    });
+
     elements.readAllButton?.addEventListener("click", () => {
       const lineCues = state.segmentOrder.flatMap(findAudioCues);
       const lineCount = state.segmentOrder.reduce(
@@ -2662,6 +2947,7 @@
     setSentenceVocabVisibility(state.showSentenceVocab);
     setAlternativeVisibility(state.showAlternatives);
     updateReadAllButton();
+    updateAbLoopButton();
     updateReadingProgress();
 
     const requested = getEpisodeFromLocation();

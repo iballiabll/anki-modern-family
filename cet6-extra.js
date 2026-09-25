@@ -295,6 +295,24 @@
         showToast(message);
       }
     };
+    // 统一播放通道：一次排队整段，句子之间不再插延时，暂停 / 重播由控制条接管。
+    if (typeof window.IballSpeech?.speakSequence === "function") {
+      const started = window.IballSpeech.speakSequence(list, {
+        label: label || "朗读",
+        rate: 0.96,
+        onFinish: (message) =>
+          finish(message || (label ? `${label}朗读完毕` : "朗读完毕")),
+        onError: () =>
+          finish("浏览器语音不可用，可点击单词单独朗读"),
+        onUnsupported: () =>
+          finish("浏览器语音不可用，可点击单词单独朗读"),
+      });
+      if (!started) {
+        finish("浏览器语音不可用，可点击单词单独朗读");
+      }
+      return;
+    }
+
     const playNext = (index) => {
       if (run !== state.speechRun) {
         return;

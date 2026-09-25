@@ -1,0 +1,223 @@
+{
+  "generatedBy": "scripts/build-study-library.mjs",
+  "generatedAt": "2026-09-25",
+  "episodeCount": 24,
+  "episodes": [
+    {
+      "id": "S01E24",
+      "title": "Modern Family S01E24",
+      "file": "study-data/S01E24.json",
+      "duration": 1036.46,
+      "sceneCount": 12,
+      "segmentCount": 453,
+      "lineCount": 453
+    },
+    {
+      "id": "S01E23",
+      "title": "Modern Family S01E23",
+      "file": "study-data/S01E23.json",
+      "duration": 1046.92,
+      "sceneCount": 12,
+      "segmentCount": 484,
+      "lineCount": 484
+    },
+    {
+      "id": "S01E22",
+      "title": "Modern Family S01E22",
+      "file": "study-data/S01E22.json",
+      "duration": 1023.13,
+      "sceneCount": 11,
+      "segmentCount": 473,
+      "lineCount": 473
+    },
+    {
+      "id": "S01E21",
+      "title": "Modern Family S01E21",
+      "file": "study-data/S01E21.json",
+      "duration": 1040.09,
+      "sceneCount": 12,
+      "segmentCount": 454,
+      "lineCount": 454
+    },
+    {
+      "id": "S01E20",
+      "title": "Modern Family S01E20",
+      "file": "study-data/S01E20.json",
+      "duration": 1053.76,
+      "sceneCount": 11,
+      "segmentCount": 491,
+      "lineCount": 491
+    },
+    {
+      "id": "S01E19",
+      "title": "Modern Family S01E19",
+      "file": "study-data/S01E19.json",
+      "duration": 1066.13,
+      "sceneCount": 12,
+      "segmentCount": 495,
+      "lineCount": 495
+    },
+    {
+      "id": "S01E18",
+      "title": "Modern Family S01E18",
+      "file": "study-data/S01E18.json",
+      "duration": 1085.46,
+      "sceneCount": 12,
+      "segmentCount": 467,
+      "lineCount": 467
+    },
+    {
+      "id": "S01E17",
+      "title": "Modern Family S01E17",
+      "file": "study-data/S01E17.json",
+      "duration": 1144.83,
+      "sceneCount": 12,
+      "segmentCount": 505,
+      "lineCount": 505
+    },
+    {
+      "id": "S01E16",
+      "title": "Modern Family S01E16",
+      "file": "study-data/S01E16.json",
+      "duration": 1128.93,
+      "sceneCount": 11,
+      "segmentCount": 463,
+      "lineCount": 463
+    },
+    {
+      "id": "S01E15",
+      "title": "Modern Family S01E15",
+      "file": "study-data/S01E15.json",
+      "duration": 1145.28,
+      "sceneCount": 12,
+      "segmentCount": 490,
+      "lineCount": 490
+    },
+    {
+      "id": "S01E14",
+      "title": "Modern Family S01E14",
+      "file": "study-data/S01E14.json",
+      "duration": 1171.15,
+      "sceneCount": 12,
+      "segmentCount": 504,
+      "lineCount": 504
+    },
+    {
+      "id": "S01E13",
+      "title": "Modern Family S01E13",
+      "file": "study-data/S01E13.json",
+      "duration": 1159.63,
+      "sceneCount": 12,
+      "segmentCount": 503,
+      "lineCount": 503
+    },
+    {
+      "id": "S01E12",
+      "title": "Modern Family S01E12",
+      "file": "study-data/S01E12.json",
+      "duration": 1112.58,
+      "sceneCount": 12,
+      "segmentCount": 477,
+      "lineCount": 477
+    },
+    {
+      "id": "S01E11",
+      "title": "Modern Family S01E11",
+      "file": "study-data/S01E11.json",
+      "duration": 1169.85,
+      "sceneCount": 12,
+      "segmentCount": 527,
+      "lineCount": 527
+    },
+    {
+      "id": "S01E10",
+      "title": "Modern Family S01E10",
+      "file": "study-data/S01E10.json",
+      "duration": 1128.15,
+      "sceneCount": 12,
+      "segmentCount": 492,
+      "lineCount": 492
+    },
+    {
+      "id": "S01E09",
+      "title": "Modern Family S01E09",
+      "file": "study-data/S01E09.json",
+      "duration": 1082.29,
+      "sceneCount": 11,
+      "segmentCount": 469,
+      "lineCount": 469
+    },
+    {
+      "id": "S01E08",
+      "title": "Modern Family S01E08",
+      "file": "study-data/S01E08.json",
+      "duration": 1145.51,
+      "sceneCount": 12,
+      "segmentCount": 478,
+      "lineCount": 478
+    },
+    {
+      "id": "S01E07",
+      "title": "Modern Family S01E07",
+      "file": "study-data/S01E07.json",
+      "duration": 991.99,
+      "sceneCount": 11,
+      "segmentCount": 414,
+      "lineCount": 414
+    },
+    {
+      "id": "S01E06",
+      "title": "Modern Family S01E06",
+      "file": "study-data/S01E06.json",
+      "duration": 1060.64,
+      "sceneCount": 11,
+      "segmentCount": 500,
+      "lineCount": 500
+    },
+    {
+      "id": "S01E05",
+      "title": "Modern Family S01E05",
+      "file": "study-data/S01E05.json",
+      "duration": 1096.46,
+      "sceneCount": 11,
+      "segmentCount": 511,
+      "lineCount": 511
+    },
+    {
+      "id": "S01E04",
+      "title": "Modern Family S01E04",
+      "file": "study-data/S01E04.json",
+      "duration": 1160.61,
+      "sceneCount": 12,
+      "segmentCount": 509,
+      "lineCount": 509
+    },
+    {
+      "id": "S01E03",
+      "title": "Modern Family S01E03",
+      "file": "study-data/S01E03.json",
+      "duration": 1027.41,
+      "sceneCount": 11,
+      "segmentCount": 465,
+      "lineCount": 465
+    },
+    {
+      "id": "S01E02",
+      "title": "Modern Family S01E02",
+      "file": "study-data/S01E02.json",
+      "duration": 1058.94,
+      "sceneCount": 12,
+      "segmentCount": 385,
+      "lineCount": 457
+    },
+    {
+      "id": "S01E01",
+      "title": "Modern Family S01E01",
+      "file": "study-data/S01E01.json",
+      "duration": 1167.42,
+      "sceneCount": 15,
+      "segmentCount": 329,
+      "lineCount": 496
+    }
+  ]
+}

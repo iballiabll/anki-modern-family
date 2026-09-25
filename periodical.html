@@ -19,6 +19,8 @@
     />
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./periodical.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <script src="./speech-transport.js" defer></script>
     <script src="./periodical-index.js" defer></script>
     <script src="./periodical-papers.js" defer></script>
     <script src="./periodical.js" defer></script>
@@ -133,6 +135,60 @@
             <span>共 50 期，每期正文单独加载。</span>
           </div>
         </section>
+
+        <aside
+          id="wordPanel"
+          class="word-panel periodical-word-panel"
+          aria-labelledby="wordPanelTitle"
+          aria-hidden="true"
+          hidden
+        >
+          <div class="word-panel-head">
+            <span>外刊生词</span>
+            <button id="closeWordPanelButton" class="icon-button" type="button">
+              关闭
+            </button>
+          </div>
+
+          <div class="word-actions">
+            <button id="markUnknownButton" class="mark-button is-unknown" type="button">
+              不会
+            </button>
+            <button id="markKnownButton" class="mark-button is-known" type="button">
+              掌握
+            </button>
+          </div>
+
+          <p class="word-panel-footnote">
+            标记后保存在本机浏览器，复习页可继续使用。
+          </p>
+
+          <div class="word-heading">
+            <h2 id="wordPanelTitle" lang="en"></h2>
+            <button id="speakWordButton" class="compact-button" type="button">
+              朗读
+            </button>
+          </div>
+          <p id="wordPanelPhonetic" class="word-phonetic" lang="en"></p>
+          <p id="wordLookupStatus" class="word-lookup-status" role="status"></p>
+          <div id="wordMeanings" class="word-meanings"></div>
+
+          <section id="wordPhraseSection" class="word-block" hidden>
+            <span class="word-block-label">固定搭配</span>
+            <div id="wordPhrases" class="word-phrases"></div>
+          </section>
+
+          <section id="wordExampleSection" class="word-block" hidden>
+            <span class="word-block-label">例句</span>
+            <div id="wordExamples" class="word-examples"></div>
+          </section>
+
+          <div class="word-context">
+            <span>当前语境</span>
+            <p id="wordContextSentence" lang="en"></p>
+            <p id="wordContextTranslation"></p>
+          </div>
+        </aside>
       </div>
 
       <section class="periodical-credits" aria-label="数据与开源说明">
@@ -148,53 +204,5 @@
       </section>
     </main>
 
-    <aside
-      id="wordPanel"
-      class="word-panel"
-      aria-labelledby="wordPanelTitle"
-      aria-hidden="true"
-      hidden
-    >
-      <div class="word-panel-head">
-        <span>外刊生词</span>
-        <button id="closeWordPanelButton" class="icon-button" type="button">
-          关闭
-        </button>
-      </div>
-
-      <div class="word-actions">
-        <button id="markUnknownButton" class="mark-button is-unknown" type="button">
-          不会
-        </button>
-        <button id="markKnownButton" class="mark-button is-known" type="button">
-          掌握
-        </button>
-      </div>
-
-      <p class="word-panel-footnote">
-        标记后保存在本机浏览器，复习页可继续使用。
-      </p>
-
-      <div class="word-heading">
-        <h2 id="wordPanelTitle" lang="en"></h2>
-        <button id="speakWordButton" class="compact-button" type="button">
-          朗读
-        </button>
-      </div>
-      <p id="wordPanelPhonetic" class="word-phonetic" lang="en"></p>
-      <p id="wordLookupStatus" class="word-lookup-status" role="status"></p>
-      <div id="wordMeanings" class="word-meanings"></div>
-
-      <section id="wordPhraseSection" class="word-block" hidden>
-        <span class="word-block-label">固定搭配</span>
-        <div id="wordPhrases" class="word-phrases"></div>
-      </section>
-
-      <div class="word-context">
-        <span>当前语境</span>
-        <p id="wordContextSentence" lang="en"></p>
-        <p id="wordContextTranslation"></p>
-      </div>
-    </aside>
   </body>
 </html>

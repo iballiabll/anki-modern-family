@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24",
+  "generatedAt": "2026-09-25",
   "corpus": "kaoyan-english references/papers（本机语料目录路径不写入产物）",
   "papers": [
     {
@@ -187,7 +187,7 @@
       "stats": {
         "sections": 8,
         "paragraphs": 28,
-        "questions": 49,
+        "questions": 50,
         "words": 2789,
         "enrichment": 23
       },
@@ -391,14 +391,12 @@
       "stats": {
         "sections": 8,
         "paragraphs": 35,
-        "questions": 45,
-        "words": 3182,
+        "questions": 46,
+        "words": 3192,
         "enrichment": 23
       },
       "warnings": [],
-      "notes": [
-        "reading-text-3：语料串入第 36 题，已按 question-map.json 裁掉"
-      ]
+      "notes": []
     },
     {
       "id": "english-ii-2026",
@@ -414,7 +412,5 @@
     }
   ],
   "warnings": [],
-  "notes": [
-    "english-ii-2025：reading-text-3：语料串入第 36 题，已按 question-map.json 裁掉"
-  ]
+  "notes": []
 }

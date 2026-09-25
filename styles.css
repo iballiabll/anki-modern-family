@@ -3772,6 +3772,126 @@ p {
   background: #cdeee4;
 }
 
+.resource-button.is-vocab-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(88, 132, 46, 0.26),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(164, 204, 116, 0.42);
+  text-decoration: none;
+}
+
+.resource-button.is-vocab-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(88, 132, 46, 0.34),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(190, 222, 150, 0.6);
+}
+
+.resource-button.is-vocab-entry .resource-index {
+  background: #b3d47c;
+  color: #263a0d;
+}
+
+.resource-button.is-vocab-entry .resource-count {
+  color: #2e450f;
+  background: #e2f1c6;
+}
+
+.resource-button.is-writing-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(176, 75, 148, 0.24),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(226, 138, 200, 0.4);
+  text-decoration: none;
+}
+
+.resource-button.is-writing-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(176, 75, 148, 0.32),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(236, 168, 216, 0.58);
+}
+
+.resource-button.is-writing-entry .resource-index {
+  background: #ec9ad4;
+  color: #4d123c;
+}
+
+.resource-button.is-writing-entry .resource-count {
+  color: #5d1848;
+  background: #fadcf1;
+}
+
+.resource-button.is-listen-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(44, 128, 176, 0.26),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(120, 186, 226, 0.42);
+  text-decoration: none;
+}
+
+.resource-button.is-listen-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(44, 128, 176, 0.34),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(154, 210, 244, 0.6);
+}
+
+.resource-button.is-listen-entry .resource-index {
+  background: #9fd6f2;
+  color: #0c3450;
+}
+
+.resource-button.is-listen-entry .resource-count {
+  color: #12405f;
+  background: #d8eefa;
+}
+
+.resource-button.is-shadow-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(205, 116, 52, 0.24),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(234, 164, 110, 0.42);
+  text-decoration: none;
+}
+
+.resource-button.is-shadow-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(205, 116, 52, 0.32),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(242, 190, 148, 0.6);
+}
+
+.resource-button.is-shadow-entry .resource-index {
+  background: #f0b077;
+  color: #54290a;
+}
+
+.resource-button.is-shadow-entry .resource-count {
+  color: #63300c;
+  background: #fbe3cc;
+}
+
 /* Welcome curtain */
 
 .welcome-overlay {

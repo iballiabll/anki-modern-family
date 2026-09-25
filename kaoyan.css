@@ -681,3 +681,90 @@ body.is-english-only .kaoyan-enrichment {
     flex-direction: column;
   }
 }
+
+/* ----------------------------------------------------------- 答案解析块 */
+
+.question-analysis {
+  margin: 10px 16px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f7faf8;
+  font-size: 0.92rem;
+}
+
+.question-analysis-summary {
+  cursor: pointer;
+  padding: 9px 12px;
+  color: var(--forest-deep);
+  font-weight: 600;
+  list-style: none;
+}
+
+.question-analysis-summary::-webkit-details-marker {
+  display: none;
+}
+
+.question-analysis-summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 7px;
+  color: var(--muted);
+  transition: transform 0.18s ease;
+}
+
+.question-analysis[open] > .question-analysis-summary::before {
+  transform: rotate(90deg);
+}
+
+.question-analysis-body {
+  padding: 0 12px 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.question-analysis-answer,
+.question-analysis-reference,
+.question-analysis-locator,
+.question-analysis-note {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.question-analysis-label {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--forest-soft);
+  color: var(--forest-deep);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.question-analysis-sentence {
+  display: block;
+  margin-top: 5px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--line);
+  background: #ffffff;
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+.question-analysis-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .question-analysis {
+    margin: 8px 10px 12px;
+  }
+
+  .question-analysis-label {
+    display: block;
+    margin: 0 0 4px;
+    width: fit-content;
+  }
+}

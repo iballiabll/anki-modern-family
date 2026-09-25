@@ -1,0 +1,658 @@
+/**
+ * 作文批改页面样式。
+ * 只作用于 body.writing-page，避免影响站内其它模块。
+ * 版式：左侧可滚动题库 + 右侧“题目 / 写作区 / 批改结果”三段纵向排列（移动端堆叠）。
+ */
+
+.writing-page {
+  --writing-radius: 8px;
+  --writing-topbar: 64px;
+  --writing-danger: #b4463b;
+  --writing-danger-soft: #fdeceb;
+  --writing-ok: #2f7a5a;
+  --writing-ok-soft: #e6f3ec;
+}
+
+.writing-board {
+  width: min(1240px, calc(100% - 44px));
+  margin: 20px auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.writing-side,
+.writing-task,
+.writing-editor,
+.writing-result {
+  background: #ffffff;
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius);
+  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.08);
+}
+
+.writing-side {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  max-height: calc(100vh - var(--writing-topbar) - 40px);
+  position: sticky;
+  top: calc(var(--writing-topbar) + 12px);
+  overflow: hidden;
+}
+
+.writing-main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.writing-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+  background: #f6faf8;
+  border-radius: var(--writing-radius) var(--writing-radius) 0 0;
+}
+
+.writing-panel-head h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--forest-deep);
+}
+
+.writing-panel-hint {
+  color: #5d746c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------ 题库列表 */
+
+.writing-prompt-list {
+  overflow-y: auto;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  scrollbar-width: thin;
+}
+
+.writing-prompt-list:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.writing-prompt-year {
+  margin: 6px 2px 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  color: #6a7f77;
+}
+
+.writing-prompt-row {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid rgba(11, 41, 37, 0.14);
+  border-radius: var(--writing-radius);
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.writing-prompt-row:hover {
+  border-color: rgba(21, 60, 53, 0.42);
+  transform: translateY(-1px);
+}
+
+.writing-prompt-row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.writing-prompt-row.is-active {
+  border-color: var(--forest);
+  background: var(--forest-soft);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.writing-prompt-row strong {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--forest-deep);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.writing-prompt-row span {
+  font-size: 12px;
+  color: #5d746c;
+  line-height: 1.4;
+}
+
+.writing-prompt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.writing-tag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #eef4f1;
+  color: #45635b;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.writing-tag.is-model {
+  background: var(--writing-ok-soft);
+  color: var(--writing-ok);
+}
+
+.writing-tag.is-draft {
+  background: #fdf2dd;
+  color: #8a6520;
+}
+
+.writing-tag.is-graded {
+  background: #e8eefb;
+  color: #345390;
+}
+
+.writing-prompt-empty {
+  padding: 18px 12px;
+  color: #6a7f77;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------ 题目面板 */
+
+.writing-task-body {
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.writing-empty {
+  margin: 0;
+  color: #5d746c;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.writing-paper-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--forest-deep);
+}
+
+.writing-directions {
+  margin: 0;
+  padding: 12px 14px;
+  background: #f8faf9;
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #223d37;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.writing-note-block {
+  display: grid;
+  gap: 6px;
+}
+
+.writing-note-block h3 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--forest);
+}
+
+.writing-note-block ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 5px;
+  color: #38544d;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.writing-note-block.is-pitfall ul {
+  color: #7b3b34;
+}
+
+.writing-task-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------ 写作区 */
+
+.writing-input {
+  width: 100%;
+  min-height: 240px;
+  padding: 16px;
+  border: 0;
+  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+  border-radius: 0;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #1f3833;
+  background: #ffffff;
+}
+
+.writing-input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(209, 165, 72, 0.45);
+}
+
+.writing-editor-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.writing-word-meter {
+  flex: 1 1 140px;
+  min-width: 120px;
+  height: 6px;
+  border-radius: 999px;
+  background: #e6ece9;
+  overflow: hidden;
+}
+
+.writing-word-meter span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--forest);
+  transition: width 0.2s ease;
+}
+
+.writing-word-meter.is-low span {
+  background: var(--writing-danger);
+}
+
+.writing-word-meter.is-over span {
+  background: #c98a1f;
+}
+
+.writing-word-count {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--forest-deep);
+  white-space: nowrap;
+}
+
+.writing-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.writing-status {
+  margin: 0;
+  padding: 0 16px 14px;
+  min-height: 18px;
+  color: #5d746c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.writing-status.is-error {
+  color: var(--writing-danger);
+}
+
+/* ------------------------------------------------------------ 批改结果 */
+
+.writing-result {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.writing-result:empty {
+  display: none;
+}
+
+.writing-score-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.writing-score-value {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--forest-deep);
+  color: #ffffff;
+  flex: 0 0 auto;
+}
+
+.writing-score-value strong {
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.writing-score-value small {
+  font-size: 11px;
+  opacity: 0.82;
+}
+
+.writing-score-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.writing-score-copy strong {
+  font-size: 15px;
+  color: var(--forest-deep);
+}
+
+.writing-score-copy span {
+  font-size: 12px;
+  color: #5d746c;
+}
+
+.writing-engine {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--forest-soft);
+  color: var(--forest);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.writing-dimensions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.writing-dimension {
+  padding: 10px 12px;
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius);
+  display: grid;
+  gap: 6px;
+  background: #fbfdfc;
+}
+
+.writing-dimension-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--forest-deep);
+}
+
+.writing-dimension-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e6ece9;
+  overflow: hidden;
+}
+
+.writing-dimension-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gold);
+}
+
+.writing-dimension p {
+  margin: 0;
+  font-size: 12px;
+  color: #5d746c;
+  line-height: 1.6;
+}
+
+.writing-section-title {
+  margin: 0;
+  font-size: 14px;
+  color: var(--forest-deep);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.writing-section-title span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6a7f77;
+}
+
+.writing-review {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--writing-radius);
+  background: #f8faf9;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  font-size: 14px;
+  line-height: 2;
+  color: #223d37;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.writing-review + .writing-review {
+  margin-top: 8px;
+}
+
+.writing-mark {
+  padding: 1px 2px;
+  border-radius: 3px;
+  background: var(--writing-danger-soft);
+  box-shadow: inset 0 -2px 0 rgba(180, 70, 59, 0.55);
+  cursor: help;
+}
+
+.writing-mark.is-active {
+  background: #f8d8d4;
+  box-shadow: inset 0 -2px 0 var(--writing-danger);
+}
+
+.writing-issues {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-issue {
+  border: 1px solid rgba(180, 70, 59, 0.28);
+  border-left: 3px solid var(--writing-danger);
+  border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+  background: #fffdfd;
+}
+
+.writing-issue strong {
+  font-size: 13px;
+  color: #8f382f;
+}
+
+.writing-issue p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #38544d;
+}
+
+.writing-issue code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #f2f5f4;
+  color: #2d4a43;
+  font-size: 12px;
+}
+
+.writing-improvements {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-improvement {
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius);
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+  background: #fbfdfc;
+}
+
+.writing-improvement-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--forest-deep);
+}
+
+.writing-improvement-head s {
+  color: #97a8a2;
+  font-weight: 600;
+}
+
+.writing-improvement-head em {
+  color: var(--writing-ok);
+  font-style: normal;
+}
+
+.writing-improvement p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #5d746c;
+}
+
+.writing-model {
+  display: grid;
+  gap: 10px;
+}
+
+.writing-model[hidden] {
+  display: none;
+}
+
+.writing-model-text {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--writing-radius);
+  background: #f6faf8;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  font-size: 14px;
+  line-height: 1.85;
+  color: #223d37;
+  display: grid;
+  gap: 10px;
+}
+
+.writing-model-text p {
+  margin: 0;
+}
+
+.writing-model-zh {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #5d746c;
+  display: grid;
+  gap: 8px;
+}
+
+.writing-next-steps {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #38544d;
+}
+
+/* ------------------------------------------------------------ 移动端 */
+
+@media (max-width: 980px) {
+  .writing-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .writing-side {
+    position: static;
+    max-height: none;
+  }
+
+  .writing-prompt-list {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 640px) {
+  .writing-board {
+    width: calc(100% - 24px);
+  }
+
+  .writing-editor-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .writing-editor-actions .tool-button {
+    flex: 1 1 auto;
+  }
+
+  .writing-score-value {
+    width: 78px;
+    height: 78px;
+  }
+
+  .writing-score-value strong {
+    font-size: 22px;
+  }
+}
