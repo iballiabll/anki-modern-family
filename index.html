@@ -16,12 +16,12 @@
     />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
-    <script src="./account-store.js?v=20260925-authflow" defer></script>
+<script src="./account-store.js?v=20260925-speaking" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
-    <script src="./session-guard.js?v=20260925-authflow" defer></script>
-    <script src="./app.js?v=20260925-authflow" defer></script>
+<script src="./session-guard.js?v=20260925-speaking" defer></script>
+<script src="./app.js?v=20260925-speaking" defer></script>
   </head>
   <body>
     <div
@@ -579,6 +579,15 @@
             >
               自由对话
             </button>
+            <button
+              id="practiceIeltsTab"
+              class="practice-section-tab"
+              type="button"
+              data-practice-section="ielts"
+              aria-pressed="false"
+            >
+              雅思口语
+            </button>
           </div>
 
           <div class="practice-layout">
@@ -743,6 +752,12 @@
                     ></span>
                   </div>
                   <div
+                    id="dialogueScenarioFilters"
+                    class="dialogue-scenario-filters"
+                    role="group"
+                    aria-label="场景筛选"
+                  ></div>
+                  <div
                     id="dialogueScenarioList"
                     class="dialogue-scenario-list"
                     role="group"
@@ -906,6 +921,143 @@
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div
+                id="ieltsPracticeView"
+                class="practice-stage-view ielts-stage"
+                hidden
+              >
+                <div class="ielts-head">
+                  <div class="ielts-head-copy">
+                    <span class="practice-block-label">IELTS SPEAKING</span>
+                    <h3>按考场顺序走完 Part 1 → Part 2 → Part 3</h3>
+                    <p id="ieltsModeSummary" class="ielts-mode-summary"></p>
+                  </div>
+                  <div class="ielts-head-side">
+                    <span id="ieltsTimer" class="ielts-timer">未计时</span>
+                    <span id="ieltsProgress" class="ielts-progress"></span>
+                  </div>
+                </div>
+
+                <div class="ielts-toolbar">
+                  <label class="ielts-card-field" for="ieltsCardSelect">
+                    <span>Part 2 题卡</span>
+                    <select id="ieltsCardSelect"></select>
+                  </label>
+                  <button
+                    id="ieltsStartButton"
+                    class="practice-primary-button"
+                    type="button"
+                  >
+                    开始模拟
+                  </button>
+                  <button
+                    id="ieltsPrepSkipButton"
+                    class="practice-secondary-button"
+                    type="button"
+                    hidden
+                  >
+                    提前开始作答
+                  </button>
+                  <button
+                    id="ieltsRestartButton"
+                    class="practice-secondary-button"
+                    type="button"
+                    hidden
+                  >
+                    重新开始
+                  </button>
+                </div>
+
+                <div id="ieltsIntroPanel" class="ielts-intro">
+                  <p>
+                    一次完整模拟包含 5 道 Part 1 日常问答、1 分钟准备加 2
+                    分钟个人陈述，以及 4 道 Part 3 深入讨论。计时器走完会自动进入下一段，你也可以随时提前提交。
+                  </p>
+                </div>
+
+                <div id="ieltsPromptBlock" class="ielts-prompt-block" hidden>
+                  <span id="ieltsPartLabel" class="practice-block-label"></span>
+                  <p id="ieltsPrompt" class="ielts-prompt" lang="en"></p>
+                  <p id="ieltsPromptZh" class="ielts-prompt-zh"></p>
+                  <ul id="ieltsBullets" class="ielts-bullets" hidden></ul>
+                </div>
+
+                <div id="ieltsAnswerBlock" class="ielts-answer-block" hidden>
+                  <label for="ieltsAnswerInput">你的英文回答</label>
+                  <textarea
+                    id="ieltsAnswerInput"
+                    rows="4"
+                    lang="en"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="先开口说，再检查文字；也可以直接手打回答..."
+                  ></textarea>
+                  <div class="ielts-actions">
+                    <button
+                      id="ieltsPlayButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      播放考官提问
+                    </button>
+                    <button
+                      id="ieltsHintButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      参考表达
+                    </button>
+                    <button
+                      id="ieltsRecordButton"
+                      class="practice-record-button"
+                      type="button"
+                    >
+                      开口回答
+                    </button>
+                    <button
+                      id="ieltsStopButton"
+                      class="practice-stop-button"
+                      type="button"
+                      hidden
+                    >
+                      结束回答
+                    </button>
+                    <button
+                      id="ieltsSubmitButton"
+                      class="practice-primary-button"
+                      type="button"
+                    >
+                      提交回答
+                    </button>
+                  </div>
+                </div>
+
+                <div id="ieltsHint" class="dialogue-hint" hidden></div>
+                <div id="ieltsNotice" class="practice-notice" hidden></div>
+
+                <div id="ieltsReport" class="ielts-report" hidden>
+                  <div class="ielts-report-head">
+                    <div>
+                      <span class="practice-block-label">练习报告</span>
+                      <h3 id="ieltsReportTitle"></h3>
+                    </div>
+                    <span
+                      id="ieltsReportOverall"
+                      class="ielts-report-overall"
+                    ></span>
+                  </div>
+                  <p id="ieltsReportSummary" class="ielts-report-summary"></p>
+                  <div id="ieltsReportParts" class="ielts-report-parts"></div>
+                  <div
+                    id="ieltsReportDimensions"
+                    class="ielts-report-dimensions"
+                  ></div>
+                  <p class="ielts-report-note">
+                    分数是本地文本规则给出的练习估算，用来定位下一步练什么，不等于官方雅思成绩。正式评估请以持证考官为准。
+                  </p>
                 </div>
               </div>
 

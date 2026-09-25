@@ -2804,6 +2804,357 @@ p {
   gap: 8px;
 }
 
+/* 情景筛选（全部 / 基础情景 / 真实生活） */
+.dialogue-scenario-filters {
+  min-width: 0;
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dialogue-scenario-filter {
+  min-height: 32px;
+  padding: 0 12px;
+  color: #5c6d65;
+  background: #ffffff;
+  border: 1px solid #dbe6df;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.dialogue-scenario-filter:hover {
+  color: #315e51;
+  border-color: #a8c6b8;
+}
+
+.dialogue-scenario-filter.is-active {
+  color: #ffffff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+/* 真实生活场景用暖色描边区分，不抢激活态的金色高亮 */
+.dialogue-scenario-button.is-adult:not(.is-active) {
+  border-color: #e3d2a8;
+}
+
+.dialogue-scenario-button.is-adult:not(.is-active) .dialogue-scenario-button-meta {
+  color: #96702a;
+}
+
+/* ---------------------------------------------------------------- 雅思口语 */
+.ielts-stage {
+  min-width: 0;
+}
+
+.ielts-head,
+.ielts-report-head {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ielts-head-copy {
+  min-width: 0;
+}
+
+.ielts-head-copy h3,
+.ielts-report-head h3 {
+  margin: 5px 0 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.ielts-mode-summary {
+  margin: 7px 0 0;
+  color: #718078;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.ielts-head-side {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.ielts-timer {
+  padding: 6px 12px;
+  color: #2f5b4d;
+  background: #edf4ef;
+  border: 1px solid #d8e4dc;
+  border-radius: 999px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.ielts-timer.is-urgent {
+  color: #a84f3e;
+  background: #fbeae5;
+  border-color: #f0c8bd;
+}
+
+.ielts-progress {
+  color: #7d8c84;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ielts-toolbar {
+  margin-top: 16px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.ielts-card-field {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: #5f6f67;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ielts-card-field select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid #d6e3db;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.ielts-toolbar > button {
+  flex: 0 0 auto;
+}
+
+.ielts-intro {
+  margin-top: 16px;
+  padding: 14px 15px;
+  color: #4a5c54;
+  background: #f7faf7;
+  border: 1px dashed #cfdcd4;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.ielts-intro p {
+  margin: 0;
+}
+
+.ielts-prompt-block {
+  margin-top: 16px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  border-radius: 10px;
+}
+
+.ielts-prompt {
+  margin: 8px 0 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.ielts-prompt-zh {
+  margin: 6px 0 0;
+  color: #7a8881;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ielts-bullets {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: #4a5c54;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ielts-answer-block {
+  margin-top: 14px;
+  padding: 15px;
+  display: grid;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.ielts-answer-block > label {
+  color: #53665d;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#ieltsAnswerInput {
+  width: 100%;
+  min-height: 92px;
+  padding: 12px 13px;
+  color: var(--ink);
+  background: #f8faf8;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  outline: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+#ieltsAnswerInput:focus {
+  border-color: #5a9684;
+  box-shadow: 0 0 0 4px rgba(90, 150, 132, 0.13);
+}
+
+.ielts-actions {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ielts-actions > button {
+  flex: 1 1 126px;
+}
+
+.ielts-report {
+  margin-top: 16px;
+  padding: 17px;
+  display: grid;
+  gap: 14px;
+  background: #f7faf8;
+  border: 1px solid #cfe0d7;
+  border-top: 3px solid #75a893;
+  border-radius: 10px;
+}
+
+.ielts-report-overall {
+  flex: 0 0 auto;
+  padding: 7px 13px;
+  color: #1f5346;
+  background: #e4f1ea;
+  border: 1px solid #c3ddd0;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ielts-report-summary {
+  margin: 0;
+  color: #53665d;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.ielts-report-parts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ielts-report-part {
+  min-width: 0;
+  padding: 11px 12px;
+  display: grid;
+  gap: 5px;
+  background: #ffffff;
+  border: 1px solid #dde8e1;
+  border-radius: 9px;
+}
+
+.ielts-report-part-name {
+  color: #7d8c84;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ielts-report-part strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--forest-deep);
+  font-size: 13px;
+}
+
+.ielts-report-dimensions {
+  display: grid;
+  gap: 12px;
+}
+
+.ielts-dimension {
+  display: grid;
+  gap: 6px;
+}
+
+.ielts-dimension-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  color: #4a5c54;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ielts-dimension-head strong {
+  color: var(--forest-deep);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ielts-dimension-track {
+  height: 7px;
+  overflow: hidden;
+  background: #e3ebe6;
+  border-radius: 999px;
+}
+
+.ielts-dimension-track > span {
+  display: block;
+  height: 100%;
+  background: #4f8d78;
+  border-radius: inherit;
+}
+
+.ielts-dimension-note {
+  margin: 0;
+  color: #7a8881;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.ielts-report-note {
+  margin: 0;
+  padding-top: 12px;
+  color: #819089;
+  border-top: 1px solid #dfe9e3;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
 .practice-service-settings {
   display: grid;
   gap: 12px;
@@ -3575,7 +3926,7 @@ p {
   .practice-section-switch {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
   }
 
   .practice-section-tab {
@@ -3585,6 +3936,32 @@ p {
 
   .practice-stage {
     padding: 16px;
+  }
+
+  .ielts-head,
+  .ielts-report-head,
+  .ielts-dimension-head {
+    align-items: flex-start;
+  }
+
+  .ielts-head,
+  .ielts-report-head {
+    flex-direction: column;
+  }
+
+  .ielts-head-side {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .ielts-toolbar > button,
+  .ielts-actions > button {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .ielts-report-parts {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .practice-target-block {

@@ -1632,7 +1632,27 @@ const state = {
   dialogueHintVisible: false,
   dialogueMessages: [],
   dialogueResult: null,
+  dialogueScenarioFilter: "all",
+  speakingPacksLoaded: false,
+  speakingPacksLoading: false,
+  speakingScenarios: [],
+  ieltsLoading: false,
+  ieltsStep: "intro",
+  ieltsPart1Index: 0,
+  ieltsPart2Id: "",
+  ieltsPart3Index: 0,
+  ieltsQuestions: { part1: [], part3: [] },
+  ieltsAnswers: [],
+  ieltsInput: "",
+  ieltsHintVisible: false,
+  ieltsMessage: "",
+  ieltsMessageType: "",
+  ieltsTimerEndsAt: 0,
+  ieltsTimerLabel: "",
+  ieltsReport: null,
   freeTopic: "daily",
+  freeTopicHistory: [],
+  freeUsedTopics: new Set(),
   freeAutoSpeak: true,
   freeInput: "",
   freeHintVisible: false,
@@ -1793,6 +1813,7 @@ const elements = {
   practiceShadowTab: document.querySelector("#practiceShadowTab"),
   practiceDialogueTab: document.querySelector("#practiceDialogueTab"),
   practiceFreeTab: document.querySelector("#practiceFreeTab"),
+  practiceIeltsTab: document.querySelector("#practiceIeltsTab"),
   practiceHeading: document.querySelector("#practiceHeading"),
   practiceSource: document.querySelector("#practiceSource"),
   practiceExitButton: document.querySelector("#practiceExitButton"),
@@ -1826,6 +1847,7 @@ const elements = {
   dialoguePracticeView: document.querySelector("#dialoguePracticeView"),
   dialogueScenarioMeta: document.querySelector("#dialogueScenarioMeta"),
   dialogueScenarioList: document.querySelector("#dialogueScenarioList"),
+  dialogueScenarioFilters: document.querySelector("#dialogueScenarioFilters"),
   dialoguePartnerLabel: document.querySelector("#dialoguePartnerLabel"),
   dialogueScenarioTitle: document.querySelector("#dialogueScenarioTitle"),
   dialogueTurnCounter: document.querySelector("#dialogueTurnCounter"),
@@ -1851,6 +1873,35 @@ const elements = {
   dialogueSampleAnswer: document.querySelector("#dialogueSampleAnswer"),
   dialogueRetryButton: document.querySelector("#dialogueRetryButton"),
   dialogueNextButton: document.querySelector("#dialogueNextButton"),
+  ieltsPracticeView: document.querySelector("#ieltsPracticeView"),
+  ieltsModeSummary: document.querySelector("#ieltsModeSummary"),
+  ieltsTimer: document.querySelector("#ieltsTimer"),
+  ieltsProgress: document.querySelector("#ieltsProgress"),
+  ieltsCardSelect: document.querySelector("#ieltsCardSelect"),
+  ieltsStartButton: document.querySelector("#ieltsStartButton"),
+  ieltsPrepSkipButton: document.querySelector("#ieltsPrepSkipButton"),
+  ieltsRestartButton: document.querySelector("#ieltsRestartButton"),
+  ieltsIntroPanel: document.querySelector("#ieltsIntroPanel"),
+  ieltsPromptBlock: document.querySelector("#ieltsPromptBlock"),
+  ieltsPartLabel: document.querySelector("#ieltsPartLabel"),
+  ieltsPrompt: document.querySelector("#ieltsPrompt"),
+  ieltsPromptZh: document.querySelector("#ieltsPromptZh"),
+  ieltsBullets: document.querySelector("#ieltsBullets"),
+  ieltsAnswerBlock: document.querySelector("#ieltsAnswerBlock"),
+  ieltsAnswerInput: document.querySelector("#ieltsAnswerInput"),
+  ieltsPlayButton: document.querySelector("#ieltsPlayButton"),
+  ieltsHintButton: document.querySelector("#ieltsHintButton"),
+  ieltsRecordButton: document.querySelector("#ieltsRecordButton"),
+  ieltsStopButton: document.querySelector("#ieltsStopButton"),
+  ieltsSubmitButton: document.querySelector("#ieltsSubmitButton"),
+  ieltsHint: document.querySelector("#ieltsHint"),
+  ieltsNotice: document.querySelector("#ieltsNotice"),
+  ieltsReport: document.querySelector("#ieltsReport"),
+  ieltsReportTitle: document.querySelector("#ieltsReportTitle"),
+  ieltsReportOverall: document.querySelector("#ieltsReportOverall"),
+  ieltsReportSummary: document.querySelector("#ieltsReportSummary"),
+  ieltsReportParts: document.querySelector("#ieltsReportParts"),
+  ieltsReportDimensions: document.querySelector("#ieltsReportDimensions"),
   freePracticeView: document.querySelector("#freePracticeView"),
   freeModeSummary: document.querySelector("#freeModeSummary"),
   freeTurnCounter: document.querySelector("#freeTurnCounter"),
@@ -3449,11 +3500,98 @@ function resetPracticeAttempt() {
   }
 }
 
+/*
+ * 口语素材包
+ * ----------
+ * 基础情景写死在 app.js 里；成人真实场景（speaking-scenarios.js）和
+ * 雅思题库（speaking-ielts.js）体积较大，只有真正进入口语区时才插入脚本，
+ * 详情页首屏不受影响。
+ */
+const SPEAKING_SCENARIO_FILTERS = [
+  { id: "all", label: "全部场景" },
+  { id: "basic", label: "基础情景" },
+  { id: "adult", label: "真实生活" },
+];
+
+const SPEAKING_PACK_URLS = {
+  scenarios: "./speaking-scenarios.js",
+  ielts: "./speaking-ielts.js",
+};
+
+const speakingScriptPromises = new Map();
+
+/** 按需插入一段脚本，同一个地址只加载一次。 */
+function loadSpeakingScript(src) {
+  if (speakingScriptPromises.has(src)) {
+    return speakingScriptPromises.get(src);
+  }
+  const promise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.addEventListener("load", () => resolve(true));
+    script.addEventListener("error", () => {
+      speakingScriptPromises.delete(src);
+      reject(new Error(`脚本加载失败：${src}`));
+    });
+    document.head.append(script);
+  });
+  speakingScriptPromises.set(src, promise);
+  return promise;
+}
+
+function getDialogueScenarios() {
+  return [...DIALOGUE_SCENARIOS, ...(state.speakingScenarios || [])];
+}
+
+function getFilteredDialogueScenarios() {
+  const filter = state.dialogueScenarioFilter || "all";
+  return getDialogueScenarios().filter((scenario) => {
+    if (filter === "all") {
+      return true;
+    }
+    return (scenario.kind || "basic") === filter;
+  });
+}
+
+/**
+ * 拉取成人场景包和雅思题库。两个文件都是可选的：任何一个加载失败，
+ * 基础情景和本地自由对话仍然照常可用，只是界面上给一句提示。
+ */
+async function ensureSpeakingPacks() {
+  if (state.speakingPacksLoaded) {
+    return true;
+  }
+  if (state.speakingPacksLoading) {
+    return false;
+  }
+
+  state.speakingPacksLoading = true;
+  const results = await Promise.allSettled(
+    Object.values(SPEAKING_PACK_URLS).map((src) => loadSpeakingScript(src)),
+  );
+  state.speakingPacksLoading = false;
+  state.speakingPacksLoaded = true;
+
+  const failed = results.filter((result) => result.status === "rejected");
+  const scenarios = window.IBALL_SPEAKING_SCENARIOS;
+  state.speakingScenarios = Array.isArray(scenarios)
+    ? scenarios.map((scenario) => ({ ...scenario, kind: "adult" }))
+    : [];
+
+  if (failed.length) {
+    state.practiceMessage =
+      "部分口语素材没有加载成功，可以先练基础情景，稍后刷新页面再试。";
+    state.practiceMessageType = "error";
+  }
+  return true;
+}
+
 function getCurrentDialogueScenario() {
+  const scenarios = getDialogueScenarios();
   const scenario =
-    DIALOGUE_SCENARIOS.find(
-      (item) => item.id === state.dialogueScenarioId,
-    ) || DIALOGUE_SCENARIOS[0];
+    scenarios.find((item) => item.id === state.dialogueScenarioId) ||
+    scenarios[0];
 
   if (scenario && scenario.id !== state.dialogueScenarioId) {
     state.dialogueScenarioId = scenario.id;
@@ -3497,7 +3635,7 @@ function clearDialogueAttempt({ keepMessages = false } = {}) {
 }
 
 function selectDialogueScenario(scenarioId) {
-  const scenario = DIALOGUE_SCENARIOS.find(
+  const scenario = getDialogueScenarios().find(
     (item) => item.id === scenarioId,
   );
   if (!scenario) {
@@ -3637,22 +3775,61 @@ function getDialogueCoachAdvice(turn, result) {
   };
 }
 
+function renderDialogueScenarioFilters() {
+  const host = elements.dialogueScenarioFilters;
+  if (!host) {
+    return;
+  }
+
+  const active = state.dialogueScenarioFilter || "all";
+  const fragment = document.createDocumentFragment();
+  SPEAKING_SCENARIO_FILTERS.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dialogue-scenario-filter";
+    button.dataset.filter = item.id;
+    const isActive = item.id === active;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+    button.textContent = item.label;
+    button.addEventListener("click", () => {
+      state.dialogueScenarioFilter = item.id;
+      const scenarios = getFilteredDialogueScenarios();
+      const stillVisible = scenarios.some(
+        (scenario) => scenario.id === state.dialogueScenarioId,
+      );
+      if (!stillVisible && scenarios[0]) {
+        selectDialogueScenario(scenarios[0].id);
+        return;
+      }
+      renderDialogueView();
+    });
+    fragment.append(button);
+  });
+  host.replaceChildren(fragment);
+}
+
 function renderDialogueScenarioList() {
   const activeScenario = getCurrentDialogueScenario();
   const fragment = document.createDocumentFragment();
 
-  DIALOGUE_SCENARIOS.forEach((scenario) => {
+  renderDialogueScenarioFilters();
+
+  getFilteredDialogueScenarios().forEach((scenario) => {
     const button = document.createElement("button");
     const isActive = scenario.id === activeScenario?.id;
     button.type = "button";
     button.className = "dialogue-scenario-button";
     button.classList.toggle("is-active", isActive);
+    button.classList.toggle("is-adult", scenario.kind === "adult");
     button.dataset.scenarioId = scenario.id;
     button.setAttribute("aria-pressed", String(isActive));
 
     const meta = document.createElement("span");
     meta.className = "dialogue-scenario-button-meta";
-    meta.textContent = `${scenario.category} · ${scenario.level}`;
+    meta.textContent = scenario.role
+      ? `${scenario.category} · ${scenario.role}`
+      : `${scenario.category} · ${scenario.level}`;
 
     const title = document.createElement("strong");
     title.textContent = scenario.title;
@@ -3797,8 +3974,12 @@ function updatePracticeSectionViews() {
     [elements.practiceShadowTab, "shadow"],
     [elements.practiceDialogueTab, "dialogue"],
     [elements.practiceFreeTab, "free"],
+    [elements.practiceIeltsTab, "ielts"],
   ];
   tabs.forEach(([tab, section]) => {
+    if (!tab) {
+      return;
+    }
     const isActive = state.practiceSection === section;
     tab.classList.toggle("is-active", isActive);
     tab.setAttribute("aria-pressed", String(isActive));
@@ -3807,6 +3988,7 @@ function updatePracticeSectionViews() {
   elements.shadowPracticeView.hidden = state.practiceSection !== "shadow";
   elements.dialoguePracticeView.hidden =
     state.practiceSection !== "dialogue";
+  elements.ieltsPracticeView.hidden = state.practiceSection !== "ielts";
   elements.freePracticeView.hidden = state.practiceSection !== "free";
 }
 
@@ -3906,8 +4088,692 @@ function renderDialogueView() {
   }
 }
 
+/* ---------------------------------------------------------------- 雅思口语 */
+
+/*
+ * 评分口径：覆盖度来自题目里的关键词组，流利度 / 词汇 / 语法 / 连贯度
+ * 由回答文本本身算出来。界面上必须写明这是练习估算，不是官方成绩。
+ */
+const IELTS_LINKERS = [
+  "however",
+  "although",
+  "whereas",
+  "that said",
+  "on the other hand",
+  "in terms of",
+  "which is why",
+  "to be honest",
+  "mainly",
+  "actually",
+  "definitely",
+  "roughly",
+  "tend to",
+  "used to",
+  "even though",
+  "as a result",
+];
+
+const IELTS_PART_LABELS = {
+  part1: "Part 1 · 日常问答",
+  part2: "Part 2 · 个人陈述",
+  part3: "Part 3 · 深入讨论",
+};
+
+let ieltsTimerHandle = 0;
+
+function getIeltsPack() {
+  const pack = window.IBALL_SPEAKING_IELTS;
+  return pack && Array.isArray(pack.part1) ? pack : null;
+}
+
+function getIeltsPart2Cards() {
+  return getIeltsPack()?.part2 || [];
+}
+
+function getIeltsPart2Card() {
+  const cards = getIeltsPart2Cards();
+  return (
+    cards.find((card) => card.id === state.ieltsPart2Id) || cards[0] || null
+  );
+}
+
+function buildIeltsPart1Pool(pack) {
+  const picked = [];
+  const rest = [];
+  (pack?.part1 || []).forEach((group) => {
+    (group.questions || []).forEach((question, index) => {
+      const entry = {
+        ...question,
+        groupId: group.id,
+        groupLabel: group.label,
+      };
+      if (index === 0) {
+        picked.push(entry);
+      } else {
+        rest.push(entry);
+      }
+    });
+  });
+  while (picked.length < 5 && rest.length) {
+    picked.push(rest.shift());
+  }
+  return picked.slice(0, 5);
+}
+
+function buildIeltsPart3Pool(pack, card) {
+  // 题卡用 part3Id 指向讨论组的 id，讨论组用 for 回指题卡 id，两边都要能对上。
+  const group = (pack?.part3 || []).find(
+    (item) => item.id === card?.part3Id || item.for === card?.part3Id,
+  );
+  return group?.questions || [];
+}
+
+function getIeltsCurrentTurn() {
+  const pack = getIeltsPack();
+  if (!pack) {
+    return null;
+  }
+  if (state.ieltsStep === "part1") {
+    return state.ieltsQuestions.part1[state.ieltsPart1Index] || null;
+  }
+  if (state.ieltsStep === "part3") {
+    return state.ieltsQuestions.part3[state.ieltsPart3Index] || null;
+  }
+  if (state.ieltsStep === "prep" || state.ieltsStep === "longturn") {
+    return getIeltsPart2Card();
+  }
+  return null;
+}
+
+function getIeltsAnswerKind() {
+  return state.ieltsStep === "longturn" ? "part2" : state.ieltsStep;
+}
+
+function stopIeltsTimer() {
+  if (ieltsTimerHandle) {
+    window.clearInterval(ieltsTimerHandle);
+    ieltsTimerHandle = 0;
+  }
+  state.ieltsTimerEndsAt = 0;
+  state.ieltsTimerLabel = "";
+}
+
+function getIeltsRemainingSeconds() {
+  if (!state.ieltsTimerEndsAt) {
+    return 0;
+  }
+  return Math.max(
+    0,
+    Math.round((state.ieltsTimerEndsAt - Date.now()) / 1000),
+  );
+}
+
+function renderIeltsTimerText() {
+  if (!elements.ieltsTimer) {
+    return;
+  }
+  if (!state.ieltsTimerEndsAt) {
+    elements.ieltsTimer.textContent = "未计时";
+    elements.ieltsTimer.classList.remove("is-urgent");
+    return;
+  }
+  const remaining = getIeltsRemainingSeconds();
+  const minutes = Math.floor(remaining / 60);
+  const seconds = String(remaining % 60).padStart(2, "0");
+  elements.ieltsTimer.textContent = `${state.ieltsTimerLabel}${minutes}:${seconds}`;
+  elements.ieltsTimer.classList.toggle("is-urgent", remaining <= 10);
+}
+
+function startIeltsTimer(seconds, label, onDone) {
+  stopIeltsTimer();
+  state.ieltsTimerEndsAt = Date.now() + seconds * 1000;
+  state.ieltsTimerLabel = label;
+  ieltsTimerHandle = window.setInterval(() => {
+    if (getIeltsRemainingSeconds() <= 0) {
+      stopIeltsTimer();
+      renderIeltsTimerText();
+      if (onDone) {
+        onDone();
+      } else {
+        renderIeltsView();
+      }
+      return;
+    }
+    renderIeltsTimerText();
+  }, 500);
+  renderIeltsTimerText();
+}
+
+function resetIeltsMock() {
+  stopIeltsTimer();
+  state.ieltsStep = "intro";
+  state.ieltsPart1Index = 0;
+  state.ieltsPart3Index = 0;
+  state.ieltsQuestions = { part1: [], part3: [] };
+  state.ieltsAnswers = [];
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  state.ieltsReport = null;
+}
+
+function buildSpeakingRubric(entries) {
+  const answered = entries.filter((entry) =>
+    String(entry.transcript || "").trim(),
+  );
+  if (!answered.length) {
+    return null;
+  }
+
+  const average = (list) =>
+    list.length
+      ? list.reduce((total, value) => total + value, 0) / list.length
+      : 0;
+  const clamp = (value) => Math.max(35, Math.min(100, Math.round(value)));
+
+  const coverage = average(answered.map((entry) => entry.score || 0));
+  const wordCounts = answered.map((entry) =>
+    getDialogueTranscriptMeta(entry.transcript).wordCount,
+  );
+  const averageWords = average(wordCounts);
+  const longTurnWords = average(
+    answered
+      .filter((entry) => entry.part === "part2")
+      .map((entry) => getDialogueTranscriptMeta(entry.transcript).wordCount),
+  );
+  const targetWords = longTurnWords ? 110 : averageWords < 20 ? 16 : 32;
+
+  const joined = answered.map((entry) => entry.transcript).join(" ");
+  const words = normalizeDialogueText(joined).split(" ").filter(Boolean);
+  const distinctRatio = words.length ? new Set(words).size / words.length : 0;
+  const lowerJoined = ` ${joined.toLowerCase()} `;
+  const linkerHits = IELTS_LINKERS.filter((phrase) =>
+    lowerJoined.includes(` ${phrase} `),
+  ).length;
+  const corrections = analyzeFreeEnglish(joined)?.corrections?.length || 0;
+
+  const dimensions = [
+    {
+      label: "任务完成度",
+      score: clamp(coverage),
+      note: "按题目要求的关键信息点覆盖情况估算，漏掉提示点会拉低这一项。",
+    },
+    {
+      label: "流利度",
+      score: clamp((averageWords / targetWords) * 100),
+      note: `平均每次回答 ${Math.round(
+        averageWords,
+      )} 词；Part 2 目标是连续说满 2 分钟、110 词以上。`,
+    },
+    {
+      label: "词汇丰富度",
+      score: clamp(distinctRatio * 210 + linkerHits * 2),
+      note: "看重复用词比例：同一个形容词反复出现时，这一项会被压住。",
+    },
+    {
+      label: "语法准确度",
+      score: clamp(100 - corrections * 8),
+      note: corrections
+        ? `本地句法检查发现 ${corrections} 处可以改写的地方。`
+        : "本地句法检查没有发现明显问题，但仍要以真人反馈为准。",
+    },
+    {
+      label: "连贯与衔接",
+      score: clamp(45 + linkerHits * 9),
+      note: linkerHits
+        ? `用上了 ${linkerHits} 个连接表达，注意别为了连接而连接。`
+        : "几乎没有连接表达，试着用 however / that said / which is why 把两句连起来。",
+    },
+  ];
+
+  const overall = clamp(
+    dimensions.reduce((total, item) => total + item.score, 0) /
+      dimensions.length,
+  );
+
+  return { overall, dimensions };
+}
+
+function buildIeltsReport() {
+  const answers = state.ieltsAnswers;
+  const parts = ["part1", "part2", "part3"].map((part) => {
+    const items = answers.filter((entry) => entry.part === part);
+    const scored = items.filter((entry) => typeof entry.score === "number");
+    return {
+      part,
+      label: IELTS_PART_LABELS[part],
+      answered: items.length,
+      average: scored.length
+        ? Math.round(
+            scored.reduce((total, entry) => total + entry.score, 0) /
+              scored.length,
+          )
+        : 0,
+    };
+  });
+
+  return {
+    createdAt: new Date().toISOString(),
+    cardTitle: getIeltsPart2Card()?.label || "",
+    parts,
+    rubric: buildSpeakingRubric(answers),
+  };
+}
+
+function advanceIeltsFromPrep() {
+  const longTurnSeconds = getIeltsPack()?.longTurnSeconds || 120;
+  state.ieltsStep = "longturn";
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  renderIeltsView();
+  startIeltsTimer(longTurnSeconds, "作答 ", () => submitIeltsAnswer(true));
+}
+
+function startIeltsPrep() {
+  const prepSeconds = getIeltsPack()?.prepSeconds || 60;
+  state.ieltsStep = "prep";
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  renderIeltsView();
+  startIeltsTimer(prepSeconds, "准备 ", () => advanceIeltsFromPrep());
+}
+
+function startIeltsMock() {
+  const pack = getIeltsPack();
+  const card = getIeltsPart2Card();
+  if (!pack || !card) {
+    state.ieltsMessage = "题库还在加载，稍等一下再开始。";
+    state.ieltsMessageType = "error";
+    renderIeltsView();
+    return;
+  }
+
+  stopIeltsTimer();
+  state.ieltsQuestions = {
+    part1: buildIeltsPart1Pool(pack),
+    part3: buildIeltsPart3Pool(pack, card),
+  };
+  state.ieltsPart1Index = 0;
+  state.ieltsPart3Index = 0;
+  state.ieltsAnswers = [];
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsReport = null;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  state.ieltsStep = "part1";
+  renderIeltsView();
+}
+
+function recordIeltsAnswer(transcript, { forced = false } = {}) {
+  const text = String(transcript || "").trim();
+  if (!text && !forced) {
+    return false;
+  }
+
+  const part = getIeltsAnswerKind();
+  const turn = getIeltsCurrentTurn();
+  const result = turn ? scoreDialogueAnswer(turn, text) : null;
+  state.ieltsAnswers.push({
+    part,
+    label:
+      part === "part2"
+        ? getIeltsPart2Card()?.label || "Part 2"
+        : turn?.prompt || "",
+    transcript: text,
+    score: result ? result.score : 0,
+    groups: result ? result.groups : [],
+    wordCount: getDialogueTranscriptMeta(text).wordCount,
+    createdAt: new Date().toISOString(),
+  });
+  return true;
+}
+
+function submitIeltsAnswer(forced = false) {
+  if (!recordIeltsAnswer(state.ieltsInput, { forced })) {
+    return;
+  }
+
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+
+  if (state.ieltsStep === "part1") {
+    state.ieltsPart1Index += 1;
+    if (state.ieltsPart1Index >= state.ieltsQuestions.part1.length) {
+      startIeltsPrep();
+      return;
+    }
+    renderIeltsView();
+    return;
+  }
+
+  if (state.ieltsStep === "longturn") {
+    stopIeltsTimer();
+    state.ieltsStep = "part3";
+    state.ieltsPart3Index = 0;
+    renderIeltsView();
+    return;
+  }
+
+  if (state.ieltsStep === "part3") {
+    state.ieltsPart3Index += 1;
+    if (state.ieltsPart3Index >= state.ieltsQuestions.part3.length) {
+      state.ieltsReport = buildIeltsReport();
+      state.ieltsStep = "report";
+    }
+    renderIeltsView();
+  }
+}
+
+function finalizeIeltsAttempt(transcript) {
+  state.ieltsInput = transcript;
+  renderIeltsView();
+}
+
+function startIeltsRecording() {
+  if (
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.ieltsStep === "intro" ||
+    state.ieltsStep === "prep" ||
+    state.ieltsStep === "report"
+  ) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.ieltsMessage = availability.message;
+    state.ieltsMessageType =
+      state.practiceRecognitionMode === "off" ? "info" : "error";
+    renderIeltsView();
+    return;
+  }
+
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  const options = { onTranscript: finalizeIeltsAttempt, requireEntry: false };
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording(options);
+    return;
+  }
+  startBrowserPracticeRecording(options);
+}
+
+function stopIeltsRecording() {
+  stopPracticeRecording();
+}
+
+function playIeltsPrompt() {
+  const card = getIeltsPart2Card();
+  const text =
+    state.ieltsStep === "prep" || state.ieltsStep === "longturn"
+      ? card?.topicLine || ""
+      : getIeltsCurrentTurn()?.prompt || "";
+  if (!text) {
+    return;
+  }
+  if (!speak(text, 0.9, { voicePreference: state.practiceVoice })) {
+    state.ieltsMessage = "当前浏览器不支持语音朗读。";
+    state.ieltsMessageType = "error";
+    renderIeltsView();
+  }
+}
+
+/** Part 2 题卡下拉框：只在未开始或已结束时允许换卡。 */
+function renderIeltsCardOptions() {
+  const host = elements.ieltsCardSelect;
+  const cards = getIeltsPart2Cards();
+  const signature = cards.map((card) => card.id).join("|");
+  if (host.dataset.signature !== signature) {
+    const fragment = document.createDocumentFragment();
+    cards.forEach((card) => {
+      const option = document.createElement("option");
+      option.value = card.id;
+      option.textContent = `${card.label} · ${card.labelZh}`;
+      fragment.append(option);
+    });
+    host.replaceChildren(fragment);
+    host.dataset.signature = signature;
+  }
+  const card = getIeltsPart2Card();
+  if (card) {
+    host.value = card.id;
+  }
+  const idle = state.ieltsStep === "intro" || state.ieltsStep === "report";
+  host.disabled = !idle || cards.length <= 1;
+}
+
+function toggleIeltsHint() {
+  state.ieltsHintVisible = !state.ieltsHintVisible;
+  renderIeltsView();
+}
+
+function renderIeltsHint() {
+  const turn = getIeltsCurrentTurn();
+  const sample = state.ieltsStep === "longturn" ? getIeltsPart2Card() : turn;
+  if (!sample || !state.ieltsHintVisible) {
+    elements.ieltsHint.hidden = true;
+    elements.ieltsHint.replaceChildren();
+    elements.ieltsHintButton.textContent = "参考表达";
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "practice-block-label";
+  label.textContent = "参考表达";
+
+  const english = document.createElement("p");
+  english.className = "dialogue-hint-sample";
+  english.lang = "en";
+  english.textContent = sample.sample || "";
+
+  const translation = document.createElement("p");
+  translation.className = "dialogue-hint-translation";
+  translation.textContent = sample.sampleZh || "";
+
+  elements.ieltsHint.replaceChildren(label, english, translation);
+  elements.ieltsHint.hidden = false;
+  elements.ieltsHintButton.textContent = "收起提示";
+}
+
+function renderIeltsReport() {
+  const report = state.ieltsReport;
+  const visible = state.ieltsStep === "report" && Boolean(report);
+  elements.ieltsReport.hidden = !visible;
+  if (!visible) {
+    return;
+  }
+
+  const rubric = report.rubric;
+  elements.ieltsReportTitle.textContent = report.cardTitle
+    ? `模拟题目：${report.cardTitle}`
+    : "本次模拟";
+  elements.ieltsReportOverall.textContent = rubric
+    ? `练习估算 ${rubric.overall}`
+    : "本次没有收到有效回答";
+
+  const answered = report.parts.reduce(
+    (total, part) => total + part.answered,
+    0,
+  );
+  elements.ieltsReportSummary.textContent = rubric
+    ? `全程共记录 ${answered} 段回答。下面的分项按本地文本规则估算，用来判断下一步该补什么。`
+    : "计时结束前没有收到可以评分的回答，重新开始一次，尽量在计时器内开口说完整句子。";
+
+  const partFragment = document.createDocumentFragment();
+  report.parts.forEach((part) => {
+    const item = document.createElement("div");
+    item.className = "ielts-report-part";
+
+    const name = document.createElement("span");
+    name.className = "ielts-report-part-name";
+    name.textContent = part.label;
+
+    const value = document.createElement("strong");
+    value.textContent = part.answered
+      ? `${part.answered} 题 · 覆盖 ${part.average}%`
+      : "未作答";
+
+    item.append(name, value);
+    partFragment.append(item);
+  });
+  elements.ieltsReportParts.replaceChildren(partFragment);
+
+  const dimensionFragment = document.createDocumentFragment();
+  (rubric?.dimensions || []).forEach((dimension) => {
+    const item = document.createElement("div");
+    item.className = "ielts-dimension";
+
+    const head = document.createElement("div");
+    head.className = "ielts-dimension-head";
+    const label = document.createElement("span");
+    label.textContent = dimension.label;
+    const score = document.createElement("strong");
+    score.textContent = `${dimension.score}`;
+    head.append(label, score);
+
+    const track = document.createElement("div");
+    track.className = "ielts-dimension-track";
+    const bar = document.createElement("span");
+    bar.style.width = `${dimension.score}%`;
+    track.append(bar);
+
+    const note = document.createElement("p");
+    note.className = "ielts-dimension-note";
+    note.textContent = dimension.note;
+
+    item.append(head, track, note);
+    dimensionFragment.append(item);
+  });
+  elements.ieltsReportDimensions.replaceChildren(dimensionFragment);
+}
+
+/**
+ * 渲染整块雅思视图。Part 1 / Part 3 显示考题，准备阶段显示题卡要点，
+ * 结束阶段换成练习报告；三块互斥，避免把计时器和输入框堆在同一屏。
+ */
+function renderIeltsView() {
+  const startButton = elements.ieltsStartButton;
+  if (!startButton) {
+    return;
+  }
+
+  const pack = getIeltsPack();
+  const step = state.ieltsStep;
+  const availability = getPracticeModeAvailability();
+  const isAnswerStep =
+    step === "part1" || step === "longturn" || step === "part3";
+  const isRunning = isAnswerStep || step === "prep";
+  const liveTranscript =
+    state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+
+  renderIeltsCardOptions();
+
+  elements.ieltsModeSummary.textContent = pack
+    ? `${pack.part1.length} 个 Part 1 话题组 · ${pack.part2.length} 张 Part 2 题卡 · 语音识别：${getPracticeModeLabel()} · 支持自定义 API`
+    : "题库正在加载，先停在这一步，稍后会自动出现题卡。";
+
+  startButton.hidden = isRunning || step === "report";
+  startButton.disabled = !pack;
+  elements.ieltsPrepSkipButton.hidden = step !== "prep";
+  elements.ieltsRestartButton.hidden = step === "intro";
+  elements.ieltsIntroPanel.hidden = step !== "intro";
+  elements.ieltsPromptBlock.hidden = !isRunning;
+
+  if (isRunning) {
+    const card = getIeltsPart2Card();
+    const turn = getIeltsCurrentTurn();
+    const isLongTurn = step === "prep" || step === "longturn";
+    elements.ieltsPartLabel.textContent = isLongTurn
+      ? `${IELTS_PART_LABELS.part2} · ${
+          step === "prep" ? "准备中" : "作答中"
+        }`
+      : IELTS_PART_LABELS[step] || "";
+    elements.ieltsPrompt.lang = "en";
+    elements.ieltsPrompt.textContent = isLongTurn
+      ? card?.topicLine || ""
+      : turn?.prompt || "";
+    elements.ieltsPromptZh.textContent = isLongTurn
+      ? card?.labelZh || ""
+      : turn?.promptZh || "";
+
+    const bullets = isLongTurn ? card?.bulletsZh || card?.bullets || [] : [];
+    elements.ieltsBullets.hidden = bullets.length === 0;
+    elements.ieltsBullets.replaceChildren(
+      ...bullets.map((line) => {
+        const item = document.createElement("li");
+        item.textContent = line;
+        return item;
+      }),
+    );
+  }
+
+  elements.ieltsProgress.textContent = isRunning
+    ? step === "part1"
+      ? `Part 1 · 第 ${state.ieltsPart1Index + 1} / ${
+          state.ieltsQuestions.part1.length
+        } 题`
+      : step === "part3"
+        ? `Part 3 · 第 ${state.ieltsPart3Index + 1} / ${
+            state.ieltsQuestions.part3.length
+          } 题`
+        : step === "prep"
+          ? "Part 2 · 准备时间"
+          : "Part 2 · 个人陈述"
+    : "";
+
+  elements.ieltsAnswerBlock.hidden = !isAnswerStep;
+  if (isAnswerStep) {
+    elements.ieltsAnswerInput.value = liveTranscript || state.ieltsInput;
+    elements.ieltsAnswerInput.disabled =
+      state.practiceListening || state.practiceTranscribing;
+    elements.ieltsPlayButton.disabled = !("speechSynthesis" in window);
+    elements.ieltsHintButton.disabled =
+      state.practiceListening || state.practiceTranscribing;
+    elements.ieltsRecordButton.disabled =
+      !availability.available ||
+      state.practiceListening ||
+      state.practiceTranscribing;
+    elements.ieltsRecordButton.textContent = state.practiceTranscribing
+      ? "正在转写"
+      : state.practiceRecognitionMode === "api"
+        ? "开始录音"
+        : "开口回答";
+    elements.ieltsRecordButton.hidden = state.practiceListening;
+    elements.ieltsStopButton.hidden = !state.practiceListening;
+    elements.ieltsStopButton.disabled = !state.practiceListening;
+    elements.ieltsSubmitButton.disabled =
+      !elements.ieltsAnswerInput.value.trim() ||
+      state.practiceListening ||
+      state.practiceTranscribing;
+    elements.ieltsSubmitButton.textContent =
+      step === "longturn" ? "结束并进入 Part 3" : "提交回答";
+  }
+
+  renderIeltsHint();
+  elements.ieltsNotice.hidden = !state.ieltsMessage;
+  elements.ieltsNotice.textContent = state.ieltsMessage;
+  elements.ieltsNotice.classList.toggle(
+    "is-error",
+    state.ieltsMessageType === "error",
+  );
+  renderIeltsReport();
+  renderIeltsTimerText();
+}
+
 function setPracticeSection(section) {
-  const allowedSections = new Set(["shadow", "dialogue", "free"]);
+  const allowedSections = new Set(["shadow", "dialogue", "ielts", "free"]);
   const nextSection = allowedSections.has(section) ? section : "shadow";
   if (state.practiceSection === nextSection) {
     return;
@@ -3918,6 +4784,22 @@ function setPracticeSection(section) {
   state.practiceSection = nextSection;
   if (nextSection === "dialogue") {
     clearDialogueAttempt();
+    ensureSpeakingPacks().then(() => {
+      if (state.practiceSection === "dialogue") {
+        renderPracticeView();
+      }
+    });
+  } else if (nextSection === "ielts") {
+    state.practiceMessage = "";
+    state.practiceMessageType = "";
+    if (state.ieltsStep === "report") {
+      resetIeltsMock();
+    }
+    ensureSpeakingPacks().then(() => {
+      if (state.practiceSection === "ielts") {
+        renderPracticeView();
+      }
+    });
   } else if (nextSection === "free") {
     state.practiceMessage = "";
     state.practiceMessageType = "";
@@ -4172,6 +5054,8 @@ function resetFreeConversation() {
   state.freeChatApiMessage = "";
   state.freeChatApiMessageType = "";
   state.freeUsedLines = new Set();
+  state.freeUsedTopics = new Set([state.freeTopic]);
+  state.freeTopicHistory = [];
   if (state.practiceSection === "free") {
     renderPracticeView();
   }
@@ -4327,8 +5211,81 @@ function pickFreeChatLine(pool, namespace) {
   return chosen;
 }
 
+/*
+ * 本地陪练的话题推进：每 3 轮换一个话题，并且优先挑还没聊过的，
+ * 这样长对话不会一直停在同一个问题上；太短的回答先要一句补充，
+ * 再进入下一个问题。
+ */
+const FREE_TOPIC_SHIFTS = [
+  {
+    english: "Let's switch to something else for a minute.",
+    chinese: "我们换个话题聊一分钟。",
+  },
+  {
+    english: "Okay, different topic.",
+    chinese: "好，换个话题。",
+  },
+  {
+    english: "Let's move on to another area.",
+    chinese: "我们换到另一个方面。",
+  },
+  {
+    english: "New question, different subject.",
+    chinese: "新问题，换个题材。",
+  },
+];
+
+const FREE_SHORT_ANSWER_NUDGES = [
+  {
+    english: "That was short. Say it again with one reason.",
+    chinese: "这句有点短。再加一个理由说一遍。",
+  },
+  {
+    english: "Give me one more sentence with a detail.",
+    chinese: "再加一句，补一个细节。",
+  },
+  {
+    english: "Try that again - one detail and one reason.",
+    chinese: "再试一次，补一个细节和一个理由。",
+  },
+];
+
+const FREE_SHORT_ANSWER_WORDS = 6;
+const FREE_TOPIC_TURNS = 3;
+
+/** 每满 3 轮返回一个没聊过的新话题 id，并把下拉框同步过去。 */
+function rotateFreeTopicIfDue(turnIndex) {
+  const topicIds = Object.keys(FREE_CHAT_TOPICS);
+  if (turnIndex <= 0 || turnIndex % FREE_TOPIC_TURNS !== 0) {
+    return "";
+  }
+
+  if (!state.freeUsedTopics || typeof state.freeUsedTopics.add !== "function") {
+    state.freeUsedTopics = new Set();
+  }
+  state.freeUsedTopics.add(state.freeTopic);
+  const unused = topicIds.filter((id) => !state.freeUsedTopics.has(id));
+  const pool = unused.length ? unused : topicIds;
+  const next = pool[Math.floor(Math.random() * pool.length)];
+  if (!next || next === state.freeTopic) {
+    return "";
+  }
+
+  state.freeTopic = next;
+  state.freeTopicHistory = [...(state.freeTopicHistory || []), next];
+  if (elements.freeTopic) {
+    elements.freeTopic.value = next;
+  }
+  return next;
+}
+
 function buildLocalFreeTurn(text, turnIndex) {
   const feedback = analyzeFreeEnglish(text);
+  const meta = getDialogueTranscriptMeta(text);
+  const shiftedTopic = rotateFreeTopicIfDue(turnIndex);
+  const shift = shiftedTopic
+    ? pickFreeChatLine(FREE_TOPIC_SHIFTS, "topic-shift")
+    : null;
   const opener = pickFreeChatLine(FREE_CHAT_OPENERS, "opener");
   const reaction = FREE_CHAT_KEYWORD_REACTIONS.find((item) =>
     item.pattern.test(text),
@@ -4343,16 +5300,32 @@ function buildLocalFreeTurn(text, turnIndex) {
     "generic",
   );
 
-  const question =
-    reaction && (turnIndex % 2 === 0 || Math.random() < 0.5)
+  const isTooShort = meta.wordCount < FREE_SHORT_ANSWER_WORDS;
+  const question = isTooShort
+    ? pickFreeChatLine(FREE_SHORT_ANSWER_NUDGES, "short-answer") ||
+      genericFollowUp
+    : reaction && (turnIndex % 2 === 0 || Math.random() < 0.5)
       ? { english: reaction.question, chinese: reaction.questionZh }
       : topicFollowUp || genericFollowUp;
+
+  if (isTooShort && Array.isArray(feedback.ieltsTips)) {
+    feedback.ieltsTips = [
+      ...feedback.ieltsTips,
+      "短句只能算作答：Part 1 至少两句话，加一个细节或一个理由。",
+    ].slice(0, 3);
+  }
+
   const english = cleanFreeEnglish(
-    [opener?.english, reaction?.english, question?.english]
+    [opener?.english, shift?.english, reaction?.english, question?.english]
       .filter(Boolean)
       .join(" "),
   );
-  const chinese = [opener?.chinese, reaction?.chinese, question?.chinese]
+  const chinese = [
+    opener?.chinese,
+    shift?.chinese,
+    reaction?.chinese,
+    question?.chinese,
+  ]
     .filter(Boolean)
     .join("");
 
@@ -5117,6 +6090,7 @@ function renderPracticeView() {
   const dialogueScenario = getCurrentDialogueScenario();
   const isDialogue = state.practiceSection === "dialogue";
   const isFree = state.practiceSection === "free";
+  const isIelts = state.practiceSection === "ielts";
   const hasEntry = Boolean(entry);
   const target = hasEntry ? getPracticeTarget(entry) : "";
   const availability = getPracticeModeAvailability();
@@ -5133,6 +6107,8 @@ function renderPracticeView() {
       : "情景对话加载失败"
     : isFree
       ? `自由对话 · ${getFreeTopic().label} · ${getFreeChatModeLabel()}`
+    : isIelts
+      ? `雅思口语模拟 · ${getIeltsPart2Card()?.label || "题卡加载中"}`
     : hasEntry
       ? `${entry.resource.category} · ${entry.resource.title} · ${entry.item.phrase}`
       : "当前视图没有可练习的句子";
@@ -5219,6 +6195,7 @@ function renderPracticeView() {
   updatePracticeSectionViews();
   renderDialogueView();
   renderFreeView();
+  renderIeltsView();
   renderPracticeStats();
 }
 
@@ -8593,6 +9570,7 @@ function render() {
     const dialogueScenario = getCurrentDialogueScenario();
     const isDialogue = state.practiceSection === "dialogue";
     const isFree = state.practiceSection === "free";
+    const isIelts = state.practiceSection === "ielts";
     elements.vocabularyToolbar.hidden = true;
     elements.practiceStudio.hidden = false;
     elements.reviewStudio.hidden = true;
@@ -8602,24 +9580,32 @@ function render() {
       ? "情景对话"
       : isFree
         ? "自由对话"
-      : "口语跟读";
+        : isIelts
+          ? "雅思口语"
+          : "口语跟读";
     elements.activeTitle.textContent = isDialogue
       ? "情景对话"
       : isFree
         ? "自由对话"
-      : "口语跟读";
+        : isIelts
+          ? "雅思口语"
+          : "口语跟读";
     elements.activeDescription.textContent = isDialogue
       ? "选择生活场景，按自己的表达完成多轮英文对话。"
       : isFree
         ? "用英语自由聊天，获得双语回复、纠错和雅思口语练习建议。"
-      : practiceEntries.length
-        ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
-        : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
+        : isIelts
+          ? "按 Part 1 → Part 2 → Part 3 的考场顺序走完一次模拟，结束后看练习报告。"
+          : practiceEntries.length
+            ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
+            : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
     elements.footerResource.textContent = isDialogue
       ? `情景对话 · ${dialogueScenario?.turns.length || 0} 轮`
       : isFree
         ? `自由对话 · ${state.freeTurnCount} 轮`
-      : `口语跟读 · ${practiceEntries.length} 句`;
+        : isIelts
+          ? `雅思口语 · ${getIeltsPart2Cards().length} 张题卡`
+          : `口语跟读 · ${practiceEntries.length} 句`;
     renderResourceList();
     updateProgress();
     updateViewSwitcher();
@@ -9383,6 +10369,9 @@ elements.practiceDialogueTab.addEventListener("click", () => {
 elements.practiceFreeTab.addEventListener("click", () => {
   setPracticeSection("free");
 });
+elements.practiceIeltsTab.addEventListener("click", () => {
+  setPracticeSection("ielts");
+});
 elements.practiceListenButton.addEventListener("click", playPracticeTarget);
 elements.practiceRecordButton.addEventListener(
   "click",
@@ -9455,6 +10444,49 @@ elements.dialogueAnswerInput.addEventListener("keydown", (event) => {
   ) {
     event.preventDefault();
     submitDialogueAnswer();
+  }
+});
+elements.ieltsStartButton.addEventListener("click", startIeltsMock);
+elements.ieltsPrepSkipButton.addEventListener("click", () => {
+  if (state.ieltsStep !== "prep") {
+    return;
+  }
+  advanceIeltsFromPrep();
+});
+elements.ieltsRestartButton.addEventListener("click", () => {
+  resetIeltsMock();
+  renderIeltsView();
+});
+elements.ieltsCardSelect.addEventListener("change", (event) => {
+  state.ieltsPart2Id = event.target.value;
+  state.ieltsReport = null;
+  state.ieltsStep = "intro";
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  renderIeltsView();
+});
+elements.ieltsPlayButton.addEventListener("click", playIeltsPrompt);
+elements.ieltsHintButton.addEventListener("click", toggleIeltsHint);
+elements.ieltsRecordButton.addEventListener("click", startIeltsRecording);
+elements.ieltsStopButton.addEventListener("click", stopIeltsRecording);
+elements.ieltsSubmitButton.addEventListener("click", () => {
+  submitIeltsAnswer();
+});
+elements.ieltsAnswerInput.addEventListener("input", (event) => {
+  state.ieltsInput = event.target.value;
+  elements.ieltsSubmitButton.disabled =
+    !state.ieltsInput.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing;
+});
+elements.ieltsAnswerInput.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Enter" &&
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey
+  ) {
+    event.preventDefault();
+    submitIeltsAnswer();
   }
 });
 elements.freeRestartButton.addEventListener(

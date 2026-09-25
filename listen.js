@@ -1,10 +1,12 @@
 /**
  * 听句精听页面。
  *
- * 素材两种来源：
+ * 素材三种来源：
  *   movie —— study-data/<集数>.json，逐句时间轴指回整集精灵音频，原声真人发音；
  *   cet6  —— cet6-listening-data/<套>.js，站内没有公开音频，用浏览器语音合成朗读，
  *            界面上明确标注，不假装是原声。
+ *   daily —— daily-listening-data/<套>.js，日常场景短对话与通知，同样用浏览器语音
+ *            合成朗读，按需加载单套内容。
  *
  * 句子数据、判分、录音、存储都走 study-core.js（window.IballStudy），
  * 朗读与暂停 / 重播控制条走 speech-transport.js（window.IballSpeech）。
@@ -19,6 +21,7 @@
 
   const INDEX_URL = "./study-data/index.json";
   const CET6_PAPERS_URL = "./cet6-listening-papers.js";
+  const DAILY_PAPERS_URL = "./daily-listening-papers.js";
   const ANSWER_KEY = "iball_listen_answers_v1";
   const WRONG_KEY = "iball_listen_wrong_v1";
   const PREFS_KEY = "iball_listen_prefs_v1";
@@ -69,6 +72,7 @@
     source: "movie",
     movieIndex: null,
     cet6Papers: null,
+    dailyPapers: null,
     sets: [],
     setId: "",
     setLabel: "",
@@ -140,7 +144,26 @@
     return papers;
   }
 
+  async function ensureDailyPapers() {
+    if (state.dailyPapers) {
+      return state.dailyPapers;
+    }
+    await study.loadScript(DAILY_PAPERS_URL);
+    const papers = window.IBALL_DAILY_LISTENING_PAPERS || [];
+    state.dailyPapers = papers;
+    return papers;
+  }
+
   async function resolveSets(source) {
+    if (source === "daily") {
+      const papers = await ensureDailyPapers();
+      return papers.map((paper) => ({
+        id: paper.id,
+        label: paper.label || paper.title || paper.id,
+        file: paper.file,
+        detail: `${paper.paragraphCount || 0} 段 · ${paper.pieceCount || 0} 个场景`,
+      }));
+    }
     if (source === "cet6") {
       const papers = await ensureCet6Papers();
       return papers.map((paper) => ({
@@ -163,6 +186,16 @@
     const cacheKey = `${source}:${set.id}`;
     if (state.cache.has(cacheKey)) {
       return state.cache.get(cacheKey);
+    }
+    if (source === "daily") {
+      await study.loadScript(set.file);
+      const library = window.IBALL_DAILY_LISTENING_LIBRARY || {};
+      const payload = library[set.id];
+      if (!payload) {
+        throw new Error("这套日常听力没有找到");
+      }
+      state.cache.set(cacheKey, payload);
+      return payload;
     }
     if (source === "cet6") {
       await study.loadScript(set.file);
@@ -208,7 +241,9 @@
         return;
       }
       state.items =
-        source === "cet6" ? study.buildCet6Items(payload) : study.buildMovieItems(payload);
+        source === "movie"
+          ? study.buildMovieItems(payload)
+          : study.buildCet6Items(payload);
       if (!state.items.length) {
         throw new Error("这份素材没有可用句子");
       }
@@ -453,7 +488,10 @@
         : "先选一份素材";
     }
     if (els.sourceMeta) {
-      const mode = state.source === "cet6" ? "浏览器朗读（站内无公开音频）" : "真人原声";
+      const mode =
+        state.source === "movie"
+          ? "真人原声"
+          : "浏览器朗读（站内无公开音频）";
       els.sourceMeta.textContent = item
         ? `${state.setLabel} · ${mode}`
         : state.loadError || "正在准备素材…";
@@ -797,6 +835,7 @@
       source: state.source,
       movieSet: state.source === "movie" ? state.setId : undefined,
       cet6Set: state.source === "cet6" ? state.setId : undefined,
+      dailySet: state.source === "daily" ? state.setId : undefined,
       rate: state.rate,
       reveal: state.reveal,
     });
@@ -809,10 +848,19 @@
     }
     state.rate = Number(prefs.rate) > 0 ? Number(prefs.rate) : state.rate;
     state.reveal = Boolean(prefs.reveal);
-    if (prefs.source === "cet6" || prefs.source === "movie") {
+    if (
+      prefs.source === "cet6" ||
+      prefs.source === "daily" ||
+      prefs.source === "movie"
+    ) {
       state.source = prefs.source;
     }
-    state.prefSetId = state.source === "cet6" ? prefs.cet6Set : prefs.movieSet;
+    state.prefSetId =
+      state.source === "cet6"
+        ? prefs.cet6Set
+        : state.source === "daily"
+          ? prefs.dailySet
+          : prefs.movieSet;
   }
 
   function syncRateButtons() {
