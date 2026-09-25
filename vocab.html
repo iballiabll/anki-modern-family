@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="词汇库：考研英语一/二、四级、六级、零基础核心词，音标、释义、例句、词根词缀与记忆法，支持收藏与生词本。"
+    />
+    <title>词汇库 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./vocab.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./vocab.js" defer></script>
+  </head>
+  <body class="vocab-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./kaoyan.html">考研真题</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link topbar-link-extra" href="./writing.html">作文批改</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>词汇库</strong>
+          <small>VOCABULARY DECK</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./review.html">复习</a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">WORD BANK</p>
+            <h1 id="pageTitle">词汇库</h1>
+            <p class="hero-description">
+              考研英语一/英语二、四级、六级、零基础核心词。每张词卡带音标、释义、例句、词根词缀与记忆法，
+              点词卡懒加载详情，收藏与生词本只存在本机浏览器，不上传任何记录。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="词库统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="词库设置">
+            <div class="setting-group">
+              <label class="setting-label" for="deckSelect">考试词库</label>
+              <select id="deckSelect" class="paper-select">
+                <option value="kaoyan1">考研英语一（核心词）</option>
+                <option value="kaoyan2">考研英语二（核心词）</option>
+                <option value="cet4">四级核心词</option>
+                <option value="cet6">六级核心词</option>
+                <option value="basic">零基础高频词</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="searchInput">查词</label>
+              <input
+                id="searchInput"
+                class="paper-select"
+                type="search"
+                placeholder="输入英文或中文释义"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">排序</span>
+              <div class="segmented-control" role="group" aria-label="排序方式">
+                <button class="segment-button is-active" type="button" data-sort="frequency" aria-pressed="true">
+                  高频优先
+                </button>
+                <button class="segment-button" type="button" data-sort="alpha" aria-pressed="false">
+                  字母序
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <button id="favoriteOnlyButton" class="tool-button" type="button" aria-pressed="false">
+                收藏夹 (<span id="favoriteCount">0</span>)
+              </button>
+              <button id="wordbookButton" class="tool-button" type="button">
+                生词本 (<span id="wordbookCount">0</span>)
+              </button>
+              <button id="clearProgressButton" class="tool-button" type="button">
+                清空进度
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="vocab-board">
+        <div class="vocab-list-panel">
+          <div class="vocab-panel-head">
+            <h2 id="deckTitle">考研核心词库</h2>
+            <span id="deckMeta" class="vocab-panel-hint">正在准备词表…</span>
+          </div>
+          <div id="vocabList" class="vocab-list" tabindex="0" aria-label="单词列表">
+            <div class="loading-state">
+              <strong>正在准备词表</strong>
+              <span>词表按考试分开加载，词卡详情再按分片懒加载。</span>
+            </div>
+          </div>
+          <div class="vocab-list-foot">
+            <button id="loadMoreButton" class="tool-button" type="button" hidden>加载更多</button>
+            <span id="listStatus" class="vocab-list-status" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <aside id="wordPanel" class="vocab-detail-panel" aria-labelledby="wordPanelTitle" hidden>
+          <div class="vocab-panel-head">
+            <h2 id="wordPanelTitle">词卡</h2>
+            <div class="vocab-detail-actions">
+              <button id="speakWordButton" class="compact-button" type="button">朗读</button>
+              <button id="favoriteWordButton" class="compact-button" type="button" aria-pressed="false">
+                收藏
+              </button>
+              <button id="wordbookToggleButton" class="compact-button" type="button" aria-pressed="false">
+                加入生词本
+              </button>
+              <button id="closeWordButton" class="compact-button" type="button">关闭</button>
+            </div>
+          </div>
+          <div id="wordDetail" class="vocab-detail" role="status" aria-live="polite"></div>
+        </aside>
+      </section>
+
+      <section id="wordbookPanel" class="vocab-wordbook-panel" hidden aria-labelledby="wordbookTitle">
+        <div class="vocab-panel-head">
+          <h2 id="wordbookTitle">生词本</h2>
+          <div class="vocab-panel-actions">
+            <button id="exportWordbookButton" class="compact-button" type="button">导出 JSON</button>
+            <button id="copyWordbookButton" class="compact-button" type="button">复制单词表</button>
+            <button id="clearWordbookButton" class="compact-button" type="button">清空</button>
+            <button id="closeWordbookButton" class="compact-button" type="button">收起</button>
+          </div>
+        </div>
+        <div id="wordbookList" class="vocab-wordbook-list"></div>
+      </section>
+
+      <section class="kaoyan-attribution" aria-labelledby="vocabCreditTitle">
+        <h2 id="vocabCreditTitle">数据来源与开源借鉴</h2>
+        <p>
+          词表按考试类型整理自站内考试词表，音标、英释与词形变化来自开源词典数据，词根词缀与形近词辨析同样来自公开词典数据；
+          词卡分片、点词索引由 <code>scripts/build-vocab-shards.mjs</code> 生成，页面按分片懒加载并缓存。
+        </p>
+        <ul>
+          <li>
+            <a href="https://github.com/lilinji/English" target="_blank" rel="noopener noreferrer">lilinji/English</a>
+            （MIT）：按考试类型分类的词汇数据结构与列表式展示思路。
+          </li>
+          <li>
+            <a href="https://github.com/skywind3000/ECDict" target="_blank" rel="noopener noreferrer">skywind3000/ECDict</a>
+            （MIT）：音标、释义、词形变化、词根与形近词数据。
+          </li>
+          <li>
+            <a href="https://github.com/tangshimin/MuJing" target="_blank" rel="noopener noreferrer">tangshimin/MuJing</a>
+            （MIT）：点词查义的交互组织方式。
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

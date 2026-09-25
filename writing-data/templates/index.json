@@ -1,0 +1,31 @@
+{
+  "note": "作文模板库索引。首屏只读这份小文件，点击模板分组后再按 exam 懒加载对应分片，分片写进 localStorage 复用。",
+  "updatedAt": "2026-09-25",
+  "total": 25,
+  "exams": {
+    "cet4": {
+      "examLabel": "四级",
+      "wordTarget": "120-180 词",
+      "count": 5,
+      "url": "./writing-data/templates/cet4.json"
+    },
+    "cet6": {
+      "examLabel": "六级",
+      "wordTarget": "150-200 词",
+      "count": 5,
+      "url": "./writing-data/templates/cet6.json"
+    },
+    "english-i": {
+      "examLabel": "考研英语一",
+      "wordTarget": "小作文约 100 词；大作文 160-200 词",
+      "count": 8,
+      "url": "./writing-data/templates/english-i.json"
+    },
+    "english-ii": {
+      "examLabel": "考研英语二",
+      "wordTarget": "小作文约 100 词；大作文约 150 词",
+      "count": 7,
+      "url": "./writing-data/templates/english-ii.json"
+    }
+  }
+}

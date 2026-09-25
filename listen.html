@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="听句精听：固定顶部播放器 + 可滚动句子列表 + 下方答题区，逐句听写、即时判分、错题本复习，支持美剧原声与六级听力。"
+    />
+    <title>听句精听 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./listen.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./study-core.js" defer></script>
+    <script src="./listen.js" defer></script>
+  </head>
+  <body class="listen-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./movie.html">台词精读</a>
+        <a class="topbar-link topbar-link-extra" href="./shadow.html">跟读</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>听句精听</strong>
+          <small>LISTENING BOOTH</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./kaoyan.html">考研英语</a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">DICTATION &amp; LISTENING</p>
+            <h1 id="pageTitle">听句精听</h1>
+            <p class="hero-description">
+              挑一集原声或一套六级听力，从第一句开始逐句听写。播放器固定在顶部，句子列表可滚动，
+              答题区在列表下方；提交后立即给出命中率与逐词差异，错句自动进错题本。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="练习数据统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="练习设置">
+            <div class="setting-group">
+              <label class="setting-label" for="sourceSelect">素材来源</label>
+              <select id="sourceSelect" class="paper-select">
+                <option value="movie">美剧原声（真人原声）</option>
+                <option value="cet6">六级听力（浏览器朗读）</option>
+                <option value="daily">日常听力（浏览器朗读）</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="setSelect">选择素材</label>
+              <select id="setSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">语速</span>
+              <div class="segmented-control" role="group" aria-label="语速">
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-rate="0.7"
+                  aria-pressed="false"
+                >
+                  0.7x
+                </button>
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-rate="0.9"
+                  aria-pressed="true"
+                >
+                  0.9x
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-rate="1"
+                  aria-pressed="false"
+                >
+                  原速
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <button id="revealToggleButton" class="tool-button" type="button">
+                显示原文
+              </button>
+              <button id="wrongBookButton" class="tool-button" type="button">
+                错题本 (<span id="wrongCount">0</span>)
+              </button>
+              <button id="clearAnswersButton" class="tool-button" type="button">
+                清空本次听写
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="listenPlayer" class="listen-player" aria-label="播放控制">
+        <div class="listen-player-main">
+          <span class="listen-progress" id="listenProgress">第 0 / 0 句</span>
+          <div class="listen-player-actions">
+            <button id="prevButton" class="icon-button" type="button" title="上一句" aria-label="上一句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14" /><path d="M19 5 9 12l10 7z" /></svg>
+            </button>
+            <button id="playButton" class="listen-play-button" type="button" aria-label="播放当前句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5z" /></svg>
+              <span id="playButtonLabel">播放</span>
+            </button>
+            <button id="replayButton" class="icon-button" type="button" title="重播本句" aria-label="重播本句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg>
+            </button>
+            <button id="nextButton" class="icon-button" type="button" title="下一句" aria-label="下一句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5v14" /><path d="M5 5l10 7-10 7z" /></svg>
+            </button>
+          </div>
+          <label class="listen-loop">
+            <input id="loopToggle" type="checkbox" />
+            <span>循环本句</span>
+          </label>
+        </div>
+        <div class="listen-player-meta">
+          <span id="listenSourceMeta" class="listen-source-meta">正在准备素材…</span>
+          <span id="listenTimer" class="listen-timer">00:00 / 00:00</span>
+        </div>
+      </section>
+
+      <section class="listen-board">
+        <div class="listen-list-panel">
+          <div class="listen-panel-head">
+            <h2>句子列表</h2>
+            <span class="listen-panel-hint">点句号跳到该句，列表可滚动</span>
+          </div>
+          <div id="listenList" class="listen-list" tabindex="0" aria-label="句子列表">
+            <div class="loading-state">
+              <strong>正在准备听写素材</strong>
+              <span>素材按集 / 按套加载，只读取当前这一份。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="listen-answer-panel" id="listenAnswerPanel">
+          <div class="listen-panel-head">
+            <h2>答题区</h2>
+            <span class="listen-panel-hint">听不出来的地方可以先空着</span>
+          </div>
+          <p id="answerSentenceNumber" class="listen-answer-number"></p>
+          <div id="answerPlayerHint" class="listen-answer-audio">
+            <button id="answerPlayButton" class="compact-button" type="button">重听本句</button>
+            <button id="answerSlowButton" class="compact-button" type="button">慢速重听</button>
+            <span id="answerAttempts" class="listen-attempts"></span>
+          </div>
+          <label class="listen-input-field" for="answerInput">
+            <span>写下你听到的英文</span>
+            <textarea
+              id="answerInput"
+              rows="3"
+              spellcheck="false"
+              autocapitalize="off"
+              autocomplete="off"
+              placeholder="Type what you hear…"
+            ></textarea>
+          </label>
+          <div class="listen-answer-actions">
+            <button id="submitAnswerButton" class="tool-button is-primary" type="button">
+              提交并判分
+            </button>
+            <button id="showAnswerButton" class="tool-button" type="button">
+              显示答案
+            </button>
+            <button id="nextSentenceButton" class="tool-button" type="button">
+              下一句
+            </button>
+          </div>
+          <div id="answerResult" class="listen-result" role="status" aria-live="polite"></div>
+          <div id="answerReference" class="listen-reference" hidden>
+            <p class="listen-reference-en" lang="en"></p>
+            <p class="listen-reference-zh"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="wrongBookPanel" class="listen-wrong-panel" hidden aria-labelledby="wrongBookTitle">
+        <div class="listen-panel-head">
+          <h2 id="wrongBookTitle">错题本</h2>
+          <div class="listen-wrong-actions">
+            <button id="exportWrongButton" class="compact-button" type="button">导出 JSON</button>
+            <button id="clearWrongButton" class="compact-button" type="button">清空</button>
+            <button id="closeWrongButton" class="compact-button" type="button">收起</button>
+          </div>
+        </div>
+        <div id="wrongList" class="listen-wrong-list"></div>
+      </section>
+
+      <section class="kaoyan-attribution" aria-labelledby="listenCreditTitle">
+        <h2 id="listenCreditTitle">数据来源与开源借鉴</h2>
+        <p>
+          美剧原声时间轴来自站内 <code>movie-data/audio</code>，逐句台词与译文来自
+          <code>movie-data</code>；六级听力文本来自站内 <code>cet6-listening-data</code>，
+          该份素材没有公开音频，因此用浏览器语音合成朗读，并在界面上标注。听写交互参考了开源项目的公开做法，
+          只借鉴思路与布局，未复制其代码或受版权保护的题库正文。
+        </p>
+        <ul>
+          <li>
+            <a href="https://github.com/Pi3-l22/TingJu" target="_blank" rel="noopener noreferrer">Pi3-l22/TingJu</a>
+            （MIT）：固定顶部播放器 + 可滚动句子列表 + 下方答题区的版式。
+          </li>
+          <li>
+            <a href="https://github.com/tangshimin/MuJing" target="_blank" rel="noopener noreferrer">tangshimin/MuJing</a>
+            （MIT）：影视原声按句子切分、逐句重听与字幕联动的做法。
+          </li>
+          <li>
+            <a href="https://github.com/isboyjc/le-agent" target="_blank" rel="noopener noreferrer">isboyjc/le-agent</a>
+            （MIT）：跟读练习中「原音—录音—评分」的顺序与反馈结构。
+          </li>
+          <li>
+            <a href="https://github.com/HoraceLuBFA/zh-en-translation-polish" target="_blank" rel="noopener noreferrer">HoraceLuBFA/zh-en-translation-polish</a>：
+            逐句点评与改写建议的组织方式，本站只借鉴其分层反馈思路。
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

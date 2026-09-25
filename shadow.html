@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="跟读台：逐句播原音、慢速重听、跟读录音、语音识别打分，支持连续跟读不停顿，素材来自站内美剧原声与六级听力。"
+    />
+    <title>跟读台 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./shadow.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./study-core.js" defer></script>
+    <script src="./shadow.js" defer></script>
+  </head>
+  <body class="shadow-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./movie.html">台词精读</a>
+        <a class="topbar-link topbar-link-extra" href="./listen.html">听句精听</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>跟读台</strong>
+          <small>SHADOWING STUDIO</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./kaoyan.html">考研英语</a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">LISTEN · RECORD · SCORE</p>
+            <h1 id="pageTitle">跟读台</h1>
+            <p class="hero-description">
+              一句一句来：先听原音，再按正常或慢速重听，然后跟读录音。浏览器支持语音识别时会给出发音评分和逐词差异；
+              开启「连续跟读」会按句自动播放、自动开录、自动推进，中途不停。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="跟读数据统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="跟读设置">
+            <div class="setting-group">
+              <label class="setting-label" for="sourceSelect">素材来源</label>
+              <select id="sourceSelect" class="paper-select">
+                <option value="movie">美剧原声（真人原声）</option>
+                <option value="cet6">六级听力（浏览器朗读）</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="setSelect">选择素材</label>
+              <select id="setSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">原音语速</span>
+              <div class="segmented-control" id="rateGroup" role="group" aria-label="原音语速">
+                <button class="segment-button" type="button" data-rate="0.7" aria-pressed="false">
+                  慢速 0.7x
+                </button>
+                <button class="segment-button is-active" type="button" data-rate="1" aria-pressed="true">
+                  正常 1.0x
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <button id="continuousButton" class="tool-button is-primary" type="button">
+                开始连续跟读
+              </button>
+              <button id="clearRecordsButton" class="tool-button" type="button">
+                清空本次评分
+              </button>
+              <button id="micCheckButton" class="tool-button" type="button">
+                检查麦克风
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="shadowPlayer" class="shadow-player" aria-label="跟读播放控制">
+        <div class="shadow-player-main">
+          <span class="shadow-progress" id="shadowProgress">第 0 / 0 句</span>
+          <div class="shadow-player-actions">
+            <button id="prevButton" class="icon-button" type="button" title="上一句" aria-label="上一句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14" /><path d="M19 5 9 12l10 7z" /></svg>
+            </button>
+            <button id="playButton" class="shadow-play-button" type="button" aria-label="播放原音">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5z" /></svg>
+              <span id="playButtonLabel">播放原音</span>
+            </button>
+            <button id="slowButton" class="icon-button" type="button" title="慢速重听" aria-label="慢速重听">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16" /><path d="M9 7v10" /><path d="M15 9v6" /></svg>
+            </button>
+            <button id="replayButton" class="icon-button" type="button" title="重播本句" aria-label="重播本句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg>
+            </button>
+            <button id="nextButton" class="icon-button" type="button" title="下一句" aria-label="下一句">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5v14" /><path d="M5 5l10 7-10 7z" /></svg>
+            </button>
+          </div>
+          <label class="shadow-switch">
+            <input id="loopToggle" type="checkbox" />
+            <span>循环本句</span>
+          </label>
+        </div>
+        <div class="shadow-player-meta">
+          <span id="shadowSourceMeta" class="shadow-source-meta">正在准备素材…</span>
+          <span id="shadowTimer" class="shadow-timer">00:00 / 00:00</span>
+        </div>
+      </section>
+
+      <section class="shadow-grid">
+        <article class="shadow-script" aria-labelledby="scriptTitle">
+          <div class="shadow-panel-head">
+            <h2 id="scriptTitle">当前句</h2>
+            <span class="shadow-panel-hint" id="scriptScene"></span>
+          </div>
+          <p id="scriptText" class="shadow-script-text" lang="en">
+            先选一份素材，这里会显示当前要跟读的句子。
+          </p>
+          <p id="scriptZh" class="shadow-script-zh"></p>
+          <div id="scriptFocus" class="shadow-focus"></div>
+          <div id="scriptNotes" class="shadow-notes"></div>
+        </article>
+
+        <article class="shadow-record" aria-labelledby="recordTitle">
+          <div class="shadow-panel-head">
+            <h2 id="recordTitle">跟读录音</h2>
+            <span class="shadow-panel-hint" id="recordStatus">待机</span>
+          </div>
+
+          <div class="shadow-record-main">
+            <button id="recordButton" class="shadow-record-button" type="button" aria-label="开始跟读录音">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V7a3 3 0 0 1 3-3z" /><path d="M6 11a6 6 0 0 0 12 0" /><path d="M12 17v3" /></svg>
+              <span id="recordButtonLabel">开始跟读</span>
+            </button>
+            <div class="shadow-record-side">
+              <span id="recordTimer" class="shadow-record-timer">00:00</span>
+              <div class="shadow-record-actions">
+                <button id="stopRecordButton" class="compact-button" type="button">停止录音</button>
+                <button id="playRecordButton" class="compact-button" type="button" disabled>听我的录音</button>
+                <button id="scoreButton" class="compact-button" type="button" disabled>重新评分</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="recordMeter" class="shadow-meter" hidden>
+            <span class="shadow-meter-bar" id="recordMeterBar"></span>
+            <span class="shadow-meter-text" id="recordMeterText">录音中…</span>
+          </div>
+
+          <div id="shadowResult" class="shadow-result" role="status" aria-live="polite"></div>
+
+          <label class="shadow-note-field" for="noteInput">
+            <span>这一句的笔记（自动保存）</span>
+            <textarea id="noteInput" rows="2" placeholder="连读、弱读、重音位置…"></textarea>
+          </label>
+        </article>
+      </section>
+
+      <section class="shadow-lines-panel">
+        <div class="shadow-panel-head">
+          <h2>句子列表</h2>
+          <span class="shadow-panel-hint">点句号跳到该句；分数是最近一次跟读的得分</span>
+        </div>
+        <div id="shadowList" class="shadow-list" tabindex="0" aria-label="跟读句子列表">
+          <div class="loading-state">
+            <strong>正在准备跟读素材</strong>
+            <span>素材按集 / 按套加载，只读取当前这一份。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="kaoyan-attribution" aria-labelledby="shadowCreditTitle">
+        <h2 id="shadowCreditTitle">数据来源与开源借鉴</h2>
+        <p>
+          原音与时间轴来自站内 <code>movie-data/audio</code>，逐句台词、译文与语法提示来自
+          <code>movie-data</code>；六级听力正文来自 <code>cet6-listening-data</code>，站内没有公开音频，
+          因此改用浏览器语音合成朗读，并在界面上标注。评分用浏览器自带的语音识别结果做词级对齐，
+          只在本地计算，不会上传录音。
+        </p>
+        <ul>
+          <li>
+            <a href="https://github.com/isboyjc/le-agent" target="_blank" rel="noopener noreferrer">isboyjc/le-agent</a>
+            （MIT）：「原音 → 跟读 → 评分 → 改写建议」的练习顺序与反馈结构。
+          </li>
+          <li>
+            <a href="https://github.com/tangshimin/MuJing" target="_blank" rel="noopener noreferrer">tangshimin/MuJing</a>
+            （MIT）：影视片段按句切分、逐句重听与字幕联动的做法。
+          </li>
+          <li>
+            <a href="https://github.com/Pi3-l22/TingJu" target="_blank" rel="noopener noreferrer">Pi3-l22/TingJu</a>
+            （MIT）：固定播放器 + 可滚动句子列表的版式，本站听句页同样参考了这一版式。
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

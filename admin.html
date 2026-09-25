@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="description"
+      content="站长控制台：账号、在线情况、接口调用、密码找回申请、邀请码与单词测试规模。"
+    />
+    <title>控制台 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./session-guard.js" defer></script>
+    <script src="./admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link topbar-link-extra" href="./quiz.html">单词测试</a>
+        <a class="topbar-link topbar-link-extra" href="./review.html">错词复习</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>控制台</strong>
+          <small>ADMIN CONSOLE</small>
+        </span>
+      </a>
+      <span class="admin-topbar-actions">
+        <span id="liveState" class="admin-live" data-state="idle">未连接</span>
+        <button id="refreshButton" class="admin-refresh" type="button">
+          刷新
+        </button>
+      </span>
+    </header>
+
+    <main class="admin-main">
+      <section id="adminGate" class="admin-gate" hidden>
+        <strong id="gateTitle">需要管理员账号</strong>
+        <p id="gateCopy">
+          这个页面只对站长账号开放。请先用管理员账号登录，再回到这里。
+        </p>
+        <a class="admin-button primary" href="./index.html">去登录</a>
+      </section>
+
+      <div id="adminBody" hidden>
+        <section class="admin-head">
+          <div>
+            <p class="admin-eyebrow">ADMIN CONSOLE</p>
+            <h1>账号与运行状态</h1>
+            <p id="adminUpdated" class="admin-lead">正在读取服务端数据…</p>
+          </div>
+          <div id="storageBadge" class="admin-badge">存储状态未知</div>
+        </section>
+
+        <section id="statCards" class="admin-stats"></section>
+
+        <div class="admin-columns">
+          <section class="admin-card">
+            <header class="admin-card-head">
+              <h2>邀请码</h2>
+              <p>注册时校验；留空表示谁都能注册。</p>
+            </header>
+
+            <div class="admin-invite-row">
+              <label class="admin-field">
+                <span>当前邀请码</span>
+                <input
+                  id="inviteInput"
+                  type="text"
+                  inputmode="latin"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="例如 CABIN-7F3K9Q"
+                />
+              </label>
+              <div class="admin-invite-buttons">
+                <button id="inviteSave" class="admin-button primary" type="button">
+                  保存
+                </button>
+                <button id="inviteGenerate" class="admin-button" type="button">
+                  随机生成
+                </button>
+                <button id="inviteClear" class="admin-button ghost" type="button">
+                  关闭邀请码
+                </button>
+              </div>
+            </div>
+
+            <p id="inviteStatus" class="admin-note"></p>
+            <p id="inviteMessage" class="admin-message" role="status" hidden></p>
+          </section>
+
+          <section class="admin-card">
+            <header class="admin-card-head">
+              <h2>接口调用</h2>
+              <p>最近一小时的调用量，只记接口名和状态码。</p>
+            </header>
+            <div id="endpointList" class="admin-endpoints"></div>
+          </section>
+        </div>
+
+        <section class="admin-card">
+          <header class="admin-card-head">
+            <h2>在线与活动</h2>
+            <p>3 分钟内有心跳算在线；只记录页面路径和标题，不记录内容。</p>
+          </header>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>账号</th>
+                  <th>状态</th>
+                  <th>当前页面</th>
+                  <th>心跳</th>
+                  <th>最近活动</th>
+                </tr>
+              </thead>
+              <tbody id="activityBody">
+                <tr class="admin-empty-row">
+                  <td colspan="5">暂无活动记录。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <header class="admin-card-head">
+            <h2>账号</h2>
+            <p>只看得到数据规模（条目数、字节、错词条数），看不到正文。</p>
+          </header>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>账号</th>
+                  <th>邮箱</th>
+                  <th>注册时间</th>
+                  <th>数据量</th>
+                  <th>错词</th>
+                  <th>成绩（四级 / 考研 / 全词库）</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="userBody">
+                <tr class="admin-empty-row">
+                  <td colspan="7">还没有账号数据。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <header class="admin-card-head">
+            <h2>密码找回申请</h2>
+            <p>
+              学生点了「忘记密码」会出现在这里。点「生成重置码」把一次性码发给他，
+              再点「已处理」归档。
+            </p>
+          </header>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>账号</th>
+                  <th>申请时间</th>
+                  <th>状态</th>
+                  <th>重置码</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="resetBody">
+                <tr class="admin-empty-row">
+                  <td colspan="5">暂无找回申请。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p id="resetMessage" class="admin-message" role="status" hidden></p>
+        </section>
+
+        <section class="admin-card">
+          <header class="admin-card-head">
+            <h2>实时请求流</h2>
+            <p>每条都是接口名、账号、状态码和耗时。不记录请求体与内容。</p>
+          </header>
+          <ol id="requestList" class="admin-requests"></ol>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="口语房间：挑一个真实的人，像打电话一样用英语聊天。本地陪聊不需要联网，也可以接自己的模型接口，聊完给一份朋友式的复盘。"
+    />
+    <title>口语房间 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./speaking.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./session-guard.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./study-core.js" defer></script>
+    <script src="./speaking-personas.js" defer></script>
+    <script src="./speaking-engine.js" defer></script>
+    <script src="./speaking.js" defer></script>
+  </head>
+  <body class="speaking-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./shadow.html">跟读台</a>
+        <a class="topbar-link topbar-link-extra" href="./quiz.html">单词测试</a>
+      </span>
+      <a class="intensive-brand" href="./speaking.html" aria-label="口语房间">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>口语房间</strong>
+          <small>SPEAKING ROOM</small>
+        </span>
+      </a>
+      <span id="accountChip" class="speaking-account" hidden></span>
+    </header>
+
+    <main class="speaking-main">
+      <section class="speaking-intro" aria-labelledby="pageTitle">
+        <p class="speaking-eyebrow">REAL CONVERSATION · NO EXAMINER</p>
+        <h1 id="pageTitle">口语房间</h1>
+        <p class="speaking-lead">
+          挑一个人，像打电话那样聊。对方不是考官，也不会给你打分：他先接住你刚说的那句话，
+          再讲点自己的事，最后才可能问你一句。
+        </p>
+        <p id="modeNote" class="speaking-note"></p>
+        <nav class="speaking-links" aria-label="其它练习入口">
+          <a class="speaking-link" href="./index.html#practice">情景对话与雅思练习台</a>
+          <a class="speaking-link" href="./shadow.html">跟读台</a>
+          <a class="speaking-link" href="./vocab.html">词汇库</a>
+        </nav>
+      </section>
+
+      <section class="speaking-people" aria-labelledby="peopleTitle">
+        <div class="speaking-section-head">
+          <h2 id="peopleTitle">今天跟谁聊</h2>
+          <span class="speaking-section-hint">点一张卡片换人，正在聊的时候换人会重新开场</span>
+        </div>
+        <div id="personaList" class="persona-rail" role="list"></div>
+      </section>
+
+      <section class="speaking-room" aria-labelledby="roomTitle">
+        <h2 id="roomTitle" class="visually-hidden">通话</h2>
+
+        <header class="call-bar">
+          <span id="callAvatar" class="call-avatar" aria-hidden="true">D</span>
+          <span class="call-identity">
+            <strong id="callName">Dana</strong>
+            <span id="callMeta">Chicago · 夜班护士</span>
+          </span>
+          <span class="call-state">
+            <span id="callStatus" class="call-status" data-state="idle">还没开始</span>
+            <span id="callTimer" class="call-timer">00:00</span>
+          </span>
+          <span class="call-actions">
+            <button
+              id="speakingStartButton"
+              class="tool-button is-primary"
+              type="button"
+            >
+              开始通话
+            </button>
+            <button
+              id="speakingRecapButton"
+              class="tool-button"
+              type="button"
+              disabled
+            >
+              复盘
+            </button>
+          </span>
+        </header>
+
+        <div
+          id="callLog"
+          class="call-log"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+        >
+          <p id="callEmpty" class="call-empty">
+            选好人物，按下「开始通话」，对方会先说第一句。
+          </p>
+        </div>
+
+        <form id="composer" class="composer" autocomplete="off">
+          <div class="composer-row">
+            <button
+              id="speakingMicButton"
+              class="composer-icon-button"
+              type="button"
+              title="按住说话，或点一下开始录音"
+              aria-label="用麦克风说英语"
+              disabled
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <path d="M12 19v3" />
+              </svg>
+            </button>
+
+            <label class="composer-field" for="speakingInput">
+              <span class="composer-label">轮到你</span>
+              <textarea
+                id="speakingInput"
+                rows="2"
+                placeholder="What would you say?"
+                spellcheck="false"
+                disabled
+              ></textarea>
+            </label>
+
+            <button
+              id="speakingSendButton"
+              class="composer-send-button"
+              type="submit"
+              disabled
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M22 2 11 13" />
+                <path d="M22 2 15 22l-4-9-9-4z" />
+              </svg>
+              <span>发送</span>
+            </button>
+          </div>
+
+          <div class="composer-foot">
+            <span id="composerHint" class="composer-hint">
+              Enter 发送，Shift + Enter 换行
+            </span>
+            <span class="composer-quick">
+              <button
+                id="speakingTopicButton"
+                class="ghost-button"
+                type="button"
+                disabled
+              >
+                让 ta 起个新话题
+              </button>
+              <button
+                id="speakingReplayButton"
+                class="ghost-button"
+                type="button"
+                disabled
+              >
+                重听上一句
+              </button>
+            </span>
+          </div>
+        </form>
+      </section>
+
+      <section class="speaking-settings" aria-labelledby="settingsTitle">
+        <div class="speaking-section-head">
+          <h2 id="settingsTitle">房间设置</h2>
+          <span id="settingsHint" class="speaking-section-hint">
+            本地陪聊在浏览器里生成回复，不连网
+          </span>
+        </div>
+
+        <div class="settings-grid">
+          <div class="setting-group">
+            <span class="setting-label">陪聊方式</span>
+            <div
+              id="modeGroup"
+              class="segmented-control segmented-control-wide"
+              role="group"
+              aria-label="陪聊方式"
+            >
+              <button
+                class="segment-button is-active"
+                type="button"
+                data-mode="local"
+                aria-pressed="true"
+              >
+                本地陪聊
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-mode="api"
+                aria-pressed="false"
+              >
+                我的接口
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-mode="quiet"
+                aria-pressed="false"
+              >
+                只看文本
+              </button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label" for="speakingTopic">开场话题</label>
+            <select id="speakingTopic" class="paper-select"></select>
+          </div>
+
+          <div class="setting-group">
+            <span class="setting-label">朗读语速</span>
+            <div
+              id="rateGroup"
+              class="segmented-control segmented-control-wide"
+              role="group"
+              aria-label="朗读语速"
+            >
+              <button class="segment-button" type="button" data-rate="0.85" aria-pressed="false">
+                慢一点
+              </button>
+              <button class="segment-button is-active" type="button" data-rate="1" aria-pressed="true">
+                正常
+              </button>
+              <button class="segment-button" type="button" data-rate="1.12" aria-pressed="false">
+                快一点
+              </button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <span class="setting-label">朗读</span>
+            <label class="switch-row" for="speakingAutoSpeak">
+              <input id="speakingAutoSpeak" type="checkbox" checked />
+              <span>对方说话时自动念出来</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="apiFields" class="api-fields" hidden>
+          <label class="api-field">
+            <span>Chat 接口地址</span>
+            <input
+              id="speakingApiUrl"
+              type="url"
+              placeholder="https://api.example.com/v1/chat/completions"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </label>
+          <label class="api-field">
+            <span>模型名</span>
+            <input
+              id="speakingApiModel"
+              type="text"
+              placeholder="gpt-4o-mini"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </label>
+          <label class="api-field">
+            <span>密钥</span>
+            <input
+              id="speakingApiKey"
+              type="password"
+              placeholder="只保存在这台设备"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </label>
+          <label class="api-field">
+            <span>鉴权方式</span>
+            <select id="speakingApiAuth">
+              <option value="bearer">Authorization: Bearer</option>
+              <option value="x-api-key">x-api-key</option>
+              <option value="none">不需要</option>
+            </select>
+          </label>
+          <div class="api-actions">
+            <button id="speakingApiSaveButton" class="tool-button is-primary" type="button">
+              保存接口设置
+            </button>
+            <span id="speakingApiStatus" class="api-status" role="status"></span>
+          </div>
+        </div>
+
+        <p class="settings-note">
+          聊天记录按账号分开存在这台设备的浏览器里。接口地址、模型名和密钥不会上传到本站服务器，
+          只有你按下发送、并且选的是「我的接口」时，才会带着这一段对话去请求你自己填的地址。
+        </p>
+      </section>
+
+      <section
+        id="speakingRecapPanel"
+        class="speaking-recap"
+        aria-labelledby="recapTitle"
+        hidden
+      >
+        <div class="speaking-section-head">
+          <h2 id="recapTitle">复盘</h2>
+          <button id="speakingRecapClose" class="ghost-button" type="button">
+            收起
+          </button>
+        </div>
+        <div id="recapBody" class="recap-body"></div>
+      </section>
+
+      <section class="speaking-sources" aria-labelledby="sourcesTitle">
+        <div class="speaking-section-head">
+          <h2 id="sourcesTitle">借鉴的开源项目</h2>
+          <span class="speaking-section-hint">只借鉴对话组织方式，没有引入它们的服务端组件</span>
+        </div>
+        <ul class="source-list">
+          <li>
+            <a href="https://github.com/kyutai-labs/moshi" target="_blank" rel="noreferrer">
+              kyutai-labs/moshi
+            </a>
+            全双工语音对话的思路：说完就能被打断，不用一轮一轮等。
+          </li>
+          <li>
+            <a href="https://github.com/pipecat-ai/pipecat" target="_blank" rel="noreferrer">
+              pipecat-ai/pipecat
+            </a>
+            语音流水线的阶段拆分，本站简化为浏览器朗读与识别两条通道。
+          </li>
+          <li>
+            <a href="https://github.com/vocodedev/vocode-core" target="_blank" rel="noreferrer">
+              vocodedev/vocode-core
+            </a>
+            角色人设与话题推进的写法，对应这里的八个人物包。
+          </li>
+          <li>
+            <a href="https://github.com/fixie-ai/ultravox" target="_blank" rel="noreferrer">
+              fixie-ai/ultravox
+            </a>
+            实时语音模型的交互约定，用来约束接口返回的字段。
+          </li>
+          <li>
+            <a
+              href="https://github.com/Barty-Bart/openai-realtime-api-voice-assistant-V2"
+              target="_blank"
+              rel="noreferrer"
+            >
+              openai-realtime-api-voice-assistant-V2
+            </a>
+            通话历史与上下文保留的做法。
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

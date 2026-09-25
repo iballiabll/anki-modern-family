@@ -1,0 +1,11181 @@
+const {
+  parseDeck,
+  DEFAULT_UNIT_SIZE,
+  REVIEW_DAY_MS,
+  REVIEW_LEARNING_STEPS_MS,
+  REVIEW_MAX_INTERVAL_DAYS,
+  REVIEW_GRADES,
+  formatUnitNumber,
+  buildDeckUnits,
+  getItemKey,
+  clampReviewEase,
+  computeReviewSchedule,
+  formatReviewInterval,
+  getReviewDayKey,
+  restoreSet,
+  persistSet,
+  fetchLibraryManifest,
+  fetchLibraryDeck,
+  materialRequestUrl,
+  buildReviewQueue,
+} = window.IballDeck;
+
+const {
+  known: STORAGE_KEY,
+  favorites: FAVORITES_STORAGE_KEY,
+  unknown: UNKNOWN_STORAGE_KEY,
+  reviewProgress: REVIEW_PROGRESS_STORAGE_KEY,
+  reviewDaily: REVIEW_DAILY_STORAGE_KEY,
+} = window.IballDeck.STORAGE_KEYS;
+
+const MANIFEST_PATH = "./resources.json";
+const WORD_API_PATH = "./api/word";
+const PRACTICE_HISTORY_STORAGE_KEY =
+  "iball-listening-cabin-speaking-history";
+const PRACTICE_SETTINGS_STORAGE_KEY =
+  "iball-listening-cabin-speaking-settings";
+const FREE_CONVERSATION_STORAGE_KEY =
+  "iball-listening-cabin-free-conversation";
+const WELCOME_OVERLAY_STORAGE_KEY = "iball-listening-cabin-welcome-seen";
+const COLLAPSED_CATEGORIES_STORAGE_KEY =
+  "iball-listening-cabin-collapsed-categories";
+const GITHUB_SEARCH_URL = "https://github.com/search";
+const OPEN_SOURCE_FILTERS = [
+  { id: "all", label: "全部", keyword: "english learning web app" },
+  { id: "speaking", label: "口语跟读", keyword: "english speaking practice" },
+  { id: "ielts", label: "雅思口语", keyword: "ielts speaking practice" },
+  { id: "listening", label: "听力听写", keyword: "english listening dictation" },
+  { id: "vocab", label: "词汇记忆", keyword: "english vocabulary spaced repetition" },
+  { id: "exam", label: "考研四六级", keyword: "kaoyan english cet6 exam" },
+  { id: "design", label: "界面设计", keyword: "education app ui design system" },
+];
+// 每次改版前逐页调研过的公开仓库，只借鉴思路、数据结构与版式。
+const OPEN_SOURCE_REFERENCES = [
+  {
+    group: "speaking",
+    module: "素材跟读",
+    name: "yin-yizhen/SpeakHub",
+    url: "https://github.com/yin-yizhen/SpeakHub",
+    license: "许可以仓库为准",
+    takeaway: "跟读练习里「播放原文 → 录音 → 查看结果」的三段式状态组织。",
+  },
+  {
+    group: "speaking",
+    module: "情景对话",
+    name: "EthanLyu30/spoken",
+    url: "https://github.com/EthanLyu30/spoken",
+    license: "MIT",
+    takeaway: "成人日常场景的轮次编排与追问方式，用于餐厅、医院、租房等场景。",
+  },
+  {
+    group: "speaking",
+    module: "口语反馈",
+    name: "luyou666/english-speaking-coach",
+    url: "https://github.com/luyou666/english-speaking-coach",
+    license: "MIT",
+    takeaway: "把发音、用词、语法拆成独立字段分别给建议的反馈结构。",
+  },
+  {
+    group: "ielts",
+    module: "雅思口语",
+    name: "Luxshan2000/ielts-prep",
+    url: "https://github.com/Luxshan2000/ielts-prep",
+    license: "MIT",
+    takeaway: "Part 1 问答、Part 2 题卡、Part 3 追问的结构与练习流程。",
+  },
+  {
+    group: "speaking",
+    module: "纠错表达",
+    name: "anticipate218/EchoMentor",
+    url: "https://github.com/anticipate218/EchoMentor",
+    license: "MIT",
+    takeaway: "把纠错写成「原句 → 地道改写 → 原因」的表达方式。",
+  },
+  {
+    group: "speaking",
+    module: "语音管线调研",
+    name: "xiaochong/hi-kid-fun",
+    url: "https://github.com/xiaochong/hi-kid-fun",
+    license: "ISC",
+    takeaway: "语音识别与朗读链路、话题驱动对话循环的调研，本站只用于成人场景的管线结论。",
+  },
+  {
+    group: "listening",
+    module: "听句版式",
+    name: "Pi3-l22/TingJu",
+    url: "https://github.com/Pi3-l22/TingJu",
+    license: "MIT",
+    takeaway: "固定顶部播放器 + 可滚动句子列表 + 下方答题区的版式。",
+  },
+  {
+    group: "listening",
+    module: "影视原声",
+    name: "tangshimin/MuJing",
+    url: "https://github.com/tangshimin/MuJing",
+    license: "MIT",
+    takeaway: "影视原声按句切分、逐句重听与字幕联动、点词查义的交互。",
+  },
+  {
+    group: "speaking",
+    module: "跟读评分",
+    name: "isboyjc/le-agent",
+    url: "https://github.com/isboyjc/le-agent",
+    license: "MIT",
+    takeaway: "「原音 → 跟读 → 评分 → 改写建议」的练习顺序与反馈结构。",
+  },
+  {
+    group: "vocab",
+    module: "词汇数据",
+    name: "lilinji/English",
+    url: "https://github.com/lilinji/English",
+    license: "MIT",
+    takeaway: "按考试类型分类的词表结构与列表式展示思路。",
+  },
+  {
+    group: "vocab",
+    module: "词典数据",
+    name: "skywind3000/ECDict",
+    url: "https://github.com/skywind3000/ECDict",
+    license: "MIT",
+    takeaway: "音标、释义、词形变化、词根与形近词数据。",
+  },
+  {
+    group: "vocab",
+    module: "短语搭配",
+    name: "2ndLA/english-phrases",
+    url: "https://github.com/2ndLA/english-phrases",
+    license: "CC-BY-SA-4.0",
+    takeaway: "固定搭配与短语表，站内词库脚本已在用。",
+  },
+  {
+    group: "vocab",
+    module: "复习调度",
+    name: "open-spaced-repetition/fsrs4anki",
+    url: "https://github.com/open-spaced-repetition/fsrs4anki",
+    license: "MIT",
+    takeaway: "间隔重复的到期队列与评分口径，复习卡组按这个思路排期。",
+  },
+  {
+    group: "exam",
+    module: "考研资料",
+    name: "Echo1LZJY/echo-kaoyan-english-skill",
+    url: "https://github.com/Echo1LZJY/echo-kaoyan-english-skill",
+    license: "仅借鉴公开结构",
+    takeaway: "真题按题型拆分，解析与复盘清单一起组织的知识结构。",
+  },
+  {
+    group: "exam",
+    module: "四六级资料",
+    name: "Liuxiangjian-ai/cet-skill",
+    url: "https://github.com/Liuxiangjian-ai/cet-skill",
+    license: "MIT",
+    takeaway: "真题按年份逐条拆成条目、配合复盘清单的组织方式。",
+  },
+  {
+    group: "design",
+    module: "界面规范",
+    name: "shadcn-ui/ui",
+    url: "https://github.com/shadcn-ui/ui",
+    license: "MIT",
+    takeaway: "组件默认值与键盘可访问性：可见焦点环、足够对比度、克制的圆角。",
+  },
+  {
+    group: "design",
+    module: "设计文档",
+    name: "VoltAgent/awesome-design-md",
+    url: "https://github.com/VoltAgent/awesome-design-md",
+    license: "MIT",
+    takeaway: "先把设计体系写成规范文档，再逐页落地的做法。",
+  },
+  {
+    group: "design",
+    module: "改版自查",
+    name: "nextlevelbuilder/ui-ux-pro-max-skill",
+    url: "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+    license: "MIT",
+    takeaway: "把 UI/UX 检查清单拆成可逐条复查的 skill 条目。",
+  },
+];
+const CATEGORY_ORDER = [
+  "0基础",
+  "四级",
+  "六级",
+  "考研",
+  "外刊",
+  "电影",
+  "其他",
+];
+const VIRTUAL_CATEGORY_NAMES = ["外刊"];
+const LARGE_DECK_UNIT_THRESHOLD = 300;
+const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
+const INTENSIVE_ENTRY_SEARCH_TEXT =
+  "四级听力全文翻译语法精读出题点技巧原文2022至2026美剧台词摩登家庭精翻固定搭配";
+const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
+const READING_ENTRY_SEARCH_TEXT =
+  "上传四六级考研题目翻译阅读背单词真题精读";
+const READING_INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级"];
+const READING_INTENSIVE_ENTRY_SEARCH_TEXT =
+  "四六级阅读全文精读仔细阅读段落匹配选词填空完形翻译解析技巧替换词固定搭配2022至2026真题";
+const CET6_ENTRY_CATEGORIES = ["六级"];
+const CET6_ENTRY_SEARCH_TEXT =
+  "六级备考总览阅读听力翻译写作作文范文逐句精读真题点词生词按套懒加载";
+const CET6_EXTRA_ENTRY_CATEGORIES = ["六级"];
+const CET6_EXTRA_ENTRY_SEARCH_TEXT =
+  "六级翻译写作作文范文提纲评分要点逐句拆解参考译文段落翻译2015至2026";
+const KAOYAN_ENTRY_CATEGORIES = ["考研"];
+const KAOYAN_ENTRY_SEARCH_TEXT =
+  "考研英语一二真题精读阅读完形新题型翻译写作作文模板解析2010至2026";
+const PERIODICAL_ENTRY_CATEGORIES = ["外刊"];
+const PERIODICAL_ENTRY_SEARCH_TEXT =
+  "外刊经济学人卫报巴伦周刊精读原文检验题完形新题型答疑杂志排版生词时间轴主题导引50期";
+const VOCAB_ENTRY_CATEGORIES = ["0基础", "四级", "六级", "考研"];
+const VOCAB_ENTRY_SEARCH_TEXT =
+  "词汇库背单词生词本收藏音标释义例句词根词缀记忆法核心词零基础";
+const WRITING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
+const WRITING_ENTRY_SEARCH_TEXT =
+  "作文批改写作范文模板真题大作文小作文语法标注词汇替换句式优化评分";
+const LISTEN_ENTRY_CATEGORIES = ["四级", "六级"];
+const LISTEN_ENTRY_SEARCH_TEXT =
+  "听句精听听写听力练习逐句错题本答题区原文播放器定格";
+const SHADOW_ENTRY_CATEGORIES = ["电影", "四级", "六级"];
+const SHADOW_ENTRY_SEARCH_TEXT =
+  "跟读台跟读影子跟读录音发音评分慢速正常语速逐句原音连续跟读";
+const AMERICAN_VOICE_NAMES = {
+  female: [
+    "aria",
+    "jenny",
+    "michelle",
+    "emma",
+    "ava",
+    "samantha",
+    "nicole",
+    "serena",
+    "victoria",
+    "zira",
+    "google us english",
+  ],
+  male: [
+    "guy",
+    "andrew",
+    "brian",
+    "christopher",
+    "eric",
+    "ryan",
+    "thomas",
+    "alex",
+    "fred",
+    "david",
+    "mark",
+  ],
+};
+const NATURAL_VOICE_HINTS = [
+  "natural",
+  "neural",
+  "online",
+  "enhanced",
+  "premium",
+  "multilingual",
+];
+const DIALOGUE_SPEAKER_VOICE_PROFILES = {
+  Barista: { gender: "female", pitch: 1.02, rateScale: 1 },
+  Receptionist: { gender: "female", pitch: 1, rateScale: 0.99 },
+  Interviewer: { gender: "male", pitch: 0.94, rateScale: 0.96 },
+  Local: { gender: "male", pitch: 0.96, rateScale: 0.99 },
+  Doctor: { gender: "female", pitch: 0.98, rateScale: 0.95 },
+  Friend: { gender: "female", pitch: 1.04, rateScale: 1.01 },
+};
+const FREE_CHAT_COACH_PROFILE = {
+  gender: "female",
+  pitch: 1,
+  rateScale: 0.96,
+};
+const REALTIME_SILENCE_MS = 1000;
+const REALTIME_RESTART_DELAY_MS = 260;
+const REALTIME_SPEECH_TAIL_MS = 420;
+const REALTIME_MAX_RESTARTS = 8;
+const FREE_CHAT_TOPICS = {
+  daily: {
+    label: "日常交流",
+    ideas: [
+      "描述今天发生的一件小事",
+      "说明你喜欢或不喜欢的日常习惯",
+      "补充一个原因，再问对方一个问题",
+    ],
+    replies: [
+      {
+        english:
+          "That sounds like a familiar part of everyday life. What made it stand out to you today, and how did you feel about it afterward?",
+        chinese:
+          "这听起来是日常生活中很熟悉的一部分。今天是什么让它特别值得一聊？之后你的感受如何？",
+      },
+      {
+        english:
+          "Thanks for sharing that. If you could change one detail about your routine, what would you change, and what difference would it make?",
+        chinese:
+          "谢谢你的分享。如果能改变日常安排中的一个细节，你会改变什么？这会带来什么不同？",
+      },
+    ],
+  },
+  study: {
+    label: "学习与考试",
+    ideas: [
+      "说一个最近学到的知识点",
+      "解释它为什么有用",
+      "举一个实际应用的例子",
+    ],
+    replies: [
+      {
+        english:
+          "That is a useful way to think about learning. Which part of your study routine helps you remember new material most effectively?",
+        chinese:
+          "这是看待学习的实用方式。你的学习安排中，哪一部分最能帮助你记住新内容？",
+      },
+      {
+        english:
+          "Good point. If you had to explain that idea to a beginner, what example would you use to make it easier to understand?",
+        chinese:
+          "说得好。如果要把这个想法解释给初学者，你会用什么例子让它更容易理解？",
+      },
+    ],
+  },
+  travel: {
+    label: "旅行与城市",
+    ideas: [
+      "描述一个想去或去过的地方",
+      "说一个具体场景",
+      "比较它和家乡的不同",
+    ],
+    replies: [
+      {
+        english:
+          "Travel can change the way we see ordinary places. What detail from that experience would you remember most clearly?",
+        chinese:
+          "旅行会改变我们看待普通地方的方式。那段经历中，哪一个细节你最会记得清楚？",
+      },
+      {
+        english:
+          "That makes the place sound vivid. How does it compare with the place where you live now?",
+        chinese:
+          "你的描述让这个地方很有画面感。它和你现在生活的地方相比有什么不同？",
+      },
+    ],
+  },
+  work: {
+    label: "工作与职业",
+    ideas: [
+      "介绍你正在做或想做的事",
+      "说一个需要解决的问题",
+      "解释你具备的相关能力",
+    ],
+    replies: [
+      {
+        english:
+          "That sounds like a meaningful challenge. What skill do you rely on most when you deal with that kind of situation?",
+        chinese:
+          "这听起来是一个很有意义的挑战。处理这类情况时，你最依赖哪项能力？",
+      },
+      {
+        english:
+          "I can see why that matters to you. If you could improve one part of the process, what would you focus on first?",
+        chinese:
+          "我能理解为什么这对你很重要。如果只能先改善流程中的一个部分，你会优先关注什么？",
+      },
+    ],
+  },
+  technology: {
+    label: "科技与媒体",
+    ideas: [
+      "说一个常用应用或设备",
+      "说明它带来的便利",
+      "谈一个可能的风险",
+    ],
+    replies: [
+      {
+        english:
+          "Technology often shapes our habits without us noticing. How has that tool changed the way you work or communicate?",
+        chinese:
+          "科技常常在不知不觉中改变我们的习惯。这个工具怎样改变了你的工作或沟通方式？",
+      },
+      {
+        english:
+          "That is worth considering. Do you think the benefits outweigh the possible disadvantages? Why?",
+        chinese:
+          "这确实值得思考。你认为它的好处是否大于潜在缺点？为什么？",
+      },
+    ],
+  },
+  culture: {
+    label: "文化与生活",
+    ideas: [
+      "介绍一个文化习惯",
+      "说明它和你的经验有何关系",
+      "提出一个值得讨论的问题",
+    ],
+    replies: [
+      {
+        english:
+          "Culture becomes easier to understand when we connect it with everyday examples. How did you first learn about that custom?",
+        chinese:
+          "当文化和日常例子联系起来时，它会更容易理解。你最初是怎样了解到这个习俗的？",
+      },
+      {
+        english:
+          "That is an interesting perspective. What do you think people from another culture might find surprising about it?",
+        chinese:
+          "这是一个很有意思的视角。你认为来自另一种文化的人会对它的哪一点感到意外？",
+      },
+    ],
+  },
+};
+const FREE_CHAT_OPENERS = [
+  { english: "That makes sense.", chinese: "这说得通。" },
+  { english: "I can picture that.", chinese: "我能想象出那个画面。" },
+  { english: "Nice, that's a good detail.", chinese: "不错，这个细节很好。" },
+  { english: "Got it.", chinese: "明白了。" },
+  { english: "I see what you mean.", chinese: "我明白你的意思。" },
+  { english: "That sounds familiar.", chinese: "这听起来很熟悉。" },
+  { english: "Fair enough.", chinese: "有道理。" },
+  { english: "Okay, good to know.", chinese: "好，知道了。" },
+];
+const FREE_CHAT_KEYWORD_REACTIONS = [
+  {
+    pattern:
+      /\b(work|job|office|career|meeting|project|boss|colleague|company)\b/i,
+    english: "Work can eat up a lot of energy.",
+    chinese: "工作确实很消耗精力。",
+    question: "What part of your work do you enjoy the most?",
+    questionZh: "工作中你最享受的部分是什么？",
+  },
+  {
+    pattern:
+      /\b(study|studying|exam|test|school|university|class|homework|ielts|english)\b/i,
+    english: "Learning something new always takes patience.",
+    chinese: "学新东西总是需要耐心。",
+    question: "What is the hardest part for you right now?",
+    questionZh: "现在对你来说最难的部分是什么？",
+  },
+  {
+    pattern:
+      /\b(travel|trip|city|flight|hotel|holiday|vacation|visit|abroad)\b/i,
+    english: "Travel usually leaves you with a few strong memories.",
+    chinese: "旅行常常会留下几个很深的记忆。",
+    question: "What would you like to do there next time?",
+    questionZh: "下次去那里你想做什么？",
+  },
+  {
+    pattern:
+      /\b(food|eat|eating|cook|cooking|restaurant|dinner|lunch|breakfast|coffee|tea)\b/i,
+    english: "Food is such a big part of daily life.",
+    chinese: "吃确实是日常生活里很重要的一部分。",
+    question: "Do you cook it yourself, or do you usually eat out?",
+    questionZh: "你是自己做饭，还是通常在外面吃？",
+  },
+  {
+    pattern:
+      /\b(family|mother|father|mom|dad|parents|brother|sister|son|daughter|child|children|kid)\b/i,
+    english: "Family things tend to stay with us.",
+    chinese: "家里的事往往最让人记挂。",
+    question: "How often do you get to spend time together?",
+    questionZh: "你们多久能一起待一会儿？",
+  },
+  {
+    pattern:
+      /\b(run|running|gym|sport|exercise|walk|walking|swim|basketball|football|yoga|health|sleep)\b/i,
+    english: "Keeping that habit going is the hard part.",
+    chinese: "能坚持这个习惯才是最难的。",
+    question: "How did you get started with it?",
+    questionZh: "你最初是怎么开始的？",
+  },
+  {
+    pattern:
+      /\b(phone|app|computer|laptop|ai|internet|online|software|video|game|social media)\b/i,
+    english: "Technology changes how we spend our time.",
+    chinese: "科技会改变我们花时间的方式。",
+    question: "Could you live without it for a week?",
+    questionZh: "你能一周不用它吗？",
+  },
+  {
+    pattern:
+      /\b(happy|glad|excited|tired|stressed|worried|nervous|proud|angry|sad|relaxed|busy)\b/i,
+    english: "It sounds like that really shaped your day.",
+    chinese: "听起来那件事真的影响了你的这一天。",
+    question: "What helped you deal with it?",
+    questionZh: "后来是什么帮你应对的？",
+  },
+  {
+    pattern: /\b(music|song|movie|film|book|reading|series|show|concert)\b/i,
+    english: "That is a good way to switch off.",
+    chinese: "这是放松的好方式。",
+    question: "What do you like most about it?",
+    questionZh: "你最喜欢它的哪一点？",
+  },
+  {
+    pattern: /\b(weather|rain|sunny|cold|hot|town|park|street|neighbour|neighbor)\b/i,
+    english: "Places and weather shape the mood of a day.",
+    chinese: "地方和天气会影响一天的心情。",
+    question: "Is that typical for where you live?",
+    questionZh: "在你住的地方这算典型情况吗？",
+  },
+];
+const FREE_CHAT_TOPIC_FOLLOW_UPS = {
+  daily: [
+    {
+      english: "What does a normal day look like for you?",
+      chinese: "你平常的一天是怎样的？",
+    },
+    {
+      english: "Is there anything you would like to change about your routine?",
+      chinese: "你的日常安排里有什么想改变的吗？",
+    },
+    {
+      english: "How do you usually relax after a busy day?",
+      chinese: "忙完一天你通常怎么放松？",
+    },
+    {
+      english: "Has anything about your daily habits changed recently?",
+      chinese: "最近你的日常习惯有什么变化吗？",
+    },
+  ],
+  study: [
+    {
+      english: "Which part of your studies takes the most effort?",
+      chinese: "学习中哪一部分最费力气？",
+    },
+    {
+      english: "How do you usually prepare for a big exam?",
+      chinese: "大考前你通常怎么准备？",
+    },
+    {
+      english: "Is there a method that works better for you than others?",
+      chinese: "有哪种方法对你特别有效？",
+    },
+    {
+      english: "What would you like to improve in the next few months?",
+      chinese: "接下来几个月你想提升什么？",
+    },
+  ],
+  travel: [
+    {
+      english: "What do you usually enjoy most on a trip?",
+      chinese: "旅行中你最享受什么？",
+    },
+    {
+      english: "Do you prefer busy cities or quiet places?",
+      chinese: "你更喜欢热闹的城市还是安静的地方？",
+    },
+    {
+      english: "What is the most memorable place you have been to?",
+      chinese: "你去过最难忘的地方是哪里？",
+    },
+    {
+      english: "If you could leave tomorrow, where would you go?",
+      chinese: "如果明天就能出发，你会去哪里？",
+    },
+  ],
+  work: [
+    {
+      english: "What does a typical working day look like for you?",
+      chinese: "你典型的工作日是怎样的？",
+    },
+    {
+      english: "Which skill matters most in your job?",
+      chinese: "你的工作中哪项能力最重要？",
+    },
+    {
+      english: "What would make your work easier?",
+      chinese: "什么会让你的工作更轻松？",
+    },
+    {
+      english: "Where would you like to be in a few years?",
+      chinese: "几年后你希望自己处在什么位置？",
+    },
+  ],
+  technology: [
+    {
+      english: "Which app do you open the most during the day?",
+      chinese: "你一天里打开最多的应用是哪个？",
+    },
+    {
+      english: "How does it help you in daily life?",
+      chinese: "它在日常生活中怎么帮到你？",
+    },
+    {
+      english: "Do you ever feel you spend too much time on screens?",
+      chinese: "你会不会觉得看屏幕的时间太长了？",
+    },
+    {
+      english: "What would you change about it if you could?",
+      chinese: "如果可以，你会改变它的哪一点？",
+    },
+  ],
+  culture: [
+    {
+      english: "Is there a custom in your city that visitors find interesting?",
+      chinese: "你所在的城市有什么让外地人觉得有趣的习俗？",
+    },
+    {
+      english: "How do people usually celebrate it?",
+      chinese: "大家通常怎么庆祝？",
+    },
+    {
+      english: "Has that custom changed since you were a child?",
+      chinese: "这个习俗和你小时候相比有变化吗？",
+    },
+    {
+      english: "What do you think it says about the local culture?",
+      chinese: "你觉得它体现了怎样的当地文化？",
+    },
+  ],
+};
+const FREE_CHAT_GENERIC_FOLLOW_UPS = [
+  {
+    english: "Could you tell me a bit more about that?",
+    chinese: "能再多说一点吗？",
+  },
+  {
+    english: "What happened next?",
+    chinese: "后来发生了什么？",
+  },
+  {
+    english: "Why do you think that is?",
+    chinese: "你觉得为什么会这样？",
+  },
+  {
+    english: "How did that make you feel at the time?",
+    chinese: "当时那让你有什么感受？",
+  },
+];
+const FREE_LANGUAGE_RULES = [
+  {
+    type: "语法",
+    pattern: /\bi\b/g,
+    replacement: "I",
+    message: "英文中的第一人称代词 I 在任何位置都要大写。",
+  },
+  {
+    type: "语法",
+    pattern: /\bI\s+am\s+agree\b/gi,
+    replacement: "I agree",
+    message: "agree 本身是动词，直接用 I agree，不需要加 am。",
+  },
+  {
+    type: "表达",
+    pattern: /\bI\s+(?:very|really very)\s+like\b/gi,
+    replacement: "I really like",
+    message: "I really like 比 I very like 更符合英语语序和搭配。",
+  },
+  {
+    type: "语法",
+    pattern: /\b(he|she|it)\s+don't\b/gi,
+    replacement: "$1 doesn't",
+    message: "第三人称单数在一般现在时的否定式要用 doesn't。",
+  },
+  {
+    type: "语法",
+    pattern: /\bI\s+have\s+(\d+)\s+years?\s+old\b/gi,
+    replacement: "I am $1 years old",
+    message: "表达年龄用 be + 数字 + years old，不用 have。",
+  },
+  {
+    type: "语法",
+    pattern: /\bmore\s+better\b/gi,
+    replacement: "better",
+    message: "better 已经是比较级，不需要再加 more。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bI\s+am\s+boring\b/gi,
+    replacement: "I am bored",
+    message: "bored 表示“感到无聊”，boring 表示“令人无聊”。",
+  },
+  {
+    type: "语法",
+    pattern: /\bdiscuss\s+about\b/gi,
+    replacement: "discuss",
+    message: "discuss 是及物动词，后面直接接讨论的内容。",
+  },
+  {
+    type: "语法",
+    pattern: /\blisten\s+music\b/gi,
+    replacement: "listen to music",
+    message: "listen 后面接对象时需要加 to。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bmarried\s+with\b/gi,
+    replacement: "married to",
+    message: "固定搭配是 be married to someone。",
+  },
+  {
+    type: "语法",
+    pattern: /\bcan\s+to\s+(\w+)\b/gi,
+    replacement: "can $1",
+    message: "情态动词 can 后直接接动词原形。",
+  },
+  {
+    type: "语法",
+    pattern: /\bthere\s+is\s+(many|several|lots of)\b/gi,
+    replacement: "there are $1",
+    message: "后面接复数名词时，要用 there are。",
+  },
+  {
+    type: "表达",
+    pattern: /\bhow\s+to\s+say\b/gi,
+    replacement: "How do you say",
+    message: "独立提问时应说 How do you say...?。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bdo\s+a\s+mistake\b/gi,
+    replacement: "make a mistake",
+    message: "英语中固定说 make a mistake。",
+  },
+  {
+    type: "词汇",
+    pattern: /\bopen\s+the\s+light\b/gi,
+    replacement: "turn on the light",
+    message: "开灯用 turn on the light，不用 open。",
+  },
+  {
+    type: "词汇",
+    pattern: /\blearn\s+knowledge\b/gi,
+    replacement: "gain knowledge",
+    message: "knowledge 常与 gain 或 acquire 搭配；表达“学到知识”也可说 learn a lot。",
+  },
+];
+const FREE_VOCABULARY_UPGRADES = [
+  {
+    pattern: /\bvery\s+good\b/gi,
+    replacement: "excellent",
+    message: "excellent 比 very good 更凝练，也更适合雅思口语。",
+  },
+  {
+    pattern: /\bvery\s+bad\b/gi,
+    replacement: "terrible",
+    message: "terrible 可以替代 very bad，使表达更简洁。",
+  },
+  {
+    pattern: /\bI\s+think\b/gi,
+    replacement: "In my view",
+    message: "In my view 是更正式、适合展开观点的开头。",
+  },
+];
+const DIALOGUE_SCENARIOS = [
+  {
+    id: "cafe",
+    title: "咖啡馆点单",
+    titleEn: "Ordering at a Cafe",
+    category: "日常",
+    level: "入门",
+    summary: "点饮品、选择规格并完成付款。",
+    turns: [
+      {
+        speaker: "Barista",
+        prompt: "Hi, welcome in! What are you having today?",
+        promptZh: "你好，欢迎光临！今天想喝点什么？",
+        sample: "Could I get a latte, please?",
+        sampleZh: "我想要一杯拿铁，谢谢。",
+        keywords: [
+          {
+            label: "说出饮品",
+            options: [["latte"], ["coffee"], ["cappuccino"], ["tea"]],
+          },
+          {
+            label: "礼貌点单",
+            options: [["i'd like"], ["can i have"], ["could i get"], ["i would like"]],
+          },
+        ],
+      },
+      {
+        speaker: "Barista",
+        prompt: "Sure thing. What size are we doing, and any milk with that?",
+        promptZh: "好的。你要什么杯型？需要加牛奶吗？",
+        sample: "A medium with oat milk, please.",
+        sampleZh: "请给我中杯，加燕麦奶。",
+        keywords: [
+          {
+            label: "说明杯型",
+            options: [["small"], ["medium"], ["large"]],
+          },
+          {
+            label: "选择牛奶",
+            options: [["milk"], ["oat milk"], ["almond milk"], ["soy milk"]],
+          },
+        ],
+      },
+      {
+        speaker: "Barista",
+        prompt: "All right, that's gonna be five bucks. How do you wanna pay?",
+        promptZh: "一共五美元。你想怎么付款？",
+        sample: "I'll pay by card. Could I get it to go?",
+        sampleZh: "我刷卡。可以帮我做成外带吗？",
+        keywords: [
+          {
+            label: "付款方式",
+            options: [["card"], ["cash"], ["apple pay"], ["google pay"]],
+          },
+          {
+            label: "说明堂食或外带",
+            options: [["to go"], ["takeaway"], ["for here"], ["to stay"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "hotel",
+    title: "酒店入住",
+    titleEn: "Hotel Check-in",
+    category: "出行",
+    level: "入门",
+    summary: "办理入住、出示证件并询问酒店服务。",
+    turns: [
+      {
+        speaker: "Receptionist",
+        prompt: "Welcome in! Do you have a reservation with us?",
+        promptZh: "欢迎！您有预订吗？",
+        sample: "Yes, it's under Li. I have a reservation for two.",
+        sampleZh: "有，我用李这个名字预订了。",
+        keywords: [
+          {
+            label: "确认预订",
+            options: [["reservation"], ["booked"], ["booking"]],
+          },
+          {
+            label: "说明预订姓名",
+            options: [
+              ["under li"],
+              ["under the name"],
+              ["name is"],
+              ["my name"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Receptionist",
+        prompt: "Could I see your passport and a credit card?",
+        promptZh: "可以出示您的护照和一张信用卡吗？",
+        sample: "Sure. Here's my passport and credit card.",
+        sampleZh: "当然可以。这是我的护照和信用卡。",
+        keywords: [
+          {
+            label: "出示护照",
+            options: [["passport"], ["id"]],
+          },
+          {
+            label: "出示信用卡",
+            options: [["credit card"], ["card"]],
+          },
+          {
+            label: "礼貌回应",
+            options: [
+              ["of course"],
+              ["sure"],
+              ["here's"],
+              ["here is"],
+              ["here are"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Receptionist",
+        prompt: "You're all set. Anything else I can help you with?",
+        promptZh: "您的房间准备好了。还需要其他帮助吗？",
+        sample: "Yes, what time's breakfast, and is Wi-Fi free?",
+        sampleZh: "有，早餐几点开始？Wi-Fi 免费吗？",
+        keywords: [
+          {
+            label: "询问酒店服务",
+            options: [
+              ["breakfast"],
+              ["wifi"],
+              ["gym"],
+              ["checkout"],
+              ["airport shuttle"],
+            ],
+          },
+          {
+            label: "礼貌提问",
+            options: [
+              ["what time's"],
+              ["what time"],
+              ["is there"],
+              ["could you tell me"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "interview",
+    title: "求职面试",
+    titleEn: "The Job Interview",
+    category: "职场",
+    level: "进阶",
+    summary: "介绍经历、回答追问并表达求职动机。",
+    turns: [
+      {
+        speaker: "Interviewer",
+        prompt: "Thanks for coming in. So, tell me a little about yourself.",
+        promptZh: "感谢你来面试。可以先介绍一下自己吗？",
+        sample:
+          "I'm a product designer with three years of experience in mobile apps.",
+        sampleZh: "我是一名产品设计师，有三年移动应用经验。",
+        keywords: [
+          {
+            label: "说明职业",
+            options: [
+              ["designer"],
+              ["engineer"],
+              ["manager"],
+              ["developer"],
+              ["student"],
+            ],
+          },
+          {
+            label: "说明经验",
+            options: [["experience"], ["years"], ["worked"], ["project"]],
+          },
+        ],
+      },
+      {
+        speaker: "Interviewer",
+        prompt: "What makes you a good fit for this role?",
+        promptZh: "哪些经历让你适合这个岗位？",
+        sample:
+          "I led a project that improved retention by twenty percent.",
+        sampleZh: "我曾负责一个项目，把用户留存率提高了百分之二十。",
+        keywords: [
+          {
+            label: "举出具体经历",
+            options: [["project"], ["led"], ["built"], ["launched"], ["managed"]],
+          },
+          {
+            label: "说明能力和结果",
+            options: [
+              ["improved"],
+              ["increased"],
+              ["reduced"],
+              ["result"],
+              ["skill"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Interviewer",
+        prompt: "So, why do you wanna join our team?",
+        promptZh: "你为什么想加入我们公司？",
+        sample:
+          "I admire your product, and I want to grow with a strong team.",
+        sampleZh: "我很欣赏贵公司的产品，也希望和优秀的团队一起成长。",
+        keywords: [
+          {
+            label: "表达对公司的兴趣",
+            options: [["product"], ["mission"], ["company"], ["team"]],
+          },
+          {
+            label: "说明个人动机",
+            options: [["grow"], ["learn"], ["contribute"], ["opportunity"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "directions",
+    title: "街头问路",
+    titleEn: "Asking for Directions",
+    category: "出行",
+    level: "入门",
+    summary: "询问目的地、交通方式并确认路线。",
+    turns: [
+      {
+        speaker: "Local",
+        prompt: "Hey, you look a little lost. Where are you headed?",
+        promptZh: "你好，你好像在找路。你想去哪里？",
+        sample: "I'm trying to find the train station.",
+        sampleZh: "我想去火车站。",
+        keywords: [
+          {
+            label: "说明目的地",
+            options: [
+              ["train station"],
+              ["museum"],
+              ["hotel"],
+              ["airport"],
+              ["city center"],
+            ],
+          },
+          {
+            label: "询问位置",
+            options: [["find"], ["get to"], ["where is"], ["looking for"]],
+          },
+        ],
+      },
+      {
+        speaker: "Local",
+        prompt: "You wanna walk, or would you rather take the subway?",
+        promptZh: "你想走路，还是坐地铁？",
+        sample: "I'd rather take the subway if it's quicker.",
+        sampleZh: "如果更快的话，我更想坐地铁。",
+        keywords: [
+          {
+            label: "选择交通方式",
+            options: [["walk"], ["subway"], ["bus"], ["taxi"]],
+          },
+          {
+            label: "比较时间",
+            options: [["faster"], ["quicker"], ["how long"], ["time"]],
+          },
+        ],
+      },
+      {
+        speaker: "Local",
+        prompt:
+          "Take the number two and hop off at Central Park. Make sense?",
+        promptZh: "坐二号线，在中央公园下车。记住了吗？",
+        sample:
+          "Got it, take the number two and get off at Central Park. Thanks!",
+        sampleZh: "好，坐二号线，在中央公园下车。谢谢！",
+        keywords: [
+          {
+            label: "复述路线",
+            options: [["line two"], ["number two"], ["central park"]],
+          },
+          {
+            label: "确认理解",
+            options: [["got it"], ["i see"], ["yes"], ["understand"]],
+          },
+          {
+            label: "表达感谢",
+            options: [["thank you"], ["thanks"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "doctor",
+    title: "医院看诊",
+    titleEn: "A Doctor's Visit",
+    category: "生活",
+    level: "进阶",
+    summary: "描述症状、说明持续时间并回答医生问题。",
+    turns: [
+      {
+        speaker: "Doctor",
+        prompt: "Come on in and have a seat. What's going on today?",
+        promptZh: "请进，坐吧。今天哪里不舒服？",
+        sample: "I've got a bad headache and a sore throat.",
+        sampleZh: "我头很痛，嗓子也疼。",
+        keywords: [
+          {
+            label: "描述症状",
+            options: [
+              ["headache"],
+              ["sore throat"],
+              ["cough"],
+              ["fever"],
+              ["stomachache"],
+            ],
+          },
+          {
+            label: "说明严重程度",
+            options: [["bad"], ["terrible"], ["painful"], ["hurts"], ["mild"]],
+          },
+        ],
+      },
+      {
+        speaker: "Doctor",
+        prompt: "How long's that been going on?",
+        promptZh: "这些症状持续多久了？",
+        sample: "Since Monday, so about three days.",
+        sampleZh: "从周一开始的，大约三天了。",
+        keywords: [
+          {
+            label: "说明持续时间",
+            options: [["days"], ["weeks"], ["since"], ["yesterday"], ["last night"]],
+          },
+          {
+            label: "给出起始时间",
+            options: [["monday"], ["tuesday"], ["weekend"], ["three days"]],
+          },
+        ],
+      },
+      {
+        speaker: "Doctor",
+        prompt: "Any allergies to medicine? And are you taking anything right now?",
+        promptZh: "你对药物过敏吗？目前有在服药吗？",
+        sample: "No allergies, and I'm just taking vitamins.",
+        sampleZh: "我没有过敏，只吃维生素。",
+        keywords: [
+          {
+            label: "说明过敏情况",
+            options: [["allergic"], ["no allergies"], ["not allergic"]],
+          },
+          {
+            label: "说明用药情况",
+            options: [["taking"], ["medicine"], ["medication"], ["vitamins"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "small-talk",
+    title: "朋友闲聊",
+    titleEn: "Catching Up",
+    category: "社交",
+    level: "入门",
+    summary: "问候近况、聊周末安排并自然约见。",
+    turns: [
+      {
+        speaker: "Friend",
+        prompt: "Hey! Long time no see. How've you been?",
+        promptZh: "嗨！好久不见，你最近怎么样？",
+        sample: "Pretty good, just busy with work. How about you?",
+        sampleZh: "我挺好的，就是工作有点忙。你呢？",
+        keywords: [
+          {
+            label: "回应近况",
+            options: [["good"], ["not bad"], ["busy"], ["great"], ["okay"]],
+          },
+          {
+            label: "反问对方",
+            options: [["how about you"], ["what about you"], ["and you"]],
+          },
+        ],
+      },
+      {
+        speaker: "Friend",
+        prompt: "So, what'd you get up to over the weekend?",
+        promptZh: "你周末做了什么？",
+        sample: "I went hiking with friends and caught a movie.",
+        sampleZh: "我和朋友去徒步了，还看了一部电影。",
+        keywords: [
+          {
+            label: "说明周末活动",
+            options: [
+              ["hiking"],
+              ["movie"],
+              ["shopping"],
+              ["visited"],
+              ["stayed home"],
+            ],
+          },
+          {
+            label: "补充同行或时间",
+            options: [["with friends"], ["family"], ["on saturday"], ["sunday"]],
+          },
+        ],
+      },
+      {
+        speaker: "Friend",
+        prompt: "We should grab coffee sometime. When are you free?",
+        promptZh: "我们找时间喝杯咖啡吧。你什么时候有空？",
+        sample: "I'm free on Friday afternoon. Does that work for you?",
+        sampleZh: "我周五下午有空。你方便吗？",
+        keywords: [
+          {
+            label: "提出时间",
+            options: [["friday"], ["weekend"], ["afternoon"], ["tomorrow"]],
+          },
+          {
+            label: "确认对方安排",
+            options: [["does that work"], ["works for you"], ["how about"], ["are you free"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "airport",
+    title: "机场值机",
+    titleEn: "Airport Check-in",
+    category: "出行",
+    level: "入门",
+    summary: "出示证件、办理托运并询问登机信息。",
+    turns: [
+      {
+        speaker: "Agent",
+        prompt: "Good morning. May I see your passport and booking reference?",
+        promptZh: "早上好。可以出示您的护照和订票号吗？",
+        sample: "Good morning. Here's my passport and my booking reference.",
+        sampleZh: "早上好。这是我的护照和订票号。",
+        keywords: [
+          {
+            label: "出示护照",
+            options: [["passport"], ["id"]],
+          },
+          {
+            label: "提供订票号",
+            options: [["booking reference"], ["booking number"], ["reference"]],
+          },
+          {
+            label: "礼貌回应",
+            options: [["here's"], ["here is"], ["sure"], ["of course"]],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt: "Are you checking any bags today?",
+        promptZh: "今天有需要托运的行李吗？",
+        sample: "Yes, I'd like to check one bag, and I'll keep a carry-on with me.",
+        sampleZh: "有的，我想托运一件行李，随身再带一个登机箱。",
+        keywords: [
+          {
+            label: "托运行李",
+            options: [
+              ["check one bag"],
+              ["check a bag"],
+              ["check in a bag"],
+              ["checked bag"],
+            ],
+          },
+          {
+            label: "随身行李",
+            options: [["carry-on"], ["carry on"], ["hand luggage"]],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt:
+          "Your gate is B12, and boarding starts at 10:40. Any questions?",
+        promptZh: "您的登机口是 B12，10:40 开始登机。有什么问题吗？",
+        sample:
+          "Yes, could you tell me where security is and how long it usually takes?",
+        sampleZh: "有，可以告诉我安检口在哪里，一般需要多长时间吗？",
+        keywords: [
+          {
+            label: "询问安检",
+            options: [["security"], ["security check"], ["security line"]],
+          },
+          {
+            label: "询问时间",
+            options: [["how long"], ["how many minutes"], ["what time"]],
+          },
+          {
+            label: "礼貌提问",
+            options: [
+              ["could you tell me"],
+              ["can you tell me"],
+              ["do you know"],
+              ["where is"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "shopping",
+    title: "商店退换货",
+    titleEn: "Returning an Item",
+    category: "生活",
+    level: "入门",
+    summary: "说明退换需求、出示凭证并确认退款方式。",
+    turns: [
+      {
+        speaker: "Assistant",
+        prompt: "Hi, how can I help you today?",
+        promptZh: "你好，今天需要什么帮助？",
+        sample: "Hi, I'd like to return this jacket. I bought it last week.",
+        sampleZh: "你好，我想退这件夹克。我上周买的。",
+        keywords: [
+          {
+            label: "说明退换",
+            options: [["return"], ["refund"], ["exchange"]],
+          },
+          {
+            label: "说明商品",
+            options: [["jacket"], ["shirt"], ["shoes"], ["coat"]],
+          },
+          {
+            label: "说明购买时间",
+            options: [
+              ["last week"],
+              ["yesterday"],
+              ["a few days ago"],
+              ["last month"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Assistant",
+        prompt: "Do you have the receipt with you?",
+        promptZh: "您带收据了吗？",
+        sample: "Yes, I have the receipt here, and I paid by card.",
+        sampleZh: "带了，收据在这里，我是刷卡付款的。",
+        keywords: [
+          {
+            label: "提供收据",
+            options: [["receipt"], ["proof of purchase"], ["order number"]],
+          },
+          {
+            label: "说明付款方式",
+            options: [["card"], ["cash"], ["apple pay"], ["credit card"]],
+          },
+        ],
+      },
+      {
+        speaker: "Assistant",
+        prompt: "Would you like a refund or store credit?",
+        promptZh: "您想退款还是换成店内额度？",
+        sample:
+          "I'd prefer a refund, please. Also, is there anything I need to sign?",
+        sampleZh: "我希望退款，谢谢。另外，有需要我签字的地方吗？",
+        keywords: [
+          {
+            label: "选择方案",
+            options: [["refund"], ["store credit"], ["gift card"], ["exchange"]],
+          },
+          {
+            label: "询问手续",
+            options: [
+              ["need to sign"],
+              ["fill in a form"],
+              ["fill out a form"],
+              ["what next"],
+            ],
+          },
+          {
+            label: "礼貌请求",
+            options: [["please"], ["i'd prefer"], ["could you"], ["would you"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "renting",
+    title: "租房看房",
+    titleEn: "Viewing an Apartment",
+    category: "生活",
+    level: "进阶",
+    summary: "说明需求、谈租金押金并检查房屋设施。",
+    turns: [
+      {
+        speaker: "Agent",
+        prompt:
+          "Thanks for coming. So, what kind of place are you looking for?",
+        promptZh: "谢谢你来。你想找什么样的房子？",
+        sample: "I'm looking for a one-bedroom apartment near the subway.",
+        sampleZh: "我在找一套靠近地铁的一居室。",
+        keywords: [
+          {
+            label: "说明房型",
+            options: [
+              ["one-bedroom"],
+              ["studio"],
+              ["two-bedroom"],
+              ["shared apartment"],
+            ],
+          },
+          {
+            label: "说明位置",
+            options: [
+              ["near the subway"],
+              ["near the station"],
+              ["city centre"],
+              ["city center"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt:
+          "The rent is 3,200 yuan a month, and utilities are not included. Does that work for you?",
+        promptZh: "房租每月 3200 元，水电另算。这个价格可以接受吗？",
+        sample:
+          "That's a little high for me. Could you tell me what the deposit is?",
+        sampleZh: "对我来说有点贵。可以告诉我押金是多少吗？",
+        keywords: [
+          {
+            label: "回应租金",
+            options: [
+              ["a little high"],
+              ["a bit expensive"],
+              ["that works"],
+              ["within my budget"],
+            ],
+          },
+          {
+            label: "询问押金",
+            options: [["deposit"], ["advance payment"], ["agency fee"]],
+          },
+        ],
+      },
+      {
+        speaker: "Agent",
+        prompt:
+          "The deposit is one month's rent, and the lease is one year. Anything else?",
+        promptZh: "押金是一个月房租，租期一年。还有别的问题吗？",
+        sample:
+          "Yes, can I see the kitchen and check whether the water pressure is good?",
+        sampleZh: "有，我可以看看厨房，顺便检查一下水压好不好吗？",
+        keywords: [
+          {
+            label: "要求看房",
+            options: [
+              ["see the kitchen"],
+              ["see the bathroom"],
+              ["look around"],
+              ["see the bedroom"],
+            ],
+          },
+          {
+            label: "检查设施",
+            options: [
+              ["water pressure"],
+              ["hot water"],
+              ["air conditioning"],
+              ["heating"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ielts-part-1",
+    title: "雅思 Part 1 日常问答",
+    titleEn: "IELTS Speaking Part 1",
+    category: "雅思口语",
+    level: "Part 1",
+    summary: "简短问答日常话题，练习自然展开两三句。",
+    turns: [
+      {
+        speaker: "Examiner",
+        prompt:
+          "Let's talk about where you live. Do you live in a house or an apartment?",
+        promptZh: "我们聊聊你的住所。你住在独栋房子还是公寓里？",
+        sample: "I live in an apartment in the city centre with my family.",
+        sampleZh: "我和家人住在市中心的一套公寓里。",
+        keywords: [
+          {
+            label: "说明住所",
+            options: [["apartment"], ["house"], ["flat"]],
+          },
+          {
+            label: "说明同住情况",
+            options: [
+              ["with my family"],
+              ["on my own"],
+              ["with my parents"],
+              ["with friends"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "What do you like most about your neighbourhood?",
+        promptZh: "你最喜欢所在社区的哪一点？",
+        sample:
+          "I like that it's quiet and convenient, because there are shops and a park nearby.",
+        sampleZh: "我喜欢这里安静又方便，因为附近有商店和公园。",
+        keywords: [
+          {
+            label: "描述优点",
+            options: [["quiet"], ["convenient"], ["friendly"], ["green"]],
+          },
+          {
+            label: "给出原因",
+            options: [["because"], ["since"], ["that's why"], ["as a result"]],
+          },
+          {
+            label: "举例说明",
+            options: [["there are"], ["for example"], ["such as"], ["there is"]],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "How long have you lived there?",
+        promptZh: "你在那里住了多久？",
+        sample:
+          "I've lived there for about five years, ever since I started university.",
+        sampleZh: "我在那里住了大约五年，从上大学开始就住那儿。",
+        keywords: [
+          {
+            label: "说明时长",
+            options: [
+              ["for about five years"],
+              ["for ten years"],
+              ["since 2018"],
+              ["for a long time"],
+            ],
+          },
+          {
+            label: "使用完成时",
+            options: [["i've lived"], ["i have lived"], ["i've been living"]],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ielts-part-2",
+    title: "雅思 Part 2 个人陈述",
+    titleEn: "IELTS Speaking Part 2",
+    category: "雅思口语",
+    level: "Part 2",
+    summary: "按题卡连续陈述，补充细节并回应追问。",
+    turns: [
+      {
+        speaker: "Examiner",
+        prompt:
+          "Describe a skill you learned recently. You have one minute to prepare. Start when you're ready.",
+        promptZh:
+          "请描述一项你最近学会的技能。你有一分钟准备时间，准备好了就开始。",
+        sample:
+          "I'd like to talk about learning to cook, which I started about six months ago.",
+        sampleZh: "我想聊聊学做饭这件事，大约六个月前开始学的。",
+        keywords: [
+          {
+            label: "引入主题",
+            options: [
+              ["i'd like to talk about"],
+              ["i want to talk about"],
+              ["i'm going to talk about"],
+            ],
+          },
+          {
+            label: "说明时间",
+            options: [
+              ["six months ago"],
+              ["last year"],
+              ["a few weeks ago"],
+              ["recently"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "Who taught you, and why did you choose this skill?",
+        promptZh: "是谁教你的？你为什么选择学这项技能？",
+        sample:
+          "My mother taught me, because I wanted to eat healthier food instead of takeaway.",
+        sampleZh:
+          "是我妈妈教我的，因为我想吃得更健康，而不是总点外卖。",
+        keywords: [
+          {
+            label: "说明人物",
+            options: [["my mother"], ["my friend"], ["a teacher"], ["my brother"]],
+          },
+          {
+            label: "说明原因",
+            options: [["because"], ["since"], ["that's why"], ["as"]],
+          },
+          {
+            label: "对比细节",
+            options: [["instead of takeaway"], ["rather than"], ["compared with"]],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "How has this skill changed your daily life?",
+        promptZh: "这项技能怎样改变了你的日常生活？",
+        sample:
+          "It has saved me money, and I feel more confident when I invite friends over.",
+        sampleZh:
+          "它帮我省了钱，而且请朋友来家里吃饭时我更有自信了。",
+        keywords: [
+          {
+            label: "说明影响",
+            options: [
+              ["saved me money"],
+              ["helped me relax"],
+              ["changed my routine"],
+              ["made me healthier"],
+            ],
+          },
+          {
+            label: "加入细节",
+            options: [
+              ["when i invite friends"],
+              ["every weekend"],
+              ["after work"],
+              ["at home"],
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ielts-part-3",
+    title: "雅思 Part 3 深入讨论",
+    titleEn: "IELTS Speaking Part 3",
+    category: "雅思口语",
+    level: "Part 3",
+    summary: "围绕社会话题展开观点、举例并做出预测。",
+    turns: [
+      {
+        speaker: "Examiner",
+        prompt:
+          "Why do you think some people find it hard to change their habits?",
+        promptZh: "你觉得为什么有些人很难改变习惯？",
+        sample:
+          "In my view, people struggle because habits give them comfort and changing takes effort.",
+        sampleZh:
+          "在我看来，人们之所以难以改变，是因为习惯让人感到舒适，而改变需要付出努力。",
+        keywords: [
+          {
+            label: "表达观点",
+            options: [
+              ["in my view"],
+              ["i think"],
+              ["it seems to me"],
+              ["from my perspective"],
+            ],
+          },
+          {
+            label: "给出原因",
+            options: [["because"], ["since"], ["due to"], ["as"]],
+          },
+          {
+            label: "补充说明",
+            options: [
+              ["takes effort"],
+              ["hard work"],
+              ["need patience"],
+              ["not easy"],
+            ],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt:
+          "How could schools encourage healthier habits among students?",
+        promptZh: "学校可以怎样鼓励学生养成更健康的习惯？",
+        sample:
+          "Schools could offer more sports clubs, and for example they could teach cooking classes.",
+        sampleZh:
+          "学校可以提供更多运动社团，比如可以开设烹饪课。",
+        keywords: [
+          {
+            label: "提出建议",
+            options: [
+              ["could offer"],
+              ["should provide"],
+              ["might introduce"],
+              ["need to give"],
+            ],
+          },
+          {
+            label: "举例说明",
+            options: [["for example"], ["such as"], ["for instance"]],
+          },
+        ],
+      },
+      {
+        speaker: "Examiner",
+        prompt: "Do you think habits will change in the future? Why?",
+        promptZh: "你认为未来人们的习惯会改变吗？为什么？",
+        sample:
+          "I believe technology will help, but I think people will still need support from their families.",
+        sampleZh:
+          "我相信科技会有帮助，但我觉得人们仍然需要家人的支持。",
+        keywords: [
+          {
+            label: "表达预测",
+            options: [
+              ["will help"],
+              ["will change"],
+              ["are going to"],
+              ["i believe"],
+            ],
+          },
+          {
+            label: "平衡观点",
+            options: [["but"], ["however"], ["on the other hand"], ["still need"]],
+          },
+        ],
+      },
+    ],
+  },
+];
+const wordLookupCache = new Map();
+let activeWordButton = null;
+let wordLookupRequestId = 0;
+let practiceRecognition = null;
+let practiceMediaRecorder = null;
+let practiceMediaStream = null;
+let practiceAudioChunks = [];
+let practiceApiAbortController = null;
+let speechVoiceCache = [];
+let freeChatRequestId = 0;
+const realtimeVoice = {
+  recognition: null,
+  silenceTimer: 0,
+  restartTimer: 0,
+  speechTimer: 0,
+  speechToken: 0,
+  finalText: "",
+  interimText: "",
+  restartCount: 0,
+  stopRequested: false,
+};
+
+const state = {
+  resources: [],
+  categories: [],
+  decks: new Map(),
+  deckPromises: new Map(),
+  deckErrors: new Map(),
+  decksReady: false,
+  decksError: "",
+  backgroundPreloadStarted: false,
+  resourceActivationToken: 0,
+  collapsedCategories: new Set(),
+  collapseOverrides: new Map(),
+  activeResourceId: "",
+  activeUnitIndex: -1,
+  known: new Set(),
+  favorites: new Set(),
+  unknown: new Set(),
+  view: "all",
+  query: "",
+  materialQuery: "",
+  mobileLibraryExpanded: false,
+  favoriteCategory: "all",
+  unknownCategory: "all",
+  ankiExportCategory: "all",
+  ankiExportSection: "all",
+  ankiExportStatus: "",
+  ankiExportStatusType: "",
+  openSourceFilter: "all",
+  openSourceQuery: "",
+  showAllMeanings: false,
+  meaningReveals: new Set(),
+  meaningHides: new Set(),
+  user: "",
+  isAdmin: false,
+  authMode: "login",
+  sessionMode: "server",
+  registration: null,
+  practiceActive: false,
+  practiceSection: "shadow",
+  practiceIndex: 0,
+  practiceRate: 0.9,
+  practiceVoice: "auto",
+  practiceListening: false,
+  practiceTranscribing: false,
+  practiceTranscript: "",
+  practiceFinalTranscript: "",
+  practiceInterimTranscript: "",
+  practiceStatusText: "准备开始",
+  practiceMessage: "",
+  practiceMessageType: "",
+  practiceResult: null,
+  practiceHistory: [],
+  practiceRecognitionMode: "browser",
+  practiceApiUrl: "",
+  practiceApiModel: "",
+  practiceApiKey: "",
+  practiceApiAuth: "bearer",
+  dialogueScenarioId: DIALOGUE_SCENARIOS[0].id,
+  dialogueTurnIndex: 0,
+  dialogueInput: "",
+  dialogueHintVisible: false,
+  dialogueMessages: [],
+  dialogueResult: null,
+  dialogueScenarioFilter: "all",
+  speakingPacksLoaded: false,
+  speakingPacksLoading: false,
+  speakingScenarios: [],
+  ieltsLoading: false,
+  ieltsStep: "intro",
+  ieltsPart1Index: 0,
+  ieltsPart2Id: "",
+  ieltsPart3Index: 0,
+  ieltsQuestions: { part1: [], part3: [] },
+  ieltsAnswers: [],
+  ieltsInput: "",
+  ieltsHintVisible: false,
+  ieltsMessage: "",
+  ieltsMessageType: "",
+  ieltsTimerEndsAt: 0,
+  ieltsTimerLabel: "",
+  ieltsReport: null,
+  freeTopic: "daily",
+  freeTopicHistory: [],
+  freeUsedTopics: new Set(),
+  freeAutoSpeak: true,
+  freeInput: "",
+  freeHintVisible: false,
+  freeMessages: [],
+  freeTurnCount: 0,
+  freeChatMode: "local",
+  freeChatLoading: false,
+  freeChatApiUrl: "",
+  freeChatApiModel: "",
+  freeChatApiKey: "",
+  freeChatApiAuth: "bearer",
+  freeChatApiMessage: "",
+  freeChatApiMessageType: "",
+  realtimeActive: false,
+  realtimePhase: "idle",
+  realtimeTranscript: "",
+  realtimeMessage: "",
+  realtimeMessageType: "",
+  freeUsedLines: new Set(),
+  reviewActive: false,
+  reviewCategory: "all",
+  reviewSection: "all",
+  reviewUnitKey: "all",
+  reviewNewLimit: 20,
+  reviewProgress: {},
+  reviewDaily: { date: "", reviewedKeys: [], newKeys: [] },
+  reviewQueue: [],
+  reviewQueueIndex: 0,
+  reviewRevealed: false,
+  reviewSessionDone: 0,
+  reviewMessage: "",
+  reviewMessageType: "",
+};
+
+const elements = {
+  loginView: document.querySelector("#loginView"),
+  loginForm: document.querySelector("#loginForm"),
+  loginButton: document.querySelector("#loginButton"),
+  loginError: document.querySelector("#loginError"),
+  authKicker: document.querySelector("#authKicker"),
+  authTitle: document.querySelector("#authTitle"),
+  authCopy: document.querySelector("#authCopy"),
+  authModeLogin: document.querySelector("#authModeLogin"),
+  authModeRegister: document.querySelector("#authModeRegister"),
+  authNotice: document.querySelector("#authNotice"),
+  authMirror: document.querySelector("#authMirror"),
+  authMirrorLink: document.querySelector("#authMirrorLink"),
+  emailField: document.querySelector("#emailField"),
+  email: document.querySelector("#email"),
+  forgotPasswordButton: document.querySelector("#forgotPasswordButton"),
+  passwordHint: document.querySelector("#passwordHint"),
+  inviteField: document.querySelector("#inviteField"),
+  inviteCode: document.querySelector("#inviteCode"),
+  username: document.querySelector("#username"),
+  password: document.querySelector("#password"),
+  resetForm: document.querySelector("#resetForm"),
+  resetAccount: document.querySelector("#resetAccount"),
+  resetRequestButton: document.querySelector("#resetRequestButton"),
+  resetRequestMessage: document.querySelector("#resetRequestMessage"),
+  resetTokenFields: document.querySelector("#resetTokenFields"),
+  resetToken: document.querySelector("#resetToken"),
+  resetNewPassword: document.querySelector("#resetNewPassword"),
+  resetSubmitButton: document.querySelector("#resetSubmitButton"),
+  resetError: document.querySelector("#resetError"),
+  resetBackButton: document.querySelector("#resetBackButton"),
+  passwordVisibilityButton: document.querySelector(
+    "#passwordVisibilityButton",
+  ),
+  appView: document.querySelector("#appView"),
+  userLabel: document.querySelector("#userLabel"),
+  adminLink: document.querySelector("#adminLink"),
+  logoutButton: document.querySelector("#logoutButton"),
+  libraryPanel: document.querySelector(".library-panel"),
+  libraryToggleButton: document.querySelector("#libraryToggleButton"),
+  libraryToggleMeta: document.querySelector("#libraryToggleMeta"),
+  libraryCollapseAllButton: document.querySelector(
+    "#libraryCollapseAllButton",
+  ),
+  resourceCount: document.querySelector("#resourceCount"),
+  materialSearchInput: document.querySelector("#materialSearchInput"),
+  resourceList: document.querySelector("#resourceList"),
+  backToLibraryButton: document.querySelector("#backToLibraryButton"),
+  workspace: document.querySelector(".workspace"),
+  activeTitle: document.querySelector("#activeTitle"),
+  activeDescription: document.querySelector("#activeDescription"),
+  progressRing: document.querySelector("#progressRing"),
+  progressPercent: document.querySelector("#progressPercent"),
+  progressText: document.querySelector("#progressText"),
+  vocabularyToolbar: document.querySelector("#vocabularyToolbar"),
+  reviewButton: document.querySelector("#reviewButton"),
+  reviewStudio: document.querySelector("#reviewStudio"),
+  reviewExitButton: document.querySelector("#reviewExitButton"),
+  reviewSource: document.querySelector("#reviewSource"),
+  reviewCategory: document.querySelector("#reviewCategory"),
+  reviewSection: document.querySelector("#reviewSection"),
+  reviewUnit: document.querySelector("#reviewUnit"),
+  reviewNewLimit: document.querySelector("#reviewNewLimit"),
+  reviewRestartButton: document.querySelector("#reviewRestartButton"),
+  reviewExportButton: document.querySelector("#reviewExportButton"),
+  reviewImportButton: document.querySelector("#reviewImportButton"),
+  reviewImportInput: document.querySelector("#reviewImportInput"),
+  reviewClearButton: document.querySelector("#reviewClearButton"),
+  reviewDueCount: document.querySelector("#reviewDueCount"),
+  reviewNewCount: document.querySelector("#reviewNewCount"),
+  reviewDoneCount: document.querySelector("#reviewDoneCount"),
+  reviewTotalCount: document.querySelector("#reviewTotalCount"),
+  reviewCardScope: document.querySelector("#reviewCardScope"),
+  reviewCardProgress: document.querySelector("#reviewCardProgress"),
+  reviewCardSentence: document.querySelector("#reviewCardSentence"),
+  reviewCardPrompt: document.querySelector("#reviewCardPrompt"),
+  reviewCardAnswer: document.querySelector("#reviewCardAnswer"),
+  reviewCardPhrase: document.querySelector("#reviewCardPhrase"),
+  reviewCardPhonetic: document.querySelector("#reviewCardPhonetic"),
+  reviewCardMeaning: document.querySelector("#reviewCardMeaning"),
+  reviewCardTranslation: document.querySelector("#reviewCardTranslation"),
+  reviewSpeakButton: document.querySelector("#reviewSpeakButton"),
+  reviewShowButton: document.querySelector("#reviewShowButton"),
+  reviewMarkActions: document.querySelector("#reviewMarkActions"),
+  reviewUnknownButton: document.querySelector("#reviewUnknownButton"),
+  reviewKnownButton: document.querySelector("#reviewKnownButton"),
+  reviewGradeActions: document.querySelector("#reviewGradeActions"),
+  reviewGradeButtons: document.querySelectorAll("[data-review-grade]"),
+  reviewIntervalAgain: document.querySelector("#reviewIntervalAgain"),
+  reviewIntervalHard: document.querySelector("#reviewIntervalHard"),
+  reviewIntervalGood: document.querySelector("#reviewIntervalGood"),
+  reviewIntervalEasy: document.querySelector("#reviewIntervalEasy"),
+  reviewStatus: document.querySelector("#reviewStatus"),
+  welcomeOverlay: document.querySelector("#welcomeOverlay"),
+  searchInput: document.querySelector("#searchInput"),
+  showAllMeaningsButton: document.querySelector("#showAllMeaningsButton"),
+  hideAllMeaningsButton: document.querySelector("#hideAllMeaningsButton"),
+  ankiExportButton: document.querySelector("#ankiExportButton"),
+  ankiExportPanel: document.querySelector("#ankiExportPanel"),
+  openSourceButton: document.querySelector("#openSourceButton"),
+  openSourcePanel: document.querySelector("#openSourcePanel"),
+  openSourceCard: document.querySelector("#openSourceCard"),
+  openSourceClose: document.querySelector("#openSourceClose"),
+  openSourceForm: document.querySelector("#openSourceForm"),
+  openSourceQuery: document.querySelector("#openSourceQuery"),
+  openSourceFilters: document.querySelector("#openSourceFilters"),
+  openSourceStatus: document.querySelector("#openSourceStatus"),
+  openSourceList: document.querySelector("#openSourceList"),
+  ankiExportCloseButton: document.querySelector(
+    "#ankiExportCloseButton",
+  ),
+  ankiExportCategory: document.querySelector("#ankiExportCategory"),
+  ankiExportSection: document.querySelector("#ankiExportSection"),
+  ankiExportCount: document.querySelector("#ankiExportCount"),
+  ankiExportScope: document.querySelector("#ankiExportScope"),
+  ankiExportDownloadButton: document.querySelector(
+    "#ankiExportDownloadButton",
+  ),
+  ankiExportStatus: document.querySelector("#ankiExportStatus"),
+  viewSwitcher: document.querySelector("#viewSwitcher"),
+  viewButtons: document.querySelectorAll("[data-view]"),
+  collectionFilters: document.querySelector("#collectionFilters"),
+  collectionFilterLabel: document.querySelector("#collectionFilterLabel"),
+  collectionFilterList: document.querySelector("#collectionFilterList"),
+  favoriteCount: document.querySelector("#favoriteCount"),
+  unknownCount: document.querySelector("#unknownCount"),
+  visibleCount: document.querySelector("#visibleCount"),
+  cardGrid: document.querySelector("#cardGrid"),
+  emptyState: document.querySelector("#emptyState"),
+  footerResource: document.querySelector("#footerResource"),
+  practiceButton: document.querySelector("#practiceButton"),
+  practiceStudio: document.querySelector("#practiceStudio"),
+  practiceShadowTab: document.querySelector("#practiceShadowTab"),
+  practiceDialogueTab: document.querySelector("#practiceDialogueTab"),
+  practiceFreeTab: document.querySelector("#practiceFreeTab"),
+  practiceIeltsTab: document.querySelector("#practiceIeltsTab"),
+  practiceHeading: document.querySelector("#practiceHeading"),
+  practiceSource: document.querySelector("#practiceSource"),
+  practiceExitButton: document.querySelector("#practiceExitButton"),
+  practiceCounter: document.querySelector("#practiceCounter"),
+  practiceStatus: document.querySelector("#practiceStatus"),
+  practiceTarget: document.querySelector("#practiceTarget"),
+  practiceTranslation: document.querySelector("#practiceTranslation"),
+  practiceRate: document.querySelector("#practiceRate"),
+  practiceVoice: document.querySelector("#practiceVoice"),
+  practiceVoiceStatus: document.querySelector("#practiceVoiceStatus"),
+  practiceListenButton: document.querySelector("#practiceListenButton"),
+  practiceRecordButton: document.querySelector("#practiceRecordButton"),
+  practiceStopButton: document.querySelector("#practiceStopButton"),
+  practiceRecognitionState: document.querySelector(
+    "#practiceRecognitionState",
+  ),
+  practiceTranscript: document.querySelector("#practiceTranscript"),
+  practiceNotice: document.querySelector("#practiceNotice"),
+  practiceResult: document.querySelector("#practiceResult"),
+  practiceScore: document.querySelector("#practiceScore"),
+  practiceFeedback: document.querySelector("#practiceFeedback"),
+  practiceTargetDiff: document.querySelector("#practiceTargetDiff"),
+  practiceExtraWords: document.querySelector("#practiceExtraWords"),
+  practiceRetryButton: document.querySelector("#practiceRetryButton"),
+  practiceNextButton: document.querySelector("#practiceNextButton"),
+  practicePreviousButton: document.querySelector(
+    "#practicePreviousButton",
+  ),
+  practiceShuffleButton: document.querySelector("#practiceShuffleButton"),
+  shadowPracticeView: document.querySelector("#shadowPracticeView"),
+  dialoguePracticeView: document.querySelector("#dialoguePracticeView"),
+  dialogueScenarioMeta: document.querySelector("#dialogueScenarioMeta"),
+  dialogueScenarioList: document.querySelector("#dialogueScenarioList"),
+  dialogueScenarioFilters: document.querySelector("#dialogueScenarioFilters"),
+  dialoguePartnerLabel: document.querySelector("#dialoguePartnerLabel"),
+  dialogueScenarioTitle: document.querySelector("#dialogueScenarioTitle"),
+  dialogueTurnCounter: document.querySelector("#dialogueTurnCounter"),
+  dialogueMessages: document.querySelector("#dialogueMessages"),
+  dialogueAnswerInput: document.querySelector("#dialogueAnswerInput"),
+  dialogueRealtimeButton: document.querySelector("#dialogueRealtimeButton"),
+  dialogueRealtimeStatus: document.querySelector("#dialogueRealtimeStatus"),
+  dialogueListenButton: document.querySelector("#dialogueListenButton"),
+  dialogueHintButton: document.querySelector("#dialogueHintButton"),
+  dialogueRecordButton: document.querySelector("#dialogueRecordButton"),
+  dialogueStopButton: document.querySelector("#dialogueStopButton"),
+  dialogueSubmitButton: document.querySelector("#dialogueSubmitButton"),
+  dialogueHint: document.querySelector("#dialogueHint"),
+  dialogueNotice: document.querySelector("#dialogueNotice"),
+  dialogueResult: document.querySelector("#dialogueResult"),
+  dialogueScore: document.querySelector("#dialogueScore"),
+  dialogueFeedback: document.querySelector("#dialogueFeedback"),
+  dialogueKeyPoints: document.querySelector("#dialogueKeyPoints"),
+  dialogueCoachLevel: document.querySelector("#dialogueCoachLevel"),
+  dialogueCoachMessage: document.querySelector("#dialogueCoachMessage"),
+  dialogueCoachTips: document.querySelector("#dialogueCoachTips"),
+  dialogueCoachTask: document.querySelector("#dialogueCoachTask"),
+  dialogueSampleAnswer: document.querySelector("#dialogueSampleAnswer"),
+  dialogueRetryButton: document.querySelector("#dialogueRetryButton"),
+  dialogueNextButton: document.querySelector("#dialogueNextButton"),
+  ieltsPracticeView: document.querySelector("#ieltsPracticeView"),
+  ieltsModeSummary: document.querySelector("#ieltsModeSummary"),
+  ieltsTimer: document.querySelector("#ieltsTimer"),
+  ieltsProgress: document.querySelector("#ieltsProgress"),
+  ieltsCardSelect: document.querySelector("#ieltsCardSelect"),
+  ieltsStartButton: document.querySelector("#ieltsStartButton"),
+  ieltsPrepSkipButton: document.querySelector("#ieltsPrepSkipButton"),
+  ieltsRestartButton: document.querySelector("#ieltsRestartButton"),
+  ieltsIntroPanel: document.querySelector("#ieltsIntroPanel"),
+  ieltsPromptBlock: document.querySelector("#ieltsPromptBlock"),
+  ieltsPartLabel: document.querySelector("#ieltsPartLabel"),
+  ieltsPrompt: document.querySelector("#ieltsPrompt"),
+  ieltsPromptZh: document.querySelector("#ieltsPromptZh"),
+  ieltsBullets: document.querySelector("#ieltsBullets"),
+  ieltsAnswerBlock: document.querySelector("#ieltsAnswerBlock"),
+  ieltsAnswerInput: document.querySelector("#ieltsAnswerInput"),
+  ieltsPlayButton: document.querySelector("#ieltsPlayButton"),
+  ieltsHintButton: document.querySelector("#ieltsHintButton"),
+  ieltsRecordButton: document.querySelector("#ieltsRecordButton"),
+  ieltsStopButton: document.querySelector("#ieltsStopButton"),
+  ieltsSubmitButton: document.querySelector("#ieltsSubmitButton"),
+  ieltsHint: document.querySelector("#ieltsHint"),
+  ieltsNotice: document.querySelector("#ieltsNotice"),
+  ieltsReport: document.querySelector("#ieltsReport"),
+  ieltsReportTitle: document.querySelector("#ieltsReportTitle"),
+  ieltsReportOverall: document.querySelector("#ieltsReportOverall"),
+  ieltsReportSummary: document.querySelector("#ieltsReportSummary"),
+  ieltsReportParts: document.querySelector("#ieltsReportParts"),
+  ieltsReportDimensions: document.querySelector("#ieltsReportDimensions"),
+  freePracticeView: document.querySelector("#freePracticeView"),
+  freeModeSummary: document.querySelector("#freeModeSummary"),
+  freeTurnCounter: document.querySelector("#freeTurnCounter"),
+  freeTopic: document.querySelector("#freeTopic"),
+  freeAutoSpeak: document.querySelector("#freeAutoSpeak"),
+  freeRestartButton: document.querySelector("#freeRestartButton"),
+  freeMessages: document.querySelector("#freeMessages"),
+  freeAnswerInput: document.querySelector("#freeAnswerInput"),
+  freeRealtimeButton: document.querySelector("#freeRealtimeButton"),
+  freeRealtimeStatus: document.querySelector("#freeRealtimeStatus"),
+  freeListenButton: document.querySelector("#freeListenButton"),
+  freeHintButton: document.querySelector("#freeHintButton"),
+  freeRecordButton: document.querySelector("#freeRecordButton"),
+  freeStopButton: document.querySelector("#freeStopButton"),
+  freeSubmitButton: document.querySelector("#freeSubmitButton"),
+  freeHint: document.querySelector("#freeHint"),
+  freeNotice: document.querySelector("#freeNotice"),
+  freeServiceSettings: document.querySelector("#freeServiceSettings"),
+  freeChatModeStatus: document.querySelector("#freeChatModeStatus"),
+  freeChatMode: document.querySelector("#freeChatMode"),
+  freeChatApiFields: document.querySelector("#freeChatApiFields"),
+  freeChatApiUrl: document.querySelector("#freeChatApiUrl"),
+  freeChatApiModel: document.querySelector("#freeChatApiModel"),
+  freeChatApiKey: document.querySelector("#freeChatApiKey"),
+  freeChatApiAuth: document.querySelector("#freeChatApiAuth"),
+  freeChatApiSaveButton: document.querySelector("#freeChatApiSaveButton"),
+  freeChatApiStatus: document.querySelector("#freeChatApiStatus"),
+  practiceClearButton: document.querySelector("#practiceClearButton"),
+  practiceModeStatus: document.querySelector("#practiceModeStatus"),
+  practiceMode: document.querySelector("#practiceMode"),
+  practiceApiFields: document.querySelector("#practiceApiFields"),
+  practiceApiUrl: document.querySelector("#practiceApiUrl"),
+  practiceApiModel: document.querySelector("#practiceApiModel"),
+  practiceApiKey: document.querySelector("#practiceApiKey"),
+  practiceApiAuth: document.querySelector("#practiceApiAuth"),
+  practiceApiSaveButton: document.querySelector(
+    "#practiceApiSaveButton",
+  ),
+  practiceApiStatus: document.querySelector("#practiceApiStatus"),
+  practiceAttemptCount: document.querySelector("#practiceAttemptCount"),
+  practiceSentenceCount: document.querySelector("#practiceSentenceCount"),
+  practiceAverageScore: document.querySelector("#practiceAverageScore"),
+  practiceBestScore: document.querySelector("#practiceBestScore"),
+  practiceHistory: document.querySelector("#practiceHistory"),
+  wordPopover: document.querySelector("#wordPopover"),
+  wordPopoverWord: document.querySelector("#wordPopoverWord"),
+  wordPopoverPhonetic: document.querySelector("#wordPopoverPhonetic"),
+  wordPopoverContent: document.querySelector("#wordPopoverContent"),
+  wordPopoverClose: document.querySelector("#wordPopoverClose"),
+};
+
+function normalizeText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("zh-CN");
+}
+
+function compareCategoryNames(left, right) {
+  const leftIndex = CATEGORY_ORDER.indexOf(left);
+  const rightIndex = CATEGORY_ORDER.indexOf(right);
+
+  if (leftIndex >= 0 && rightIndex >= 0) {
+    return leftIndex - rightIndex;
+  }
+  if (leftIndex >= 0) {
+    return -1;
+  }
+  if (rightIndex >= 0) {
+    return 1;
+  }
+  return left.localeCompare(right, "zh-CN");
+}
+
+
+
+function restoreMarks() {
+  state.known = restoreSet(STORAGE_KEY);
+  state.favorites = restoreSet(FAVORITES_STORAGE_KEY);
+  state.unknown = restoreSet(UNKNOWN_STORAGE_KEY);
+}
+
+function restoreLibraryCollapse() {
+  state.collapsedCategories = restoreSet(COLLAPSED_CATEGORIES_STORAGE_KEY);
+}
+
+function persistLibraryCollapse() {
+  persistSet(COLLAPSED_CATEGORIES_STORAGE_KEY, state.collapsedCategories);
+}
+
+function isCategoryCollapsed(name) {
+  return state.collapsedCategories.has(String(name || ""));
+}
+
+function isCategoryCollapsedInView(name, searching) {
+  const categoryName = String(name || "");
+  if (searching && state.collapseOverrides.has(categoryName)) {
+    return Boolean(state.collapseOverrides.get(categoryName));
+  }
+  return searching ? false : isCategoryCollapsed(categoryName);
+}
+
+function setCategoryCollapsed(name, collapsed) {
+  const categoryName = String(name || "");
+  if (!categoryName) {
+    return;
+  }
+  if (collapsed) {
+    state.collapsedCategories.add(categoryName);
+  } else {
+    state.collapsedCategories.delete(categoryName);
+  }
+  persistLibraryCollapse();
+}
+
+function setCategoriesCollapsed(names, collapsed) {
+  names.forEach((name) => {
+    const categoryName = String(name || "");
+    if (!categoryName) {
+      return;
+    }
+    if (collapsed) {
+      state.collapsedCategories.add(categoryName);
+    } else {
+      state.collapsedCategories.delete(categoryName);
+    }
+  });
+  persistLibraryCollapse();
+}
+
+function getItemMark(itemKey) {
+  if (state.known.has(itemKey)) {
+    return "known";
+  }
+  if (state.unknown.has(itemKey)) {
+    return "unknown";
+  }
+  return "";
+}
+
+function toggleItemMark(itemKey, mark) {
+  const isActive = getItemMark(itemKey) === mark;
+  setItemMark(itemKey, isActive ? "" : mark);
+}
+
+function setItemMark(itemKey, mark) {
+  state.known.delete(itemKey);
+  state.unknown.delete(itemKey);
+
+  if (mark === "known") {
+    state.known.add(itemKey);
+  } else if (mark === "unknown") {
+    state.unknown.add(itemKey);
+  }
+
+  persistSet(STORAGE_KEY, state.known);
+  persistSet(UNKNOWN_STORAGE_KEY, state.unknown);
+}
+
+function restorePracticeHistory() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(PRACTICE_HISTORY_STORAGE_KEY) || "[]",
+    );
+    if (!Array.isArray(stored)) {
+      return;
+    }
+
+    state.practiceHistory = stored
+      .filter(
+        (record) =>
+          record &&
+          Number.isFinite(record.accuracy) &&
+          typeof record.target === "string",
+      )
+      .slice(0, 80);
+  } catch {
+    state.practiceHistory = [];
+  }
+}
+
+function persistPracticeHistory() {
+  try {
+    localStorage.setItem(
+      PRACTICE_HISTORY_STORAGE_KEY,
+      JSON.stringify(state.practiceHistory.slice(0, 80)),
+    );
+  } catch {
+    // Practice still works for the current visit when storage is unavailable.
+  }
+}
+
+function restoreFreeConversation() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(FREE_CONVERSATION_STORAGE_KEY) || "[]",
+    );
+    if (!Array.isArray(stored)) {
+      state.freeMessages = [];
+      return;
+    }
+
+    state.freeMessages = stored
+      .filter(
+        (message) =>
+          message &&
+          (message.role === "user" || message.role === "assistant") &&
+          typeof message.english === "string" &&
+          message.english.trim(),
+      )
+      .slice(-40)
+      .map((message) => ({
+        role: message.role,
+        english: message.english.trim(),
+        chinese:
+          typeof message.chinese === "string" ? message.chinese.trim() : "",
+        feedback:
+          message.feedback && typeof message.feedback === "object"
+            ? message.feedback
+            : null,
+        source:
+          typeof message.source === "string" ? message.source : "local",
+        createdAt:
+          typeof message.createdAt === "string" ? message.createdAt : "",
+      }));
+    state.freeTurnCount = state.freeMessages.filter(
+      (message) => message.role === "user",
+    ).length;
+  } catch {
+    state.freeMessages = [];
+    state.freeTurnCount = 0;
+  }
+}
+
+function persistFreeConversation() {
+  try {
+    localStorage.setItem(
+      FREE_CONVERSATION_STORAGE_KEY,
+      JSON.stringify(state.freeMessages.slice(-40)),
+    );
+  } catch {
+    // The current conversation stays available in memory if storage is full.
+  }
+}
+
+function restorePracticeSettings() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(PRACTICE_SETTINGS_STORAGE_KEY) || "{}",
+    );
+    const allowedModes = new Set(["browser", "api", "off"]);
+    const allowedAuthModes = new Set(["bearer", "x-api-key", "none"]);
+    const allowedVoicePreferences = new Set([
+      "auto",
+      "female",
+      "male",
+      "device",
+    ]);
+    const allowedFreeChatModes = new Set(["local", "api", "off"]);
+
+    state.practiceRecognitionMode = allowedModes.has(stored.mode)
+      ? stored.mode
+      : "browser";
+    state.practiceVoice = allowedVoicePreferences.has(stored.voice)
+      ? stored.voice
+      : "auto";
+    state.practiceApiUrl = String(stored.apiUrl || "").trim();
+    state.practiceApiModel = String(stored.apiModel || "").trim();
+    state.practiceApiKey = String(stored.apiKey || "").trim();
+    state.practiceApiAuth = allowedAuthModes.has(stored.apiAuth)
+      ? stored.apiAuth
+      : "bearer";
+    state.freeChatMode = allowedFreeChatModes.has(stored.freeChatMode)
+      ? stored.freeChatMode
+      : "local";
+    state.freeChatApiUrl = String(stored.freeChatApiUrl || "").trim();
+    state.freeChatApiModel = String(stored.freeChatApiModel || "").trim();
+    state.freeChatApiKey = String(stored.freeChatApiKey || "").trim();
+    state.freeChatApiAuth = allowedAuthModes.has(stored.freeChatApiAuth)
+      ? stored.freeChatApiAuth
+      : "bearer";
+    state.freeAutoSpeak = stored.freeAutoSpeak !== false;
+    state.freeTopic = FREE_CHAT_TOPICS[stored.freeTopic]
+      ? stored.freeTopic
+      : "daily";
+  } catch {
+    state.practiceRecognitionMode = "browser";
+    state.practiceVoice = "auto";
+    state.practiceApiUrl = "";
+    state.practiceApiModel = "";
+    state.practiceApiKey = "";
+    state.practiceApiAuth = "bearer";
+    state.freeChatMode = "local";
+    state.freeChatApiUrl = "";
+    state.freeChatApiModel = "";
+    state.freeChatApiKey = "";
+    state.freeChatApiAuth = "bearer";
+    state.freeAutoSpeak = true;
+    state.freeTopic = "daily";
+  }
+}
+
+function persistPracticeSettings() {
+  try {
+    localStorage.setItem(
+      PRACTICE_SETTINGS_STORAGE_KEY,
+      JSON.stringify({
+        mode: state.practiceRecognitionMode,
+        voice: state.practiceVoice,
+        apiUrl: state.practiceApiUrl,
+        apiModel: state.practiceApiModel,
+        apiKey: state.practiceApiKey,
+        apiAuth: state.practiceApiAuth,
+        freeChatMode: state.freeChatMode,
+        freeChatApiUrl: state.freeChatApiUrl,
+        freeChatApiModel: state.freeChatApiModel,
+        freeChatApiKey: state.freeChatApiKey,
+        freeChatApiAuth: state.freeChatApiAuth,
+        freeAutoSpeak: state.freeAutoSpeak,
+        freeTopic: state.freeTopic,
+      }),
+    );
+  } catch {
+    // Settings still apply for the current visit when storage is unavailable.
+  }
+}
+
+function getActiveResource() {
+  return state.resources.find(
+    (resource) => resource.id === state.activeResourceId,
+  );
+}
+
+function isDeckLoaded(resource) {
+  return Boolean(resource && state.decks.has(resource.id));
+}
+
+function isDeckLoading(resource) {
+  return Boolean(resource && state.deckPromises.has(resource.id));
+}
+
+function getDeckError(resource) {
+  return resource ? state.deckErrors.get(resource.id) || "" : "";
+}
+
+function getResourceIndex(resource) {
+  return Math.max(0, state.resources.indexOf(resource));
+}
+
+function loadDeck(resource) {
+  if (!resource || resource.attachment) {
+    return Promise.resolve([]);
+  }
+  if (isDeckLoaded(resource)) {
+    return Promise.resolve(state.decks.get(resource.id));
+  }
+  if (state.deckPromises.has(resource.id)) {
+    return state.deckPromises.get(resource.id);
+  }
+
+  const promise = fetchLibraryDeck(resource, getResourceIndex(resource))
+    .then((items) => {
+      state.decks.set(resource.id, Array.isArray(items) ? items : []);
+      state.deckErrors.delete(resource.id);
+      if (state.activeResourceId === resource.id) {
+        state.decksError = "";
+      }
+      return state.decks.get(resource.id);
+    })
+    .catch((error) => {
+      state.deckErrors.set(
+        resource.id,
+        error?.message || `${resource.title} 加载失败。`,
+      );
+      throw error;
+    })
+    .finally(() => {
+      state.deckPromises.delete(resource.id);
+      if (elements.resourceList && state.resources.length > 0) {
+        renderResourceList();
+      }
+    });
+
+  state.deckPromises.set(resource.id, promise);
+  return promise;
+}
+
+async function preloadRemainingDecks(excludedResourceId = "") {
+  const queue = state.resources.filter(
+    (resource) =>
+      !resource.attachment && resource.id !== excludedResourceId,
+  );
+  let cursor = 0;
+  const workerCount = Math.min(2, queue.length);
+
+  async function worker() {
+    while (cursor < queue.length) {
+      const resource = queue[cursor];
+      cursor += 1;
+      try {
+        await loadDeck(resource);
+      } catch {
+        // A failed background request stays retryable from its resource button.
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: workerCount }, () => worker()),
+  );
+}
+
+function scheduleBackgroundDeckPreload(excludedResourceId = "") {
+  if (state.backgroundPreloadStarted) {
+    return;
+  }
+  state.backgroundPreloadStarted = true;
+
+  const start = () => {
+    void preloadRemainingDecks(excludedResourceId);
+  };
+
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(start, { timeout: 1800 });
+  } else {
+    window.setTimeout(start, 650);
+  }
+}
+
+function getDeckResources() {
+  return state.resources.filter((resource) => !resource.attachment);
+}
+
+function areAllDecksLoaded() {
+  return getDeckResources().every((resource) => isDeckLoaded(resource));
+}
+
+async function ensureResourcesLoaded(resources) {
+  await Promise.allSettled(
+    (Array.isArray(resources) ? resources : [])
+      .filter((resource) => !resource.attachment)
+      .map((resource) => loadDeck(resource)),
+  );
+}
+
+async function ensureAllDecksLoaded() {
+  await ensureResourcesLoaded(getDeckResources());
+}
+
+function getResourceItems(resource) {
+  return resource ? state.decks.get(resource.id) || [] : [];
+}
+
+function getDeckUnits(resource, size = DEFAULT_UNIT_SIZE) {
+  return buildDeckUnits(getResourceItems(resource), size);
+}
+
+function getDeckUnit(resource, unitKey) {
+  return (
+    getDeckUnits(resource).find((unit) => unit.key === unitKey) || null
+  );
+}
+
+function getActiveUnit() {
+  const resource = getActiveResource();
+  if (!resource) {
+    return null;
+  }
+  const unitKey =
+    state.activeUnitIndex < 1
+      ? "all"
+      : `unit-${formatUnitNumber(state.activeUnitIndex)}`;
+  const unit = getDeckUnit(resource, unitKey);
+  return unit?.index > 0 ? unit : null;
+}
+
+function getActiveItems() {
+  const items = getResourceItems(getActiveResource());
+  if (state.activeUnitIndex < 1) {
+    return items;
+  }
+  const start = (state.activeUnitIndex - 1) * DEFAULT_UNIT_SIZE;
+  return items.slice(start, start + DEFAULT_UNIT_SIZE);
+}
+
+
+function isMeaningVisible(itemKey) {
+  return state.showAllMeanings
+    ? !state.meaningHides.has(itemKey)
+    : state.meaningReveals.has(itemKey);
+}
+
+function setAllMeaningsVisible(visible) {
+  state.showAllMeanings = visible;
+  state.meaningReveals.clear();
+  state.meaningHides.clear();
+  render();
+}
+
+function getCollectionEntries(collection, category = "all") {
+  return state.resources
+    .filter(
+      (resource) => category === "all" || resource.category === category,
+    )
+    .flatMap((resource) =>
+      (state.decks.get(resource.id) || [])
+        .filter((item) =>
+          collection.has(getItemKey(resource.id, item)),
+        )
+        .map((item) => ({ item, resource })),
+    );
+}
+
+function getUnknownCategoryDefinitions() {
+  const definitions = getCategoryDefinitions();
+  if (definitions.length) {
+    return definitions;
+  }
+  return [{ name: "未分类素材", sections: [] }];
+}
+
+function resolveUnknownCategory(preferredCategory = "") {
+  const definitions = getUnknownCategoryDefinitions();
+  const names = new Set(definitions.map((category) => category.name));
+  const counts = new Map();
+  getCollectionEntries(state.unknown, "all").forEach(({ resource }) => {
+    counts.set(resource.category, (counts.get(resource.category) || 0) + 1);
+  });
+
+  const preferred = String(preferredCategory || "").trim();
+  if (preferred && names.has(preferred) && counts.get(preferred)) {
+    state.unknownCategory = preferred;
+    return preferred;
+  }
+
+  if (state.unknownCategory !== "all" && names.has(state.unknownCategory)) {
+    return state.unknownCategory;
+  }
+
+  const firstPopulated = definitions.find(
+    (category) => counts.get(category.name),
+  );
+  state.unknownCategory =
+    firstPopulated?.name || definitions[0]?.name || "未分类素材";
+  return state.unknownCategory;
+}
+
+function getBaseEntries() {
+  if (state.view === "favorites") {
+    return getCollectionEntries(state.favorites, state.favoriteCategory);
+  }
+  if (state.view === "unknown") {
+    return getCollectionEntries(state.unknown, resolveUnknownCategory());
+  }
+
+  const resource = getActiveResource();
+  return resource
+    ? getActiveItems().map((item) => ({ item, resource }))
+    : [];
+}
+
+function getVisibleEntries() {
+  const query = normalizeText(state.query).trim();
+  const entries = getBaseEntries();
+
+  if (!query) {
+    return entries;
+  }
+
+  return entries.filter(({ item }) => {
+    const searchable = [
+      item.phrase,
+      item.phonetic,
+      item.meaning,
+      item.sentence,
+      item.translation,
+    ].join(" ");
+    return normalizeText(searchable).includes(query);
+  });
+}
+
+function normalizeVoiceText(value) {
+  return String(value || "")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getVoiceLocale(voice) {
+  return String(voice?.lang || "")
+    .toLocaleLowerCase("en-US")
+    .replace("_", "-");
+}
+
+function isAmericanEnglishVoice(voice) {
+  const locale = getVoiceLocale(voice);
+  return locale === "en-us" || locale.startsWith("en-us-");
+}
+
+function getVoiceNameRank(voiceName, names) {
+  const normalizedName = normalizeVoiceText(voiceName);
+  return names.findIndex((name) => normalizedName.includes(name));
+}
+
+function scoreSpeechVoice(voice, genderPreference = "") {
+  const locale = getVoiceLocale(voice);
+  if (!locale.startsWith("en")) {
+    return Number.NEGATIVE_INFINITY;
+  }
+
+  const voiceName = normalizeVoiceText(voice?.name);
+  const naturalHintScore = NATURAL_VOICE_HINTS.reduce(
+    (score, hint, index) =>
+      voiceName.includes(hint) ? score + 42 - index * 4 : score,
+    0,
+  );
+  let score = locale === "en-us" || locale.startsWith("en-us-") ? 120 : 24;
+
+  score += naturalHintScore;
+  if (voiceName.includes("google us english")) {
+    score += 58;
+  }
+  if (voiceName.includes("siri")) {
+    score += 36;
+  }
+  if (voice?.default) {
+    score += 6;
+  }
+
+  if (genderPreference === "female" || genderPreference === "male") {
+    const preferredRank = getVoiceNameRank(
+      voiceName,
+      AMERICAN_VOICE_NAMES[genderPreference],
+    );
+    const otherGender = genderPreference === "female" ? "male" : "female";
+    const otherRank = getVoiceNameRank(
+      voiceName,
+      AMERICAN_VOICE_NAMES[otherGender],
+    );
+
+    if (preferredRank >= 0) {
+      score += 92 - preferredRank * 5;
+    }
+    if (otherRank >= 0) {
+      score -= 48;
+    }
+  }
+
+  return score;
+}
+
+function refreshSpeechVoiceCache() {
+  if (!("speechSynthesis" in window)) {
+    speechVoiceCache = [];
+    return speechVoiceCache;
+  }
+
+  speechVoiceCache = Array.from(window.speechSynthesis.getVoices() || []);
+  return speechVoiceCache;
+}
+
+function getPreferredSpeechVoice(preference = "auto", profile = null) {
+  if (!speechVoiceCache.length) {
+    refreshSpeechVoiceCache();
+  }
+  if (!speechVoiceCache.length) {
+    return null;
+  }
+
+  if (preference === "device") {
+    return (
+      speechVoiceCache.find((voice) => voice.default) ||
+      speechVoiceCache.find(isAmericanEnglishVoice) ||
+      speechVoiceCache.find(
+        (voice) => getVoiceLocale(voice).startsWith("en"),
+      ) ||
+      speechVoiceCache[0]
+    );
+  }
+
+  const genderPreference =
+    preference === "female" || preference === "male"
+      ? preference
+      : profile?.gender || "";
+  const rankedVoices = speechVoiceCache
+    .map((voice, index) => ({
+      voice,
+      index,
+      score: scoreSpeechVoice(voice, genderPreference),
+    }))
+    .filter(({ score }) => Number.isFinite(score))
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+
+  return rankedVoices[0]?.voice || speechVoiceCache[0];
+}
+
+function getPracticeVoiceStatusText() {
+  if (!("speechSynthesis" in window)) {
+    return "当前浏览器不支持语音朗读。";
+  }
+
+  if (!speechVoiceCache.length) {
+    refreshSpeechVoiceCache();
+  }
+  if (!speechVoiceCache.length) {
+    return "正在读取设备声线；播放时会自动选择美式英语。";
+  }
+
+  const profile =
+    state.practiceSection === "dialogue"
+      ? DIALOGUE_SPEAKER_VOICE_PROFILES[
+          getCurrentDialogueTurn()?.speaker || ""
+        ]
+      : state.practiceSection === "free"
+        ? FREE_CHAT_COACH_PROFILE
+      : null;
+  const voice = getPreferredSpeechVoice(state.practiceVoice, profile);
+  if (!voice) {
+    return "未找到英语声线，将使用设备默认声音。";
+  }
+
+  if (!isAmericanEnglishVoice(voice)) {
+    return `未找到 en-US 声线，暂用 ${voice.name}。`;
+  }
+
+  const voiceName = normalizeVoiceText(voice.name);
+  const isNatural = NATURAL_VOICE_HINTS.some((hint) =>
+    voiceName.includes(hint),
+  );
+  return `当前声线：${voice.name}${isNatural ? " · 自然音色" : ""}`;
+}
+
+function createSpeechUtterance(text, rate = 0.9, options = {}) {
+  const profile = options.profile || null;
+  const voice = getPreferredSpeechVoice(
+    options.voicePreference || state.practiceVoice,
+    profile,
+  );
+  const rateScale = Number(options.rateScale) || 1;
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.lang = voice?.lang || "en-US";
+  if (voice) {
+    utterance.voice = voice;
+  }
+  utterance.rate = Math.min(
+    1.3,
+    Math.max(0.5, (Number(rate) || 0.9) * rateScale),
+  );
+  utterance.pitch = Math.min(
+    1.25,
+    Math.max(0.75, Number(options.pitch) || 1),
+  );
+  utterance.volume = 1;
+  return utterance;
+}
+
+function speak(text, rate = 0.9, options = {}) {
+  if (!("speechSynthesis" in window)) {
+    return false;
+  }
+
+  const utterance = createSpeechUtterance(text, rate, options);
+  if (typeof options.onStart === "function") {
+    utterance.onstart = options.onStart;
+  }
+  if (typeof options.onEnd === "function") {
+    utterance.onend = options.onEnd;
+  }
+  if (typeof options.onError === "function") {
+    utterance.onerror = options.onError;
+  }
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
+  window.speechSynthesis.speak(utterance);
+  return utterance;
+}
+
+function getSpeechRecognitionConstructor() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function getRealtimeSection() {
+  return state.practiceSection === "free" ? "free" : "dialogue";
+}
+
+function isRealtimeSectionActive(section) {
+  return state.realtimeActive && getRealtimeSection() === section;
+}
+
+function getRealtimeSupport() {
+  if (!("speechSynthesis" in window)) {
+    return {
+      supported: false,
+      message: "当前浏览器不支持语音朗读，实时对话不可用，可继续用文字练习。",
+    };
+  }
+
+  if (state.practiceRecognitionMode === "off") {
+    return {
+      supported: false,
+      message: "语音识别已关闭，实时对话需要浏览器免费识别。",
+    };
+  }
+
+  if (state.practiceRecognitionMode !== "browser") {
+    return {
+      supported: false,
+      message: "实时对话使用浏览器免费识别，请把识别方式切换为“浏览器免费”。",
+    };
+  }
+
+  if (!getSpeechRecognitionConstructor()) {
+    return {
+      supported: false,
+      message: "当前浏览器不支持连续语音识别，请使用最新版 Chrome、Edge 或 Safari。",
+    };
+  }
+
+  return { supported: true, message: "" };
+}
+
+function setRealtimePhase(phase, message = "") {
+  state.realtimePhase = phase;
+  state.realtimeMessage = message;
+  state.realtimeMessageType = phase === "error" ? "error" : "";
+
+  if (phase === "listening") {
+    state.practiceStatusText = "实时聆听";
+  } else if (phase === "thinking") {
+    state.practiceStatusText = "正在准备回应";
+  } else if (phase === "speaking") {
+    state.practiceStatusText = "正在朗读回应";
+  }
+
+  renderPracticeView();
+}
+
+function getRealtimeStatusText(section) {
+  const support = getRealtimeSupport();
+  if (!isRealtimeSectionActive(section)) {
+    if (!support.supported) {
+      return support.message;
+    }
+    return state.realtimeMessage || "未开启";
+  }
+
+  if (state.realtimePhase === "thinking") {
+    return state.realtimeMessage || "正在理解你的表达…";
+  }
+  if (state.realtimePhase === "speaking") {
+    return state.realtimeMessage || "正在用美音回应…";
+  }
+  if (state.realtimePhase === "listening") {
+    return state.realtimeTranscript
+      ? "正在聆听 · 已识别到语音"
+      : "正在聆听 · 说完停顿一下自动发送";
+  }
+  return state.realtimeMessage || "未开启";
+}
+
+function renderRealtimeBar(section) {
+  const isFree = section === "free";
+  const button = isFree
+    ? elements.freeRealtimeButton
+    : elements.dialogueRealtimeButton;
+  const status = isFree
+    ? elements.freeRealtimeStatus
+    : elements.dialogueRealtimeStatus;
+  if (!button || !status) {
+    return;
+  }
+
+  const support = getRealtimeSupport();
+  const active = isRealtimeSectionActive(section);
+  const phase = active ? state.realtimePhase : "idle";
+
+  button.textContent = active ? "结束实时对话" : "开始实时对话";
+  button.setAttribute("aria-pressed", String(active));
+  button.classList.toggle("is-active", active);
+  button.disabled = !active && !support.supported;
+  button.dataset.phase = phase;
+
+  status.dataset.phase = phase;
+  status.classList.toggle("is-error", !active && !support.supported);
+  status.textContent = getRealtimeStatusText(section);
+}
+
+function stopRealtimeRecognition() {
+  const recognition = realtimeVoice.recognition;
+  realtimeVoice.recognition = null;
+  if (!recognition) {
+    return;
+  }
+
+  recognition.onstart = null;
+  recognition.onresult = null;
+  recognition.onerror = null;
+  recognition.onend = null;
+  try {
+    recognition.abort();
+  } catch {
+    // The recognition session may already have ended.
+  }
+}
+
+function clearRealtimeTimers() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  clearTimeout(realtimeVoice.restartTimer);
+  clearTimeout(realtimeVoice.speechTimer);
+  realtimeVoice.silenceTimer = 0;
+  realtimeVoice.restartTimer = 0;
+  realtimeVoice.speechTimer = 0;
+}
+
+function stopRealtimeConversation(message = "", { silent = false } = {}) {
+  const wasActive = state.realtimeActive;
+
+  realtimeVoice.stopRequested = true;
+  realtimeVoice.restartCount = 0;
+  realtimeVoice.speechToken += 1;
+  clearRealtimeTimers();
+  stopRealtimeRecognition();
+
+  if ((!silent || wasActive) && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  state.realtimeActive = false;
+  state.realtimePhase = "idle";
+  state.realtimeTranscript = "";
+  state.realtimeMessage = message;
+  state.realtimeMessageType = "";
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+
+  if (wasActive) {
+    state.practiceStatusText = "准备开始";
+    renderPracticeView();
+  }
+
+  return wasActive;
+}
+
+function getDialogueSpeechOptions(turn) {
+  const profile = DIALOGUE_SPEAKER_VOICE_PROFILES[turn?.speaker] || {};
+  return {
+    profile,
+    pitch: profile.pitch,
+    rateScale: profile.rateScale,
+    voicePreference: state.practiceVoice,
+    rate: 0.9,
+  };
+}
+
+function getFreeSpeechOptions() {
+  return {
+    profile: FREE_CHAT_COACH_PROFILE,
+    pitch: FREE_CHAT_COACH_PROFILE.pitch,
+    rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+    voicePreference: state.practiceVoice,
+    rate: 0.94,
+  };
+}
+
+function speakRealtime(text, options = {}, onDone = null) {
+  const speakable = String(text || "").trim();
+  if (!state.realtimeActive || !speakable) {
+    return false;
+  }
+  if (!("speechSynthesis" in window)) {
+    if (typeof onDone === "function") {
+      onDone();
+    }
+    return false;
+  }
+
+  const utterance = createSpeechUtterance(speakable, options.rate || 0.92, options);
+  const token = realtimeVoice.speechToken + 1;
+  realtimeVoice.speechToken = token;
+  realtimeVoice.speechTimer = 0;
+  let finished = false;
+
+  const finish = () => {
+    if (finished || realtimeVoice.speechToken !== token) {
+      return;
+    }
+    finished = true;
+    clearTimeout(realtimeVoice.speechTimer);
+    realtimeVoice.speechTimer = window.setTimeout(() => {
+      realtimeVoice.speechTimer = 0;
+      if (!state.realtimeActive || realtimeVoice.speechToken !== token) {
+        return;
+      }
+      if (typeof onDone === "function") {
+        onDone();
+      }
+    }, REALTIME_SPEECH_TAIL_MS);
+  };
+
+  utterance.onend = finish;
+  utterance.onerror = finish;
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
+  window.speechSynthesis.speak(utterance);
+
+  const words = speakable.split(/\s+/).filter(Boolean).length;
+  const estimated =
+    (words / Math.max(1.1, 2.4 * utterance.rate)) * 1000 + 3000;
+  realtimeVoice.speechTimer = window.setTimeout(
+    finish,
+    Math.min(45000, Math.max(8000, estimated)),
+  );
+  return true;
+}
+
+function restartRealtimeRecognitionSoon(delay = REALTIME_RESTART_DELAY_MS) {
+  clearTimeout(realtimeVoice.restartTimer);
+  realtimeVoice.restartTimer = window.setTimeout(() => {
+    realtimeVoice.restartTimer = 0;
+    if (!state.realtimeActive || realtimeVoice.stopRequested) {
+      return;
+    }
+    if (state.realtimePhase !== "listening") {
+      return;
+    }
+    startRealtimeRecognition();
+  }, delay);
+}
+
+function scheduleRealtimeCommit() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  const wordCount = String(state.realtimeTranscript || "")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  const delay = Math.min(2600, REALTIME_SILENCE_MS + wordCount * 60);
+  realtimeVoice.silenceTimer = window.setTimeout(() => {
+    realtimeVoice.silenceTimer = 0;
+    commitRealtimeUtterance();
+  }, delay);
+}
+
+function collectRealtimeTranscript(event) {
+  let interimText = "";
+  const startIndex = Number.isInteger(event.resultIndex) ? event.resultIndex : 0;
+
+  for (let index = startIndex; index < event.results.length; index += 1) {
+    const transcript = event.results[index]?.[0]?.transcript || "";
+    if (event.results[index]?.isFinal) {
+      realtimeVoice.finalText =
+        `${realtimeVoice.finalText} ${transcript}`.trim();
+    } else {
+      interimText = `${interimText} ${transcript}`.trim();
+    }
+  }
+
+  realtimeVoice.interimText = interimText;
+  state.realtimeTranscript =
+    `${realtimeVoice.finalText} ${realtimeVoice.interimText}`.trim();
+
+  if (!state.realtimeTranscript) {
+    renderPracticeView();
+    return;
+  }
+
+  scheduleRealtimeCommit();
+  renderPracticeView();
+}
+
+function startRealtimeRecognition() {
+  if (!state.realtimeActive || realtimeVoice.stopRequested) {
+    return;
+  }
+
+  const Recognition = getSpeechRecognitionConstructor();
+  if (!Recognition) {
+    state.practiceMessage =
+      "当前浏览器不支持连续语音识别，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    stopRealtimeConversation("实时对话不可用。");
+    return;
+  }
+
+  stopRealtimeRecognition();
+  clearTimeout(realtimeVoice.silenceTimer);
+  realtimeVoice.silenceTimer = 0;
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  state.realtimeTranscript = "";
+
+  const recognition = new Recognition();
+  realtimeVoice.recognition = recognition;
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+    realtimeVoice.restartCount = 0;
+    state.realtimeMessage = "";
+    state.realtimeMessageType = "";
+    renderPracticeView();
+  };
+
+  recognition.onresult = (event) => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+    collectRealtimeTranscript(event);
+  };
+
+  recognition.onerror = (event) => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+
+    const errorType = String(event?.error || "");
+    if (errorType === "aborted") {
+      return;
+    }
+    if (errorType === "no-speech") {
+      realtimeVoice.restartCount += 1;
+      return;
+    }
+    if (errorType === "not-allowed" || errorType === "service-not-allowed") {
+      state.practiceMessage =
+        "麦克风权限未开启，请在地址栏允许麦克风后重新开始实时对话。";
+      state.practiceMessageType = "error";
+      stopRealtimeConversation("麦克风权限未开启。");
+      return;
+    }
+
+    realtimeVoice.restartCount += 1;
+    state.realtimeMessage = getRecognitionErrorMessage(errorType);
+    state.realtimeMessageType = "error";
+    if (realtimeVoice.restartCount > REALTIME_MAX_RESTARTS) {
+      stopRealtimeConversation("语音识别多次中断，已结束实时对话。");
+      return;
+    }
+    renderPracticeView();
+  };
+
+  recognition.onend = () => {
+    if (realtimeVoice.recognition !== recognition) {
+      return;
+    }
+    realtimeVoice.recognition = null;
+    if (!state.realtimeActive || realtimeVoice.stopRequested) {
+      return;
+    }
+    if (state.realtimePhase !== "listening") {
+      return;
+    }
+    if (state.realtimeTranscript) {
+      commitRealtimeUtterance();
+      return;
+    }
+    restartRealtimeRecognitionSoon();
+  };
+
+  try {
+    recognition.start();
+  } catch {
+    realtimeVoice.recognition = null;
+    realtimeVoice.restartCount += 1;
+    if (realtimeVoice.restartCount > REALTIME_MAX_RESTARTS) {
+      stopRealtimeConversation("语音识别启动失败，已结束实时对话。");
+      return;
+    }
+    restartRealtimeRecognitionSoon(600);
+  }
+}
+
+function resumeRealtimeListening() {
+  if (!state.realtimeActive || realtimeVoice.stopRequested) {
+    return;
+  }
+
+  state.realtimeTranscript = "";
+  state.practiceTranscript = "";
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  setRealtimePhase("listening");
+  restartRealtimeRecognitionSoon();
+}
+
+function cancelRealtimeUtteranceCapture() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  realtimeVoice.silenceTimer = 0;
+  stopRealtimeRecognition();
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  state.realtimeTranscript = "";
+  state.practiceTranscript = "";
+}
+
+function commitRealtimeUtterance() {
+  clearTimeout(realtimeVoice.silenceTimer);
+  realtimeVoice.silenceTimer = 0;
+
+  if (!state.realtimeActive || realtimeVoice.stopRequested) {
+    return;
+  }
+  if (state.realtimePhase !== "listening") {
+    return;
+  }
+
+  const transcript = String(state.realtimeTranscript || "").trim();
+  if (!transcript) {
+    return;
+  }
+
+  stopRealtimeRecognition();
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  state.realtimeTranscript = "";
+  state.practiceTranscript = "";
+
+  if (getRealtimeSection() === "free") {
+    setRealtimePhase("thinking", "正在理解你的表达…");
+    handleRealtimeFreeUtterance(transcript);
+    return;
+  }
+
+  setRealtimePhase("thinking", "正在评价你的回答…");
+  handleRealtimeDialogueUtterance(transcript);
+}
+
+function getRealtimeDialogueReaction(score) {
+  const value = Number(score) || 0;
+  if (value >= 85) {
+    return "Nice, that sounded really natural.";
+  }
+  if (value >= 65) {
+    return "Good, that worked well.";
+  }
+  if (value >= 40) {
+    return "Okay, good try.";
+  }
+  return "Let's keep going.";
+}
+
+function continueDialogueRealtimeAfterAnswer(result) {
+  const scenario = getCurrentDialogueScenario();
+  if (!state.realtimeActive || !scenario) {
+    resumeRealtimeListening();
+    return;
+  }
+
+  const reaction = getRealtimeDialogueReaction(result?.score ?? 0);
+  const isLastTurn = state.dialogueTurnIndex >= scenario.turns.length - 1;
+
+  setRealtimePhase("speaking", "正在回应你的回答…");
+  speakRealtime(reaction, getFreeSpeechOptions(), () => {
+    if (!state.realtimeActive) {
+      return;
+    }
+    if (isLastTurn) {
+      stopRealtimeConversation("这一轮情景已练完，可以再次开始继续。");
+      return;
+    }
+
+    state.dialogueTurnIndex += 1;
+    clearDialogueAttempt({ keepMessages: true });
+    state.realtimeTranscript = "";
+    renderPracticeView();
+
+    const nextTurn = getCurrentDialogueTurn();
+    if (!nextTurn) {
+      resumeRealtimeListening();
+      return;
+    }
+
+    setRealtimePhase("speaking", "正在朗读对方的话…");
+    speakRealtime(
+      nextTurn.prompt,
+      getDialogueSpeechOptions(nextTurn),
+      resumeRealtimeListening,
+    );
+  });
+}
+
+function handleRealtimeDialogueUtterance(transcript) {
+  const result = submitDialogueAnswer(transcript);
+  if (!result) {
+    resumeRealtimeListening();
+    return;
+  }
+  continueDialogueRealtimeAfterAnswer(result);
+}
+
+async function handleRealtimeFreeUtterance(transcript) {
+  const reply = await sendFreeMessage(transcript);
+  if (!state.realtimeActive || getRealtimeSection() !== "free") {
+    return;
+  }
+  if (!reply?.english) {
+    resumeRealtimeListening();
+    return;
+  }
+
+  setRealtimePhase("speaking", "正在用美音回应…");
+  speakRealtime(reply.english, getFreeSpeechOptions(), resumeRealtimeListening);
+}
+
+function startRealtimeConversation() {
+  if (state.realtimeActive) {
+    return;
+  }
+
+  const section = getRealtimeSection();
+  const support = getRealtimeSupport();
+  if (!support.supported) {
+    state.practiceMessage = support.message;
+    state.practiceMessageType = "error";
+    renderPracticeView();
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  if (section === "free" && state.freeMessages.length === 0) {
+    resetFreeConversation();
+  }
+
+  realtimeVoice.stopRequested = false;
+  realtimeVoice.restartCount = 0;
+  realtimeVoice.finalText = "";
+  realtimeVoice.interimText = "";
+  clearRealtimeTimers();
+  state.realtimeActive = true;
+  state.realtimePhase = "idle";
+  state.realtimeTranscript = "";
+  state.realtimeMessage = "";
+  state.realtimeMessageType = "";
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+
+  if (section === "free") {
+    const lastMessage = state.freeMessages[state.freeMessages.length - 1];
+    const latestReply = [...state.freeMessages]
+      .reverse()
+      .find((message) => message.role === "assistant" && message.english);
+
+    if (lastMessage?.role === "assistant" && latestReply?.english) {
+      setRealtimePhase("speaking", "正在朗读陪练的上一句话…");
+      speakRealtime(
+        latestReply.english,
+        getFreeSpeechOptions(),
+        resumeRealtimeListening,
+      );
+      return;
+    }
+    resumeRealtimeListening();
+    return;
+  }
+
+  if (state.dialogueResult) {
+    continueDialogueRealtimeAfterAnswer(state.dialogueResult);
+    return;
+  }
+
+  const turn = getCurrentDialogueTurn();
+  if (!turn) {
+    stopRealtimeConversation("当前没有可练习的情景对话。");
+    return;
+  }
+
+  setRealtimePhase("speaking", "正在朗读对方的话…");
+  speakRealtime(
+    turn.prompt,
+    getDialogueSpeechOptions(turn),
+    resumeRealtimeListening,
+  );
+}
+
+function toggleRealtimeConversation() {
+  const section = getRealtimeSection();
+  if (isRealtimeSectionActive(section)) {
+    stopRealtimeConversation("实时对话已结束。");
+    return;
+  }
+  startRealtimeConversation();
+}
+
+function getPracticeModeLabel(mode = state.practiceRecognitionMode) {
+  const labels = {
+    browser: "浏览器免费",
+    api: "自定义 API",
+    off: "已关闭",
+  };
+  return labels[mode] || labels.browser;
+}
+
+function getPracticeModeAvailability() {
+  if (state.practiceRecognitionMode === "off") {
+    return {
+      available: false,
+      message: "语音识别已关闭，仍可使用示范朗读和句子对照。",
+    };
+  }
+
+  if (state.practiceRecognitionMode === "api") {
+    if (!String(state.practiceApiUrl || "").trim()) {
+      return {
+        available: false,
+        message: "请先填写并保存语音转写接口地址。",
+      };
+    }
+    if (!("MediaRecorder" in window)) {
+      return {
+        available: false,
+        message: "当前浏览器不支持录音功能。",
+      };
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      return {
+        available: false,
+        message: "当前页面无法访问麦克风，请确认使用 HTTPS 打开网站。",
+      };
+    }
+    return {
+      available: true,
+      message: "接口录音完成后会自动转写并评分。",
+    };
+  }
+
+  if (!getSpeechRecognitionConstructor()) {
+    return {
+      available: false,
+      message:
+        "当前浏览器不支持免费语音识别，请使用最新版 Chrome 或 Edge，或切换自定义 API。",
+    };
+  }
+
+  return {
+    available: true,
+    message: "使用浏览器免费语音识别，需允许麦克风权限。",
+  };
+}
+
+function getPracticeEntries() {
+  return getVisibleEntries();
+}
+
+function getCurrentPracticeEntry() {
+  const entries = getPracticeEntries();
+  if (entries.length === 0) {
+    state.practiceIndex = 0;
+    return null;
+  }
+
+  if (state.practiceIndex < 0 || state.practiceIndex >= entries.length) {
+    state.practiceIndex = 0;
+  }
+  return entries[state.practiceIndex];
+}
+
+function getPracticeTarget(entry) {
+  return String(entry?.item.sentence || entry?.item.phrase || "").trim();
+}
+
+function tokenizePracticeText(text) {
+  const matches = String(text || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .match(/[a-z0-9]+(?:['’][a-z]+)*/g);
+
+  return matches
+    ? matches.map((word) => word.replace(/[’]/g, "'"))
+    : [];
+}
+
+function comparePracticeText(target, transcript) {
+  const targetWords = tokenizePracticeText(target);
+  const spokenWords = tokenizePracticeText(transcript);
+  const rows = targetWords.length + 1;
+  const columns = spokenWords.length + 1;
+  const grid = Array.from(
+    { length: rows },
+    () => new Uint16Array(columns),
+  );
+
+  for (let targetIndex = 1; targetIndex < rows; targetIndex += 1) {
+    for (
+      let spokenIndex = 1;
+      spokenIndex < columns;
+      spokenIndex += 1
+    ) {
+      if (
+        targetWords[targetIndex - 1] === spokenWords[spokenIndex - 1]
+      ) {
+        grid[targetIndex][spokenIndex] =
+          grid[targetIndex - 1][spokenIndex - 1] + 1;
+      } else {
+        grid[targetIndex][spokenIndex] = Math.max(
+          grid[targetIndex - 1][spokenIndex],
+          grid[targetIndex][spokenIndex - 1],
+        );
+      }
+    }
+  }
+
+  const matchedTargetIndexes = new Set();
+  const matchedSpokenIndexes = new Set();
+  let targetIndex = targetWords.length;
+  let spokenIndex = spokenWords.length;
+
+  while (targetIndex > 0 && spokenIndex > 0) {
+    const isMatch =
+      targetWords[targetIndex - 1] === spokenWords[spokenIndex - 1] &&
+      grid[targetIndex][spokenIndex] ===
+        grid[targetIndex - 1][spokenIndex - 1] + 1;
+
+    if (isMatch) {
+      matchedTargetIndexes.add(targetIndex - 1);
+      matchedSpokenIndexes.add(spokenIndex - 1);
+      targetIndex -= 1;
+      spokenIndex -= 1;
+    } else if (
+      grid[targetIndex - 1][spokenIndex] >=
+      grid[targetIndex][spokenIndex - 1]
+    ) {
+      targetIndex -= 1;
+    } else {
+      spokenIndex -= 1;
+    }
+  }
+
+  const missingTargetIndexes = targetWords
+    .map((_, index) => index)
+    .filter((index) => !matchedTargetIndexes.has(index));
+  const extraWords = spokenWords.filter(
+    (_, index) => !matchedSpokenIndexes.has(index),
+  );
+  const accuracy = targetWords.length
+    ? Math.round((matchedTargetIndexes.size / targetWords.length) * 100)
+    : 0;
+
+  return {
+    targetWords,
+    spokenWords,
+    matchedTargetIndexes,
+    missingTargetIndexes,
+    extraWords,
+    accuracy,
+  };
+}
+
+function getPracticeFeedback(accuracy) {
+  if (accuracy >= 90) {
+    return "句子已经很完整，可以继续练下一句。";
+  }
+  if (accuracy >= 75) {
+    return "整体不错，重点补上漏掉的单词。";
+  }
+  if (accuracy >= 55) {
+    return "已经抓住大意，放慢速度再跟一遍。";
+  }
+  return "先听两遍示范，再按短句分组跟读。";
+}
+
+function formatPracticeTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function cancelPracticeRecognition() {
+  const recognition = practiceRecognition;
+  practiceRecognition = null;
+  state.practiceListening = false;
+  state.practiceTranscribing = false;
+
+  if (recognition) {
+    recognition.onstart = null;
+    recognition.onresult = null;
+    recognition.onerror = null;
+    recognition.onend = null;
+    try {
+      recognition.abort();
+    } catch {
+      // The recognition session may already have ended.
+    }
+  }
+
+  practiceApiAbortController?.abort();
+  practiceApiAbortController = null;
+
+  const mediaRecorder = practiceMediaRecorder;
+  practiceMediaRecorder = null;
+  if (mediaRecorder) {
+    mediaRecorder.ondataavailable = null;
+    mediaRecorder.onerror = null;
+    mediaRecorder.onstop = null;
+    if (mediaRecorder.state !== "inactive") {
+      try {
+        mediaRecorder.stop();
+      } catch {
+        // The recorder may already have stopped.
+      }
+    }
+  }
+
+  if (practiceMediaStream) {
+    practiceMediaStream.getTracks().forEach((track) => track.stop());
+    practiceMediaStream = null;
+  }
+  practiceAudioChunks = [];
+}
+
+function resetPracticeAttempt() {
+  cancelPracticeRecognition();
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceResult = null;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+
+  const availability = getPracticeModeAvailability();
+  if (state.practiceRecognitionMode === "off") {
+    state.practiceStatusText = "已关闭";
+    state.practiceMessage = availability.message;
+    state.practiceMessageType = "info";
+  } else if (!availability.available) {
+    state.practiceStatusText = "需要设置";
+    state.practiceMessage = availability.message;
+    state.practiceMessageType = "error";
+  } else {
+    state.practiceStatusText = "准备开始";
+  }
+}
+
+/*
+ * 口语素材包
+ * ----------
+ * 基础情景写死在 app.js 里；成人真实场景（speaking-scenarios.js）和
+ * 雅思题库（speaking-ielts.js）体积较大，只有真正进入口语区时才插入脚本，
+ * 详情页首屏不受影响。
+ */
+const SPEAKING_SCENARIO_FILTERS = [
+  { id: "all", label: "全部场景" },
+  { id: "basic", label: "基础情景" },
+  { id: "adult", label: "真实生活" },
+];
+
+const SPEAKING_PACK_URLS = {
+  scenarios: "./speaking-scenarios.js",
+  ielts: "./speaking-ielts.js",
+};
+
+const speakingScriptPromises = new Map();
+
+/** 按需插入一段脚本，同一个地址只加载一次。 */
+function loadSpeakingScript(src) {
+  if (speakingScriptPromises.has(src)) {
+    return speakingScriptPromises.get(src);
+  }
+  const promise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.addEventListener("load", () => resolve(true));
+    script.addEventListener("error", () => {
+      speakingScriptPromises.delete(src);
+      reject(new Error(`脚本加载失败：${src}`));
+    });
+    document.head.append(script);
+  });
+  speakingScriptPromises.set(src, promise);
+  return promise;
+}
+
+function getDialogueScenarios() {
+  return [...DIALOGUE_SCENARIOS, ...(state.speakingScenarios || [])];
+}
+
+function getFilteredDialogueScenarios() {
+  const filter = state.dialogueScenarioFilter || "all";
+  return getDialogueScenarios().filter((scenario) => {
+    if (filter === "all") {
+      return true;
+    }
+    return (scenario.kind || "basic") === filter;
+  });
+}
+
+/**
+ * 拉取成人场景包和雅思题库。两个文件都是可选的：任何一个加载失败，
+ * 基础情景和本地自由对话仍然照常可用，只是界面上给一句提示。
+ */
+async function ensureSpeakingPacks() {
+  if (state.speakingPacksLoaded) {
+    return true;
+  }
+  if (state.speakingPacksLoading) {
+    return false;
+  }
+
+  state.speakingPacksLoading = true;
+  const results = await Promise.allSettled(
+    Object.values(SPEAKING_PACK_URLS).map((src) => loadSpeakingScript(src)),
+  );
+  state.speakingPacksLoading = false;
+  state.speakingPacksLoaded = true;
+
+  const failed = results.filter((result) => result.status === "rejected");
+  const scenarios = window.IBALL_SPEAKING_SCENARIOS;
+  state.speakingScenarios = Array.isArray(scenarios)
+    ? scenarios.map((scenario) => ({ ...scenario, kind: "adult" }))
+    : [];
+
+  if (failed.length) {
+    state.practiceMessage =
+      "部分口语素材没有加载成功，可以先练基础情景，稍后刷新页面再试。";
+    state.practiceMessageType = "error";
+  }
+  return true;
+}
+
+function getCurrentDialogueScenario() {
+  const scenarios = getDialogueScenarios();
+  const scenario =
+    scenarios.find((item) => item.id === state.dialogueScenarioId) ||
+    scenarios[0];
+
+  if (scenario && scenario.id !== state.dialogueScenarioId) {
+    state.dialogueScenarioId = scenario.id;
+  }
+  return scenario || null;
+}
+
+function getCurrentDialogueTurn() {
+  const scenario = getCurrentDialogueScenario();
+  if (!scenario?.turns?.length) {
+    state.dialogueTurnIndex = 0;
+    return null;
+  }
+
+  if (
+    state.dialogueTurnIndex < 0 ||
+    state.dialogueTurnIndex >= scenario.turns.length
+  ) {
+    state.dialogueTurnIndex = 0;
+  }
+  return scenario.turns[state.dialogueTurnIndex];
+}
+
+function clearDialogueAttempt({ keepMessages = false } = {}) {
+  cancelPracticeRecognition();
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.dialogueInput = "";
+  state.dialogueHintVisible = false;
+  state.dialogueResult = null;
+  if (!keepMessages) {
+    state.dialogueMessages = [];
+  }
+  state.practiceStatusText =
+    state.practiceRecognitionMode === "off"
+      ? "已关闭"
+      : "准备开始";
+}
+
+function selectDialogueScenario(scenarioId) {
+  const scenario = getDialogueScenarios().find(
+    (item) => item.id === scenarioId,
+  );
+  if (!scenario) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  state.dialogueScenarioId = scenario.id;
+  state.dialogueTurnIndex = 0;
+  clearDialogueAttempt();
+  renderPracticeView();
+}
+
+function normalizeDialogueText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[’]/g, "'")
+    .replace(/[^a-z0-9']+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dialogueTextIncludes(text, phrase) {
+  const normalizedText = ` ${normalizeDialogueText(text)} `;
+  const normalizedPhrase = normalizeDialogueText(phrase);
+  return Boolean(
+    normalizedPhrase && normalizedText.includes(` ${normalizedPhrase} `),
+  );
+}
+
+function getDialogueTranscriptMeta(transcript) {
+  const normalizedText = normalizeDialogueText(transcript);
+  return {
+    wordCount: normalizedText ? normalizedText.split(" ").length : 0,
+    hasChinese: /[\u3400-\u9fff]/.test(String(transcript || "")),
+  };
+}
+
+function scoreDialogueAnswer(turn, transcript) {
+  const groups = (turn?.keywords || []).map((group) => {
+    const options = (group.options || []).map((option) =>
+      Array.isArray(option) ? option[0] : option,
+    );
+    const matchedOption = options.find((option) =>
+      dialogueTextIncludes(transcript, option),
+    );
+    return {
+      label: group.label,
+      covered: Boolean(matchedOption),
+      matchedOption: matchedOption || "",
+    };
+  });
+  const coveredCount = groups.filter((group) => group.covered).length;
+  const score = groups.length
+    ? Math.round((coveredCount / groups.length) * 100)
+    : 0;
+
+  return {
+    score,
+    groups,
+    ...getDialogueTranscriptMeta(transcript),
+  };
+}
+
+function getDialogueFeedback(score) {
+  if (score >= 100) {
+    return "这一轮已经可以直接用于真实交流。";
+  }
+  if (score >= 70) {
+    return "整体表达很稳，再连起来说一遍会更自然。";
+  }
+  if (score >= 40) {
+    return "已经开口表达，先补充一个重点再继续。";
+  }
+  return "先跟着参考表达说一遍，再用自己的话回答。";
+}
+
+function getDialogueCoachAdvice(turn, result) {
+  const coveredGroups = result.groups.filter((group) => group.covered);
+  const missingGroups = result.groups.filter((group) => !group.covered);
+  const coveredLabels = coveredGroups
+    .slice(0, 2)
+    .map((group) => `“${group.label}”`)
+    .join("、");
+  let message;
+
+  if (result.hasChinese && coveredGroups.length === 0) {
+    message =
+      "你先把意思表达出来了，接下来把这句话换成简单英文就好。";
+  } else if (result.hasChinese) {
+    message = `你已经表达出${coveredLabels}，再用英文补完整会更自然。`;
+  } else if (result.score >= 100) {
+    message = "关键信息都说到了，这一轮回答很完整。";
+  } else if (coveredGroups.length > 0) {
+    message = `你已经表达了${coveredLabels}，回答方向是对的。`;
+  } else {
+    message = "先抓住一个最关键的信息，不用一次说到完美。";
+  }
+
+  const tips = [];
+  if (result.wordCount > 0 && result.wordCount <= 3) {
+    tips.push("把单词扩展成一句完整回答。");
+  }
+  missingGroups.forEach((group) => {
+    if (tips.length < 2) {
+      tips.push(`补充“${group.label}”相关信息。`);
+    }
+  });
+  if (tips.length === 0) {
+    tips.push(
+      result.score >= 100
+        ? "换一种说法再说一次，练习自然表达。"
+        : "用一整句话把现有信息连起来。",
+    );
+  }
+
+  let task;
+  if (result.hasChinese) {
+    task = "先跟读参考表达，再用英文说一遍。";
+  } else if (missingGroups.length > 0) {
+    task = `再回答一次，只补上${missingGroups
+      .slice(0, 2)
+      .map((group) => `“${group.label}”`)
+      .join("和")}。`;
+  } else if (turn?.level === "进阶") {
+    task = "遮住参考表达，换一种说法再回答一次。";
+  } else {
+    task = "遮住参考表达，用自己的话再回答一次。";
+  }
+
+  return {
+    levelLabel: turn?.level || "基础",
+    message,
+    tips: tips.slice(0, 2),
+    task,
+  };
+}
+
+function renderDialogueScenarioFilters() {
+  const host = elements.dialogueScenarioFilters;
+  if (!host) {
+    return;
+  }
+
+  const active = state.dialogueScenarioFilter || "all";
+  const fragment = document.createDocumentFragment();
+  SPEAKING_SCENARIO_FILTERS.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dialogue-scenario-filter";
+    button.dataset.filter = item.id;
+    const isActive = item.id === active;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+    button.textContent = item.label;
+    button.addEventListener("click", () => {
+      state.dialogueScenarioFilter = item.id;
+      const scenarios = getFilteredDialogueScenarios();
+      const stillVisible = scenarios.some(
+        (scenario) => scenario.id === state.dialogueScenarioId,
+      );
+      if (!stillVisible && scenarios[0]) {
+        selectDialogueScenario(scenarios[0].id);
+        return;
+      }
+      renderDialogueView();
+    });
+    fragment.append(button);
+  });
+  host.replaceChildren(fragment);
+}
+
+function renderDialogueScenarioList() {
+  const activeScenario = getCurrentDialogueScenario();
+  const fragment = document.createDocumentFragment();
+
+  renderDialogueScenarioFilters();
+
+  getFilteredDialogueScenarios().forEach((scenario) => {
+    const button = document.createElement("button");
+    const isActive = scenario.id === activeScenario?.id;
+    button.type = "button";
+    button.className = "dialogue-scenario-button";
+    button.classList.toggle("is-active", isActive);
+    button.classList.toggle("is-adult", scenario.kind === "adult");
+    button.dataset.scenarioId = scenario.id;
+    button.setAttribute("aria-pressed", String(isActive));
+
+    const meta = document.createElement("span");
+    meta.className = "dialogue-scenario-button-meta";
+    meta.textContent = scenario.role
+      ? `${scenario.category} · ${scenario.role}`
+      : `${scenario.category} · ${scenario.level}`;
+
+    const title = document.createElement("strong");
+    title.textContent = scenario.title;
+
+    const summary = document.createElement("span");
+    summary.className = "dialogue-scenario-button-summary";
+    summary.textContent = scenario.summary;
+
+    button.append(meta, title, summary);
+    button.addEventListener("click", () => {
+      selectDialogueScenario(scenario.id);
+    });
+    fragment.append(button);
+  });
+
+  elements.dialogueScenarioList.replaceChildren(fragment);
+}
+
+function createDialogueMessage(role, label, english, chinese = "") {
+  const message = document.createElement("div");
+  message.className = `dialogue-message is-${role}`;
+
+  const meta = document.createElement("span");
+  meta.className = "dialogue-message-meta";
+  meta.textContent = label;
+
+  const englishText = document.createElement("p");
+  englishText.className = "dialogue-message-en";
+  englishText.lang = "en";
+  englishText.textContent = english;
+
+  message.append(meta, englishText);
+  if (chinese) {
+    const chineseText = document.createElement("p");
+    chineseText.className = "dialogue-message-zh";
+    chineseText.textContent = chinese;
+    message.append(chineseText);
+  }
+  return message;
+}
+
+function renderDialogueMessages() {
+  const scenario = getCurrentDialogueScenario();
+  const currentTurn = getCurrentDialogueTurn();
+  if (!scenario || !currentTurn) {
+    elements.dialogueMessages.replaceChildren();
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const liveTranscript =
+    state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+
+  scenario.turns.forEach((turn, index) => {
+    if (index > state.dialogueTurnIndex) {
+      return;
+    }
+
+    fragment.append(
+      createDialogueMessage(
+        "partner",
+        `${turn.speaker} · 第 ${index + 1} 轮`,
+        turn.prompt,
+        turn.promptZh,
+      ),
+    );
+
+    const answer =
+      index === state.dialogueTurnIndex
+        ? liveTranscript || state.dialogueMessages[index]
+        : state.dialogueMessages[index];
+    if (answer) {
+      fragment.append(
+        createDialogueMessage("user", "你的回答", answer),
+      );
+    }
+  });
+
+  elements.dialogueMessages.replaceChildren(fragment);
+}
+
+function renderDialogueHint() {
+  const turn = getCurrentDialogueTurn();
+  if (!turn || !state.dialogueHintVisible) {
+    elements.dialogueHint.hidden = true;
+    elements.dialogueHint.replaceChildren();
+    elements.dialogueHintButton.textContent = "参考表达";
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "practice-block-label";
+  label.textContent = "参考表达";
+
+  const sample = document.createElement("p");
+  sample.className = "dialogue-hint-sample";
+  sample.lang = "en";
+  sample.textContent = turn.sample;
+
+  const translation = document.createElement("p");
+  translation.className = "dialogue-hint-translation";
+  translation.textContent = turn.sampleZh;
+
+  elements.dialogueHint.replaceChildren(label, sample, translation);
+  elements.dialogueHint.hidden = false;
+  elements.dialogueHintButton.textContent = "收起提示";
+}
+
+function renderDialogueKeyPoints(result) {
+  const fragment = document.createDocumentFragment();
+  result.groups.forEach((group) => {
+    const item = document.createElement("span");
+    item.className = "dialogue-key-point";
+    item.classList.toggle("is-covered", group.covered);
+    item.textContent = group.covered
+      ? `${group.label}：已覆盖`
+      : `${group.label}：待补充`;
+    fragment.append(item);
+  });
+  elements.dialogueKeyPoints.replaceChildren(fragment);
+}
+
+function renderDialogueCoach(turn, result) {
+  const advice = getDialogueCoachAdvice(turn, result);
+  const fragment = document.createDocumentFragment();
+
+  elements.dialogueCoachLevel.textContent = advice.levelLabel;
+  elements.dialogueCoachMessage.textContent = advice.message;
+  advice.tips.forEach((tip) => {
+    const item = document.createElement("li");
+    item.textContent = tip;
+    fragment.append(item);
+  });
+  elements.dialogueCoachTips.replaceChildren(fragment);
+  elements.dialogueCoachTask.textContent = advice.task;
+}
+
+function updatePracticeSectionViews() {
+  const tabs = [
+    [elements.practiceShadowTab, "shadow"],
+    [elements.practiceDialogueTab, "dialogue"],
+    [elements.practiceFreeTab, "free"],
+    [elements.practiceIeltsTab, "ielts"],
+  ];
+  tabs.forEach(([tab, section]) => {
+    if (!tab) {
+      return;
+    }
+    const isActive = state.practiceSection === section;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-pressed", String(isActive));
+  });
+
+  elements.shadowPracticeView.hidden = state.practiceSection !== "shadow";
+  elements.dialoguePracticeView.hidden =
+    state.practiceSection !== "dialogue";
+  elements.ieltsPracticeView.hidden = state.practiceSection !== "ielts";
+  elements.freePracticeView.hidden = state.practiceSection !== "free";
+}
+
+function renderDialogueView() {
+  const scenario = getCurrentDialogueScenario();
+  const turn = getCurrentDialogueTurn();
+  const availability = getPracticeModeAvailability();
+
+  if (!scenario || !turn) {
+    return;
+  }
+
+  elements.dialogueScenarioMeta.textContent =
+    `${scenario.category} · ${scenario.level} · ${scenario.turns.length} 轮`;
+  elements.dialoguePartnerLabel.textContent = `${turn.speaker} 说`;
+  elements.dialogueScenarioTitle.textContent =
+    `${scenario.title} · ${scenario.titleEn}`;
+  elements.dialogueTurnCounter.textContent =
+    `第 ${state.dialogueTurnIndex + 1} / ${scenario.turns.length} 轮`;
+
+  renderDialogueScenarioList();
+  renderDialogueMessages();
+  renderDialogueHint();
+  renderRealtimeBar("dialogue");
+
+  const realtimeActive = isRealtimeSectionActive("dialogue");
+  const liveTranscript = realtimeActive
+    ? state.realtimeTranscript
+    : state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+  elements.dialogueAnswerInput.value =
+    liveTranscript || state.dialogueInput;
+  elements.dialogueAnswerInput.disabled =
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
+
+  elements.dialogueListenButton.disabled =
+    !("speechSynthesis" in window) || realtimeActive;
+  elements.dialogueHintButton.disabled =
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
+  elements.dialogueRecordButton.disabled =
+    !availability.available ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
+  elements.dialogueRecordButton.textContent =
+    state.practiceTranscribing
+      ? "正在转写"
+      : state.practiceRecognitionMode === "api"
+        ? "开始录音"
+        : "开口回答";
+  elements.dialogueRecordButton.hidden = state.practiceListening;
+  elements.dialogueStopButton.hidden = !state.practiceListening;
+  elements.dialogueStopButton.disabled = !state.practiceListening;
+  elements.dialogueSubmitButton.disabled =
+    !elements.dialogueAnswerInput.value.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive ||
+    Boolean(state.dialogueResult);
+  elements.dialogueNextButton.disabled =
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive;
+  elements.dialogueNextButton.textContent =
+    state.dialogueTurnIndex === scenario.turns.length - 1
+      ? "再练一遍"
+      : "下一轮";
+  elements.dialogueRetryButton.disabled = realtimeActive;
+
+  elements.dialogueNotice.hidden = !state.practiceMessage;
+  elements.dialogueNotice.textContent = state.practiceMessage;
+  elements.dialogueNotice.classList.toggle(
+    "is-error",
+    state.practiceMessageType === "error",
+  );
+
+  const result = state.dialogueResult;
+  const showResult = Boolean(
+    result &&
+      result.scenarioId === scenario.id &&
+      result.turnIndex === state.dialogueTurnIndex,
+  );
+  elements.dialogueResult.hidden = !showResult;
+  if (showResult) {
+    elements.dialogueScore.textContent = `${result.score}%`;
+    elements.dialogueFeedback.textContent = getDialogueFeedback(
+      result.score,
+    );
+    renderDialogueKeyPoints(result);
+    renderDialogueCoach(turn, result);
+    elements.dialogueSampleAnswer.textContent = turn.sample;
+  }
+}
+
+/* ---------------------------------------------------------------- 雅思口语 */
+
+/*
+ * 评分口径：覆盖度来自题目里的关键词组，流利度 / 词汇 / 语法 / 连贯度
+ * 由回答文本本身算出来。界面上必须写明这是练习估算，不是官方成绩。
+ */
+const IELTS_LINKERS = [
+  "however",
+  "although",
+  "whereas",
+  "that said",
+  "on the other hand",
+  "in terms of",
+  "which is why",
+  "to be honest",
+  "mainly",
+  "actually",
+  "definitely",
+  "roughly",
+  "tend to",
+  "used to",
+  "even though",
+  "as a result",
+];
+
+const IELTS_PART_LABELS = {
+  part1: "Part 1 · 日常问答",
+  part2: "Part 2 · 个人陈述",
+  part3: "Part 3 · 深入讨论",
+};
+
+let ieltsTimerHandle = 0;
+
+function getIeltsPack() {
+  const pack = window.IBALL_SPEAKING_IELTS;
+  return pack && Array.isArray(pack.part1) ? pack : null;
+}
+
+function getIeltsPart2Cards() {
+  return getIeltsPack()?.part2 || [];
+}
+
+function getIeltsPart2Card() {
+  const cards = getIeltsPart2Cards();
+  return (
+    cards.find((card) => card.id === state.ieltsPart2Id) || cards[0] || null
+  );
+}
+
+function buildIeltsPart1Pool(pack) {
+  const picked = [];
+  const rest = [];
+  (pack?.part1 || []).forEach((group) => {
+    (group.questions || []).forEach((question, index) => {
+      const entry = {
+        ...question,
+        groupId: group.id,
+        groupLabel: group.label,
+      };
+      if (index === 0) {
+        picked.push(entry);
+      } else {
+        rest.push(entry);
+      }
+    });
+  });
+  while (picked.length < 5 && rest.length) {
+    picked.push(rest.shift());
+  }
+  return picked.slice(0, 5);
+}
+
+function buildIeltsPart3Pool(pack, card) {
+  // 题卡用 part3Id 指向讨论组的 id，讨论组用 for 回指题卡 id，两边都要能对上。
+  const group = (pack?.part3 || []).find(
+    (item) => item.id === card?.part3Id || item.for === card?.part3Id,
+  );
+  return group?.questions || [];
+}
+
+function getIeltsCurrentTurn() {
+  const pack = getIeltsPack();
+  if (!pack) {
+    return null;
+  }
+  if (state.ieltsStep === "part1") {
+    return state.ieltsQuestions.part1[state.ieltsPart1Index] || null;
+  }
+  if (state.ieltsStep === "part3") {
+    return state.ieltsQuestions.part3[state.ieltsPart3Index] || null;
+  }
+  if (state.ieltsStep === "prep" || state.ieltsStep === "longturn") {
+    return getIeltsPart2Card();
+  }
+  return null;
+}
+
+function getIeltsAnswerKind() {
+  return state.ieltsStep === "longturn" ? "part2" : state.ieltsStep;
+}
+
+function stopIeltsTimer() {
+  if (ieltsTimerHandle) {
+    window.clearInterval(ieltsTimerHandle);
+    ieltsTimerHandle = 0;
+  }
+  state.ieltsTimerEndsAt = 0;
+  state.ieltsTimerLabel = "";
+}
+
+function getIeltsRemainingSeconds() {
+  if (!state.ieltsTimerEndsAt) {
+    return 0;
+  }
+  return Math.max(
+    0,
+    Math.round((state.ieltsTimerEndsAt - Date.now()) / 1000),
+  );
+}
+
+function renderIeltsTimerText() {
+  if (!elements.ieltsTimer) {
+    return;
+  }
+  if (!state.ieltsTimerEndsAt) {
+    elements.ieltsTimer.textContent = "未计时";
+    elements.ieltsTimer.classList.remove("is-urgent");
+    return;
+  }
+  const remaining = getIeltsRemainingSeconds();
+  const minutes = Math.floor(remaining / 60);
+  const seconds = String(remaining % 60).padStart(2, "0");
+  elements.ieltsTimer.textContent = `${state.ieltsTimerLabel}${minutes}:${seconds}`;
+  elements.ieltsTimer.classList.toggle("is-urgent", remaining <= 10);
+}
+
+function startIeltsTimer(seconds, label, onDone) {
+  stopIeltsTimer();
+  state.ieltsTimerEndsAt = Date.now() + seconds * 1000;
+  state.ieltsTimerLabel = label;
+  ieltsTimerHandle = window.setInterval(() => {
+    if (getIeltsRemainingSeconds() <= 0) {
+      stopIeltsTimer();
+      renderIeltsTimerText();
+      if (onDone) {
+        onDone();
+      } else {
+        renderIeltsView();
+      }
+      return;
+    }
+    renderIeltsTimerText();
+  }, 500);
+  renderIeltsTimerText();
+}
+
+function resetIeltsMock() {
+  stopIeltsTimer();
+  state.ieltsStep = "intro";
+  state.ieltsPart1Index = 0;
+  state.ieltsPart3Index = 0;
+  state.ieltsQuestions = { part1: [], part3: [] };
+  state.ieltsAnswers = [];
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  state.ieltsReport = null;
+}
+
+function buildSpeakingRubric(entries) {
+  const answered = entries.filter((entry) =>
+    String(entry.transcript || "").trim(),
+  );
+  if (!answered.length) {
+    return null;
+  }
+
+  const average = (list) =>
+    list.length
+      ? list.reduce((total, value) => total + value, 0) / list.length
+      : 0;
+  const clamp = (value) => Math.max(35, Math.min(100, Math.round(value)));
+
+  const coverage = average(answered.map((entry) => entry.score || 0));
+  const wordCounts = answered.map((entry) =>
+    getDialogueTranscriptMeta(entry.transcript).wordCount,
+  );
+  const averageWords = average(wordCounts);
+  const longTurnWords = average(
+    answered
+      .filter((entry) => entry.part === "part2")
+      .map((entry) => getDialogueTranscriptMeta(entry.transcript).wordCount),
+  );
+  const targetWords = longTurnWords ? 110 : averageWords < 20 ? 16 : 32;
+
+  const joined = answered.map((entry) => entry.transcript).join(" ");
+  const words = normalizeDialogueText(joined).split(" ").filter(Boolean);
+  const distinctRatio = words.length ? new Set(words).size / words.length : 0;
+  const lowerJoined = ` ${joined.toLowerCase()} `;
+  const linkerHits = IELTS_LINKERS.filter((phrase) =>
+    lowerJoined.includes(` ${phrase} `),
+  ).length;
+  const corrections = analyzeFreeEnglish(joined)?.corrections?.length || 0;
+
+  const dimensions = [
+    {
+      label: "任务完成度",
+      score: clamp(coverage),
+      note: "按题目要求的关键信息点覆盖情况估算，漏掉提示点会拉低这一项。",
+    },
+    {
+      label: "流利度",
+      score: clamp((averageWords / targetWords) * 100),
+      note: `平均每次回答 ${Math.round(
+        averageWords,
+      )} 词；Part 2 目标是连续说满 2 分钟、110 词以上。`,
+    },
+    {
+      label: "词汇丰富度",
+      score: clamp(distinctRatio * 210 + linkerHits * 2),
+      note: "看重复用词比例：同一个形容词反复出现时，这一项会被压住。",
+    },
+    {
+      label: "语法准确度",
+      score: clamp(100 - corrections * 8),
+      note: corrections
+        ? `本地句法检查发现 ${corrections} 处可以改写的地方。`
+        : "本地句法检查没有发现明显问题，但仍要以真人反馈为准。",
+    },
+    {
+      label: "连贯与衔接",
+      score: clamp(45 + linkerHits * 9),
+      note: linkerHits
+        ? `用上了 ${linkerHits} 个连接表达，注意别为了连接而连接。`
+        : "几乎没有连接表达，试着用 however / that said / which is why 把两句连起来。",
+    },
+  ];
+
+  const overall = clamp(
+    dimensions.reduce((total, item) => total + item.score, 0) /
+      dimensions.length,
+  );
+
+  return { overall, dimensions };
+}
+
+function buildIeltsReport() {
+  const answers = state.ieltsAnswers;
+  const parts = ["part1", "part2", "part3"].map((part) => {
+    const items = answers.filter((entry) => entry.part === part);
+    const scored = items.filter((entry) => typeof entry.score === "number");
+    return {
+      part,
+      label: IELTS_PART_LABELS[part],
+      answered: items.length,
+      average: scored.length
+        ? Math.round(
+            scored.reduce((total, entry) => total + entry.score, 0) /
+              scored.length,
+          )
+        : 0,
+    };
+  });
+
+  return {
+    createdAt: new Date().toISOString(),
+    cardTitle: getIeltsPart2Card()?.label || "",
+    parts,
+    rubric: buildSpeakingRubric(answers),
+  };
+}
+
+function advanceIeltsFromPrep() {
+  const longTurnSeconds = getIeltsPack()?.longTurnSeconds || 120;
+  state.ieltsStep = "longturn";
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  renderIeltsView();
+  startIeltsTimer(longTurnSeconds, "作答 ", () => submitIeltsAnswer(true));
+}
+
+function startIeltsPrep() {
+  const prepSeconds = getIeltsPack()?.prepSeconds || 60;
+  state.ieltsStep = "prep";
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  renderIeltsView();
+  startIeltsTimer(prepSeconds, "准备 ", () => advanceIeltsFromPrep());
+}
+
+function startIeltsMock() {
+  const pack = getIeltsPack();
+  const card = getIeltsPart2Card();
+  if (!pack || !card) {
+    state.ieltsMessage = "题库还在加载，稍等一下再开始。";
+    state.ieltsMessageType = "error";
+    renderIeltsView();
+    return;
+  }
+
+  stopIeltsTimer();
+  state.ieltsQuestions = {
+    part1: buildIeltsPart1Pool(pack),
+    part3: buildIeltsPart3Pool(pack, card),
+  };
+  state.ieltsPart1Index = 0;
+  state.ieltsPart3Index = 0;
+  state.ieltsAnswers = [];
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsReport = null;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  state.ieltsStep = "part1";
+  renderIeltsView();
+}
+
+function recordIeltsAnswer(transcript, { forced = false } = {}) {
+  const text = String(transcript || "").trim();
+  if (!text && !forced) {
+    return false;
+  }
+
+  const part = getIeltsAnswerKind();
+  const turn = getIeltsCurrentTurn();
+  const result = turn ? scoreDialogueAnswer(turn, text) : null;
+  state.ieltsAnswers.push({
+    part,
+    label:
+      part === "part2"
+        ? getIeltsPart2Card()?.label || "Part 2"
+        : turn?.prompt || "",
+    transcript: text,
+    score: result ? result.score : 0,
+    groups: result ? result.groups : [],
+    wordCount: getDialogueTranscriptMeta(text).wordCount,
+    createdAt: new Date().toISOString(),
+  });
+  return true;
+}
+
+function submitIeltsAnswer(forced = false) {
+  if (!recordIeltsAnswer(state.ieltsInput, { forced })) {
+    return;
+  }
+
+  state.ieltsInput = "";
+  state.ieltsHintVisible = false;
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+
+  if (state.ieltsStep === "part1") {
+    state.ieltsPart1Index += 1;
+    if (state.ieltsPart1Index >= state.ieltsQuestions.part1.length) {
+      startIeltsPrep();
+      return;
+    }
+    renderIeltsView();
+    return;
+  }
+
+  if (state.ieltsStep === "longturn") {
+    stopIeltsTimer();
+    state.ieltsStep = "part3";
+    state.ieltsPart3Index = 0;
+    renderIeltsView();
+    return;
+  }
+
+  if (state.ieltsStep === "part3") {
+    state.ieltsPart3Index += 1;
+    if (state.ieltsPart3Index >= state.ieltsQuestions.part3.length) {
+      state.ieltsReport = buildIeltsReport();
+      state.ieltsStep = "report";
+    }
+    renderIeltsView();
+  }
+}
+
+function finalizeIeltsAttempt(transcript) {
+  state.ieltsInput = transcript;
+  renderIeltsView();
+}
+
+function startIeltsRecording() {
+  if (
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.ieltsStep === "intro" ||
+    state.ieltsStep === "prep" ||
+    state.ieltsStep === "report"
+  ) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.ieltsMessage = availability.message;
+    state.ieltsMessageType =
+      state.practiceRecognitionMode === "off" ? "info" : "error";
+    renderIeltsView();
+    return;
+  }
+
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  const options = { onTranscript: finalizeIeltsAttempt, requireEntry: false };
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording(options);
+    return;
+  }
+  startBrowserPracticeRecording(options);
+}
+
+function stopIeltsRecording() {
+  stopPracticeRecording();
+}
+
+function playIeltsPrompt() {
+  const card = getIeltsPart2Card();
+  const text =
+    state.ieltsStep === "prep" || state.ieltsStep === "longturn"
+      ? card?.topicLine || ""
+      : getIeltsCurrentTurn()?.prompt || "";
+  if (!text) {
+    return;
+  }
+  if (!speak(text, 0.9, { voicePreference: state.practiceVoice })) {
+    state.ieltsMessage = "当前浏览器不支持语音朗读。";
+    state.ieltsMessageType = "error";
+    renderIeltsView();
+  }
+}
+
+/** Part 2 题卡下拉框：只在未开始或已结束时允许换卡。 */
+function renderIeltsCardOptions() {
+  const host = elements.ieltsCardSelect;
+  const cards = getIeltsPart2Cards();
+  const signature = cards.map((card) => card.id).join("|");
+  if (host.dataset.signature !== signature) {
+    const fragment = document.createDocumentFragment();
+    cards.forEach((card) => {
+      const option = document.createElement("option");
+      option.value = card.id;
+      option.textContent = `${card.label} · ${card.labelZh}`;
+      fragment.append(option);
+    });
+    host.replaceChildren(fragment);
+    host.dataset.signature = signature;
+  }
+  const card = getIeltsPart2Card();
+  if (card) {
+    host.value = card.id;
+  }
+  const idle = state.ieltsStep === "intro" || state.ieltsStep === "report";
+  host.disabled = !idle || cards.length <= 1;
+}
+
+function toggleIeltsHint() {
+  state.ieltsHintVisible = !state.ieltsHintVisible;
+  renderIeltsView();
+}
+
+function renderIeltsHint() {
+  const turn = getIeltsCurrentTurn();
+  const sample = state.ieltsStep === "longturn" ? getIeltsPart2Card() : turn;
+  if (!sample || !state.ieltsHintVisible) {
+    elements.ieltsHint.hidden = true;
+    elements.ieltsHint.replaceChildren();
+    elements.ieltsHintButton.textContent = "参考表达";
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "practice-block-label";
+  label.textContent = "参考表达";
+
+  const english = document.createElement("p");
+  english.className = "dialogue-hint-sample";
+  english.lang = "en";
+  english.textContent = sample.sample || "";
+
+  const translation = document.createElement("p");
+  translation.className = "dialogue-hint-translation";
+  translation.textContent = sample.sampleZh || "";
+
+  elements.ieltsHint.replaceChildren(label, english, translation);
+  elements.ieltsHint.hidden = false;
+  elements.ieltsHintButton.textContent = "收起提示";
+}
+
+function renderIeltsReport() {
+  const report = state.ieltsReport;
+  const visible = state.ieltsStep === "report" && Boolean(report);
+  elements.ieltsReport.hidden = !visible;
+  if (!visible) {
+    return;
+  }
+
+  const rubric = report.rubric;
+  elements.ieltsReportTitle.textContent = report.cardTitle
+    ? `模拟题目：${report.cardTitle}`
+    : "本次模拟";
+  elements.ieltsReportOverall.textContent = rubric
+    ? `练习估算 ${rubric.overall}`
+    : "本次没有收到有效回答";
+
+  const answered = report.parts.reduce(
+    (total, part) => total + part.answered,
+    0,
+  );
+  elements.ieltsReportSummary.textContent = rubric
+    ? `全程共记录 ${answered} 段回答。下面的分项按本地文本规则估算，用来判断下一步该补什么。`
+    : "计时结束前没有收到可以评分的回答，重新开始一次，尽量在计时器内开口说完整句子。";
+
+  const partFragment = document.createDocumentFragment();
+  report.parts.forEach((part) => {
+    const item = document.createElement("div");
+    item.className = "ielts-report-part";
+
+    const name = document.createElement("span");
+    name.className = "ielts-report-part-name";
+    name.textContent = part.label;
+
+    const value = document.createElement("strong");
+    value.textContent = part.answered
+      ? `${part.answered} 题 · 覆盖 ${part.average}%`
+      : "未作答";
+
+    item.append(name, value);
+    partFragment.append(item);
+  });
+  elements.ieltsReportParts.replaceChildren(partFragment);
+
+  const dimensionFragment = document.createDocumentFragment();
+  (rubric?.dimensions || []).forEach((dimension) => {
+    const item = document.createElement("div");
+    item.className = "ielts-dimension";
+
+    const head = document.createElement("div");
+    head.className = "ielts-dimension-head";
+    const label = document.createElement("span");
+    label.textContent = dimension.label;
+    const score = document.createElement("strong");
+    score.textContent = `${dimension.score}`;
+    head.append(label, score);
+
+    const track = document.createElement("div");
+    track.className = "ielts-dimension-track";
+    const bar = document.createElement("span");
+    bar.style.width = `${dimension.score}%`;
+    track.append(bar);
+
+    const note = document.createElement("p");
+    note.className = "ielts-dimension-note";
+    note.textContent = dimension.note;
+
+    item.append(head, track, note);
+    dimensionFragment.append(item);
+  });
+  elements.ieltsReportDimensions.replaceChildren(dimensionFragment);
+}
+
+/**
+ * 渲染整块雅思视图。Part 1 / Part 3 显示考题，准备阶段显示题卡要点，
+ * 结束阶段换成练习报告；三块互斥，避免把计时器和输入框堆在同一屏。
+ */
+function renderIeltsView() {
+  const startButton = elements.ieltsStartButton;
+  if (!startButton) {
+    return;
+  }
+
+  const pack = getIeltsPack();
+  const step = state.ieltsStep;
+  const availability = getPracticeModeAvailability();
+  const isAnswerStep =
+    step === "part1" || step === "longturn" || step === "part3";
+  const isRunning = isAnswerStep || step === "prep";
+  const liveTranscript =
+    state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+
+  renderIeltsCardOptions();
+
+  elements.ieltsModeSummary.textContent = pack
+    ? `${pack.part1.length} 个 Part 1 话题组 · ${pack.part2.length} 张 Part 2 题卡 · 语音识别：${getPracticeModeLabel()} · 支持自定义 API`
+    : "题库正在加载，先停在这一步，稍后会自动出现题卡。";
+
+  startButton.hidden = isRunning || step === "report";
+  startButton.disabled = !pack;
+  elements.ieltsPrepSkipButton.hidden = step !== "prep";
+  elements.ieltsRestartButton.hidden = step === "intro";
+  elements.ieltsIntroPanel.hidden = step !== "intro";
+  elements.ieltsPromptBlock.hidden = !isRunning;
+
+  if (isRunning) {
+    const card = getIeltsPart2Card();
+    const turn = getIeltsCurrentTurn();
+    const isLongTurn = step === "prep" || step === "longturn";
+    elements.ieltsPartLabel.textContent = isLongTurn
+      ? `${IELTS_PART_LABELS.part2} · ${
+          step === "prep" ? "准备中" : "作答中"
+        }`
+      : IELTS_PART_LABELS[step] || "";
+    elements.ieltsPrompt.lang = "en";
+    elements.ieltsPrompt.textContent = isLongTurn
+      ? card?.topicLine || ""
+      : turn?.prompt || "";
+    elements.ieltsPromptZh.textContent = isLongTurn
+      ? card?.labelZh || ""
+      : turn?.promptZh || "";
+
+    const bullets = isLongTurn ? card?.bulletsZh || card?.bullets || [] : [];
+    elements.ieltsBullets.hidden = bullets.length === 0;
+    elements.ieltsBullets.replaceChildren(
+      ...bullets.map((line) => {
+        const item = document.createElement("li");
+        item.textContent = line;
+        return item;
+      }),
+    );
+  }
+
+  elements.ieltsProgress.textContent = isRunning
+    ? step === "part1"
+      ? `Part 1 · 第 ${state.ieltsPart1Index + 1} / ${
+          state.ieltsQuestions.part1.length
+        } 题`
+      : step === "part3"
+        ? `Part 3 · 第 ${state.ieltsPart3Index + 1} / ${
+            state.ieltsQuestions.part3.length
+          } 题`
+        : step === "prep"
+          ? "Part 2 · 准备时间"
+          : "Part 2 · 个人陈述"
+    : "";
+
+  elements.ieltsAnswerBlock.hidden = !isAnswerStep;
+  if (isAnswerStep) {
+    elements.ieltsAnswerInput.value = liveTranscript || state.ieltsInput;
+    elements.ieltsAnswerInput.disabled =
+      state.practiceListening || state.practiceTranscribing;
+    elements.ieltsPlayButton.disabled = !("speechSynthesis" in window);
+    elements.ieltsHintButton.disabled =
+      state.practiceListening || state.practiceTranscribing;
+    elements.ieltsRecordButton.disabled =
+      !availability.available ||
+      state.practiceListening ||
+      state.practiceTranscribing;
+    elements.ieltsRecordButton.textContent = state.practiceTranscribing
+      ? "正在转写"
+      : state.practiceRecognitionMode === "api"
+        ? "开始录音"
+        : "开口回答";
+    elements.ieltsRecordButton.hidden = state.practiceListening;
+    elements.ieltsStopButton.hidden = !state.practiceListening;
+    elements.ieltsStopButton.disabled = !state.practiceListening;
+    elements.ieltsSubmitButton.disabled =
+      !elements.ieltsAnswerInput.value.trim() ||
+      state.practiceListening ||
+      state.practiceTranscribing;
+    elements.ieltsSubmitButton.textContent =
+      step === "longturn" ? "结束并进入 Part 3" : "提交回答";
+  }
+
+  renderIeltsHint();
+  elements.ieltsNotice.hidden = !state.ieltsMessage;
+  elements.ieltsNotice.textContent = state.ieltsMessage;
+  elements.ieltsNotice.classList.toggle(
+    "is-error",
+    state.ieltsMessageType === "error",
+  );
+  renderIeltsReport();
+  renderIeltsTimerText();
+}
+
+function setPracticeSection(section) {
+  const allowedSections = new Set(["shadow", "dialogue", "ielts", "free"]);
+  const nextSection = allowedSections.has(section) ? section : "shadow";
+  if (state.practiceSection === nextSection) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceSection = nextSection;
+  if (nextSection === "dialogue") {
+    clearDialogueAttempt();
+    ensureSpeakingPacks().then(() => {
+      if (state.practiceSection === "dialogue") {
+        renderPracticeView();
+      }
+    });
+  } else if (nextSection === "ielts") {
+    state.practiceMessage = "";
+    state.practiceMessageType = "";
+    if (state.ieltsStep === "report") {
+      resetIeltsMock();
+    }
+    ensureSpeakingPacks().then(() => {
+      if (state.practiceSection === "ielts") {
+        renderPracticeView();
+      }
+    });
+  } else if (nextSection === "free") {
+    state.practiceMessage = "";
+    state.practiceMessageType = "";
+    if (state.freeMessages.length === 0) {
+      resetFreeConversation();
+    }
+  } else {
+    resetPracticeAttempt();
+  }
+  render();
+}
+
+function playDialoguePrompt() {
+  const turn = getCurrentDialogueTurn();
+  if (!turn) {
+    return;
+  }
+
+  const profile = DIALOGUE_SPEAKER_VOICE_PROFILES[turn.speaker] || {};
+  if (
+    !speak(turn.prompt, 0.9, {
+      profile,
+      pitch: profile.pitch,
+      rateScale: profile.rateScale,
+      voicePreference: state.practiceVoice,
+    })
+  ) {
+    state.practiceMessage =
+      "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    renderDialogueView();
+    return;
+  }
+
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  renderDialogueView();
+}
+
+function toggleDialogueHint() {
+  state.dialogueHintVisible = !state.dialogueHintVisible;
+  renderDialogueView();
+}
+
+function addDialogueHistory(scenario, turnIndex, transcript, score) {
+  state.practiceHistory.unshift({
+    itemKey: `dialogue:${scenario.id}:${turnIndex}`,
+    resourceTitle: scenario.title,
+    target: `${scenario.title} · 第 ${turnIndex + 1} 轮`,
+    transcript,
+    accuracy: score,
+    createdAt: new Date().toISOString(),
+  });
+  state.practiceHistory = state.practiceHistory.slice(0, 80);
+  persistPracticeHistory();
+}
+
+function submitDialogueAnswer(providedTranscript = "") {
+  const scenario = getCurrentDialogueScenario();
+  const turn = getCurrentDialogueTurn();
+  if (
+    !scenario ||
+    !turn ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.dialogueResult
+  ) {
+    return null;
+  }
+
+  const transcript = String(
+    providedTranscript || elements.dialogueAnswerInput.value,
+  ).trim();
+  if (!transcript) {
+    state.practiceMessage = "请先说出或输入一个英文回答。";
+    state.practiceMessageType = "error";
+    renderDialogueView();
+    return null;
+  }
+
+  const result = scoreDialogueAnswer(turn, transcript);
+  state.dialogueInput = transcript;
+  state.dialogueMessages[state.dialogueTurnIndex] = transcript;
+  state.dialogueHintVisible = false;
+  state.dialogueResult = {
+    ...result,
+    scenarioId: scenario.id,
+    turnIndex: state.dialogueTurnIndex,
+  };
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  addDialogueHistory(
+    scenario,
+    state.dialogueTurnIndex,
+    transcript,
+    result.score,
+  );
+  renderPracticeView();
+  updateProgress();
+  return state.dialogueResult;
+}
+
+function finalizeDialogueAttempt(transcript) {
+  submitDialogueAnswer(transcript);
+}
+
+function startDialogueRecording() {
+  if (state.practiceListening || state.practiceTranscribing) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.practiceMessage = availability.message;
+    state.practiceMessageType =
+      state.practiceRecognitionMode === "off" ? "info" : "error";
+    renderDialogueView();
+    return;
+  }
+
+  state.dialogueInput = "";
+  state.dialogueResult = null;
+  state.dialogueHintVisible = false;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording({
+      onTranscript: finalizeDialogueAttempt,
+      requireEntry: false,
+    });
+    return;
+  }
+
+  startBrowserPracticeRecording({
+    onTranscript: finalizeDialogueAttempt,
+    requireEntry: false,
+  });
+}
+
+function stopDialogueRecording() {
+  stopPracticeRecording();
+}
+
+function retryDialogueTurn() {
+  const turn = getCurrentDialogueTurn();
+  if (!turn) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.dialogueInput = "";
+  state.dialogueMessages[state.dialogueTurnIndex] = "";
+  state.dialogueHintVisible = false;
+  state.dialogueResult = null;
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  renderDialogueView();
+}
+
+function moveDialogueTurn() {
+  const scenario = getCurrentDialogueScenario();
+  if (!scenario || state.practiceListening || state.practiceTranscribing) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  if (state.dialogueTurnIndex < scenario.turns.length - 1) {
+    state.dialogueTurnIndex += 1;
+    clearDialogueAttempt({ keepMessages: true });
+  } else {
+    state.dialogueTurnIndex = 0;
+    clearDialogueAttempt();
+  }
+  renderPracticeView();
+}
+
+function getFreeTopic() {
+  return FREE_CHAT_TOPICS[state.freeTopic] || FREE_CHAT_TOPICS.daily;
+}
+
+function getFreeChatModeLabel(mode = state.freeChatMode) {
+  const labels = {
+    local: "本地免费",
+    api: "自定义 Chat API",
+    off: "关闭自动回复",
+  };
+  return labels[mode] || labels.local;
+}
+
+function getFreeTopicIntro(topicId) {
+  const introductions = {
+    daily:
+      "Hi! I'm your American English conversation coach. Let's start with something simple: what is one small thing that happened in your day?",
+    study:
+      "Hi! Let's talk about learning and exams. What are you studying at the moment, and what part feels most challenging?",
+    travel:
+      "Hi! Let's talk about travel and cities. Is there a place you have visited or would love to visit? Tell me what interests you about it.",
+    work:
+      "Hi! Let's talk about work and careers. What kind of work are you doing now, or what career would you like to build?",
+    technology:
+      "Hi! Let's talk about technology and media. Which app or device do you use most often, and how does it affect your daily life?",
+    culture:
+      "Hi! Let's talk about culture and everyday life. What is one custom or habit in your community that visitors might find interesting?",
+  };
+  return introductions[topicId] || introductions.daily;
+}
+
+function getFreeTopicIntroZh(topicId) {
+  const introductions = {
+    daily:
+      "你好！我是你的美式英语对话教练。先从简单的话题开始：今天发生的一件小事是什么？",
+    study:
+      "你好！我们来聊聊学习和考试。你目前在学习什么？哪一部分最有挑战？",
+    travel:
+      "你好！我们来聊聊旅行和城市。有没有一个你去过或很想去的地方？说说它哪里吸引你。",
+    work:
+      "你好！我们来聊聊工作和职业。你现在做什么工作，或者想建立怎样的职业方向？",
+    technology:
+      "你好！我们来聊聊科技和媒体。你最常用哪个应用或设备？它怎样影响你的日常生活？",
+    culture:
+      "你好！我们来聊聊文化和日常生活。你的社区里有什么习俗或习惯会让外来者觉得有趣？",
+  };
+  return introductions[topicId] || introductions.daily;
+}
+
+function resetFreeConversation() {
+  stopRealtimeConversation("", { silent: true });
+  freeChatRequestId += 1;
+  const topic = getFreeTopic();
+  state.freeMessages = [
+    {
+      role: "assistant",
+      english: getFreeTopicIntro(state.freeTopic),
+      chinese: getFreeTopicIntroZh(state.freeTopic),
+      source: "local",
+      createdAt: new Date().toISOString(),
+    },
+  ];
+  state.freeTurnCount = 0;
+  state.freeInput = "";
+  state.freeHintVisible = false;
+  state.freeChatLoading = false;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.freeChatApiMessage = "";
+  state.freeChatApiMessageType = "";
+  state.freeUsedLines = new Set();
+  state.freeUsedTopics = new Set([state.freeTopic]);
+  state.freeTopicHistory = [];
+  persistFreeConversation();
+  if (state.practiceSection === "free") {
+    renderPracticeView();
+  }
+}
+
+function cleanFreeEnglish(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\s+([,.!?;:])/g, "$1");
+}
+
+function applyFreeLanguageRules(text) {
+  const corrections = [];
+  let correctedText = cleanFreeEnglish(text);
+
+  FREE_LANGUAGE_RULES.forEach((rule) => {
+    const pattern = new RegExp(rule.pattern.source, rule.pattern.flags);
+    const nextText = correctedText.replace(pattern, rule.replacement);
+    if (nextText === correctedText) {
+      return;
+    }
+    correctedText = nextText;
+    corrections.push({
+      type: rule.type,
+      message: rule.message,
+    });
+  });
+
+  if (/\bbecause\b[\s\S]*\bso\b/i.test(correctedText)) {
+    corrections.push({
+      type: "连贯性",
+      message:
+        "英语里 because 和 so 通常不同时使用；保留一个连接词就足够。",
+    });
+  }
+  if (/\balthough\b[\s\S]*\bbut\b/i.test(correctedText)) {
+    corrections.push({
+      type: "连贯性",
+      message:
+        "although 和 but 通常不同时出现；可以只保留 although 或 but。",
+    });
+  }
+
+  return { correctedText, corrections };
+}
+
+function buildFreeVocabularySuggestion(text) {
+  let suggestedText = text;
+  const notes = [];
+
+  FREE_VOCABULARY_UPGRADES.forEach((upgrade) => {
+    const pattern = new RegExp(upgrade.pattern.source, upgrade.pattern.flags);
+    const nextText = suggestedText.replace(pattern, upgrade.replacement);
+    if (nextText === suggestedText) {
+      return;
+    }
+    suggestedText = nextText;
+    notes.push({
+      type: "词汇",
+      message: upgrade.message,
+    });
+  });
+
+  return { suggestedText, notes };
+}
+
+function buildFreeIeltsTips(text) {
+  const words = cleanFreeEnglish(text).match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || [];
+  const lowerText = cleanFreeEnglish(text).toLocaleLowerCase("en-US");
+  const tips = [];
+
+  if (words.length < 12) {
+    tips.push(
+      "流利度：回答偏短。雅思口语 Part 1 通常用 2–3 句展开，可以先回答，再补一个原因或例子。",
+    );
+  }
+
+  if (
+    !/\b(because|since|for example|however|although|while|which|that)\b/i.test(
+      lowerText,
+    )
+  ) {
+    tips.push(
+      "连贯性：加入 because、for example 或 however，让观点之间的关系更清楚。",
+    );
+  }
+
+  if (
+    !/\b(if|when|although|because|which|who|that|while|before|after)\b/i.test(
+      lowerText,
+    )
+  ) {
+    tips.push(
+      "语法：尝试加入一个从句，例如 “When I have time, I usually...” 来展示句式变化。",
+    );
+  }
+
+  if (words.length >= 12 && !tips.length) {
+    tips.push(
+      "表达：回答长度合适。下一步可以加入一个具体细节、数字或对比，让内容更像真实交流。",
+    );
+  }
+
+  return tips.slice(0, 2);
+}
+
+function analyzeFreeEnglish(text) {
+  const original = cleanFreeEnglish(text);
+  const { correctedText, corrections } = applyFreeLanguageRules(original);
+  const vocabulary = buildFreeVocabularySuggestion(correctedText);
+  const allCorrections = [...corrections, ...vocabulary.notes];
+  const betterExpression = vocabulary.suggestedText;
+  const ieltsTips = buildFreeIeltsTips(correctedText);
+  const feedback = {
+    correctedText,
+    corrections:
+      allCorrections.length > 0
+        ? allCorrections.slice(0, 4)
+        : [
+            {
+              type: "状态",
+              message: "没有发现明显语法错误，继续保持具体表达。",
+            },
+          ],
+    betterExpression:
+      betterExpression !== correctedText ? betterExpression : "",
+    ieltsTips,
+  };
+
+  return feedback;
+}
+
+function pickFreeChatLine(pool, namespace) {
+  const items = (pool || []).filter(Boolean);
+  if (items.length === 0) {
+    return null;
+  }
+
+  if (!state.freeUsedLines || typeof state.freeUsedLines.has !== "function") {
+    state.freeUsedLines = new Set();
+  }
+
+  const keyOf = (item) => `${namespace}:${item.english}`;
+  const unused = items.filter((item) => !state.freeUsedLines.has(keyOf(item)));
+  const candidates = unused.length > 0 ? unused : items;
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+
+  state.freeUsedLines.add(keyOf(chosen));
+  if (state.freeUsedLines.size > 80) {
+    state.freeUsedLines = new Set([keyOf(chosen)]);
+  }
+  return chosen;
+}
+
+/*
+ * 本地陪练的话题推进：每 3 轮换一个话题，并且优先挑还没聊过的，
+ * 这样长对话不会一直停在同一个问题上；太短的回答先要一句补充，
+ * 再进入下一个问题。
+ */
+const FREE_TOPIC_SHIFTS = [
+  {
+    english: "Let's switch to something else for a minute.",
+    chinese: "我们换个话题聊一分钟。",
+  },
+  {
+    english: "Okay, different topic.",
+    chinese: "好，换个话题。",
+  },
+  {
+    english: "Let's move on to another area.",
+    chinese: "我们换到另一个方面。",
+  },
+  {
+    english: "New question, different subject.",
+    chinese: "新问题，换个题材。",
+  },
+];
+
+const FREE_SHORT_ANSWER_NUDGES = [
+  {
+    english: "That was short. Say it again with one reason.",
+    chinese: "这句有点短。再加一个理由说一遍。",
+  },
+  {
+    english: "Give me one more sentence with a detail.",
+    chinese: "再加一句，补一个细节。",
+  },
+  {
+    english: "Try that again - one detail and one reason.",
+    chinese: "再试一次，补一个细节和一个理由。",
+  },
+];
+
+const FREE_SHORT_ANSWER_WORDS = 6;
+const FREE_TOPIC_TURNS = 3;
+
+/** 每满 3 轮返回一个没聊过的新话题 id，并把下拉框同步过去。 */
+function rotateFreeTopicIfDue(turnIndex) {
+  const topicIds = Object.keys(FREE_CHAT_TOPICS);
+  if (turnIndex <= 0 || turnIndex % FREE_TOPIC_TURNS !== 0) {
+    return "";
+  }
+
+  if (!state.freeUsedTopics || typeof state.freeUsedTopics.add !== "function") {
+    state.freeUsedTopics = new Set();
+  }
+  state.freeUsedTopics.add(state.freeTopic);
+  const unused = topicIds.filter((id) => !state.freeUsedTopics.has(id));
+  const pool = unused.length ? unused : topicIds;
+  const next = pool[Math.floor(Math.random() * pool.length)];
+  if (!next || next === state.freeTopic) {
+    return "";
+  }
+
+  state.freeTopic = next;
+  state.freeTopicHistory = [...(state.freeTopicHistory || []), next];
+  if (elements.freeTopic) {
+    elements.freeTopic.value = next;
+  }
+  return next;
+}
+
+function buildLocalFreeTurn(text, turnIndex) {
+  const feedback = analyzeFreeEnglish(text);
+  const meta = getDialogueTranscriptMeta(text);
+  const shiftedTopic = rotateFreeTopicIfDue(turnIndex);
+  const shift = shiftedTopic
+    ? pickFreeChatLine(FREE_TOPIC_SHIFTS, "topic-shift")
+    : null;
+  const opener = pickFreeChatLine(FREE_CHAT_OPENERS, "opener");
+  const reaction = FREE_CHAT_KEYWORD_REACTIONS.find((item) =>
+    item.pattern.test(text),
+  );
+  const topicFollowUp = pickFreeChatLine(
+    FREE_CHAT_TOPIC_FOLLOW_UPS[state.freeTopic] ||
+      FREE_CHAT_TOPIC_FOLLOW_UPS.daily,
+    `topic-${state.freeTopic}`,
+  );
+  const genericFollowUp = pickFreeChatLine(
+    FREE_CHAT_GENERIC_FOLLOW_UPS,
+    "generic",
+  );
+
+  const isTooShort = meta.wordCount < FREE_SHORT_ANSWER_WORDS;
+  const question = isTooShort
+    ? pickFreeChatLine(FREE_SHORT_ANSWER_NUDGES, "short-answer") ||
+      genericFollowUp
+    : reaction && (turnIndex % 2 === 0 || Math.random() < 0.5)
+      ? { english: reaction.question, chinese: reaction.questionZh }
+      : topicFollowUp || genericFollowUp;
+
+  if (isTooShort && Array.isArray(feedback.ieltsTips)) {
+    feedback.ieltsTips = [
+      ...feedback.ieltsTips,
+      "短句只能算作答：Part 1 至少两句话，加一个细节或一个理由。",
+    ].slice(0, 3);
+  }
+
+  const english = cleanFreeEnglish(
+    [opener?.english, shift?.english, reaction?.english, question?.english]
+      .filter(Boolean)
+      .join(" "),
+  );
+  const chinese = [
+    opener?.chinese,
+    shift?.chinese,
+    reaction?.chinese,
+    question?.chinese,
+  ]
+    .filter(Boolean)
+    .join("");
+
+  return {
+    feedback,
+    reply: {
+      english: english || FREE_CHAT_TOPICS.daily.replies[0].english,
+      chinese: chinese || FREE_CHAT_TOPICS.daily.replies[0].chinese,
+    },
+  };
+}
+
+function getFreeChatEndpoint() {
+  const rawUrl = String(state.freeChatApiUrl || "").trim();
+  if (!rawUrl) {
+    return "";
+  }
+
+  const resolved = new URL(rawUrl, window.location.href);
+  const pathname = resolved.pathname.replace(/\/+$/, "");
+  if (!pathname || pathname === "/v1") {
+    resolved.pathname = `${pathname || "/v1"}/chat/completions`;
+  }
+  return resolved.toString();
+}
+
+function buildFreeChatHeaders() {
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  if (!state.freeChatApiKey || state.freeChatApiAuth === "none") {
+    return headers;
+  }
+
+  if (state.freeChatApiAuth === "x-api-key") {
+    headers["x-api-key"] = state.freeChatApiKey;
+  } else {
+    headers.Authorization = `Bearer ${state.freeChatApiKey}`;
+  }
+  return headers;
+}
+
+function buildFreeChatSystemPrompt() {
+  const topic = getFreeTopic();
+  const learnerTurns = state.freeMessages.filter(
+    (message) => message.role === "user" && message.english,
+  ).length;
+  return [
+    "You are Mia, a warm, easygoing American conversation partner in your early thirties.",
+    "You are talking with a Chinese learner who is preparing for IELTS Speaking. Your reply is read aloud by text-to-speech, so it has to sound natural when spoken.",
+    `Current conversation topic: ${topic.label}.`,
+    `The learner has already answered ${learnerTurns} time(s) in this conversation; keep building on those details instead of restarting the topic.`,
+    "Sound like a real person, not a textbook or an assistant: use contractions, short sentences, and a relaxed spoken rhythm.",
+    "React to the specific detail the learner just mentioned first, and paraphrase it in your own words.",
+    "Ask at most one follow-up question, and make it specific and easy to answer out loud in a few sentences.",
+    "Never begin two replies in the same conversation with the same words, and never repeat a question you already asked.",
+    'Avoid formulaic chatbot openers such as "That\'s a great question", "Certainly", or "As an AI". Avoid lists, headings, emoji, and bullet points.',
+    "Keep the English reply to 1-3 sentences, roughly 20-45 words, unless the learner clearly asks for more detail.",
+    "Use American English spelling and phrasing.",
+    "Always provide an accurate Simplified Chinese translation of your English reply.",
+    "Correct the learner's grammar, vocabulary, and unnatural expressions. Do not invent errors; if the sentence is already clear, say so.",
+    "Give practical IELTS Speaking practice advice about fluency, lexical resource, grammar, or coherence. Never claim an official IELTS score.",
+    "Return only a valid JSON object with this exact shape:",
+    '{"reply_en":"English reply","reply_zh":"Simplified Chinese translation","corrected_text":"A corrected, natural version of the learner message","corrections":[{"type":"语法|词汇|表达|状态","message":"short explanation in Chinese"}],"better_expression":"A more natural version or an empty string","ielts_tip":"One concise IELTS practice tip in Chinese"}',
+  ].join("\n");
+}
+
+function extractFreeChatContent(payload) {
+  const content = payload?.choices?.[0]?.message?.content;
+  if (typeof content === "string") {
+    return content.trim();
+  }
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => (typeof part === "string" ? part : part?.text || ""))
+      .join("")
+      .trim();
+  }
+  return "";
+}
+
+function parseFreeChatJson(content) {
+  const raw = String(content || "").trim();
+  if (!raw) {
+    return null;
+  }
+
+  const withoutFence = raw
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  try {
+    return JSON.parse(withoutFence);
+  } catch {
+    const start = withoutFence.indexOf("{");
+    const end = withoutFence.lastIndexOf("}");
+    if (start === -1 || end <= start) {
+      return null;
+    }
+    try {
+      return JSON.parse(withoutFence.slice(start, end + 1));
+    } catch {
+      return null;
+    }
+  }
+}
+
+function normalizeFreeCorrections(value) {
+  if (value == null || value === "") {
+    return [];
+  }
+
+  const items = Array.isArray(value) ? value : [value];
+  return items
+    .map((item) => {
+      if (typeof item === "string") {
+        return { type: "表达", message: item.trim() };
+      }
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+      const message = String(
+        item.message || item.explanation || item.note || "",
+      ).trim();
+      if (!message) {
+        return null;
+      }
+      return {
+        type: String(item.type || "表达").trim() || "表达",
+        message,
+      };
+    })
+    .filter(Boolean);
+}
+
+async function requestFreeChatTurn(text) {
+  const endpoint = getFreeChatEndpoint();
+  if (!endpoint) {
+    throw new Error("请先填写 Chat 接口地址。");
+  }
+
+  const history = state.freeMessages
+    .filter((message) => message.role === "user" || message.role === "assistant")
+    .slice(-12)
+    .map((message) => ({
+      role: message.role,
+      content:
+        message.role === "assistant" && message.chinese
+          ? `${message.english}\n中文：${message.chinese}`
+          : message.english,
+    }));
+  const messages = [
+    { role: "system", content: buildFreeChatSystemPrompt() },
+    ...history,
+  ];
+  const requestBody = {
+    model: state.freeChatApiModel || "gpt-4o-mini",
+    temperature: 0.85,
+    frequency_penalty: 0.3,
+    presence_penalty: 0.4,
+    max_tokens: 600,
+    messages,
+  };
+  const requestOptions = {
+    method: "POST",
+    headers: buildFreeChatHeaders(),
+    body: JSON.stringify(requestBody),
+  };
+  let response = await fetch(endpoint, requestOptions);
+  let responseText = await response.text();
+
+  // Some OpenAI-compatible providers reject sampling extras such as
+  // frequency_penalty even though they accept the core Chat Completions body.
+  if (!response.ok && [400, 422].includes(response.status)) {
+    const retryBody = { ...requestBody };
+    delete retryBody.frequency_penalty;
+    delete retryBody.presence_penalty;
+    response = await fetch(endpoint, {
+      ...requestOptions,
+      body: JSON.stringify(retryBody),
+    });
+    responseText = await response.text();
+  }
+
+  let payload = null;
+  try {
+    payload = JSON.parse(responseText);
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      payload?.error?.message ||
+      payload?.message ||
+      responseText ||
+      `Chat 接口返回 ${response.status}`;
+    throw new Error(String(message).slice(0, 180));
+  }
+
+  const content = extractFreeChatContent(payload);
+  const data = parseFreeChatJson(content);
+  if (!data?.reply_en || !data?.reply_zh) {
+    throw new Error("Chat 接口没有返回双语 JSON 内容。");
+  }
+
+  const corrections = normalizeFreeCorrections(data.corrections);
+  return {
+    feedback: {
+      correctedText: String(
+        data.corrected_text || data.correctedText || text,
+      ).trim(),
+      corrections:
+        corrections.length > 0
+          ? corrections
+          : [
+              {
+                type: "状态",
+                message: "没有发现明显语法错误，继续保持具体表达。",
+              },
+            ],
+      betterExpression: String(
+        data.better_expression || data.betterExpression || "",
+      ).trim(),
+      ieltsTips: String(data.ielts_tip || data.ieltsTip || "")
+        .trim()
+        ? [String(data.ielts_tip || data.ieltsTip).trim()]
+        : [],
+    },
+    reply: {
+      english: String(data.reply_en).trim(),
+      chinese: String(data.reply_zh).trim(),
+    },
+  };
+}
+
+function playLatestFreeReply() {
+  const latest = [...state.freeMessages]
+    .reverse()
+    .find((message) => message.role === "assistant" && message.english);
+  if (!latest) {
+    return;
+  }
+
+  if (
+    !speak(latest.english, 0.94, {
+      profile: FREE_CHAT_COACH_PROFILE,
+      pitch: FREE_CHAT_COACH_PROFILE.pitch,
+      rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+      voicePreference: state.practiceVoice,
+    })
+  ) {
+    state.practiceMessage =
+      "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    renderFreeView();
+  }
+}
+
+function toggleFreeHint() {
+  state.freeHintVisible = !state.freeHintVisible;
+  renderFreeView();
+}
+
+async function sendFreeMessage(providedText = "") {
+  const text = cleanFreeEnglish(providedText || state.freeInput);
+  if (!text || state.freeChatLoading) {
+    return null;
+  }
+
+  const requestId = freeChatRequestId + 1;
+  freeChatRequestId = requestId;
+  const userMessage = {
+    role: "user",
+    english: text,
+    feedback: null,
+    createdAt: new Date().toISOString(),
+  };
+  state.freeMessages.push(userMessage);
+  persistFreeConversation();
+  state.freeTurnCount += 1;
+  state.freeInput = "";
+  state.freeHintVisible = false;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.freeChatLoading = true;
+  renderPracticeView();
+
+  let turn;
+  if (state.freeChatMode === "off") {
+    userMessage.feedback = {
+      correctedText: text,
+      corrections: [
+        {
+          type: "状态",
+          message: "自动回复已关闭，你仍然可以保留这段英文练习记录。",
+        },
+      ],
+      betterExpression: "",
+      ieltsTips: [],
+    };
+    state.freeChatLoading = false;
+    renderPracticeView();
+    return null;
+  }
+
+  try {
+    turn =
+      state.freeChatMode === "api"
+        ? await requestFreeChatTurn(text)
+        : buildLocalFreeTurn(text, state.freeTurnCount - 1);
+  } catch (error) {
+    if (requestId !== freeChatRequestId) {
+      return null;
+    }
+    turn = buildLocalFreeTurn(text, state.freeTurnCount - 1);
+    state.freeChatApiMessage = `Chat API 调用失败，已切换到本地免费陪练：${
+      error?.message || "未知错误"
+    }`;
+    state.freeChatApiMessageType = "error";
+  }
+
+  if (requestId !== freeChatRequestId) {
+    return null;
+  }
+
+  userMessage.feedback = turn.feedback;
+  const assistantMessage = {
+    role: "assistant",
+    english: turn.reply.english,
+    chinese: turn.reply.chinese,
+    source: state.freeChatMode,
+    createdAt: new Date().toISOString(),
+  };
+  state.freeMessages.push(assistantMessage);
+  persistFreeConversation();
+  state.freeChatLoading = false;
+  renderPracticeView();
+
+  if (!state.realtimeActive && state.freeAutoSpeak && turn.reply.english) {
+    speak(turn.reply.english, 0.94, {
+      profile: FREE_CHAT_COACH_PROFILE,
+      pitch: FREE_CHAT_COACH_PROFILE.pitch,
+      rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+      voicePreference: state.practiceVoice,
+    });
+  }
+  return assistantMessage;
+}
+
+function finalizeFreeAttempt(transcript) {
+  state.freeInput = transcript;
+  sendFreeMessage(transcript);
+}
+
+function startFreeRecording() {
+  if (
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading
+  ) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.practiceMessage = availability.message;
+    state.practiceMessageType =
+      state.practiceRecognitionMode === "off" ? "info" : "error";
+    renderFreeView();
+    return;
+  }
+
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording({
+      onTranscript: finalizeFreeAttempt,
+      requireEntry: false,
+    });
+    return;
+  }
+
+  startBrowserPracticeRecording({
+    onTranscript: finalizeFreeAttempt,
+    requireEntry: false,
+  });
+}
+
+function stopFreeRecording() {
+  stopPracticeRecording();
+}
+
+function createFreeFeedbackBlock(feedback) {
+  if (!feedback) {
+    return null;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "free-feedback";
+
+  const heading = document.createElement("span");
+  heading.className = "free-feedback-heading";
+  heading.textContent = "教练反馈";
+  wrapper.append(heading);
+
+  if (
+    feedback.correctedText &&
+    feedback.correctedText !== feedback.originalEnglish
+  ) {
+    const corrected = document.createElement("div");
+    corrected.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "修正后";
+    const copy = document.createElement("p");
+    copy.lang = "en";
+    copy.textContent = feedback.correctedText;
+    corrected.append(label, copy);
+    wrapper.append(corrected);
+  }
+
+  if (feedback.corrections?.length) {
+    const corrections = document.createElement("div");
+    corrections.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "纠错";
+    const list = document.createElement("ul");
+    feedback.corrections.forEach((correction) => {
+      const item = document.createElement("li");
+      item.textContent = `${correction.type}：${correction.message}`;
+      list.append(item);
+    });
+    corrections.append(label, list);
+    wrapper.append(corrections);
+  }
+
+  if (feedback.betterExpression) {
+    const better = document.createElement("div");
+    better.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "更自然";
+    const copy = document.createElement("p");
+    copy.lang = "en";
+    copy.textContent = feedback.betterExpression;
+    better.append(label, copy);
+    wrapper.append(better);
+  }
+
+  if (feedback.ieltsTips?.length) {
+    const ielts = document.createElement("div");
+    ielts.className = "free-feedback-row";
+    const label = document.createElement("span");
+    label.textContent = "雅思练习";
+    const list = document.createElement("ul");
+    feedback.ieltsTips.forEach((tip) => {
+      const item = document.createElement("li");
+      item.textContent = tip;
+      list.append(item);
+    });
+    ielts.append(label, list);
+    wrapper.append(ielts);
+  }
+
+  return wrapper;
+}
+
+function createFreeMessageElement(message) {
+  const article = document.createElement("article");
+  article.className = `free-message is-${message.role}`;
+
+  const header = document.createElement("header");
+  const meta = document.createElement("span");
+  meta.className = "free-message-meta";
+  meta.textContent =
+    message.role === "assistant" ? "美音陪练 · 英文 / 中文" : "你的英文";
+  header.append(meta);
+
+  if (message.role === "assistant" && message.english) {
+    const speakButton = document.createElement("button");
+    speakButton.type = "button";
+    speakButton.className = "free-message-speak";
+    speakButton.textContent = "播放美音";
+    speakButton.disabled = !("speechSynthesis" in window);
+    speakButton.addEventListener("click", () => {
+      speak(message.english, 0.94, {
+        profile: FREE_CHAT_COACH_PROFILE,
+        pitch: FREE_CHAT_COACH_PROFILE.pitch,
+        rateScale: FREE_CHAT_COACH_PROFILE.rateScale,
+        voicePreference: state.practiceVoice,
+      });
+    });
+    header.append(speakButton);
+  }
+
+  const english = document.createElement("p");
+  english.className = "free-message-en";
+  english.lang = "en";
+  english.textContent = message.english || "";
+
+  article.append(header, english);
+
+  if (message.role === "assistant" && message.chinese) {
+    const chinese = document.createElement("p");
+    chinese.className = "free-message-zh";
+    chinese.textContent = message.chinese;
+    article.append(chinese);
+  }
+
+  if (message.feedback) {
+    const feedback = createFreeFeedbackBlock({
+      ...message.feedback,
+      originalEnglish: message.english,
+    });
+    if (feedback) {
+      article.append(feedback);
+    }
+  }
+
+  return article;
+}
+
+function renderFreeMessages() {
+  const fragment = document.createDocumentFragment();
+  state.freeMessages.forEach((message) => {
+    fragment.append(createFreeMessageElement(message));
+  });
+
+  if (state.freeChatLoading) {
+    const loading = document.createElement("div");
+    loading.className = "free-message is-assistant is-loading";
+    const label = document.createElement("span");
+    label.className = "free-message-meta";
+    label.textContent = "美音陪练";
+    const copy = document.createElement("p");
+    copy.className = "free-message-en";
+    copy.textContent =
+      state.freeChatMode === "api"
+        ? "Thinking about your answer..."
+        : "Preparing a follow-up...";
+    loading.append(label, copy);
+    fragment.append(loading);
+  }
+
+  elements.freeMessages.replaceChildren(fragment);
+  requestAnimationFrame(() => {
+    elements.freeMessages.scrollTop = elements.freeMessages.scrollHeight;
+  });
+}
+
+function renderFreeHint() {
+  const topic = getFreeTopic();
+  if (!state.freeHintVisible) {
+    elements.freeHint.hidden = true;
+    elements.freeHint.replaceChildren();
+    elements.freeHintButton.textContent = "思路提示";
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "practice-block-label";
+  label.textContent = "可以从这些方向展开";
+  const list = document.createElement("ul");
+  (topic.ideas || []).forEach((idea) => {
+    const item = document.createElement("li");
+    item.textContent = idea;
+    list.append(item);
+  });
+  elements.freeHint.replaceChildren(label, list);
+  elements.freeHint.hidden = false;
+  elements.freeHintButton.textContent = "收起提示";
+}
+
+function renderFreeServiceSettings() {
+  const isFree = state.practiceSection === "free";
+  elements.freeServiceSettings.hidden = !isFree;
+  if (!isFree) {
+    return;
+  }
+
+  elements.freeChatMode.value = state.freeChatMode;
+  elements.freeChatModeStatus.textContent = getFreeChatModeLabel();
+  elements.freeChatApiFields.hidden = state.freeChatMode !== "api";
+  elements.freeChatApiUrl.value = state.freeChatApiUrl;
+  elements.freeChatApiModel.value = state.freeChatApiModel;
+  elements.freeChatApiKey.value = state.freeChatApiKey;
+  elements.freeChatApiAuth.value = state.freeChatApiAuth;
+  elements.freeChatApiStatus.textContent = state.freeChatApiMessage;
+  elements.freeChatApiStatus.classList.toggle(
+    "is-error",
+    state.freeChatApiMessageType === "error",
+  );
+}
+
+function renderFreeView() {
+  const topic = getFreeTopic();
+  const availability = getPracticeModeAvailability();
+  const modeSummary = {
+    local: "本地免费陪练 · 英文回复、中文翻译、纠错与雅思练习提示",
+    api: `自定义 Chat API · ${
+      state.freeChatApiModel || "未填写模型"
+    } · 费用由你的接口账户结算`,
+    off: "自动回复已关闭 · 只保留你的英文练习记录",
+  };
+
+  elements.freeModeSummary.textContent =
+    modeSummary[state.freeChatMode] || modeSummary.local;
+  elements.freeTurnCounter.textContent = `第 ${state.freeTurnCount} 轮`;
+  elements.freeTopic.value = state.freeTopic;
+  elements.freeAutoSpeak.checked = state.freeAutoSpeak;
+  renderRealtimeBar("free");
+
+  const realtimeActive = isRealtimeSectionActive("free");
+  const liveTranscript = realtimeActive
+    ? state.realtimeTranscript
+    : state.practiceListening || state.practiceTranscribing
+      ? state.practiceTranscript
+      : "";
+  elements.freeAnswerInput.value = liveTranscript || state.freeInput;
+  elements.freeAnswerInput.disabled =
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive ||
+    state.freeChatLoading;
+  elements.freeListenButton.disabled =
+    !("speechSynthesis" in window) ||
+    realtimeActive ||
+    state.freeChatLoading ||
+    !state.freeMessages.some(
+      (message) => message.role === "assistant" && message.english,
+    );
+  elements.freeHintButton.disabled = state.freeChatLoading || realtimeActive;
+  elements.freeRecordButton.disabled =
+    !availability.available ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive ||
+    state.freeChatLoading;
+  elements.freeRecordButton.textContent = state.practiceTranscribing
+    ? "正在转写"
+    : state.practiceRecognitionMode === "api"
+      ? "开始录音"
+      : "开口说";
+  elements.freeRecordButton.hidden = state.practiceListening;
+  elements.freeStopButton.hidden = !state.practiceListening;
+  elements.freeStopButton.disabled = !state.practiceListening;
+  elements.freeSubmitButton.disabled =
+    !elements.freeAnswerInput.value.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    realtimeActive ||
+    state.freeChatLoading;
+  elements.freeRestartButton.disabled =
+    state.freeChatLoading || realtimeActive;
+  elements.freeTopic.disabled = state.freeChatLoading || realtimeActive;
+  elements.freeAutoSpeak.disabled = realtimeActive;
+
+  renderFreeMessages();
+  renderFreeHint();
+  renderFreeServiceSettings();
+
+  elements.freeNotice.hidden = !state.practiceMessage;
+  elements.freeNotice.textContent = state.practiceMessage;
+  elements.freeNotice.classList.toggle(
+    "is-error",
+    state.practiceMessageType === "error",
+  );
+}
+
+function renderPracticeDiff(result) {
+  const fragment = document.createDocumentFragment();
+
+  result.targetWords.forEach((word, index) => {
+    const token = document.createElement("span");
+    token.className = result.matchedTargetIndexes.has(index)
+      ? "practice-token is-matched"
+      : "practice-token is-missing";
+    token.textContent = word;
+    fragment.append(token);
+    if (index < result.targetWords.length - 1) {
+      fragment.append(" ");
+    }
+  });
+
+  elements.practiceTargetDiff.replaceChildren(fragment);
+
+  if (result.extraWords.length === 0) {
+    elements.practiceExtraWords.textContent = "无";
+    elements.practiceExtraWords.classList.add("is-empty");
+    return;
+  }
+
+  const extraFragment = document.createDocumentFragment();
+  result.extraWords.forEach((word, index) => {
+    const token = document.createElement("span");
+    token.className = "practice-token is-extra";
+    token.textContent = word;
+    extraFragment.append(token);
+    if (index < result.extraWords.length - 1) {
+      extraFragment.append(" ");
+    }
+  });
+  elements.practiceExtraWords.replaceChildren(extraFragment);
+  elements.practiceExtraWords.classList.remove("is-empty");
+}
+
+function renderPracticeStats() {
+  const history = state.practiceHistory;
+  const attempts = history.length;
+  const sentenceCount = new Set(
+    history.map((record) => record.itemKey || record.target),
+  ).size;
+  const average = attempts
+    ? Math.round(
+        history.reduce((sum, record) => sum + record.accuracy, 0) /
+          attempts,
+      )
+    : 0;
+  const best = attempts
+    ? Math.max(...history.map((record) => record.accuracy))
+    : 0;
+
+  elements.practiceAttemptCount.textContent = String(attempts);
+  elements.practiceSentenceCount.textContent = String(sentenceCount);
+  elements.practiceAverageScore.textContent = `${average}%`;
+  elements.practiceBestScore.textContent = `${best}%`;
+  elements.practiceClearButton.disabled = attempts === 0;
+
+  if (attempts === 0) {
+    const empty = document.createElement("p");
+    empty.className = "practice-history-empty";
+    empty.textContent = "还没有练习记录。";
+    elements.practiceHistory.replaceChildren(empty);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  history.slice(0, 6).forEach((record) => {
+    const item = document.createElement("div");
+    item.className = "practice-history-item";
+
+    const score = document.createElement("strong");
+    score.textContent = `${record.accuracy}%`;
+    score.classList.toggle("is-high", record.accuracy >= 85);
+
+    const copy = document.createElement("span");
+    copy.className = "practice-history-copy";
+    copy.textContent = record.target;
+
+    const time = document.createElement("time");
+    time.dateTime = record.createdAt || "";
+    time.textContent = formatPracticeTime(record.createdAt);
+
+    item.append(score, copy, time);
+    fragment.append(item);
+  });
+  elements.practiceHistory.replaceChildren(fragment);
+}
+
+function renderPracticeView() {
+  const entries = getPracticeEntries();
+  const entry = getCurrentPracticeEntry();
+  const dialogueScenario = getCurrentDialogueScenario();
+  const isDialogue = state.practiceSection === "dialogue";
+  const isFree = state.practiceSection === "free";
+  const isIelts = state.practiceSection === "ielts";
+  const hasEntry = Boolean(entry);
+  const target = hasEntry ? getPracticeTarget(entry) : "";
+  const availability = getPracticeModeAvailability();
+  const currentItemKey = hasEntry
+    ? getItemKey(entry.resource.id, entry.item)
+    : "";
+
+  elements.practiceCounter.textContent = hasEntry
+    ? `${state.practiceIndex + 1} / ${entries.length}`
+    : "0 / 0";
+  elements.practiceSource.textContent = isDialogue
+    ? dialogueScenario
+      ? `${dialogueScenario.category} · ${dialogueScenario.title} · ${dialogueScenario.turns.length} 轮情景对话`
+      : "情景对话加载失败"
+    : isFree
+      ? `自由对话 · ${getFreeTopic().label} · ${getFreeChatModeLabel()}`
+    : isIelts
+      ? `雅思口语模拟 · ${getIeltsPart2Card()?.label || "题卡加载中"}`
+    : hasEntry
+      ? `${entry.resource.category} · ${entry.resource.title} · ${entry.item.phrase}`
+      : "当前视图没有可练习的句子";
+  elements.practiceStatus.textContent = state.practiceStatusText;
+  elements.practiceTarget.replaceChildren(
+    createSentenceText(target || "暂无可练习句子"),
+  );
+  elements.practiceTranslation.textContent = hasEntry
+    ? entry.item.translation || ""
+    : "";
+  elements.practiceTranslation.hidden =
+    !hasEntry || !entry.item.translation;
+
+  elements.practiceMode.value = state.practiceRecognitionMode;
+  elements.practiceVoice.value = state.practiceVoice;
+  elements.practiceVoiceStatus.textContent = getPracticeVoiceStatusText();
+  elements.practiceModeStatus.textContent = getPracticeModeLabel();
+  elements.practiceApiFields.hidden =
+    state.practiceRecognitionMode !== "api";
+  elements.practiceListenButton.disabled =
+    !hasEntry || !("speechSynthesis" in window);
+  elements.practiceRecordButton.disabled =
+    !hasEntry || !availability.available || state.practiceTranscribing;
+  elements.practiceRecordButton.textContent =
+    state.practiceRecognitionMode === "api" ? "开始录音" : "开始跟读";
+  elements.practiceRecordButton.hidden = state.practiceListening;
+  elements.practiceStopButton.hidden = !state.practiceListening;
+  elements.practiceStopButton.disabled = !state.practiceListening;
+  elements.practicePreviousButton.disabled = entries.length <= 1;
+  elements.practiceShuffleButton.disabled = entries.length <= 1;
+
+  if (state.practiceRecognitionMode === "off") {
+    elements.practiceRecognitionState.textContent = "已关闭";
+  } else if (!availability.available) {
+    elements.practiceRecognitionState.textContent = "需要设置";
+  } else if (state.practiceTranscribing) {
+    elements.practiceRecognitionState.textContent = "转写中";
+  } else if (state.practiceListening) {
+    elements.practiceRecognitionState.textContent =
+      state.practiceRecognitionMode === "api" ? "录音中" : "聆听中";
+  } else if (state.practiceTranscript) {
+    elements.practiceRecognitionState.textContent = "识别完成";
+  } else {
+    elements.practiceRecognitionState.textContent =
+      state.practiceRecognitionMode === "api" ? "API 待录音" : "未开始";
+  }
+
+  elements.practiceTranscript.textContent =
+    state.practiceTranscript ||
+    (state.practiceTranscribing
+      ? "正在转写录音..."
+      : state.practiceListening
+      ? state.practiceRecognitionMode === "api"
+        ? "正在录音..."
+        : "正在识别..."
+      : state.practiceRecognitionMode === "off"
+        ? "识别已关闭"
+        : "等待跟读");
+  elements.practiceTranscript.classList.toggle(
+    "is-placeholder",
+    !state.practiceTranscript,
+  );
+
+  elements.practiceNotice.hidden = !state.practiceMessage;
+  elements.practiceNotice.textContent = state.practiceMessage;
+  elements.practiceNotice.classList.toggle(
+    "is-error",
+    state.practiceMessageType === "error",
+  );
+
+  const result = state.practiceResult;
+  const showResult = Boolean(
+    result && result.itemKey === currentItemKey,
+  );
+  elements.practiceResult.hidden = !showResult;
+  if (showResult) {
+    elements.practiceScore.textContent = `${result.accuracy}%`;
+    elements.practiceFeedback.textContent = getPracticeFeedback(
+      result.accuracy,
+    );
+    renderPracticeDiff(result);
+  }
+
+  updatePracticeSectionViews();
+  renderDialogueView();
+  renderFreeView();
+  renderIeltsView();
+  renderPracticeStats();
+}
+
+function syncPracticeSettingsForm() {
+  elements.practiceMode.value = state.practiceRecognitionMode;
+  elements.practiceVoice.value = state.practiceVoice;
+  elements.practiceApiUrl.value = state.practiceApiUrl;
+  elements.practiceApiModel.value = state.practiceApiModel;
+  elements.practiceApiKey.value = state.practiceApiKey;
+  elements.practiceApiAuth.value = state.practiceApiAuth;
+  elements.practiceApiFields.hidden =
+    state.practiceRecognitionMode !== "api";
+}
+
+function setPracticeRecognitionMode(mode) {
+  const allowedModes = new Set(["browser", "api", "off"]);
+  if (!allowedModes.has(mode)) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceRecognitionMode = mode;
+  persistPracticeSettings();
+  resetPracticeAttempt();
+  renderPracticeView();
+  updateProgress();
+}
+
+function savePracticeApiSettings() {
+  const apiUrl = elements.practiceApiUrl.value.trim();
+  const apiModel = elements.practiceApiModel.value.trim();
+  const apiKey = elements.practiceApiKey.value.trim();
+  const apiAuth = elements.practiceApiAuth.value;
+
+  if (apiUrl) {
+    try {
+      const resolved = new URL(apiUrl, window.location.href);
+      if (!["http:", "https:"].includes(resolved.protocol)) {
+        throw new Error("unsupported protocol");
+      }
+    } catch {
+      elements.practiceApiStatus.textContent =
+        "接口地址格式不正确，请填写 http 或 https 地址。";
+      elements.practiceApiStatus.classList.add("is-error");
+      return;
+    }
+  }
+
+  state.practiceApiUrl = apiUrl;
+  state.practiceApiModel = apiModel;
+  state.practiceApiKey = apiKey;
+  state.practiceApiAuth = apiAuth;
+  persistPracticeSettings();
+  elements.practiceApiStatus.textContent = "接口配置已保存在当前浏览器。";
+  elements.practiceApiStatus.classList.remove("is-error");
+  resetPracticeAttempt();
+  renderPracticeView();
+}
+
+function setFreeChatMode(mode) {
+  const allowedModes = new Set(["local", "api", "off"]);
+  if (!allowedModes.has(mode)) {
+    return;
+  }
+
+  stopRealtimeConversation("", { silent: true });
+  state.freeChatMode = mode;
+  state.freeChatApiMessage = "";
+  state.freeChatApiMessageType = "";
+  persistPracticeSettings();
+  renderPracticeView();
+}
+
+function saveFreeChatApiSettings() {
+  const apiUrl = elements.freeChatApiUrl.value.trim();
+  const apiModel = elements.freeChatApiModel.value.trim();
+  const apiKey = elements.freeChatApiKey.value.trim();
+  const apiAuth = elements.freeChatApiAuth.value;
+
+  if (apiUrl) {
+    try {
+      const resolved = new URL(apiUrl, window.location.href);
+      if (!["http:", "https:"].includes(resolved.protocol)) {
+        throw new Error("unsupported protocol");
+      }
+    } catch {
+      elements.freeChatApiStatus.textContent =
+        "接口地址格式不正确，请填写 http 或 https 地址。";
+      elements.freeChatApiStatus.classList.add("is-error");
+      return;
+    }
+  }
+
+  state.freeChatApiUrl = apiUrl;
+  state.freeChatApiModel = apiModel;
+  state.freeChatApiKey = apiKey;
+  state.freeChatApiAuth = apiAuth;
+  state.freeChatApiMessage = apiUrl
+    ? "Chat 接口配置已保存在当前浏览器。"
+    : "已清空 Chat 接口地址，自由对话会使用本地免费陪练。";
+  state.freeChatApiMessageType = "info";
+  persistPracticeSettings();
+  renderPracticeView();
+}
+
+function openPractice(targetKey = "") {
+  stopRealtimeConversation("", { silent: true });
+  state.reviewActive = false;
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+
+  const entries = getPracticeEntries();
+  const targetIndex = targetKey
+    ? entries.findIndex(
+        ({ resource, item }) =>
+          getItemKey(resource.id, item) === targetKey,
+      )
+    : -1;
+
+  if (targetKey) {
+    state.practiceSection = "shadow";
+  }
+  state.practiceActive = true;
+  if (targetIndex >= 0) {
+    state.practiceIndex = targetIndex;
+  } else if (
+    state.practiceIndex < 0 ||
+    state.practiceIndex >= entries.length
+  ) {
+    state.practiceIndex = 0;
+  }
+
+  if (state.practiceSection === "dialogue") {
+    clearDialogueAttempt();
+  } else {
+    resetPracticeAttempt();
+  }
+  syncPracticeSettingsForm();
+  if (entries.length === 0) {
+    state.practiceMessage = "当前视图没有可练习的句子，请先选择其他素材。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "暂无句子";
+  }
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function closePractice() {
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.practiceTranscript = "";
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceResult = null;
+  render();
+  elements.practiceButton.focus();
+}
+
+function movePractice(offset) {
+  const entries = getPracticeEntries();
+  if (entries.length === 0) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  state.practiceIndex =
+    (state.practiceIndex + offset + entries.length) % entries.length;
+  resetPracticeAttempt();
+  render();
+}
+
+function shufflePractice() {
+  const entries = getPracticeEntries();
+  if (entries.length <= 1) {
+    return;
+  }
+
+  cancelPracticeRecognition();
+  let nextIndex = state.practiceIndex;
+  while (nextIndex === state.practiceIndex) {
+    nextIndex = Math.floor(Math.random() * entries.length);
+  }
+  state.practiceIndex = nextIndex;
+  resetPracticeAttempt();
+  render();
+}
+
+function addPracticeHistory(entry, target, transcript, accuracy) {
+  state.practiceHistory.unshift({
+    itemKey: getItemKey(entry.resource.id, entry.item),
+    resourceTitle: entry.resource.title,
+    target,
+    transcript,
+    accuracy,
+    createdAt: new Date().toISOString(),
+  });
+  state.practiceHistory = state.practiceHistory.slice(0, 80);
+  persistPracticeHistory();
+}
+
+function finalizePracticeAttempt(transcript) {
+  const entry = getCurrentPracticeEntry();
+  const target = getPracticeTarget(entry);
+  if (!entry || !target) {
+    return;
+  }
+
+  const cleanedTranscript = String(transcript || "").trim();
+  const result = comparePracticeText(target, cleanedTranscript);
+  state.practiceTranscript = cleanedTranscript;
+  state.practiceResult = {
+    ...result,
+    itemKey: getItemKey(entry.resource.id, entry.item),
+    transcript: cleanedTranscript,
+  };
+  state.practiceStatusText = `${result.accuracy}%`;
+  addPracticeHistory(
+    entry,
+    target,
+    cleanedTranscript,
+    result.accuracy,
+  );
+  renderPracticeView();
+  updateProgress();
+}
+
+function getRecognitionErrorMessage(errorType) {
+  const messages = {
+    "not-allowed":
+      "麦克风权限未开启，请在浏览器地址栏允许麦克风后重试。",
+    "service-not-allowed":
+      "浏览器未允许语音识别服务，请使用最新版 Chrome 或 Edge。",
+    "audio-capture": "没有检测到可用麦克风。",
+    network: "语音识别服务连接失败，请检查网络后重试。",
+    "no-speech": "没有识别到语音，请靠近麦克风再试一次。",
+    aborted: "",
+  };
+  return messages[errorType] || "语音识别中断，请再试一次。";
+}
+
+function extractApiTranscript(text) {
+  const rawText = String(text || "").trim();
+  if (!rawText) {
+    return "";
+  }
+
+  try {
+    const data = JSON.parse(rawText);
+    return String(
+      data.text ||
+        data.transcript ||
+        data.result?.text ||
+        data.result?.transcript ||
+        data.data?.text ||
+        "",
+    ).trim();
+  } catch {
+    return rawText;
+  }
+}
+
+function buildPracticeApiHeaders() {
+  const headers = {};
+  if (!state.practiceApiKey || state.practiceApiAuth === "none") {
+    return headers;
+  }
+
+  if (state.practiceApiAuth === "x-api-key") {
+    headers["x-api-key"] = state.practiceApiKey;
+  } else {
+    headers.Authorization = `Bearer ${state.practiceApiKey}`;
+  }
+  return headers;
+}
+
+async function transcribePracticeAudio(
+  audioBlob,
+  onTranscript = finalizePracticeAttempt,
+) {
+  const controller = new AbortController();
+  practiceApiAbortController = controller;
+  state.practiceTranscribing = true;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "正在转写";
+  renderPracticeView();
+
+  const formData = new FormData();
+  const extension = audioBlob.type.includes("mp4")
+    ? "mp4"
+    : audioBlob.type.includes("ogg")
+      ? "ogg"
+      : "webm";
+  formData.append("file", audioBlob, `speaking-answer.${extension}`);
+  if (state.practiceApiModel) {
+    formData.append("model", state.practiceApiModel);
+  }
+  formData.append("language", "en");
+
+  try {
+    const response = await fetch(state.practiceApiUrl, {
+      method: "POST",
+      headers: buildPracticeApiHeaders(),
+      body: formData,
+      signal: controller.signal,
+    });
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      let serverMessage = "";
+      try {
+        const errorData = JSON.parse(responseText);
+        serverMessage =
+          errorData.error?.message ||
+          errorData.message ||
+          errorData.error ||
+          "";
+      } catch {
+        serverMessage = responseText;
+      }
+      throw new Error(
+        String(serverMessage || `语音接口返回 ${response.status}`).slice(
+          0,
+          180,
+        ),
+      );
+    }
+
+    const transcript = extractApiTranscript(responseText);
+    if (!transcript) {
+      throw new Error("语音接口没有返回可用文本。");
+    }
+
+    state.practiceTranscribing = false;
+    practiceApiAbortController = null;
+    onTranscript(transcript);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      return;
+    }
+
+    state.practiceTranscribing = false;
+    practiceApiAbortController = null;
+    state.practiceMessage =
+      error.message ||
+      "语音转写失败，请检查接口地址、网络和跨域设置。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "转写失败";
+    renderPracticeView();
+  }
+}
+
+async function startApiPracticeRecording({
+  onTranscript = finalizePracticeAttempt,
+  requireEntry = true,
+} = {}) {
+  const availability = getPracticeModeAvailability();
+  if (!availability.available) {
+    state.practiceMessage = availability.message;
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "需要设置";
+    renderPracticeView();
+    return;
+  }
+
+  const entry = requireEntry ? getCurrentPracticeEntry() : null;
+  if (requireEntry && !entry) {
+    state.practiceMessage = "当前没有可跟读的句子。";
+    state.practiceMessageType = "error";
+    renderPracticeView();
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceTranscript = "";
+  state.practiceResult = null;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "等待麦克风权限";
+  state.practiceListening = true;
+  renderPracticeView();
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+      },
+    });
+
+    if (!state.practiceActive || !state.practiceListening) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
+
+    practiceMediaStream = stream;
+    const preferredTypes = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/mp4",
+    ];
+    const mimeType = preferredTypes.find((type) =>
+      window.MediaRecorder.isTypeSupported?.(type),
+    );
+    const recorder = mimeType
+      ? new MediaRecorder(stream, { mimeType })
+      : new MediaRecorder(stream);
+
+    practiceMediaRecorder = recorder;
+    practiceAudioChunks = [];
+    state.practiceStatusText = "正在录音";
+    renderPracticeView();
+
+    recorder.ondataavailable = (event) => {
+      if (event.data?.size) {
+        practiceAudioChunks.push(event.data);
+      }
+    };
+
+    recorder.onerror = () => {
+      cancelPracticeRecognition();
+      state.practiceMessage = "录音过程发生错误，请重新开始。";
+      state.practiceMessageType = "error";
+      state.practiceStatusText = "录音失败";
+      renderPracticeView();
+    };
+
+    recorder.onstop = () => {
+      if (practiceMediaRecorder !== recorder) {
+        return;
+      }
+
+      practiceMediaRecorder = null;
+      state.practiceListening = false;
+      if (practiceMediaStream) {
+        practiceMediaStream.getTracks().forEach((track) => track.stop());
+        practiceMediaStream = null;
+      }
+
+      const chunks = practiceAudioChunks;
+      practiceAudioChunks = [];
+      const audioBlob = new Blob(chunks, {
+        type: recorder.mimeType || mimeType || "audio/webm",
+      });
+      if (!audioBlob.size) {
+        state.practiceMessage = "没有录到音频，请重新开始。";
+        state.practiceMessageType = "error";
+        state.practiceStatusText = "没有音频";
+        renderPracticeView();
+        return;
+      }
+
+      transcribePracticeAudio(audioBlob, onTranscript);
+    };
+
+    recorder.start();
+  } catch (error) {
+    cancelPracticeRecognition();
+    state.practiceMessage =
+      error?.name === "NotAllowedError"
+        ? "麦克风权限未开启，请在浏览器地址栏允许麦克风后重试。"
+        : error?.name === "NotFoundError"
+          ? "没有检测到可用麦克风。"
+          : "录音启动失败，请检查麦克风权限后重试。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "启动失败";
+    renderPracticeView();
+  }
+}
+
+function startPracticeRecording() {
+  if (state.practiceListening || state.practiceTranscribing) {
+    return;
+  }
+
+  if (state.practiceRecognitionMode === "off") {
+    state.practiceMessage =
+      "语音识别已关闭，仍可使用示范朗读和句子对照。";
+    state.practiceMessageType = "info";
+    state.practiceStatusText = "已关闭";
+    renderPracticeView();
+    return;
+  }
+
+  if (state.practiceRecognitionMode === "api") {
+    startApiPracticeRecording();
+    return;
+  }
+
+  startBrowserPracticeRecording();
+}
+
+function stopPracticeRecording() {
+  if (
+    state.practiceRecognitionMode === "api" &&
+    practiceMediaRecorder
+  ) {
+    state.practiceStatusText = "正在转写";
+    renderPracticeView();
+    try {
+      practiceMediaRecorder.stop();
+    } catch {
+      cancelPracticeRecognition();
+      state.practiceMessage = "录音已停止，请重新开始。";
+      state.practiceMessageType = "error";
+      state.practiceStatusText = "已停止";
+      renderPracticeView();
+    }
+    return;
+  }
+
+  if (!practiceRecognition) {
+    return;
+  }
+
+  state.practiceStatusText = "正在结束";
+  renderPracticeView();
+  try {
+    practiceRecognition.stop();
+  } catch {
+    cancelPracticeRecognition();
+    state.practiceMessage = "语音识别已停止，请重新开始。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "已停止";
+    renderPracticeView();
+  }
+}
+
+function startBrowserPracticeRecording({
+  onTranscript = finalizePracticeAttempt,
+  requireEntry = true,
+} = {}) {
+  if (state.practiceListening) {
+    return;
+  }
+
+  const Recognition = getSpeechRecognitionConstructor();
+  const entry = requireEntry ? getCurrentPracticeEntry() : null;
+  if (!Recognition) {
+    state.practiceMessage =
+      "当前浏览器不支持语音识别，请使用最新版 Chrome 或 Edge。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "浏览器不支持";
+    renderPracticeView();
+    return;
+  }
+  if (requireEntry && !entry) {
+    state.practiceMessage = "当前没有可跟读的句子。";
+    state.practiceMessageType = "error";
+    renderPracticeView();
+    return;
+  }
+
+  cancelPracticeRecognition();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  const recognition = new Recognition();
+  state.practiceFinalTranscript = "";
+  state.practiceInterimTranscript = "";
+  state.practiceTranscript = "";
+  state.practiceResult = null;
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "正在聆听";
+  state.practiceListening = true;
+  practiceRecognition = recognition;
+
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    state.practiceStatusText = "正在聆听";
+    renderPracticeView();
+  };
+
+  recognition.onresult = (event) => {
+    let interimTranscript = "";
+    const startIndex = Number.isInteger(event.resultIndex)
+      ? event.resultIndex
+      : 0;
+
+    for (
+      let resultIndex = startIndex;
+      resultIndex < event.results.length;
+      resultIndex += 1
+    ) {
+      const transcript = event.results[resultIndex][0]?.transcript || "";
+      if (event.results[resultIndex].isFinal) {
+        state.practiceFinalTranscript =
+          `${state.practiceFinalTranscript} ${transcript}`.trim();
+      } else {
+        interimTranscript =
+          `${interimTranscript} ${transcript}`.trim();
+      }
+    }
+
+    state.practiceInterimTranscript = interimTranscript;
+    state.practiceTranscript =
+      `${state.practiceFinalTranscript} ${interimTranscript}`.trim();
+    state.practiceStatusText = state.practiceTranscript
+      ? "已识别到语音"
+      : "正在聆听";
+    renderPracticeView();
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === "aborted") {
+      return;
+    }
+    state.practiceMessage = getRecognitionErrorMessage(event.error);
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "识别中断";
+    renderPracticeView();
+  };
+
+  recognition.onend = () => {
+    if (practiceRecognition !== recognition) {
+      return;
+    }
+
+    practiceRecognition = null;
+    state.practiceListening = false;
+    const transcript =
+      `${state.practiceFinalTranscript} ${state.practiceInterimTranscript}`.trim();
+
+    if (transcript) {
+      onTranscript(transcript);
+      return;
+    }
+
+    if (!state.practiceMessage) {
+      state.practiceMessage =
+        "没有识别到语音，请靠近麦克风再试一次。";
+      state.practiceMessageType = "error";
+    }
+    state.practiceStatusText = "未识别到语音";
+    renderPracticeView();
+  };
+
+  renderPracticeView();
+  try {
+    recognition.start();
+  } catch {
+    cancelPracticeRecognition();
+    state.practiceMessage = "语音识别启动失败，请刷新页面后重试。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "启动失败";
+    renderPracticeView();
+  }
+}
+
+function playPracticeTarget() {
+  const entry = getCurrentPracticeEntry();
+  const target = getPracticeTarget(entry);
+  if (!target) {
+    return;
+  }
+
+  if (
+    !speak(target, state.practiceRate, {
+      voicePreference: state.practiceVoice,
+    })
+  ) {
+    state.practiceMessage =
+      "当前浏览器不支持语音朗读，请使用最新版 Chrome、Edge 或 Safari。";
+    state.practiceMessageType = "error";
+    state.practiceStatusText = "无法朗读";
+    renderPracticeView();
+    return;
+  }
+
+  state.practiceMessage = "";
+  state.practiceMessageType = "";
+  state.practiceStatusText = "正在播放示范";
+  renderPracticeView();
+}
+
+function normalizeLookupWord(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[’]/g, "'")
+    .toLocaleLowerCase("en-US");
+}
+
+function setWordButtonExpanded(button, expanded) {
+  if (button) {
+    button.setAttribute("aria-expanded", String(expanded));
+  }
+}
+
+async function lookupLocalLibraryWord(normalizedWord) {
+  const index = window.VocabIndex;
+  if (!index || typeof index.lookup !== "function") {
+    return null;
+  }
+
+  const entry = await index.lookup(normalizedWord).catch(() => null);
+  if (!entry || !entry.meaning) {
+    return null;
+  }
+
+  return {
+    ok: true,
+    word: entry.word,
+    phonetic: entry.phonetic,
+    translations: [entry.meaning],
+    definitions: [],
+    localSource: entry.source,
+    localKind: entry.kind,
+  };
+}
+
+function mergeWordLookupResults(localResult, remoteResult) {
+  const translations = [
+    ...(Array.isArray(localResult?.translations)
+      ? localResult.translations
+      : []),
+    ...(Array.isArray(remoteResult?.translations)
+      ? remoteResult.translations
+      : []),
+  ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
+  const definitions = [
+    ...(Array.isArray(localResult?.definitions)
+      ? localResult.definitions
+      : []),
+    ...(Array.isArray(remoteResult?.definitions)
+      ? remoteResult.definitions
+      : []),
+  ].filter((meaning, index, list) => meaning && list.indexOf(meaning) === index);
+
+  return {
+    ...remoteResult,
+    translations,
+    definitions,
+    phonetic: remoteResult?.phonetic || localResult?.phonetic || "",
+    localSource: localResult?.localSource || "",
+    localKind: localResult?.localKind || "",
+    remoteChecked: true,
+  };
+}
+
+async function fetchWordLookupResult(normalizedWord) {
+  const response = await fetch(
+    `${WORD_API_PATH}?word=${encodeURIComponent(normalizedWord)}`,
+    { cache: "no-store" },
+  );
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.ok) {
+    throw new Error(result.message || "暂时没有查到这个词");
+  }
+  return result;
+}
+
+function closeWordPopover() {
+  wordLookupRequestId += 1;
+  elements.wordPopover.hidden = true;
+  setWordButtonExpanded(activeWordButton, false);
+  activeWordButton = null;
+}
+
+function positionWordPopover(anchor) {
+  const anchorRect = anchor.getBoundingClientRect();
+  const popoverRect = elements.wordPopover.getBoundingClientRect();
+  const viewportPadding = 12;
+  const gap = 8;
+  const maxLeft = Math.max(
+    viewportPadding,
+    window.innerWidth - popoverRect.width - viewportPadding,
+  );
+  const maxTop = Math.max(
+    viewportPadding,
+    window.innerHeight - popoverRect.height - viewportPadding,
+  );
+  const centeredLeft =
+    anchorRect.left + anchorRect.width / 2 - popoverRect.width / 2;
+  let top = anchorRect.bottom + gap;
+
+  if (top > maxTop) {
+    top = anchorRect.top - popoverRect.height - gap;
+  }
+
+  elements.wordPopover.style.left = `${Math.min(
+    Math.max(centeredLeft, viewportPadding),
+    maxLeft,
+  )}px`;
+  elements.wordPopover.style.top = `${Math.min(
+    Math.max(top, viewportPadding),
+    maxTop,
+  )}px`;
+}
+
+function renderWordPopoverContent(result) {
+  const content = document.createDocumentFragment();
+  const translations = Array.isArray(result.translations)
+    ? result.translations
+    : [];
+  const definitions = Array.isArray(result.definitions)
+    ? result.definitions
+    : [];
+
+  if (result.localSource) {
+    const source = document.createElement("span");
+    source.className = "word-popover-source";
+    source.textContent = `本地词库 · ${result.localSource}${
+      result.localKind === "phrase" ? " · 短语" : ""
+    }`;
+    content.append(source);
+  }
+
+  if (translations.length > 0) {
+    const label = document.createElement("span");
+    label.className = "word-popover-label";
+    label.textContent = "中文释义";
+    content.append(label);
+
+    translations.forEach((translation) => {
+      const meaning = document.createElement("p");
+      meaning.className = "word-popover-meaning";
+      meaning.textContent = translation;
+      content.append(meaning);
+    });
+  } else if (definitions.length > 0) {
+    const label = document.createElement("span");
+    label.className = "word-popover-label";
+    label.textContent = "英文释义";
+    content.append(label);
+
+    definitions.forEach((definition) => {
+      const meaning = document.createElement("p");
+      meaning.className = "word-popover-meaning";
+      meaning.textContent = definition;
+      content.append(meaning);
+    });
+  } else {
+    const message = document.createElement("p");
+    message.className = "word-popover-status is-error";
+    message.textContent = "暂时没有查到这个词。";
+    content.append(message);
+  }
+
+  elements.wordPopoverContent.replaceChildren(content);
+}
+
+async function lookupWord(word, anchor) {
+  const normalizedWord = normalizeLookupWord(word);
+  if (!normalizedWord) {
+    return;
+  }
+
+  if (activeWordButton === anchor && !elements.wordPopover.hidden) {
+    closeWordPopover();
+    return;
+  }
+
+  setWordButtonExpanded(activeWordButton, false);
+  activeWordButton = anchor;
+  setWordButtonExpanded(activeWordButton, true);
+  elements.wordPopover.hidden = false;
+  elements.wordPopoverWord.textContent = normalizedWord;
+  elements.wordPopoverPhonetic.textContent = "";
+  elements.wordPopoverPhonetic.hidden = true;
+
+  const loading = document.createElement("p");
+  loading.className = "word-popover-status";
+  loading.textContent = "正在查询...";
+  elements.wordPopoverContent.replaceChildren(loading);
+  positionWordPopover(anchor);
+
+  const requestId = ++wordLookupRequestId;
+
+  try {
+    let result = wordLookupCache.get(normalizedWord);
+    if (!result) {
+      result = await lookupLocalLibraryWord(normalizedWord);
+    }
+    if (result && !result.phonetic) {
+      try {
+        result = mergeWordLookupResults(
+          result,
+          await fetchWordLookupResult(normalizedWord),
+        );
+      } catch {
+        // 本地释义仍然可用，音标查询失败时直接展示已有内容。
+      }
+    }
+    if (!result) {
+      result = await fetchWordLookupResult(normalizedWord);
+    }
+    if (
+      result &&
+      (result.phonetic || result.remoteChecked || !result.localSource)
+    ) {
+      if (wordLookupCache.size >= 300) {
+        wordLookupCache.delete(wordLookupCache.keys().next().value);
+      }
+      wordLookupCache.set(normalizedWord, result);
+    }
+
+    if (requestId !== wordLookupRequestId) {
+      return;
+    }
+
+    elements.wordPopoverWord.textContent = result.word || normalizedWord;
+    elements.wordPopoverPhonetic.textContent = result.phonetic || "";
+    elements.wordPopoverPhonetic.hidden = !result.phonetic;
+    renderWordPopoverContent(result);
+    positionWordPopover(anchor);
+  } catch (error) {
+    if (requestId !== wordLookupRequestId) {
+      return;
+    }
+
+    const message = document.createElement("p");
+    message.className = "word-popover-status is-error";
+    message.textContent = error.message || "查询失败，请稍后再试。";
+    elements.wordPopoverContent.replaceChildren(message);
+    positionWordPopover(anchor);
+  }
+}
+
+function createSentenceText(text) {
+  const fragment = document.createDocumentFragment();
+  const pattern = /[A-Za-z]+(?:['’][A-Za-z]+)*/g;
+  const source = String(text || "");
+  let lastIndex = 0;
+  let match = pattern.exec(source);
+
+  while (match) {
+    if (match.index > lastIndex) {
+      fragment.append(source.slice(lastIndex, match.index));
+    }
+
+    const word = match[0];
+    const wordButton = document.createElement("button");
+    wordButton.className = "word-lookup";
+    wordButton.type = "button";
+    wordButton.dataset.word = word;
+    wordButton.textContent = word;
+    wordButton.setAttribute("aria-haspopup", "dialog");
+    wordButton.setAttribute("aria-expanded", "false");
+    wordButton.setAttribute("aria-label", `查看 ${word} 的释义`);
+    wordButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      lookupWord(word, wordButton);
+    });
+    fragment.append(wordButton);
+
+    lastIndex = pattern.lastIndex;
+    match = pattern.exec(source);
+  }
+
+  if (lastIndex < source.length) {
+    fragment.append(source.slice(lastIndex));
+  }
+
+  return fragment;
+}
+
+function formatResourceIndex(index) {
+  return String(index + 1).padStart(2, "0");
+}
+
+function getCategoryDefinitions() {
+  const categories = new Map();
+
+  function registerCategory(name, sections = []) {
+    const categoryName = String(name || "").trim();
+    if (!categoryName) {
+      return;
+    }
+
+    if (!categories.has(categoryName)) {
+      categories.set(categoryName, new Set());
+    }
+
+    const sectionSet = categories.get(categoryName);
+    sections.forEach((section) => {
+      const sectionName = String(section || "").trim();
+      if (sectionName) {
+        sectionSet.add(sectionName);
+      }
+    });
+  }
+
+  state.categories.forEach((category) => {
+    const categoryName =
+      typeof category === "string" ? category : category?.name;
+    const sections = Array.isArray(category?.sections)
+      ? category.sections
+      : [];
+    registerCategory(categoryName, sections);
+  });
+
+  state.resources.forEach((resource) => {
+    registerCategory(resource.category || "未分类素材", [
+      resource.section || "",
+    ]);
+  });
+
+  VIRTUAL_CATEGORY_NAMES.forEach((name) => registerCategory(name));
+
+  return [...categories.entries()]
+    .sort(([left], [right]) => compareCategoryNames(left, right))
+    .map(([name, sections]) => ({
+      name,
+      sections: [...sections].sort((left, right) =>
+        left.localeCompare(right, "zh-CN"),
+      ),
+    }));
+}
+
+function getAnkiExportResources(
+  categoryName = state.ankiExportCategory,
+  sectionName = state.ankiExportSection,
+) {
+  return state.resources
+    .filter((resource) => {
+      const resourceCategory = resource.category || "未分类素材";
+      const resourceSection = resource.section || "";
+      if (categoryName !== "all" && resourceCategory !== categoryName) {
+        return false;
+      }
+      return (
+        categoryName === "all" ||
+        sectionName === "all" ||
+        resourceSection === sectionName
+      );
+    });
+}
+
+function getAnkiExportEntries(
+  categoryName = state.ankiExportCategory,
+  sectionName = state.ankiExportSection,
+) {
+  return getAnkiExportResources(categoryName, sectionName).flatMap((resource) =>
+      (state.decks.get(resource.id) || []).map((item) => ({
+        item,
+        resource,
+      })),
+  );
+}
+
+function getAnkiExportScopeLabel() {
+  if (state.ankiExportCategory === "all") {
+    return "整个素材库";
+  }
+  if (state.ankiExportSection === "all") {
+    return `${state.ankiExportCategory} · 整个分类`;
+  }
+  return `${state.ankiExportCategory} / ${state.ankiExportSection}`;
+}
+
+function getAnkiExportDeckName() {
+  const deckParts = ["iball的小屋"];
+  if (state.ankiExportCategory === "all") {
+    deckParts.push("全部分类");
+  } else {
+    deckParts.push(state.ankiExportCategory);
+    if (state.ankiExportSection !== "all") {
+      deckParts.push(state.ankiExportSection);
+    }
+  }
+  return deckParts
+    .map((part) => String(part || "").replace(/::/g, " / ").trim())
+    .filter(Boolean)
+    .join("::");
+}
+
+function escapeAnkiCsvField(value) {
+  const text = String(value ?? "").replace(/\r\n|\r|\n/g, "\r\n");
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function buildAnkiExportBack(item) {
+  const backParts = [];
+  if (item.translation) {
+    backParts.push(item.translation);
+  }
+
+  const annotation = [];
+  if (item.meaning) {
+    annotation.push(`释义：${item.meaning}`);
+  }
+  if (item.phonetic) {
+    annotation.push(`音标：${item.phonetic}`);
+  }
+  if (annotation.length > 0) {
+    backParts.push(annotation.join("\n"));
+  }
+
+  return backParts.join("\n\n") || item.phrase || "";
+}
+
+function buildAnkiExportCsv(entries) {
+  const lines = [
+    "#separator:Comma",
+    "#html:false",
+    "#notetype:Basic",
+    `#deck:${getAnkiExportDeckName()}`,
+    "#columns:Front,Back",
+  ];
+
+  entries.forEach(({ item }) => {
+    lines.push(
+      [
+        escapeAnkiCsvField(item.sentence || item.phrase || ""),
+        escapeAnkiCsvField(buildAnkiExportBack(item)),
+      ].join(","),
+    );
+  });
+
+  return `\uFEFF${lines.join("\r\n")}\r\n`;
+}
+
+function getAnkiExportFileName() {
+  const scope = getAnkiExportScopeLabel()
+    .replace(/[\\/:*?"<>|]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+  const now = new Date();
+  const date = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
+  return `iball的小屋-${scope || "Anki"}-${date}.csv`;
+}
+
+function setAnkiExportStatus(message = "", type = "") {
+  state.ankiExportStatus = message;
+  state.ankiExportStatusType = type;
+}
+
+function renderAnkiExport() {
+  const definitions = getCategoryDefinitions();
+  const categoryNames = new Set(definitions.map((category) => category.name));
+  if (
+    state.ankiExportCategory !== "all" &&
+    !categoryNames.has(state.ankiExportCategory)
+  ) {
+    state.ankiExportCategory = "all";
+    state.ankiExportSection = "all";
+  }
+
+  const categoryFragment = document.createDocumentFragment();
+  const allCategoryOption = document.createElement("option");
+  allCategoryOption.value = "all";
+  allCategoryOption.textContent = "整个素材库";
+  categoryFragment.append(allCategoryOption);
+  definitions.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.name;
+    option.textContent = category.name;
+    categoryFragment.append(option);
+  });
+  elements.ankiExportCategory.replaceChildren(categoryFragment);
+  elements.ankiExportCategory.value = state.ankiExportCategory;
+
+  const selectedCategory = definitions.find(
+    (category) => category.name === state.ankiExportCategory,
+  );
+  const sectionNames =
+    state.ankiExportCategory === "all"
+      ? []
+      : selectedCategory?.sections || [];
+  if (
+    state.ankiExportSection !== "all" &&
+    !sectionNames.includes(state.ankiExportSection)
+  ) {
+    state.ankiExportSection = "all";
+  }
+
+  const sectionFragment = document.createDocumentFragment();
+  const allSectionOption = document.createElement("option");
+  allSectionOption.value = "all";
+  allSectionOption.textContent =
+    state.ankiExportCategory === "all" ? "整个素材库" : "整个分类";
+  sectionFragment.append(allSectionOption);
+  sectionNames.forEach((sectionName) => {
+    const option = document.createElement("option");
+    option.value = sectionName;
+    option.textContent = sectionName;
+    sectionFragment.append(option);
+  });
+  elements.ankiExportSection.replaceChildren(sectionFragment);
+  elements.ankiExportSection.value = state.ankiExportSection;
+  elements.ankiExportSection.disabled =
+    state.ankiExportCategory === "all" || sectionNames.length === 0;
+
+  const entries = getAnkiExportEntries();
+  elements.ankiExportCount.textContent = String(entries.length);
+  elements.ankiExportScope.textContent = `· ${getAnkiExportScopeLabel()}`;
+  elements.ankiExportDownloadButton.disabled = entries.length === 0;
+  elements.ankiExportStatus.textContent = state.ankiExportStatus;
+  elements.ankiExportStatus.classList.toggle(
+    "is-error",
+    state.ankiExportStatusType === "error",
+  );
+}
+
+async function openAnkiExport() {
+  elements.ankiExportPanel.hidden = false;
+  elements.ankiExportButton.setAttribute("aria-expanded", "true");
+  setAnkiExportStatus("正在读取所选范围…");
+  renderAnkiExport();
+
+  const resources = getAnkiExportResources();
+  await ensureResourcesLoaded(resources);
+  const failedResources = resources.filter((resource) => getDeckError(resource));
+  setAnkiExportStatus(
+    failedResources.length
+      ? `${failedResources.length} 个素材暂时加载失败，可关闭后重试。`
+      : "",
+    failedResources.length ? "error" : "",
+  );
+  renderAnkiExport();
+
+  if (!elements.ankiExportPanel.hidden) {
+    elements.ankiExportCategory.focus();
+  }
+}
+
+function closeAnkiExport({ restoreFocus = false } = {}) {
+  elements.ankiExportPanel.hidden = true;
+  elements.ankiExportButton.setAttribute("aria-expanded", "false");
+  if (restoreFocus) {
+    elements.ankiExportButton.focus();
+  }
+}
+
+async function downloadAnkiExport() {
+  await ensureResourcesLoaded(getAnkiExportResources());
+  const entries = getAnkiExportEntries();
+  if (entries.length === 0) {
+    setAnkiExportStatus("当前范围没有可导出的词卡。", "error");
+    renderAnkiExport();
+    return;
+  }
+
+  const csv = buildAnkiExportCsv(entries);
+  const fileName = getAnkiExportFileName();
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = fileName;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+
+  setAnkiExportStatus(`已生成 ${entries.length} 条词卡：${fileName}`);
+  renderAnkiExport();
+}
+
+function openSourceSearchUrl(query) {
+  const text = String(query || "").trim();
+  const keyword =
+    text ||
+    OPEN_SOURCE_FILTERS.find((filter) => filter.id === state.openSourceFilter)
+      ?.keyword ||
+    OPEN_SOURCE_FILTERS[0].keyword;
+  const url = new URL(GITHUB_SEARCH_URL);
+  url.searchParams.set("q", keyword);
+  url.searchParams.set("type", "repositories");
+  return url.toString();
+}
+
+function visibleOpenSourceReferences() {
+  const query = state.openSourceQuery.trim().toLowerCase();
+  return OPEN_SOURCE_REFERENCES.filter((item) => {
+    if (state.openSourceFilter !== "all" && item.group !== state.openSourceFilter) {
+      return false;
+    }
+    if (!query) {
+      return true;
+    }
+    return [item.name, item.module, item.license, item.takeaway].some((value) =>
+      value.toLowerCase().includes(query),
+    );
+  });
+}
+
+function renderOpenSourcePanel() {
+  const list = elements.openSourceList;
+  if (!list) {
+    return;
+  }
+
+  elements.openSourceFilters.replaceChildren(
+    ...OPEN_SOURCE_FILTERS.map((filter) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "open-source-filter";
+      button.dataset.openSourceFilter = filter.id;
+      button.textContent = filter.label;
+      const isActive = state.openSourceFilter === filter.id;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      return button;
+    }),
+  );
+
+  const visible = visibleOpenSourceReferences();
+  elements.openSourceStatus.textContent = `显示 ${visible.length} / ${OPEN_SOURCE_REFERENCES.length} 项，点标题可打开仓库。`;
+
+  if (visible.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "open-source-empty";
+    empty.textContent =
+      "本站索引里没有匹配项，可以点上面的按钮去 GitHub 上继续找。";
+    list.replaceChildren(empty);
+    return;
+  }
+
+  list.replaceChildren(
+    ...visible.map((item) => {
+      const row = document.createElement("li");
+      row.className = "open-source-item";
+
+      const head = document.createElement("div");
+      head.className = "open-source-item-head";
+      const link = document.createElement("a");
+      link.className = "open-source-link";
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = item.name;
+      const license = document.createElement("em");
+      license.className = "open-source-license";
+      license.textContent = item.license;
+      head.append(link, license);
+
+      const module = document.createElement("span");
+      module.className = "open-source-item-module";
+      module.textContent = item.module;
+
+      const takeaway = document.createElement("p");
+      takeaway.textContent = item.takeaway;
+
+      row.append(head, module, takeaway);
+      return row;
+    }),
+  );
+}
+
+function openOpenSourcePanel() {
+  elements.openSourcePanel.hidden = false;
+  elements.openSourceButton.setAttribute("aria-expanded", "true");
+  state.openSourceQuery = "";
+  elements.openSourceQuery.value = "";
+  renderOpenSourcePanel();
+  elements.openSourceCard.focus();
+}
+
+function closeOpenSourcePanel({ restoreFocus = false } = {}) {
+  elements.openSourcePanel.hidden = true;
+  elements.openSourceButton.setAttribute("aria-expanded", "false");
+  if (restoreFocus) {
+    elements.openSourceButton.focus();
+  }
+}
+
+
+function restoreReviewData() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(REVIEW_PROGRESS_STORAGE_KEY) || "{}",
+    );
+    state.reviewProgress =
+      stored && typeof stored === "object" && !Array.isArray(stored)
+        ? stored
+        : {};
+  } catch {
+    state.reviewProgress = {};
+  }
+
+  const today = getReviewDayKey();
+  let daily = null;
+  try {
+    daily = JSON.parse(
+      localStorage.getItem(REVIEW_DAILY_STORAGE_KEY) || "{}",
+    );
+  } catch {
+    daily = null;
+  }
+
+  if (daily && daily.date === today) {
+    state.reviewDaily = {
+      date: today,
+      reviewedKeys: Array.isArray(daily.reviewedKeys)
+        ? daily.reviewedKeys.filter((key) => typeof key === "string")
+        : [],
+      newKeys: Array.isArray(daily.newKeys)
+        ? daily.newKeys.filter((key) => typeof key === "string")
+        : [],
+    };
+    return;
+  }
+
+  state.reviewDaily = { date: today, reviewedKeys: [], newKeys: [] };
+}
+
+function persistReviewProgress() {
+  try {
+    localStorage.setItem(
+      REVIEW_PROGRESS_STORAGE_KEY,
+      JSON.stringify(state.reviewProgress),
+    );
+  } catch {
+    // Storage may be unavailable in private mode; the session still works.
+  }
+}
+
+function persistReviewDaily() {
+  try {
+    localStorage.setItem(
+      REVIEW_DAILY_STORAGE_KEY,
+      JSON.stringify(state.reviewDaily),
+    );
+  } catch {
+    // Storage may be unavailable in private mode; the session still works.
+  }
+}
+
+function getReviewScopeResources() {
+  return state.resources.filter((resource) => {
+    const resourceCategory = resource.category || "未分类素材";
+    const resourceSection = resource.section || "";
+    if (
+      state.reviewCategory !== "all" &&
+      resourceCategory !== state.reviewCategory
+    ) {
+      return false;
+    }
+    return (
+      state.reviewCategory === "all" ||
+      state.reviewSection === "all" ||
+      resourceSection === state.reviewSection
+    );
+  });
+}
+
+function getReviewUnitOptions() {
+  const resources = getReviewScopeResources();
+  const total = resources.reduce(
+    (sum, resource) => sum + getResourceItems(resource).length,
+    0,
+  );
+  const deckResources = resources.filter(
+    (resource) => getResourceItems(resource).length > DEFAULT_UNIT_SIZE,
+  );
+  const options = [
+    {
+      key: "all",
+      label: deckResources.length ? "整套" : "全部",
+      detail: `${total} 张`,
+    },
+  ];
+
+  deckResources.forEach((resource) => {
+    const prefix = deckResources.length > 1 ? `${resource.title} · ` : "";
+    getDeckUnits(resource).forEach((unit) => {
+      if (unit.index < 1) {
+        return;
+      }
+      options.push({
+        key: `${resource.id}::${unit.key}`,
+        label: `${prefix}${unit.label}`,
+        detail: unit.detail,
+      });
+    });
+  });
+
+  return options;
+}
+
+function parseReviewUnitKey(unitKey) {
+  const separator = String(unitKey || "").indexOf("::");
+  if (separator < 0) {
+    return null;
+  }
+  return {
+    resourceId: unitKey.slice(0, separator),
+    deckUnitKey: unitKey.slice(separator + 2),
+  };
+}
+
+function getReviewUnitLabel() {
+  const option = getReviewUnitOptions().find(
+    (item) => item.key === state.reviewUnitKey,
+  );
+  return option && option.key !== "all" ? option.label : "";
+}
+
+function getReviewEntries() {
+  const entries = getAnkiExportEntries(
+    state.reviewCategory,
+    state.reviewSection,
+  );
+  const parsed = parseReviewUnitKey(state.reviewUnitKey);
+  if (!parsed) {
+    return entries;
+  }
+
+  const resource = state.resources.find(
+    (item) => item.id === parsed.resourceId,
+  );
+  const unit = resource ? getDeckUnit(resource, parsed.deckUnitKey) : null;
+  if (!unit || unit.index < 1) {
+    return entries;
+  }
+
+  const unitItemIds = new Set(unit.items.map((item) => item.id));
+  return entries.filter(
+    (entry) =>
+      entry.resource.id === parsed.resourceId &&
+      unitItemIds.has(entry.item.id),
+  );
+}
+
+function getReviewRecord(cardKey) {
+  const record = state.reviewProgress[cardKey];
+  return record && typeof record === "object" ? record : null;
+}
+
+
+
+
+function markReviewDaily(cardKey, isNew) {
+  if (state.reviewDaily.date !== getReviewDayKey()) {
+    state.reviewDaily = {
+      date: getReviewDayKey(),
+      reviewedKeys: [],
+      newKeys: [],
+    };
+  }
+
+  if (!state.reviewDaily.reviewedKeys.includes(cardKey)) {
+    state.reviewDaily.reviewedKeys.push(cardKey);
+  }
+  if (isNew && !state.reviewDaily.newKeys.includes(cardKey)) {
+    state.reviewDaily.newKeys.push(cardKey);
+  }
+  persistReviewDaily();
+}
+
+function getCurrentReviewEntry() {
+  return state.reviewQueue[state.reviewQueueIndex] || null;
+}
+
+function startReviewSession() {
+  const entries = getReviewEntries();
+  const summary = buildReviewQueue(entries, {
+    progress: state.reviewProgress,
+    daily: state.reviewDaily,
+    newLimit: state.reviewNewLimit,
+  });
+
+  state.reviewQueue = summary.queue;
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  state.reviewSessionDone = 0;
+  state.reviewMessage = entries.length
+    ? state.reviewQueue.length
+      ? "队列已重新整理。"
+      : summary.masteredCount === entries.length
+        ? "范围内的卡片都已经安排到未来，稍后再来复习。"
+        : "今天的新卡额度已经用完，明天会解锁新的卡片。"
+    : "当前范围没有可复习的卡片。";
+  state.reviewMessageType = "";
+}
+
+function getStandaloneReviewUrl() {
+  const params = new URLSearchParams();
+  const resource = getActiveResource();
+  const activeUnit = getActiveUnit();
+
+  if (state.view === "unknown") {
+    params.set("category", resolveUnknownCategory());
+    params.set("scope", "unknown");
+    const query = params.toString();
+    return `./review.html${query ? `?${query}` : ""}`;
+  }
+
+  if (resource) {
+    if (resource.category) {
+      params.set("category", resource.category);
+    }
+    if (resource.section) {
+      params.set("section", resource.section);
+    }
+    params.set("resource", resource.id);
+  }
+  if (activeUnit) {
+    params.set("unit", activeUnit.key);
+  }
+
+  const query = params.toString();
+  return `./review.html${query ? `?${query}` : ""}`;
+}
+
+function openReview() {
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.reviewActive = false;
+  window.location.assign(getStandaloneReviewUrl());
+}
+
+function closeReview() {
+  state.reviewActive = false;
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  render();
+  elements.reviewButton.focus();
+}
+
+function revealReviewCard() {
+  if (!getCurrentReviewEntry() || state.reviewRevealed) {
+    return;
+  }
+  state.reviewRevealed = true;
+  state.reviewMessage = "";
+  state.reviewMessageType = "";
+  renderReviewView();
+}
+
+function gradeReviewCard(grade, options = {}) {
+  if (!REVIEW_GRADES.includes(grade)) {
+    return;
+  }
+
+  const entry = getCurrentReviewEntry();
+  if (!entry || !state.reviewRevealed) {
+    return;
+  }
+
+  const cardKey = entry.item.id;
+  const previous = getReviewRecord(cardKey);
+  const isNew = !previous || !Number(previous.reps);
+  const record = computeReviewSchedule(previous, grade, Date.now());
+  state.reviewProgress[cardKey] = record;
+  persistReviewProgress();
+  markReviewDaily(cardKey, isNew);
+
+  const needsRelearn = record.status !== "review";
+  state.reviewQueue.splice(state.reviewQueueIndex, 1);
+  if (needsRelearn) {
+    const insertAt = Math.min(
+      state.reviewQueue.length,
+      state.reviewQueueIndex + 3,
+    );
+    state.reviewQueue.splice(insertAt, 0, entry);
+  }
+  if (state.reviewQueueIndex >= state.reviewQueue.length) {
+    state.reviewQueueIndex = 0;
+  }
+
+  state.reviewRevealed = false;
+  state.reviewSessionDone += 1;
+  const markLabel = options.markLabel ? `${options.markLabel} · ` : "";
+  state.reviewMessage = `${entry.item.phrase} · ${markLabel}下次复习 ${
+    record.status === "review"
+      ? formatReviewInterval(record.dueAt - Date.now())
+      : "本次会话内"
+  }`;
+  state.reviewMessageType = "info";
+  renderReviewView();
+}
+
+function markReviewCard(mark) {
+  const entry = getCurrentReviewEntry();
+  if (!entry) {
+    return;
+  }
+
+  setItemMark(getItemKey(entry.resource.id, entry.item), mark);
+  state.reviewRevealed = true;
+  gradeReviewCard(mark === "known" ? "good" : "again", {
+    markLabel: mark === "known" ? "已标记掌握" : "已标不会",
+  });
+}
+
+function renderReviewMarkButtons(entry) {
+  if (!elements.reviewMarkActions) {
+    return;
+  }
+
+  const hasCard = Boolean(entry);
+  elements.reviewMarkActions.hidden = !hasCard;
+  if (!hasCard) {
+    return;
+  }
+
+  const mark = getItemMark(getItemKey(entry.resource.id, entry.item));
+  const states = [
+    { element: elements.reviewUnknownButton, mark: "unknown", label: "不会", activeLabel: "已标不会" },
+    { element: elements.reviewKnownButton, mark: "known", label: "标记掌握", activeLabel: "已掌握" },
+  ];
+
+  states.forEach((state) => {
+    if (!state.element) {
+      return;
+    }
+    const isActive = mark === state.mark;
+    state.element.textContent = isActive ? state.activeLabel : state.label;
+    state.element.classList.toggle("is-active", isActive);
+    state.element.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function speakReviewCard() {
+  const entry = getCurrentReviewEntry();
+  if (!entry || !("speechSynthesis" in window)) {
+    return;
+  }
+
+  const text = entry.item.sentence || entry.item.phrase;
+  speak(text, 0.92, {
+    profile: { pitch: 1, rateScale: 1 },
+    voicePreference: state.practiceVoice,
+  });
+}
+
+function renderReviewScope() {
+  if (!elements.reviewCategory || !elements.reviewSection) {
+    return;
+  }
+
+  const definitions = getCategoryDefinitions();
+  const categoryNames = new Set(
+    definitions.map((category) => category.name),
+  );
+  if (
+    state.reviewCategory !== "all" &&
+    !categoryNames.has(state.reviewCategory)
+  ) {
+    state.reviewCategory = "all";
+    state.reviewSection = "all";
+  }
+
+  const categoryFragment = document.createDocumentFragment();
+  const allCategoryOption = document.createElement("option");
+  allCategoryOption.value = "all";
+  allCategoryOption.textContent = "整个素材库";
+  categoryFragment.append(allCategoryOption);
+  definitions.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.name;
+    option.textContent = category.name;
+    categoryFragment.append(option);
+  });
+  elements.reviewCategory.replaceChildren(categoryFragment);
+  elements.reviewCategory.value = state.reviewCategory;
+
+  const activeCategory = definitions.find(
+    (category) => category.name === state.reviewCategory,
+  );
+  const sectionNames =
+    state.reviewCategory === "all"
+      ? []
+      : activeCategory?.sections || [];
+  if (
+    state.reviewSection !== "all" &&
+    !sectionNames.includes(state.reviewSection)
+  ) {
+    state.reviewSection = "all";
+  }
+
+  const sectionFragment = document.createDocumentFragment();
+  const allSectionOption = document.createElement("option");
+  allSectionOption.value = "all";
+  allSectionOption.textContent =
+    state.reviewCategory === "all" ? "整个素材库" : "整个分类";
+  sectionFragment.append(allSectionOption);
+  sectionNames.forEach((sectionName) => {
+    const option = document.createElement("option");
+    option.value = sectionName;
+    option.textContent = sectionName;
+    sectionFragment.append(option);
+  });
+  elements.reviewSection.replaceChildren(sectionFragment);
+  elements.reviewSection.value = state.reviewSection;
+  elements.reviewSection.disabled =
+    state.reviewCategory === "all" || sectionNames.length === 0;
+
+  if (elements.reviewUnit) {
+    const unitOptions = getReviewUnitOptions();
+    const unitKeys = new Set(unitOptions.map((option) => option.key));
+    if (!unitKeys.has(state.reviewUnitKey)) {
+      state.reviewUnitKey = "all";
+    }
+
+    const unitFragment = document.createDocumentFragment();
+    unitOptions.forEach((option) => {
+      const unitOption = document.createElement("option");
+      unitOption.value = option.key;
+      unitOption.textContent = `${option.label} · ${option.detail}`;
+      unitFragment.append(unitOption);
+    });
+    elements.reviewUnit.replaceChildren(unitFragment);
+    elements.reviewUnit.value = state.reviewUnitKey;
+    elements.reviewUnit.disabled = unitOptions.length <= 1;
+  }
+
+  elements.reviewNewLimit.value = String(state.reviewNewLimit);
+}
+
+function renderReviewStats() {
+  const entries = getReviewEntries();
+  const summary = buildReviewQueue(entries, {
+    progress: state.reviewProgress,
+    daily: state.reviewDaily,
+    newLimit: state.reviewNewLimit,
+  });
+  const masteredCount = summary.masteredCount;
+
+  elements.reviewDueCount.textContent = String(summary.dueCount);
+  elements.reviewNewCount.textContent = String(
+    Math.min(summary.freshCount, summary.remainingNew),
+  );
+  elements.reviewDoneCount.textContent = String(state.reviewSessionDone);
+  elements.reviewTotalCount.textContent = String(entries.length);
+
+  const unitLabel = getReviewUnitLabel();
+  const unitSuffix = unitLabel ? ` · ${unitLabel}` : "";
+  if (state.reviewCategory === "all") {
+    elements.reviewSource.textContent = `整个素材库${unitSuffix} · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
+    return;
+  }
+
+  const scopeLabel =
+    state.reviewSection === "all"
+      ? `${state.reviewCategory} · 整个分类`
+      : `${state.reviewCategory} / ${state.reviewSection}`;
+  elements.reviewSource.textContent = `${scopeLabel}${unitSuffix} · ${entries.length} 张卡片 · 已安排 ${masteredCount} 张 · 今日已复习 ${state.reviewDaily.reviewedKeys.length} 张`;
+}
+
+function renderReviewCard() {
+  const entry = getCurrentReviewEntry();
+  const hasCard = Boolean(entry);
+
+  elements.reviewSpeakButton.disabled =
+    !hasCard || !("speechSynthesis" in window);
+  elements.reviewShowButton.disabled = !hasCard || state.reviewRevealed;
+  elements.reviewShowButton.hidden = state.reviewRevealed;
+  elements.reviewGradeActions.hidden = !state.reviewRevealed || !hasCard;
+  renderReviewMarkButtons(entry);
+
+  if (!hasCard) {
+    const entries = getReviewEntries();
+    elements.reviewCardScope.textContent = "本次队列已完成";
+    elements.reviewCardProgress.textContent = entries.length
+      ? `${state.reviewSessionDone} 张已评分`
+      : "";
+    elements.reviewCardSentence.textContent = entries.length
+      ? "这一轮复习结束了"
+      : "当前范围还没有卡片";
+    elements.reviewCardPrompt.textContent = entries.length
+      ? "点“重新排队”可以继续处理到期和新解锁的卡片。"
+      : "先在素材库上传或选择带词汇的素材。";
+    elements.reviewCardAnswer.hidden = true;
+    return;
+  }
+
+  const { item, resource } = entry;
+  const record = getReviewRecord(item.id);
+  elements.reviewCardScope.textContent = `${resource.category} · ${resource.title}`;
+  elements.reviewCardProgress.textContent = record?.reps
+    ? `已复习 ${record.reps} 次 · ${
+        record.lapses ? `遗忘 ${record.lapses} 次` : "暂无遗忘"
+      }`
+    : "新卡片";
+  elements.reviewCardSentence.textContent = item.sentence || item.phrase;
+  elements.reviewCardPrompt.textContent = state.reviewRevealed
+    ? ""
+    : "先回忆它的含义和用法";
+
+  elements.reviewCardAnswer.hidden = !state.reviewRevealed;
+  elements.reviewCardPhrase.textContent = item.phrase || "";
+  elements.reviewCardPhonetic.textContent = item.phonetic || "";
+  elements.reviewCardMeaning.textContent = item.meaning || "";
+  elements.reviewCardTranslation.textContent = item.translation || "";
+
+  const now = Date.now();
+  const previews = {
+    again: computeReviewSchedule(record, "again", now),
+    hard: computeReviewSchedule(record, "hard", now),
+    good: computeReviewSchedule(record, "good", now),
+    easy: computeReviewSchedule(record, "easy", now),
+  };
+  elements.reviewIntervalAgain.textContent = formatReviewInterval(
+    previews.again.dueAt - now,
+  );
+  elements.reviewIntervalHard.textContent = formatReviewInterval(
+    previews.hard.dueAt - now,
+  );
+  elements.reviewIntervalGood.textContent = formatReviewInterval(
+    previews.good.dueAt - now,
+  );
+  elements.reviewIntervalEasy.textContent = formatReviewInterval(
+    previews.easy.dueAt - now,
+  );
+}
+
+function renderReviewView() {
+  if (!elements.reviewStudio) {
+    return;
+  }
+  renderReviewScope();
+  renderReviewStats();
+  renderReviewCard();
+  elements.reviewStatus.textContent = state.reviewMessage;
+  elements.reviewStatus.classList.toggle(
+    "is-error",
+    state.reviewMessageType === "error",
+  );
+}
+
+function exportReviewProgress() {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    progress: state.reviewProgress,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json;charset=utf-8",
+  });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = `iball的小屋-在线复习进度-${getReviewDayKey()}.json`;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  state.reviewMessage = "复习进度已导出，可以在其他设备导入继续。";
+  state.reviewMessageType = "info";
+  renderReviewView();
+}
+
+async function importReviewProgress(file) {
+  if (!file) {
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    const incoming = payload?.progress;
+    if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) {
+      throw new Error("invalid");
+    }
+
+    let imported = 0;
+    Object.entries(incoming).forEach(([key, value]) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        return;
+      }
+      state.reviewProgress[key] = value;
+      imported += 1;
+    });
+    persistReviewProgress();
+    startReviewSession();
+    state.reviewMessage = `已导入 ${imported} 张卡片的复习进度。`;
+    state.reviewMessageType = "info";
+  } catch {
+    state.reviewMessage = "导入失败，请选择本站在线复习导出的 JSON 文件。";
+    state.reviewMessageType = "error";
+  }
+
+  renderReviewView();
+}
+
+function clearReviewProgress() {
+  const total = Object.keys(state.reviewProgress).length;
+  if (
+    total > 0 &&
+    !window.confirm("确定清空在线复习的全部进度吗？此操作不可撤销。")
+  ) {
+    return;
+  }
+
+  state.reviewProgress = {};
+  state.reviewDaily = { date: getReviewDayKey(), reviewedKeys: [], newKeys: [] };
+  persistReviewProgress();
+  persistReviewDaily();
+  startReviewSession();
+  state.reviewMessage = "复习进度已清空。";
+  state.reviewMessageType = "info";
+  renderReviewView();
+}
+
+function matchesMaterialQuery(resource, query) {
+  const searchable = [
+    resource.category,
+    resource.section,
+    resource.title,
+    resource.description,
+    resource.file,
+  ].join(" ");
+  return normalizeText(searchable).includes(query);
+}
+
+function matchesIntensiveEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(INTENSIVE_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesReadingEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(READING_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesReadingIntensiveEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(READING_INTENSIVE_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesKaoyanEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(KAOYAN_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesCet6EntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(CET6_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesCet6ExtraEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(CET6_EXTRA_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesPeriodicalEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(PERIODICAL_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesVocabEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(VOCAB_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesWritingEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(WRITING_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesListenEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(LISTEN_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesShadowEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(SHADOW_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function createReadingEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-reading-entry";
+  link.href = "./reading.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.readingEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `上传${categoryName}题目并翻译阅读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "读";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "上传题目 · 翻译阅读";
+
+  const meta = document.createElement("span");
+  meta.textContent = "上传真题 · 点词背诵 · 加入复习";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createIntensiveEntry(categoryName) {
+  const isMovie = categoryName === "电影";
+  const isCet6 = categoryName === "六级";
+  const intensivePaperCount =
+    window.IBALL_INTENSIVE_PAPERS?.length > 0
+      ? window.IBALL_INTENSIVE_PAPERS.length
+      : 19;
+  const cet6ListeningCount =
+    window.IBALL_CET6_LISTENING_PAPERS?.length > 0
+      ? window.IBALL_CET6_LISTENING_PAPERS.length
+      : 49;
+  const link = document.createElement("a");
+  link.className = "resource-button is-intensive-entry";
+  link.href = isMovie
+    ? "./movie.html"
+    : isCet6
+      ? "./cet6-listening.html"
+      : "./intensive.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.intensiveEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    isMovie
+      ? `打开美剧台词精读、逐句精翻与固定搭配，位于${categoryName}分类`
+      : isCet6
+        ? `打开六级听力全文翻译、出题点与逐段精读，位于${categoryName}分类`
+        : `打开四级听力全文翻译、出题点与语法精读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = isMovie ? "剧" : isCet6 ? "听" : "精";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = isMovie
+    ? "美剧台词逐句精读"
+    : isCet6
+      ? "六级听力全文精读"
+      : "四级听力全文翻译 + 出题点精读";
+
+  const meta = document.createElement("span");
+  meta.textContent = isMovie
+    ? "摩登家庭 S01E01 · 逐句精翻 · 考试词与固定搭配"
+    : isCet6
+      ? `2015-2026 年已收录 ${cet6ListeningCount} 套 · 逐段翻译 · 出题点提示`
+      : `2022-2026 年已收录 ${intensivePaperCount} 套 · 逐句翻译 · 答案位置提示`;
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createReadingIntensiveEntry(categoryName) {
+  const isCet6 = categoryName === "六级";
+  const readingPaperCount =
+    window.IBALL_READING_PAPERS?.length > 0
+      ? window.IBALL_READING_PAPERS.length
+      : 28;
+  const cet6ReadingCount =
+    window.IBALL_CET6_READING_PAPERS?.length > 0
+      ? window.IBALL_CET6_READING_PAPERS.length
+      : 70;
+  const link = document.createElement("a");
+  link.className = "resource-button is-reading-intensive-entry";
+  link.href = isCet6 ? "./cet6-reading.html" : "./reading-intensive.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.readingIntensiveEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开${isCet6 ? "六级" : "四级"}阅读全文精读、逐段翻译与答案位置提示，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "阅";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = isCet6 ? "六级阅读全文精读" : "四级阅读全文精读";
+
+  const meta = document.createElement("span");
+  meta.textContent = isCet6
+    ? `2015-2026 年已收录 ${cet6ReadingCount} 套 · 仔细阅读 / 段落匹配 / 选词填空`
+    : `2022-2026 年已收录 ${readingPaperCount} 套 · 仔细阅读 / 段落匹配 / 选词填空`;
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createKaoyanEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-kaoyan-entry";
+  link.href = "./kaoyan.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.kaoyanEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开考研英语一/二真题精读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "研";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "考研英语一/二真题精读";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "2010-2026 · 阅读 / 完形 / 新题型 / 翻译 / 写作 · 按套懒加载";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createPeriodicalEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-periodical-entry";
+  link.href = "./periodical.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.periodicalEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开外刊精读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "刊";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "外刊精读";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "50 期 · 时间轴 / 主题导引 · 精读 / 原文 / 检验题 / 答疑 / 原件 · 单期懒加载";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createVocabEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-vocab-entry";
+  link.href = "./vocab.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.vocabEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开词汇库，按考试词库背单词并加入生词本，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "词";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "词汇库 · 生词本";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "考研一/二 · 四级 · 六级 · 音标释义例句 · 词根词缀与记忆法";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createWritingEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-writing-entry";
+  link.href = "./writing.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.writingEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开作文批改，按考试类型选真题写作并获取评分反馈，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "写";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "作文批改";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "历年真题题目 · 语法标注 · 词汇替换 · 句式优化 · 总分与范文";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createListenEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-listen-entry";
+  link.href = "./listen.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.listenEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开听句精听，逐句听写并自动收集错题，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "听";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "听句精听";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "顶部固定播放器 · 可滚动句子列表 · 答题区 · 错题本复习";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createShadowEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-shadow-entry";
+  link.href = "./shadow.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.shadowEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开跟读台，逐句听原音、录音跟读并查看发音评分，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "跟";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "跟读台";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "逐句原音 · 慢速/正常语速 · 录音跟读 · 发音评分 · 连续跟读";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createCet6Entry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-cet6-entry";
+  link.href = "./cet6.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.cet6Entry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开六级备考总览，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "六";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "六级备考总览";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "阅读 / 听力 / 翻译写作 · 三个板块 · 按套懒加载 · 点词查义";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createCet6ExtraEntry(categoryName) {
+  const cet6ExtraCount =
+    window.IBALL_CET6_EXTRA_PAPERS?.length > 0
+      ? window.IBALL_CET6_EXTRA_PAPERS.length
+      : 76;
+  const link = document.createElement("a");
+  link.className = "resource-button is-cet6-extra-entry";
+  link.href = "./cet6-extra.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.cet6ExtraEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开六级翻译与写作精读、逐句拆解与范文，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "译";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "六级翻译写作精读";
+
+  const meta = document.createElement("span");
+  meta.textContent = `2015-2026 年已收录 ${cet6ExtraCount} 套 · 逐句拆解 · 提纲范文与评分要点`;
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function openResourceAttachment(resource) {
+  const link = document.createElement("a");
+  link.href = materialRequestUrl(resource) || resource.file;
+  link.rel = "noopener noreferrer";
+
+  if (resource.format === "html-page") {
+    link.target = "_blank";
+  } else {
+    const extension = resource.file.match(/\.[^./?#]+(?=($|[?#]))/)?.[0] || "";
+    link.download = `${resource.title}${extension}`;
+  }
+
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+function createResourceButton(resource, index) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "resource-button";
+  button.classList.toggle("is-attachment", Boolean(resource.attachment));
+  button.dataset.resourceId = resource.id;
+  if (!resource.attachment) {
+    button.setAttribute(
+      "aria-pressed",
+      String(resource.id === state.activeResourceId),
+    );
+    button.classList.toggle(
+      "is-active",
+      resource.id === state.activeResourceId,
+    );
+  }
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = formatResourceIndex(index);
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = resource.title;
+
+  const meta = document.createElement("span");
+  meta.textContent = resource.section || resource.category || "上传素材";
+
+  copy.append(title, meta);
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  if (resource.attachment) {
+    count.textContent = resource.format === "html-page" ? "打开" : "下载";
+  } else if (isDeckLoading(resource)) {
+    count.textContent = "…";
+    count.classList.add("is-loading");
+    count.title = "正在加载";
+  } else if (isDeckLoaded(resource)) {
+    count.textContent = String(getResourceItems(resource).length);
+  } else if (getDeckError(resource)) {
+    count.textContent = "重试";
+    count.title = getDeckError(resource);
+  } else {
+    count.textContent = "加载";
+    count.title = "点击加载这个素材";
+  }
+
+  button.append(badge, copy, count);
+  button.addEventListener("click", () => {
+    if (resource.attachment) {
+      openResourceAttachment(resource);
+      return;
+    }
+
+    activateResource(resource);
+  });
+
+  return button;
+}
+
+const MOBILE_LIBRARY_QUERY = "(max-width: 760px)";
+
+function isMobileLibraryLayout() {
+  return window.matchMedia(MOBILE_LIBRARY_QUERY).matches;
+}
+
+function getScrollBehavior() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
+
+function updateLibraryToggleMeta() {
+  if (!elements.libraryToggleMeta) {
+    return;
+  }
+
+  const activeResource = getActiveResource();
+  const resourceCount = state.resources.length;
+  elements.libraryToggleMeta.textContent = resourceCount
+    ? `${resourceCount} 项素材${
+        activeResource ? ` · ${activeResource.title}` : ""
+      }`
+    : "按分类浏览素材";
+}
+
+function updateLibraryCollapseAllMeta() {
+  const button = elements.libraryCollapseAllButton;
+  if (!button || !elements.resourceList) {
+    return;
+  }
+
+  const groups = [
+    ...elements.resourceList.querySelectorAll(".resource-group"),
+  ];
+  button.hidden = groups.length === 0;
+  const allCollapsed =
+    groups.length > 0 &&
+    groups.every((group) => group.classList.contains("is-collapsed"));
+  button.textContent = allCollapsed ? "展开全部" : "收起全部";
+  button.dataset.mode = allCollapsed ? "expand" : "collapse";
+  button.setAttribute(
+    "aria-label",
+    allCollapsed ? "展开全部分类" : "收起全部分类",
+  );
+}
+
+function toggleAllLibraryGroups() {
+  if (!elements.resourceList) {
+    return;
+  }
+
+  const groups = [
+    ...elements.resourceList.querySelectorAll(".resource-group"),
+  ];
+  const allCollapsed =
+    groups.length > 0 &&
+    groups.every((group) => group.classList.contains("is-collapsed"));
+
+  state.collapseOverrides.clear();
+  setCategoriesCollapsed(
+    groups.map((group) => group.dataset.category),
+    !allCollapsed,
+  );
+  renderResourceList();
+}
+
+function syncLibraryDisclosure() {
+  const mobile = isMobileLibraryLayout();
+  const expanded = mobile && state.mobileLibraryExpanded;
+
+  elements.libraryPanel?.classList.toggle(
+    "is-mobile-expanded",
+    expanded,
+  );
+  elements.libraryToggleButton?.setAttribute(
+    "aria-expanded",
+    String(expanded),
+  );
+
+  if (elements.resourceList) {
+    elements.resourceList.hidden = mobile && !expanded;
+  }
+
+  updateLibraryToggleMeta();
+}
+
+function setLibraryPanelExpanded(expanded) {
+  state.mobileLibraryExpanded = Boolean(expanded);
+  syncLibraryDisclosure();
+}
+
+function scrollToWorkspace() {
+  const behavior = getScrollBehavior();
+  window.requestAnimationFrame(() => {
+    elements.workspace?.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  });
+}
+
+function scrollToLibraryNavigation() {
+  setLibraryPanelExpanded(true);
+  const behavior = getScrollBehavior();
+  window.requestAnimationFrame(() => {
+    elements.libraryPanel?.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  });
+}
+
+async function activateResource(resource, unitIndex = null) {
+  if (!resource || resource.attachment) {
+    return;
+  }
+
+  const activationToken = state.resourceActivationToken + 1;
+  state.resourceActivationToken = activationToken;
+  const sameDeck = resource.id === state.activeResourceId;
+  const previousUnitIndex = state.activeUnitIndex;
+  const wasLoaded = isDeckLoaded(resource);
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.reviewActive = false;
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  state.practiceResult = null;
+  state.activeUnitIndex =
+    unitIndex === null
+      ? sameDeck && wasLoaded
+        ? previousUnitIndex
+        : -1
+      : unitIndex;
+  state.activeResourceId = resource.id;
+  state.view = "all";
+  state.query = "";
+  state.favoriteCategory = "all";
+  state.unknownCategory = "all";
+  elements.searchInput.value = "";
+  render();
+
+  if (!wasLoaded) {
+    try {
+      await loadDeck(resource);
+    } catch (error) {
+      if (activationToken !== state.resourceActivationToken) {
+        return;
+      }
+      state.decksError =
+        error?.message || `${resource.title} 加载失败。`;
+      render();
+      return;
+    }
+  }
+
+  if (activationToken !== state.resourceActivationToken) {
+    return;
+  }
+
+  const oversizedDeck =
+    getResourceItems(resource).length > LARGE_DECK_UNIT_THRESHOLD;
+  state.activeUnitIndex =
+    unitIndex === null
+      ? sameDeck && wasLoaded
+        ? previousUnitIndex
+        : oversizedDeck
+          ? 1
+          : -1
+      : unitIndex;
+  state.decksError = "";
+  render();
+
+  if (isMobileLibraryLayout()) {
+    setLibraryPanelExpanded(false);
+    scrollToWorkspace();
+    return;
+  }
+
+  window.scrollTo({ top: 0, behavior: getScrollBehavior() });
+}
+
+function createResourceEntry(resource, index) {
+  const button = createResourceButton(resource, index);
+  const items = getResourceItems(resource);
+  if (resource.attachment || items.length <= DEFAULT_UNIT_SIZE) {
+    return button;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "resource-item";
+  wrapper.classList.toggle(
+    "is-active",
+    resource.id === state.activeResourceId,
+  );
+
+  const picker = document.createElement("label");
+  picker.className = "resource-unit-picker";
+
+  const pickerLabel = document.createElement("span");
+  pickerLabel.textContent = "学习单元";
+
+  const select = document.createElement("select");
+  select.setAttribute("aria-label", `${resource.title} 学习单元`);
+  getDeckUnits(resource).forEach((unit) => {
+    const option = document.createElement("option");
+    option.value = unit.key;
+    option.textContent = `${unit.label} · ${unit.detail}`;
+    select.append(option);
+  });
+  select.value =
+    resource.id === state.activeResourceId && state.activeUnitIndex >= 1
+      ? `unit-${formatUnitNumber(state.activeUnitIndex)}`
+      : "all";
+  select.addEventListener("change", (event) => {
+    const unit = getDeckUnit(resource, event.target.value);
+    activateResource(resource, unit?.index > 0 ? unit.index : -1);
+  });
+
+  picker.append(pickerLabel, select);
+  wrapper.append(button, picker);
+  return wrapper;
+}
+
+function renderResourceList() {
+  const query = normalizeText(state.materialQuery).trim();
+  const definitions = getCategoryDefinitions();
+  const fragment = document.createDocumentFragment();
+  let visibleResourceCount = 0;
+  let visibleCategoryCount = 0;
+
+  definitions.forEach((category) => {
+    const categoryResources = state.resources.filter(
+      (resource) =>
+        (resource.category || "未分类素材") === category.name,
+    );
+    const categoryNameMatches =
+      Boolean(query) && normalizeText(category.name).includes(query);
+    const showIntensiveEntry =
+      INTENSIVE_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesIntensiveEntryQuery(query));
+    const showReadingEntry =
+      READING_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesReadingEntryQuery(query));
+    const showReadingIntensiveEntry =
+      READING_INTENSIVE_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query ||
+        categoryNameMatches ||
+        matchesReadingIntensiveEntryQuery(query));
+    const showKaoyanEntry =
+      KAOYAN_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesKaoyanEntryQuery(query));
+    const showCet6Entry =
+      CET6_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesCet6EntryQuery(query));
+    const showCet6ExtraEntry =
+      CET6_EXTRA_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesCet6ExtraEntryQuery(query));
+    const showPeriodicalEntry =
+      PERIODICAL_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesPeriodicalEntryQuery(query));
+    const showVocabEntry =
+      VOCAB_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesVocabEntryQuery(query));
+    const showWritingEntry =
+      WRITING_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesWritingEntryQuery(query));
+    const showListenEntry =
+      LISTEN_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesListenEntryQuery(query));
+    const showShadowEntry =
+      SHADOW_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesShadowEntryQuery(query));
+    const visibleResources = categoryResources.filter(
+      (resource) =>
+        !query || categoryNameMatches || matchesMaterialQuery(resource, query),
+    );
+
+    const sectionNames = new Set(category.sections);
+    categoryResources.forEach((resource) => {
+      if (resource.section) {
+        sectionNames.add(resource.section);
+      }
+    });
+    visibleResources.forEach((resource) => {
+      if (resource.section) {
+        sectionNames.add(resource.section);
+      }
+    });
+
+    const visibleSections = [...sectionNames].sort((left, right) =>
+      left.localeCompare(right, "zh-CN"),
+    ).filter((section) => {
+      if (!query || categoryNameMatches) {
+        return true;
+      }
+      return (
+        normalizeText(section).includes(query) ||
+        visibleResources.some((resource) => resource.section === section)
+      );
+    });
+
+    if (
+      query &&
+      !categoryNameMatches &&
+      visibleResources.length === 0 &&
+      visibleSections.length === 0 &&
+      !showIntensiveEntry &&
+      !showReadingEntry &&
+      !showReadingIntensiveEntry &&
+      !showKaoyanEntry &&
+      !showCet6Entry &&
+      !showCet6ExtraEntry &&
+      !showPeriodicalEntry &&
+      !showVocabEntry &&
+      !showWritingEntry &&
+      !showListenEntry &&
+      !showShadowEntry
+    ) {
+      return;
+    }
+
+    visibleCategoryCount += 1;
+    visibleResourceCount += visibleResources.length;
+
+    const collapsed = isCategoryCollapsedInView(category.name, Boolean(query));
+    const groupItemCount =
+      visibleResources.length +
+      (showIntensiveEntry ? 1 : 0) +
+      (showReadingEntry ? 1 : 0) +
+      (showReadingIntensiveEntry ? 1 : 0) +
+      (showKaoyanEntry ? 1 : 0) +
+      (showCet6Entry ? 1 : 0) +
+      (showCet6ExtraEntry ? 1 : 0) +
+      (showPeriodicalEntry ? 1 : 0) +
+      (showVocabEntry ? 1 : 0) +
+      (showWritingEntry ? 1 : 0) +
+      (showListenEntry ? 1 : 0) +
+      (showShadowEntry ? 1 : 0);
+
+    const group = document.createElement("section");
+    group.className = "resource-group";
+    group.classList.toggle("is-collapsed", collapsed);
+    group.dataset.category = category.name;
+
+    const heading = document.createElement("button");
+    heading.type = "button";
+    heading.className = "resource-group-heading";
+    heading.dataset.category = category.name;
+    heading.setAttribute("aria-expanded", String(!collapsed));
+    heading.title = collapsed
+      ? `展开“${category.name}”`
+      : `收起“${category.name}”`;
+
+    const headingLabel = document.createElement("span");
+    headingLabel.className = "resource-group-label";
+
+    const headingChevron = document.createElement("span");
+    headingChevron.className = "resource-group-chevron";
+    headingChevron.setAttribute("aria-hidden", "true");
+    headingChevron.textContent = "⌄";
+
+    const headingName = document.createElement("strong");
+    headingName.textContent = category.name;
+    headingLabel.append(headingChevron, headingName);
+
+    const headingCount = document.createElement("span");
+    headingCount.className = "resource-group-count";
+    headingCount.textContent = String(groupItemCount);
+
+    heading.addEventListener("click", () => {
+      const next = !collapsed;
+      if (query) {
+        state.collapseOverrides.set(category.name, next);
+      } else {
+        state.collapseOverrides.delete(category.name);
+        setCategoryCollapsed(category.name, next);
+      }
+      renderResourceList();
+    });
+
+    heading.append(headingLabel, headingCount);
+    group.append(heading);
+
+    if (showReadingEntry) {
+      group.append(createReadingEntry(category.name));
+    }
+
+    if (showReadingIntensiveEntry) {
+      group.append(createReadingIntensiveEntry(category.name));
+    }
+
+    if (showIntensiveEntry) {
+      group.append(createIntensiveEntry(category.name));
+    }
+
+    if (showKaoyanEntry) {
+      group.append(createKaoyanEntry(category.name));
+    }
+
+    if (showCet6Entry) {
+      group.append(createCet6Entry(category.name));
+    }
+
+    if (showCet6ExtraEntry) {
+      group.append(createCet6ExtraEntry(category.name));
+    }
+
+    if (showPeriodicalEntry) {
+      group.append(createPeriodicalEntry(category.name));
+    }
+
+    if (showVocabEntry) {
+      group.append(createVocabEntry(category.name));
+    }
+
+    if (showWritingEntry) {
+      group.append(createWritingEntry(category.name));
+    }
+
+    if (showListenEntry) {
+      group.append(createListenEntry(category.name));
+    }
+
+    if (showShadowEntry) {
+      group.append(createShadowEntry(category.name));
+    }
+
+    const directResources = visibleResources.filter(
+      (resource) => !resource.section,
+    );
+    directResources.forEach((resource) => {
+      group.append(
+        createResourceEntry(resource, state.resources.indexOf(resource)),
+      );
+    });
+
+    visibleSections.forEach((section) => {
+      const sectionResources = visibleResources.filter(
+        (resource) => resource.section === section,
+      );
+      const sectionLabel = document.createElement("div");
+      sectionLabel.className = "resource-section-label";
+      sectionLabel.textContent = section;
+      group.append(sectionLabel);
+
+      if (sectionResources.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "resource-empty";
+        empty.textContent = "暂无素材";
+        group.append(empty);
+        return;
+      }
+
+      sectionResources.forEach((resource) => {
+        group.append(
+          createResourceEntry(resource, state.resources.indexOf(resource)),
+        );
+      });
+    });
+
+    if (
+      !showIntensiveEntry &&
+      !showReadingEntry &&
+      !showReadingIntensiveEntry &&
+      !showKaoyanEntry &&
+      !showCet6Entry &&
+      !showCet6ExtraEntry &&
+      !showPeriodicalEntry &&
+      !showVocabEntry &&
+      !showWritingEntry &&
+      !showListenEntry &&
+      !showShadowEntry &&
+      !directResources.length &&
+      !visibleSections.length
+    ) {
+      const empty = document.createElement("p");
+      empty.className = "resource-empty";
+      empty.textContent = "暂无素材";
+      group.append(empty);
+    }
+
+    fragment.append(group);
+  });
+
+  if (visibleCategoryCount === 0) {
+    const empty = document.createElement("p");
+    empty.className = "resource-search-empty";
+    empty.textContent = "没有找到匹配素材";
+    fragment.append(empty);
+  }
+
+  elements.resourceList.replaceChildren(fragment);
+  elements.resourceCount.textContent = String(
+    query ? visibleResourceCount : state.resources.length,
+  );
+  updateLibraryCollapseAllMeta();
+  updateLibraryToggleMeta();
+}
+
+function createCard(entry, index) {
+  const { item, resource } = entry;
+  const card = document.createElement("article");
+  const itemKey = getItemKey(resource.id, item);
+  const isKnown = state.known.has(itemKey);
+  const isFavorite = state.favorites.has(itemKey);
+  const isUnknown = state.unknown.has(itemKey);
+  card.className = "vocab-card";
+  card.classList.toggle("is-known", isKnown);
+  card.classList.toggle("is-favorite", isFavorite);
+  card.classList.toggle("is-unknown", isUnknown);
+
+  const head = document.createElement("div");
+  head.className = "card-head";
+
+  const number = document.createElement("span");
+  number.className = "card-number";
+  number.setAttribute("aria-hidden", "true");
+  number.textContent = formatResourceIndex(index);
+
+  const phraseBlock = document.createElement("div");
+  phraseBlock.className = "phrase-block";
+
+  const source = document.createElement("span");
+  source.className = "card-source";
+  source.textContent = resource.description || resource.title;
+  source.hidden = state.view === "all";
+
+  const phrase = document.createElement("h2");
+  phrase.className = "phrase";
+  phrase.lang = "en";
+  phrase.textContent = item.phrase;
+
+  const phonetic = document.createElement("p");
+  phonetic.className = "phonetic";
+  phonetic.lang = "en";
+  phonetic.textContent = item.phonetic;
+  phonetic.hidden = !item.phonetic;
+
+  phraseBlock.append(source, phrase, phonetic);
+
+  const speakButton = document.createElement("button");
+  speakButton.className = "speak-button";
+  speakButton.type = "button";
+  speakButton.textContent = "朗读";
+  speakButton.setAttribute("aria-label", `播放 ${item.phrase} 的发音`);
+  speakButton.addEventListener("click", () =>
+    speak(item.phrase, 0.9, { voicePreference: state.practiceVoice }),
+  );
+
+  head.append(number, phraseBlock, speakButton);
+
+  const meaning = document.createElement("p");
+  meaning.className = "meaning";
+  meaning.textContent = item.meaning;
+
+  const sentence = document.createElement("p");
+  sentence.className = "sentence";
+  sentence.lang = "en";
+  sentence.append(createSentenceText(item.sentence));
+
+  if (item.translation) {
+    const translation = document.createElement("span");
+    translation.className = "translation";
+    translation.textContent = item.translation;
+    sentence.append(translation);
+  }
+
+  sentence.hidden = !String(item.sentence || "").trim() && !item.translation;
+
+  const answerPanel = document.createElement("div");
+  const meaningVisible = isMeaningVisible(itemKey);
+  answerPanel.className = "answer-panel";
+  answerPanel.classList.toggle("is-visible", meaningVisible);
+
+  const meaningRevealButton = document.createElement("button");
+  meaningRevealButton.className = "meaning-reveal-button";
+  meaningRevealButton.type = "button";
+  meaningRevealButton.textContent = meaningVisible
+    ? "关闭本条释义"
+    : "显示本条释义";
+  meaningRevealButton.setAttribute(
+    "aria-expanded",
+    String(meaningVisible),
+  );
+  meaningRevealButton.setAttribute(
+    "aria-label",
+    `${meaningVisible ? "关闭" : "显示"} ${item.phrase} 的释义`,
+  );
+  meaningRevealButton.addEventListener("click", () => {
+    const visible = isMeaningVisible(itemKey);
+    if (state.showAllMeanings) {
+      if (visible) {
+        state.meaningHides.add(itemKey);
+      } else {
+        state.meaningHides.delete(itemKey);
+      }
+    } else if (visible) {
+      state.meaningReveals.delete(itemKey);
+    } else {
+      state.meaningReveals.add(itemKey);
+    }
+    render();
+  });
+
+  answerPanel.append(meaningRevealButton, meaning, sentence);
+
+  const actions = document.createElement("div");
+  actions.className = "card-actions";
+
+  const favoriteButton = document.createElement("button");
+  favoriteButton.className = "favorite-button";
+  favoriteButton.type = "button";
+  favoriteButton.textContent = isFavorite ? "已收藏" : "收藏";
+  favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+  favoriteButton.setAttribute(
+    "aria-label",
+    `${isFavorite ? "取消收藏" : "收藏"} ${item.phrase}`,
+  );
+  favoriteButton.addEventListener("click", () => {
+    if (state.favorites.has(itemKey)) {
+      state.favorites.delete(itemKey);
+    } else {
+      state.favorites.add(itemKey);
+    }
+    persistSet(FAVORITES_STORAGE_KEY, state.favorites);
+    render();
+  });
+
+  const unknownButton = document.createElement("button");
+  unknownButton.className = "unknown-button";
+  unknownButton.type = "button";
+  unknownButton.textContent = isUnknown ? "已标不会" : "不会";
+  unknownButton.setAttribute("aria-pressed", String(isUnknown));
+  unknownButton.setAttribute(
+    "aria-label",
+    `${isUnknown ? "取消标记" : "标记"} ${item.phrase} 为不会`,
+  );
+  unknownButton.addEventListener("click", () => {
+    toggleItemMark(itemKey, "unknown");
+    render();
+  });
+
+  const knownButton = document.createElement("button");
+  knownButton.className = "known-button";
+  knownButton.type = "button";
+  knownButton.textContent = isKnown ? "已掌握" : "标记掌握";
+  knownButton.setAttribute("aria-pressed", String(isKnown));
+  knownButton.addEventListener("click", () => {
+    toggleItemMark(itemKey, "known");
+    render();
+  });
+
+  const practiceButton = document.createElement("button");
+  practiceButton.className = "practice-card-button";
+  practiceButton.type = "button";
+  practiceButton.textContent = "跟读";
+  practiceButton.setAttribute("aria-label", `跟读练习：${item.sentence || item.phrase}`);
+  practiceButton.addEventListener("click", () => {
+    openPractice(itemKey);
+  });
+
+  actions.append(
+    favoriteButton,
+    unknownButton,
+    knownButton,
+    practiceButton,
+  );
+  card.append(head, answerPanel, actions);
+  return card;
+}
+
+function updateProgress() {
+  const items = getActiveItems();
+  const knownCount = items.filter((item) =>
+    state.known.has(getItemKey(state.activeResourceId, item)),
+  ).length;
+  const percent = items.length
+    ? Math.round((knownCount / items.length) * 100)
+    : 0;
+
+  elements.progressRing.style.setProperty("--progress", `${percent}%`);
+  elements.progressPercent.textContent = `${percent}%`;
+  elements.progressText.textContent = `${knownCount} / ${items.length} 已掌握`;
+}
+
+function getCollectionViewConfig() {
+  const isUnknownView = state.view === "unknown";
+  return {
+    collection: isUnknownView ? state.unknown : state.favorites,
+    activeCategory: isUnknownView
+      ? state.unknownCategory
+      : state.favoriteCategory,
+    heading: isUnknownView ? "不会分类" : "收藏集分类",
+    allLabel: isUnknownView ? "全部不会" : "全部收藏集",
+    labelFor: (name) =>
+      isUnknownView ? `${name}不会` : `${name}收藏集`,
+    setCategory: (category) => {
+      if (isUnknownView) {
+        state.unknownCategory = category;
+      } else {
+        state.favoriteCategory = category;
+      }
+    },
+  };
+}
+
+function renderCollectionFilters() {
+  const isCollectionView =
+    state.view === "favorites" || state.view === "unknown";
+  elements.collectionFilters.hidden = !isCollectionView;
+
+  if (!isCollectionView) {
+    elements.collectionFilterList.replaceChildren();
+    return;
+  }
+
+  const config = getCollectionViewConfig();
+  const definitions = getCategoryDefinitions();
+  const filterDefinitions =
+    config.heading === "不会分类"
+      ? getUnknownCategoryDefinitions()
+      : definitions;
+  const categoryNames = new Set(
+    filterDefinitions.map((category) => category.name),
+  );
+  let activeCategory = config.activeCategory;
+  if (config.heading === "不会分类") {
+    activeCategory = resolveUnknownCategory();
+  } else if (
+    activeCategory !== "all" &&
+    !categoryNames.has(activeCategory)
+  ) {
+    config.setCategory("all");
+    activeCategory = "all";
+  }
+
+  const entries = getCollectionEntries(config.collection, "all");
+  const counts = new Map();
+  entries.forEach(({ resource }) => {
+    counts.set(resource.category, (counts.get(resource.category) || 0) + 1);
+  });
+
+  const categoryFilters = filterDefinitions.map((category) => ({
+    category: category.name,
+    label: config.labelFor(category.name),
+    count: counts.get(category.name) || 0,
+  }));
+  const filters =
+    config.heading === "不会分类"
+      ? categoryFilters
+      : [
+          {
+            category: "all",
+            label: config.allLabel,
+            count: entries.length,
+          },
+          ...categoryFilters,
+        ];
+
+  if (elements.collectionFilterLabel) {
+    elements.collectionFilterLabel.textContent = config.heading;
+  }
+  elements.collectionFilters.setAttribute("aria-label", config.heading);
+
+  const fragment = document.createDocumentFragment();
+  filters.forEach((filter) => {
+    const button = document.createElement("button");
+    const isActive = filter.category === activeCategory;
+    button.type = "button";
+    button.className = "collection-filter-button";
+    button.classList.toggle("is-active", isActive);
+    button.dataset.category = filter.category;
+    button.setAttribute("aria-pressed", String(isActive));
+
+    const label = document.createElement("span");
+    label.textContent = filter.label;
+
+    const count = document.createElement("span");
+    count.className = "collection-filter-count";
+    count.textContent = String(filter.count);
+
+    button.append(label, count);
+    button.addEventListener("click", () => {
+      config.setCategory(filter.category);
+      render();
+    });
+    fragment.append(button);
+  });
+
+  elements.collectionFilterList.replaceChildren(fragment);
+}
+
+function updateViewSwitcher() {
+  elements.viewButtons.forEach((button) => {
+    const isActive = button.dataset.view === state.view;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+  elements.favoriteCount.textContent = String(state.favorites.size);
+  elements.unknownCount.textContent = String(state.unknown.size);
+}
+
+function updateMeaningControls() {
+  elements.showAllMeaningsButton.classList.toggle(
+    "is-active",
+    state.showAllMeanings,
+  );
+  elements.hideAllMeaningsButton.classList.toggle(
+    "is-active",
+    !state.showAllMeanings,
+  );
+  elements.showAllMeaningsButton.setAttribute(
+    "aria-pressed",
+    String(state.showAllMeanings),
+  );
+  elements.hideAllMeaningsButton.setAttribute(
+    "aria-pressed",
+    String(!state.showAllMeanings),
+  );
+}
+
+function render() {
+  closeWordPopover();
+  renderAnkiExport();
+  const resource = getActiveResource();
+  const activeResourceLoaded = isDeckLoaded(resource);
+  const visibleEntriesReady =
+    state.view === "favorites" || state.view === "unknown"
+      ? areAllDecksLoaded()
+      : activeResourceLoaded;
+  const visibleEntries = getVisibleEntries();
+
+  if (state.reviewActive) {
+    elements.vocabularyToolbar.hidden = true;
+    elements.practiceStudio.hidden = true;
+    elements.reviewStudio.hidden = false;
+    elements.cardGrid.hidden = true;
+    elements.emptyState.hidden = true;
+    elements.activeTitle.textContent = "在线复习";
+    elements.activeDescription.textContent =
+      "按间隔重复的顺序复习当前素材，复习进度保存在本机浏览器。";
+    elements.footerResource.textContent = `在线复习 · ${getReviewEntries().length} 张卡片`;
+    renderResourceList();
+    updateProgress();
+    updateViewSwitcher();
+    updateMeaningControls();
+    renderCollectionFilters();
+    renderReviewView();
+    return;
+  }
+
+  if (state.practiceActive) {
+    const practiceEntries = getPracticeEntries();
+    const dialogueScenario = getCurrentDialogueScenario();
+    const isDialogue = state.practiceSection === "dialogue";
+    const isFree = state.practiceSection === "free";
+    const isIelts = state.practiceSection === "ielts";
+    elements.vocabularyToolbar.hidden = true;
+    elements.practiceStudio.hidden = false;
+    elements.reviewStudio.hidden = true;
+    elements.cardGrid.hidden = true;
+    elements.emptyState.hidden = true;
+    elements.practiceHeading.textContent = isDialogue
+      ? "情景对话"
+      : isFree
+        ? "自由对话"
+        : isIelts
+          ? "雅思口语"
+          : "口语跟读";
+    elements.activeTitle.textContent = isDialogue
+      ? "情景对话"
+      : isFree
+        ? "自由对话"
+        : isIelts
+          ? "雅思口语"
+          : "口语跟读";
+    elements.activeDescription.textContent = isDialogue
+      ? "选择生活场景，按自己的表达完成多轮英文对话。"
+      : isFree
+        ? "用英语自由聊天，获得双语回复、纠错和雅思口语练习建议。"
+        : isIelts
+          ? "按 Part 1 → Part 2 → Part 3 的考场顺序走完一次模拟，结束后看练习报告。"
+          : practiceEntries.length
+            ? `从“${resource?.title || "当前素材"}”中选择完整句子，听示范并跟读。`
+            : "当前视图没有可练习的完整句子，请先返回并选择其他素材。";
+    elements.footerResource.textContent = isDialogue
+      ? `情景对话 · ${dialogueScenario?.turns.length || 0} 轮`
+      : isFree
+        ? `自由对话 · ${state.freeTurnCount} 轮`
+        : isIelts
+          ? `雅思口语 · ${getIeltsPart2Cards().length} 张题卡`
+          : `口语跟读 · ${practiceEntries.length} 句`;
+    renderResourceList();
+    updateProgress();
+    updateViewSwitcher();
+    updateMeaningControls();
+    renderCollectionFilters();
+    renderPracticeView();
+    return;
+  }
+
+  elements.vocabularyToolbar.hidden = false;
+  elements.practiceStudio.hidden = true;
+  elements.reviewStudio.hidden = true;
+  const fragment = document.createDocumentFragment();
+
+  visibleEntries.forEach((entry, index) => {
+    fragment.append(createCard(entry, index));
+  });
+
+  elements.cardGrid.replaceChildren(fragment);
+  elements.visibleCount.textContent = visibleEntriesReady
+    ? String(visibleEntries.length)
+    : "…";
+  elements.cardGrid.hidden = visibleEntries.length === 0;
+
+  if (state.view === "favorites") {
+    const isAllFavorites = state.favoriteCategory === "all";
+    const collectionName = isAllFavorites
+      ? "全部收藏集"
+      : `${state.favoriteCategory}收藏集`;
+    elements.activeTitle.textContent = collectionName;
+    elements.activeDescription.textContent = isAllFavorites
+      ? "汇总所有素材中手动收藏的词汇，方便集中复习。"
+      : `汇总“${state.favoriteCategory}”分类中手动收藏的词汇，方便集中复习。`;
+    elements.footerResource.textContent = `${collectionName} · ${visibleEntries.length} 条`;
+  } else if (state.view === "unknown") {
+    const unknownCategory = resolveUnknownCategory();
+    const unknownName = `${unknownCategory}不会`;
+    elements.activeTitle.textContent = unknownName;
+    elements.activeDescription.textContent = `只汇总“${unknownCategory}”分类中标记为不会的词汇，掌握后可随时移出。`;
+    elements.footerResource.textContent = `${unknownName} · ${visibleEntries.length} 条`;
+  } else if (resource) {
+    const unit = getActiveUnit();
+    const unitLabel = unit ? ` · ${unit.label}` : "";
+    const description = resource.description || resource.group || "上传素材";
+    elements.activeTitle.textContent = `${resource.title}${unitLabel}`;
+    elements.activeDescription.textContent = unit
+      ? `${description} · ${unit.detail}`
+      : description;
+    elements.footerResource.textContent = `${resource.title}${unitLabel} · ${
+      activeResourceLoaded ? getActiveItems().length : "加载中"
+    } 条`;
+  }
+
+  if (visibleEntries.length > 0) {
+    elements.emptyState.hidden = true;
+  } else {
+    elements.emptyState.hidden = false;
+    const title = elements.emptyState.querySelector("strong");
+    const copy = elements.emptyState.querySelector("span");
+    if (state.query) {
+      title.textContent = "没有找到匹配内容";
+      copy.textContent = "换一个关键词，或切换到其他视图。";
+    } else if (
+      (state.view === "favorites" || state.view === "unknown") &&
+      !visibleEntriesReady
+    ) {
+      title.textContent =
+        state.view === "favorites"
+          ? "正在整理收藏集"
+          : "正在整理不会分类";
+      copy.textContent = "正在后台读取全部素材，完成后会自动刷新。";
+    } else if (state.view === "favorites") {
+      title.textContent =
+        state.favoriteCategory === "all"
+          ? "收藏集还是空的"
+          : `${state.favoriteCategory}收藏集还是空的`;
+      copy.textContent = "在任意词汇卡片上点“收藏”，它会汇总到这里。";
+    } else if (state.view === "unknown") {
+      title.textContent = `${resolveUnknownCategory()}还没有标记不会的单词`;
+      copy.textContent = "遇到不熟的词汇时点“不会”，之后可在这里集中复习。";
+    } else if (resource && !activeResourceLoaded) {
+      title.textContent = "正在读取词卡";
+      copy.textContent = isDeckLoading(resource)
+        ? "正在加载这个素材，其他素材会在后台继续读取。"
+        : "点击左侧素材按钮后读取它的词卡。";
+    } else if (resource && getDeckError(resource)) {
+      title.textContent = "词卡加载失败";
+      copy.textContent = getDeckError(resource);
+    } else if (!state.decksReady) {
+      title.textContent = "正在读取素材清单";
+      copy.textContent = "素材列表就绪后，点击具体模块即可开始学习。";
+    } else {
+      title.textContent = "素材里还没有卡片";
+      copy.textContent = "请检查对应 CSV 文件是否已经上传。";
+    }
+  }
+
+  renderResourceList();
+  updateProgress();
+  updateViewSwitcher();
+  updateMeaningControls();
+  renderCollectionFilters();
+}
+
+const AUTH_MODE_COPY = {
+  login: {
+    kicker: "欢迎回来",
+    title: "进入小屋",
+    copy: "使用账号密码继续你的听力词汇复习。",
+    button: "登录",
+    pending: "登录中...",
+  },
+  register: {
+    kicker: "第一次来",
+    title: "创建账号",
+    copy: "注册后即可登录；学习进度仍保存在当前浏览器里。",
+    button: "注册并进入",
+    pending: "注册中...",
+  },
+};
+
+function renderAuthNotice(text = "", tone = "info") {
+  if (!elements.authNotice) {
+    return;
+  }
+  elements.authNotice.textContent = text;
+  elements.authNotice.dataset.tone = tone;
+  elements.authNotice.hidden = !text;
+  renderMirrorNotice();
+}
+
+/** 有账号服务的正式入口；只读镜像上所有登录／注册动作都指向这里。 */
+const MAIN_SITE_URL = "https://app.iball.top/";
+
+/**
+ * 登录页可能由其它页面带 ?next= 跳进来。只接受本站绝对路径，
+ * 防止把用户带到外部地址，也避免协议相对地址造成开放重定向。
+ */
+function requestedPostAuthPath() {
+  try {
+    const raw = new URLSearchParams(window.location.search).get("next") || "";
+    if (
+      !raw.startsWith("/") ||
+      raw.startsWith("//") ||
+      raw.includes("\\")
+    ) {
+      return "";
+    }
+    const target = new URL(raw, window.location.origin);
+    if (target.origin !== window.location.origin) {
+      return "";
+    }
+    return `${target.pathname}${target.search}${target.hash}`;
+  } catch {
+    return "";
+  }
+}
+
+/** 登录成功后返回请求页；没有合法目标时返回 false，让调用方继续首页流程。 */
+function redirectToRequestedPage() {
+  const next = requestedPostAuthPath();
+  if (!next) {
+    return false;
+  }
+  window.location.replace(next);
+  return true;
+}
+
+/**
+ * 只读镜像判定：接口在，但服务器没有可写账号目录（典型是 Vercel 那份部署）。
+ * 这种站点登录、注册都写不进去，必须把用户引到主站，否则只会反复撞「账号或密码不正确」。
+ */
+function isReadOnlyMirror() {
+  return Boolean(
+    state.sessionMode === "server" &&
+      state.registration &&
+      state.registration.storageReady === false,
+  );
+}
+
+function renderMirrorNotice() {
+  if (!elements.authMirror) {
+    return;
+  }
+  const mirror = isReadOnlyMirror();
+  elements.authMirror.hidden = !mirror;
+  if (mirror && elements.authMirrorLink) {
+    elements.authMirrorLink.href = MAIN_SITE_URL;
+  }
+}
+
+function setAuthMode(mode, message = "") {
+  const next = mode === "register" ? "register" : "login";
+  const copy = AUTH_MODE_COPY[next];
+  state.authMode = next;
+
+  if (elements.authKicker) {
+    elements.authKicker.textContent = copy.kicker;
+  }
+  if (elements.authTitle) {
+    elements.authTitle.textContent = copy.title;
+  }
+  if (elements.authCopy) {
+    elements.authCopy.textContent = copy.copy;
+  }
+
+  const registering = next === "register";
+  elements.authModeLogin?.classList.toggle("is-active", !registering);
+  elements.authModeRegister?.classList.toggle("is-active", registering);
+  elements.authModeLogin?.setAttribute("aria-selected", String(!registering));
+  elements.authModeRegister?.setAttribute("aria-selected", String(registering));
+
+  if (elements.emailField) {
+    elements.emailField.hidden = !registering;
+  }
+  if (elements.passwordHint) {
+    elements.passwordHint.hidden = !registering;
+  }
+  if (elements.inviteField) {
+    elements.inviteField.hidden = !(
+      registering && state.registration?.inviteRequired
+    );
+  }
+  if (elements.password) {
+    elements.password.autocomplete = registering
+      ? "new-password"
+      : "current-password";
+  }
+
+  elements.loginButton.textContent = copy.button;
+  elements.loginError.textContent = message;
+  elements.loginError.hidden = !message;
+}
+
+function showLogin(message = "") {
+  setPasswordVisibility(false);
+  elements.loginView.hidden = false;
+  elements.appView.hidden = true;
+  setAuthMode(state.authMode, message);
+  renderMirrorNotice();
+  elements.username.focus();
+}
+
+function setPasswordVisibility(visible) {
+  const show = Boolean(visible);
+  elements.password.type = show ? "text" : "password";
+  if (elements.passwordVisibilityButton) {
+    elements.passwordVisibilityButton.textContent = show ? "隐藏" : "显示";
+    elements.passwordVisibilityButton.setAttribute(
+      "aria-pressed",
+      String(show),
+    );
+    elements.passwordVisibilityButton.setAttribute(
+      "aria-label",
+      show ? "隐藏密码" : "显示密码",
+    );
+  }
+}
+
+async function showApp(user) {
+  state.user = user;
+  elements.userLabel.textContent = user;
+  if (elements.adminLink) {
+    elements.adminLink.hidden = !state.isAdmin;
+  }
+  removeWelcomeOverlay();
+  elements.loginView.hidden = true;
+  elements.appView.hidden = false;
+
+  if (state.resources.length === 0) {
+    await loadLibrary();
+  } else {
+    render();
+  }
+  elements.searchInput.focus();
+}
+
+async function requestAuth(payload = {}, method = "POST") {
+  const response = await fetch("./api/auth", {
+    method,
+    headers:
+      method === "POST" ? { "Content-Type": "application/json" } : undefined,
+    body: method === "POST" ? JSON.stringify(payload) : undefined,
+    credentials: "same-origin",
+  });
+  const data = await response.json().catch(() => ({}));
+  return { response, data };
+}
+
+const NAMESPACE_RELOAD_FLAG = "iball:namespace-reload";
+const PRE_ACTIVATION_NAMESPACE = window.iballAccounts?.namespace() || "";
+
+/**
+ * 切换本地命名空间并接入云端同步。
+ *
+ * 页面在加载时就已经按「上一个账号」读过本地数据了，如果这里换人，就必须
+ * 刷新一次让收藏、错词、复习记录重新按新账号读取。用 sessionStorage 打标记
+ * 保证最多只刷一次，不会来回跳。
+ */
+async function activateAccount(account) {
+  if (!window.iballAccounts || !window.iballProgress) {
+    return false;
+  }
+
+  window.iballAccounts.activate(account?.id || "");
+
+  if (window.iballAccounts.namespace() !== PRE_ACTIVATION_NAMESPACE) {
+    let alreadyReloaded = false;
+    try {
+      alreadyReloaded =
+        sessionStorage.getItem(NAMESPACE_RELOAD_FLAG) === "1";
+      if (!alreadyReloaded) {
+        sessionStorage.setItem(NAMESPACE_RELOAD_FLAG, "1");
+      }
+    } catch {
+      alreadyReloaded = true;
+    }
+    if (!alreadyReloaded) {
+      window.location.reload();
+      return true;
+    }
+  }
+
+  try {
+    sessionStorage.removeItem(NAMESPACE_RELOAD_FLAG);
+  } catch {
+    // 隐私模式下没有 sessionStorage，忽略即可。
+  }
+
+  await window.iballProgress.enableSync();
+  window.iballProgress.startHeartbeat();
+  return false;
+}
+
+async function checkSession() {
+  const session = window.iballSession
+    ? await window.iballSession.probe()
+    : null;
+
+  // 静态镜像（GitHub 备份）或账号服务临时不可用时，仍然放行浏览，
+  // 学习进度继续写 localStorage，等服务器恢复后再登录即可。
+  if (!session || session.mode === "local") {
+    state.sessionMode = "local";
+    state.registration = null;
+    state.isAdmin = false;
+    await activateAccount(null);
+    await showApp("本地模式");
+    return;
+  }
+
+  state.sessionMode = "server";
+  state.registration = session.registration || null;
+  state.isAdmin = Boolean(session.admin);
+
+  if (session.authenticated) {
+    const reloading = await activateAccount(session.account);
+    if (reloading) {
+      return;
+    }
+    if (redirectToRequestedPage()) {
+      return;
+    }
+    removeWelcomeOverlay();
+    await showApp(session.user || "用户");
+    return;
+  }
+
+  await activateAccount(null);
+  state.isAdmin = false;
+  // 从「还没有账号？注册」这类链接进来时，直接把面板切到注册页签。
+  if (
+    window.location.hash === "#register" &&
+    !(state.registration && state.registration.enabled === false)
+  ) {
+    state.authMode = "register";
+  }
+  showLogin();
+  renderAuthNotice(
+    state.registration && !state.registration.enabled
+      ? "本站当前未开放注册，请使用已有账号登录。"
+      : "",
+  );
+  showWelcomeOverlay();
+}
+
+async function loadLibrary() {
+  elements.activeTitle.textContent = "正在加载素材";
+  elements.activeDescription.textContent =
+    "正在读取素材清单。";
+  elements.emptyState.hidden = false;
+
+  try {
+    const library = await fetchLibraryManifest(MANIFEST_PATH);
+    state.categories = library.categories;
+    state.resources = library.resources;
+    state.decks = new Map();
+    state.deckPromises = new Map();
+    state.deckErrors = new Map();
+    state.decksReady = false;
+    state.decksError = "";
+    state.backgroundPreloadStarted = false;
+    state.resourceActivationToken += 1;
+
+    if (!state.activeResourceId) {
+      const firstDeck = state.resources.find(
+        (resource) => !resource.attachment,
+      );
+      state.activeResourceId = firstDeck?.id || "";
+    }
+
+    // Paint the navigation from the manifest first. The active material gets
+    // priority; the remaining files are fetched in the background so a click
+    // never waits on the whole library.
+    render();
+
+    const firstDeck = state.resources.find(
+      (resource) => resource.id === state.activeResourceId,
+    );
+    if (firstDeck) {
+      try {
+        await loadDeck(firstDeck);
+      } catch (error) {
+        state.decksError =
+          error?.message || "词汇文件加载失败。";
+        console.error(error);
+      }
+    }
+
+    state.decksReady = true;
+    render();
+    scheduleBackgroundDeckPreload(firstDeck?.id || "");
+  } catch (error) {
+    state.categories = [];
+    state.resources = [];
+    state.decks = new Map();
+    state.deckPromises = new Map();
+    state.deckErrors = new Map();
+    state.decksReady = true;
+    state.decksError = "";
+    elements.activeTitle.textContent = "素材加载失败";
+    elements.activeDescription.textContent =
+      "请检查 materials 目录和素材文件是否已经上传。";
+    elements.emptyState.hidden = false;
+    elements.emptyState.querySelector("strong").textContent = "暂时无法打开素材";
+    elements.emptyState.querySelector("span").textContent =
+      "刷新页面后重试，或检查控制台中的具体错误。";
+    console.error(error);
+  }
+}
+
+async function handleAuthSubmit(event) {
+  event.preventDefault();
+  const mode = state.authMode === "register" ? "register" : "login";
+  const copy = AUTH_MODE_COPY[mode];
+  const username = elements.username.value.trim();
+  const password = elements.password.value;
+
+  elements.loginButton.disabled = true;
+  elements.loginButton.textContent = copy.pending;
+  elements.loginError.hidden = true;
+
+  // 只读镜像没有可写账号目录，注册必然失败，直接给出可执行的下一步。
+  if (isReadOnlyMirror() && mode === "register") {
+    elements.loginButton.disabled = false;
+    elements.loginButton.textContent = copy.button;
+    showLogin(`这里是只读镜像，不能注册账号。请到主站 ${MAIN_SITE_URL} 注册。`);
+    return;
+  }
+
+  try {
+    const payload =
+      mode === "register"
+        ? {
+            action: "register",
+            username,
+            password,
+            email: elements.email?.value.trim() || "",
+            inviteCode: elements.inviteCode?.value.trim() || "",
+          }
+        : { action: "login", username, password };
+
+    const { response, data } = await requestAuth(payload);
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "账号或密码不正确");
+    }
+
+    elements.password.value = "";
+    if (elements.inviteCode) {
+      elements.inviteCode.value = "";
+    }
+    state.authMode = "login";
+    state.isAdmin = Boolean(data.admin);
+    const reloading = await activateAccount(data.account);
+    if (reloading) {
+      return;
+    }
+    if (redirectToRequestedPage()) {
+      return;
+    }
+    // 注册成功后服务端已经下发会话，直接进入小屋。
+    await showApp(data.user || username);
+  } catch (error) {
+    const reason = error.message || "登录服务暂时不可用";
+    showLogin(
+      isReadOnlyMirror()
+        ? `${reason} 当前是只读镜像，账号在主站 ${MAIN_SITE_URL}。`
+        : reason,
+    );
+  } finally {
+    elements.loginButton.disabled = false;
+    elements.loginButton.textContent = AUTH_MODE_COPY[state.authMode].button;
+  }
+}
+
+async function handleLogout() {
+  elements.logoutButton.disabled = true;
+  try {
+    await window.iballProgress?.flushSync();
+    await requestAuth({ action: "logout" });
+  } catch {
+    // Clear the local view even if the network request fails.
+  }
+  window.iballProgress?.stopHeartbeat();
+  window.iballProgress?.disableSync("已退出登录。");
+  elements.logoutButton.disabled = false;
+  state.user = "";
+  state.isAdmin = false;
+  state.authMode = "login";
+  elements.loginError.hidden = true;
+  elements.password.value = "";
+  window.iballAccounts?.activate("");
+  window.iballSession?.reset();
+  if (elements.email) {
+    elements.email.value = "";
+  }
+  if (elements.adminLink) {
+    elements.adminLink.hidden = true;
+  }
+  resetStateForAccount();
+  renderAuthNotice("");
+  showLogin();
+}
+
+function resetStateForAccount() {
+  state.practiceHistory = [];
+  state.freeMessages = [];
+  state.freeTurnCount = 0;
+  state.reviewProgress = {};
+  state.reviewDaily = { date: "", reviewedKeys: [], newKeys: [] };
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  state.reviewSessionDone = 0;
+  state.resources = [];
+  state.categories = [];
+  state.decks = new Map();
+  state.deckPromises = new Map();
+  state.deckErrors = new Map();
+  state.activeResourceId = "";
+  restoreMarks();
+  restoreLibraryCollapse();
+  restorePracticeHistory();
+  restoreFreeConversation();
+  restorePracticeSettings();
+  restoreReviewData();
+}
+
+function showResetForm(message = "") {
+  elements.loginForm.hidden = true;
+  elements.resetForm.hidden = false;
+  elements.authModeLogin.disabled = true;
+  elements.authModeRegister.disabled = true;
+  elements.loginError.hidden = true;
+  elements.resetError.textContent = message;
+  elements.resetError.hidden = !message;
+  elements.resetRequestMessage.hidden = true;
+  elements.resetTokenFields.hidden = true;
+  elements.resetToken.value = "";
+  elements.resetNewPassword.value = "";
+  elements.resetAccount.focus();
+}
+
+function showLoginForm() {
+  elements.resetForm.hidden = true;
+  elements.loginForm.hidden = false;
+  elements.authModeLogin.disabled = false;
+  elements.authModeRegister.disabled = false;
+  elements.resetError.hidden = true;
+  elements.resetRequestMessage.hidden = true;
+  elements.resetTokenFields.hidden = true;
+}
+
+async function handleResetRequest() {
+  const identifier = elements.resetAccount.value.trim();
+  if (!identifier) {
+    elements.resetError.textContent = "请先填写账号或注册邮箱。";
+    elements.resetError.hidden = false;
+    elements.resetAccount.focus();
+    return;
+  }
+
+  elements.resetRequestButton.disabled = true;
+  elements.resetRequestButton.textContent = "正在生成…";
+  elements.resetError.hidden = true;
+
+  try {
+    const { response, data } = await requestAuth({
+      action: "reset-request",
+      identifier,
+    });
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "暂时无法生成重置码。");
+    }
+    elements.resetRequestMessage.textContent =
+      data.message ||
+      "如果该账号存在，重置码已生成。请联系站长领取后填入下方。";
+    elements.resetRequestMessage.hidden = false;
+    elements.resetTokenFields.hidden = false;
+    elements.resetToken.focus();
+  } catch (error) {
+    elements.resetError.textContent =
+      error?.message || "暂时无法生成重置码。";
+    elements.resetError.hidden = false;
+  } finally {
+    elements.resetRequestButton.disabled = false;
+    elements.resetRequestButton.textContent = "生成重置码";
+  }
+}
+
+async function handleResetSubmit() {
+  const token = elements.resetToken.value.trim();
+  const newPassword = elements.resetNewPassword.value;
+
+  if (!token) {
+    elements.resetError.textContent = "请填写站长给你的重置码。";
+    elements.resetError.hidden = false;
+    elements.resetToken.focus();
+    return;
+  }
+  if (newPassword.length < 8) {
+    elements.resetError.textContent = "新密码至少 8 位。";
+    elements.resetError.hidden = false;
+    elements.resetNewPassword.focus();
+    return;
+  }
+
+  elements.resetSubmitButton.disabled = true;
+  elements.resetSubmitButton.textContent = "正在重设…";
+  elements.resetError.hidden = true;
+
+  try {
+    const { response, data } = await requestAuth({
+      action: "reset-password",
+      token,
+      newPassword,
+      password: newPassword,
+    });
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "重置码无效或已经过期。");
+    }
+    showLoginForm();
+    elements.password.value = "";
+    renderAuthNotice("密码已重设，请用新密码登录。", "info");
+    elements.username.focus();
+  } catch (error) {
+    elements.resetError.textContent =
+      error?.message || "重置码无效或已经过期。";
+    elements.resetError.hidden = false;
+  } finally {
+    elements.resetSubmitButton.disabled = false;
+    elements.resetSubmitButton.textContent = "重设密码";
+  }
+}
+
+elements.loginForm.addEventListener("submit", handleAuthSubmit);
+elements.forgotPasswordButton?.addEventListener("click", () => {
+  showResetForm();
+});
+elements.resetRequestButton?.addEventListener("click", handleResetRequest);
+elements.resetSubmitButton?.addEventListener("click", handleResetSubmit);
+elements.resetBackButton?.addEventListener("click", () => {
+  showLoginForm();
+  renderAuthNotice("");
+});
+elements.authModeLogin?.addEventListener("click", () => {
+  renderAuthNotice("");
+  setAuthMode("login");
+  elements.username.focus();
+});
+elements.authModeRegister?.addEventListener("click", () => {
+  setAuthMode("register");
+  renderAuthNotice(
+    state.registration && !state.registration.enabled
+      ? "本站当前未开放注册，请使用已有账号登录。"
+      : "",
+    state.registration && !state.registration.enabled ? "warn" : "info",
+  );
+  elements.username.focus();
+});
+elements.logoutButton.addEventListener("click", handleLogout);
+elements.practiceButton.addEventListener("click", () => {
+  openPractice();
+});
+elements.reviewButton.addEventListener("click", openReview);
+elements.reviewExitButton.addEventListener("click", closeReview);
+elements.reviewRestartButton.addEventListener("click", () => {
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewShowButton.addEventListener("click", revealReviewCard);
+elements.reviewSpeakButton.addEventListener("click", speakReviewCard);
+elements.reviewUnknownButton?.addEventListener("click", () => {
+  markReviewCard("unknown");
+});
+elements.reviewKnownButton?.addEventListener("click", () => {
+  markReviewCard("known");
+});
+elements.reviewGradeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    gradeReviewCard(button.dataset.reviewGrade);
+  });
+});
+elements.reviewCategory.addEventListener("change", (event) => {
+  state.reviewCategory = event.target.value;
+  state.reviewSection = "all";
+  state.reviewUnitKey = "all";
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewSection.addEventListener("change", (event) => {
+  state.reviewSection = event.target.value;
+  state.reviewUnitKey = "all";
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewUnit.addEventListener("change", (event) => {
+  state.reviewUnitKey = event.target.value;
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewNewLimit.addEventListener("change", (event) => {
+  state.reviewNewLimit = Math.max(0, Number(event.target.value) || 0);
+  startReviewSession();
+  renderReviewView();
+});
+elements.reviewExportButton.addEventListener("click", exportReviewProgress);
+elements.reviewImportButton.addEventListener("click", () => {
+  elements.reviewImportInput.click();
+});
+elements.reviewImportInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  importReviewProgress(file);
+  event.target.value = "";
+});
+elements.reviewClearButton.addEventListener("click", clearReviewProgress);
+elements.practiceExitButton.addEventListener("click", closePractice);
+elements.practiceShadowTab.addEventListener("click", () => {
+  setPracticeSection("shadow");
+});
+elements.practiceDialogueTab.addEventListener("click", () => {
+  setPracticeSection("dialogue");
+});
+elements.practiceFreeTab.addEventListener("click", () => {
+  setPracticeSection("free");
+});
+elements.practiceIeltsTab.addEventListener("click", () => {
+  setPracticeSection("ielts");
+});
+elements.practiceListenButton.addEventListener("click", playPracticeTarget);
+elements.practiceRecordButton.addEventListener(
+  "click",
+  startPracticeRecording,
+);
+elements.practiceStopButton.addEventListener(
+  "click",
+  stopPracticeRecording,
+);
+elements.practiceRetryButton.addEventListener("click", () => {
+  resetPracticeAttempt();
+  renderPracticeView();
+});
+elements.practiceNextButton.addEventListener("click", () => {
+  movePractice(1);
+});
+elements.practicePreviousButton.addEventListener("click", () => {
+  movePractice(-1);
+});
+elements.practiceShuffleButton.addEventListener("click", shufflePractice);
+elements.dialogueListenButton.addEventListener(
+  "click",
+  playDialoguePrompt,
+);
+elements.dialogueHintButton.addEventListener(
+  "click",
+  toggleDialogueHint,
+);
+elements.dialogueRecordButton.addEventListener(
+  "click",
+  startDialogueRecording,
+);
+elements.dialogueStopButton.addEventListener(
+  "click",
+  stopDialogueRecording,
+);
+elements.dialogueSubmitButton.addEventListener("click", () => {
+  submitDialogueAnswer();
+});
+elements.dialogueRealtimeButton.addEventListener(
+  "click",
+  toggleRealtimeConversation,
+);
+elements.dialogueRetryButton.addEventListener(
+  "click",
+  retryDialogueTurn,
+);
+elements.dialogueNextButton.addEventListener(
+  "click",
+  moveDialogueTurn,
+);
+elements.dialogueAnswerInput.addEventListener("input", (event) => {
+  if (state.dialogueResult) {
+    state.dialogueResult = null;
+    elements.dialogueResult.hidden = true;
+    state.dialogueMessages[state.dialogueTurnIndex] = "";
+  }
+  state.dialogueInput = event.target.value;
+  elements.dialogueSubmitButton.disabled =
+    !state.dialogueInput.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    Boolean(state.dialogueResult);
+});
+elements.dialogueAnswerInput.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Enter" &&
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey
+  ) {
+    event.preventDefault();
+    submitDialogueAnswer();
+  }
+});
+elements.ieltsStartButton.addEventListener("click", startIeltsMock);
+elements.ieltsPrepSkipButton.addEventListener("click", () => {
+  if (state.ieltsStep !== "prep") {
+    return;
+  }
+  advanceIeltsFromPrep();
+});
+elements.ieltsRestartButton.addEventListener("click", () => {
+  resetIeltsMock();
+  renderIeltsView();
+});
+elements.ieltsCardSelect.addEventListener("change", (event) => {
+  state.ieltsPart2Id = event.target.value;
+  state.ieltsReport = null;
+  state.ieltsStep = "intro";
+  state.ieltsMessage = "";
+  state.ieltsMessageType = "";
+  renderIeltsView();
+});
+elements.ieltsPlayButton.addEventListener("click", playIeltsPrompt);
+elements.ieltsHintButton.addEventListener("click", toggleIeltsHint);
+elements.ieltsRecordButton.addEventListener("click", startIeltsRecording);
+elements.ieltsStopButton.addEventListener("click", stopIeltsRecording);
+elements.ieltsSubmitButton.addEventListener("click", () => {
+  submitIeltsAnswer();
+});
+elements.ieltsAnswerInput.addEventListener("input", (event) => {
+  state.ieltsInput = event.target.value;
+  elements.ieltsSubmitButton.disabled =
+    !state.ieltsInput.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing;
+});
+elements.ieltsAnswerInput.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Enter" &&
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey
+  ) {
+    event.preventDefault();
+    submitIeltsAnswer();
+  }
+});
+elements.freeRestartButton.addEventListener(
+  "click",
+  resetFreeConversation,
+);
+elements.freeListenButton.addEventListener("click", playLatestFreeReply);
+elements.freeHintButton.addEventListener("click", toggleFreeHint);
+elements.freeRecordButton.addEventListener("click", startFreeRecording);
+elements.freeStopButton.addEventListener("click", stopFreeRecording);
+elements.freeSubmitButton.addEventListener("click", () => {
+  sendFreeMessage();
+});
+elements.freeRealtimeButton.addEventListener(
+  "click",
+  toggleRealtimeConversation,
+);
+elements.freeTopic.addEventListener("change", (event) => {
+  const topicId = event.target.value;
+  if (!FREE_CHAT_TOPICS[topicId]) {
+    return;
+  }
+
+  state.freeTopic = topicId;
+  persistPracticeSettings();
+  resetFreeConversation();
+});
+elements.freeAutoSpeak.addEventListener("change", (event) => {
+  state.freeAutoSpeak = event.target.checked;
+  persistPracticeSettings();
+});
+elements.freeAnswerInput.addEventListener("input", (event) => {
+  state.freeInput = event.target.value;
+  elements.freeSubmitButton.disabled =
+    !state.freeInput.trim() ||
+    state.practiceListening ||
+    state.practiceTranscribing ||
+    state.freeChatLoading;
+});
+elements.freeAnswerInput.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Enter" &&
+    (event.ctrlKey || event.metaKey) &&
+    !event.shiftKey
+  ) {
+    event.preventDefault();
+    sendFreeMessage();
+  }
+});
+elements.freeChatMode.addEventListener("change", (event) => {
+  setFreeChatMode(event.target.value);
+});
+elements.freeChatApiSaveButton.addEventListener(
+  "click",
+  saveFreeChatApiSettings,
+);
+elements.practiceClearButton.addEventListener("click", () => {
+  if (
+    state.practiceHistory.length > 0 &&
+    !window.confirm("确定清空本机的口语练习记录吗？")
+  ) {
+    return;
+  }
+  state.practiceHistory = [];
+  persistPracticeHistory();
+  renderPracticeView();
+});
+elements.practiceMode.addEventListener("change", (event) => {
+  setPracticeRecognitionMode(event.target.value);
+});
+elements.practiceApiSaveButton.addEventListener(
+  "click",
+  savePracticeApiSettings,
+);
+elements.practiceRate.addEventListener("change", (event) => {
+  state.practiceRate = Number(event.target.value) || 0.9;
+});
+elements.practiceVoice.addEventListener("change", (event) => {
+  const allowedPreferences = new Set([
+    "auto",
+    "female",
+    "male",
+    "device",
+  ]);
+  if (!allowedPreferences.has(event.target.value)) {
+    return;
+  }
+
+  state.practiceVoice = event.target.value;
+  persistPracticeSettings();
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  renderPracticeView();
+});
+elements.materialSearchInput.addEventListener("input", (event) => {
+  state.materialQuery = event.target.value;
+  state.collapseOverrides.clear();
+  renderResourceList();
+});
+elements.passwordVisibilityButton?.addEventListener("click", () => {
+  setPasswordVisibility(elements.password.type !== "text");
+  elements.password.focus({ preventScroll: true });
+});
+elements.libraryCollapseAllButton?.addEventListener(
+  "click",
+  toggleAllLibraryGroups,
+);
+elements.libraryToggleButton.addEventListener("click", () => {
+  setLibraryPanelExpanded(!state.mobileLibraryExpanded);
+});
+elements.backToLibraryButton.addEventListener(
+  "click",
+  scrollToLibraryNavigation,
+);
+elements.ankiExportButton.addEventListener("click", () => {
+  if (elements.ankiExportPanel.hidden) {
+    openAnkiExport();
+  } else {
+    closeAnkiExport({ restoreFocus: true });
+  }
+});
+elements.ankiExportCloseButton.addEventListener("click", () => {
+  closeAnkiExport({ restoreFocus: true });
+});
+elements.ankiExportCategory.addEventListener("change", (event) => {
+  state.ankiExportCategory = event.target.value;
+  state.ankiExportSection = "all";
+  setAnkiExportStatus();
+  renderAnkiExport();
+});
+elements.ankiExportSection.addEventListener("change", (event) => {
+  state.ankiExportSection = event.target.value;
+  setAnkiExportStatus();
+  renderAnkiExport();
+});
+elements.ankiExportDownloadButton.addEventListener(
+  "click",
+  downloadAnkiExport,
+);
+elements.showAllMeaningsButton.addEventListener("click", () => {
+  setAllMeaningsVisible(true);
+});
+elements.hideAllMeaningsButton.addEventListener("click", () => {
+  setAllMeaningsVisible(false);
+});
+elements.searchInput.addEventListener("input", (event) => {
+  state.query = event.target.value;
+  render();
+});
+elements.viewSwitcher.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-view]");
+  if (!button) {
+    return;
+  }
+  if (button.dataset.view === "unknown") {
+    resolveUnknownCategory(getActiveResource()?.category || "");
+  }
+  state.view = button.dataset.view;
+  render();
+});
+elements.wordPopoverClose.addEventListener("click", closeWordPopover);
+elements.openSourceButton.addEventListener("click", () => {
+  if (elements.openSourcePanel.hidden) {
+    openOpenSourcePanel();
+    return;
+  }
+  closeOpenSourcePanel();
+});
+elements.openSourceClose.addEventListener("click", () =>
+  closeOpenSourcePanel({ restoreFocus: true }),
+);
+elements.openSourcePanel.addEventListener("click", (event) => {
+  const target = event.target;
+  if (
+    target instanceof HTMLElement &&
+    target.dataset.openSourceDismiss !== undefined
+  ) {
+    closeOpenSourcePanel({ restoreFocus: true });
+  }
+});
+elements.openSourceFilters.addEventListener("click", (event) => {
+  const target = event.target;
+  const button =
+    target instanceof HTMLElement
+      ? target.closest("[data-open-source-filter]")
+      : null;
+  if (!button) {
+    return;
+  }
+  state.openSourceFilter = button.dataset.openSourceFilter;
+  renderOpenSourcePanel();
+});
+elements.openSourceQuery.addEventListener("input", (event) => {
+  state.openSourceQuery = event.target.value;
+  renderOpenSourcePanel();
+});
+elements.openSourceForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  window.open(
+    openSourceSearchUrl(elements.openSourceQuery.value),
+    "_blank",
+    "noopener,noreferrer",
+  );
+});
+document.addEventListener("click", (event) => {
+  if (
+    elements.wordPopover.hidden ||
+    elements.wordPopover.contains(event.target) ||
+    event.target.closest(".word-lookup")
+  ) {
+    return;
+  }
+  closeWordPopover();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !elements.openSourcePanel.hidden) {
+    closeOpenSourcePanel({ restoreFocus: true });
+    return;
+  }
+  if (event.key === "Escape" && !elements.ankiExportPanel.hidden) {
+    closeAnkiExport({ restoreFocus: true });
+    return;
+  }
+  if (event.key === "Escape" && !elements.wordPopover.hidden) {
+    const button = activeWordButton;
+    closeWordPopover();
+    button?.focus();
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (!state.reviewActive) {
+    return;
+  }
+
+  const target = event.target;
+  if (
+    target instanceof HTMLElement &&
+    (target.tagName === "INPUT" ||
+      target.tagName === "SELECT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable)
+  ) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    closeReview();
+    return;
+  }
+
+  if (!getCurrentReviewEntry()) {
+    return;
+  }
+
+  if (event.code === "Space" || event.key === "Enter") {
+    event.preventDefault();
+    if (!state.reviewRevealed) {
+      revealReviewCard();
+      return;
+    }
+    if (event.code === "Space") {
+      gradeReviewCard("good");
+    }
+    return;
+  }
+
+  const shortcuts = { "1": "again", "2": "hard", "3": "good", "4": "easy" };
+  const grade = shortcuts[event.key];
+  if (grade) {
+    event.preventDefault();
+    gradeReviewCard(grade);
+    return;
+  }
+
+  if (event.key === "s" || event.key === "S") {
+    event.preventDefault();
+    speakReviewCard();
+  }
+});
+window.addEventListener("resize", closeWordPopover);
+window.addEventListener("scroll", closeWordPopover, { passive: true });
+const mobileLibraryMediaQuery = window.matchMedia(MOBILE_LIBRARY_QUERY);
+mobileLibraryMediaQuery.addEventListener?.("change", syncLibraryDisclosure);
+
+function dismissWelcomeOverlay() {
+  const overlay = elements.welcomeOverlay;
+  if (!overlay || overlay.hidden) {
+    return;
+  }
+
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  window.setTimeout(
+    () => {
+      overlay.classList.add("is-leaving");
+      window.setTimeout(
+        () => overlay.remove(),
+        reduceMotion ? 150 : 900,
+      );
+    },
+    reduceMotion ? 700 : 3000,
+  );
+}
+
+function removeWelcomeOverlay() {
+  elements.welcomeOverlay?.remove();
+}
+
+function welcomeOverlaySeen() {
+  try {
+    return window.sessionStorage.getItem(WELCOME_OVERLAY_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markWelcomeOverlaySeen() {
+  try {
+    window.sessionStorage.setItem(WELCOME_OVERLAY_STORAGE_KEY, "1");
+  } catch {
+    // Storage can be unavailable; the curtain then simply reappears once more.
+  }
+}
+
+function showWelcomeOverlay() {
+  const overlay = elements.welcomeOverlay;
+  if (!overlay || welcomeOverlaySeen()) {
+    return;
+  }
+
+  markWelcomeOverlaySeen();
+  overlay.hidden = false;
+  dismissWelcomeOverlay();
+}
+
+if ("speechSynthesis" in window) {
+  refreshSpeechVoiceCache();
+  window.speechSynthesis.addEventListener("voiceschanged", () => {
+    refreshSpeechVoiceCache();
+    if (state.practiceActive) {
+      renderPracticeView();
+    }
+  });
+}
+
+restoreMarks();
+restoreLibraryCollapse();
+restorePracticeHistory();
+restoreFreeConversation();
+restorePracticeSettings();
+restoreReviewData();
+syncLibraryDisclosure();
+checkSession();

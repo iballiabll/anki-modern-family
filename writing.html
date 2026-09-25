@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="作文批改：四级、六级、考研英语一/二历年写作题目，提交后给出语法标注、词汇替换、句式优化、总分评分、范文参考，以及逐段逐句讲解与升格改写。"
+    />
+    <title>作文批改与逐段逐句讲解 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./writing.css" />
+    <link rel="stylesheet" href="./writing-templates.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+  <script src="./writing-grade.js?v=20260925-rubric" defer></script>
+  <script src="./writing.js?v=20260925-rubric" defer></script>
+  </head>
+  <body class="writing-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./vocab.html">词汇库</a>
+        <a class="topbar-link topbar-link-extra" href="./kaoyan.html">考研真题</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>作文批改</strong>
+          <small>WRITING STUDIO</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./shadow.html">跟读</a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">WRITING STUDIO</p>
+            <h1 id="pageTitle">作文批改</h1>
+            <p class="hero-description">
+              四级、六级、考研英语一/二写作题目按考试与年份分片懒加载。写完点批改，
+              立刻得到语法标注、词汇替换、句式优化、分项得分与范文参考；草稿与批改结果只存在本机浏览器。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="题库统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="作文设置">
+            <div class="setting-group">
+              <span class="setting-label">考试类型</span>
+              <div
+                id="examTabs"
+                class="segmented-control"
+                role="group"
+                aria-label="考试类型"
+              >
+                <button class="segment-button is-active" type="button" data-exam="cet4" aria-pressed="true">
+                  四级
+                </button>
+                <button class="segment-button" type="button" data-exam="cet6" aria-pressed="false">
+                  六级
+                </button>
+                <button class="segment-button" type="button" data-exam="english-i" aria-pressed="false">
+                  考研一
+                </button>
+                <button class="segment-button" type="button" data-exam="english-ii" aria-pressed="false">
+                  考研二
+                </button>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="yearSelect">年份</label>
+              <select id="yearSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="promptSearch">搜题</label>
+              <input
+                id="promptSearch"
+                class="paper-select"
+                type="search"
+                placeholder="输入关键词或题型"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <div class="tool-actions">
+              <button id="draftOnlyButton" class="tool-button" type="button" aria-pressed="false">
+                只看有草稿 (<span id="draftCount">0</span>)
+              </button>
+              <button id="clearDraftButton" class="tool-button" type="button">
+                清空本题草稿
+              </button>
+              <a id="templateJumpLink" class="tool-button" href="#templateSection">
+                作文模板
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="writing-board">
+        <aside class="writing-side" aria-labelledby="promptListTitle">
+          <div class="writing-panel-head">
+            <h2 id="promptListTitle">题目</h2>
+            <span id="promptMeta" class="writing-panel-hint" role="status" aria-live="polite">
+              正在准备题库…
+            </span>
+          </div>
+          <div
+            id="promptList"
+            class="writing-prompt-list"
+            tabindex="0"
+            aria-label="作文题目列表"
+          ></div>
+        </aside>
+
+        <div class="writing-main">
+          <article class="writing-task" aria-labelledby="taskTitle">
+            <div class="writing-panel-head">
+              <h2 id="taskTitle">题目与评分标准</h2>
+              <span id="taskMeta" class="writing-panel-hint"></span>
+            </div>
+            <div id="taskBody" class="writing-task-body">
+              <p class="writing-empty">
+                从左侧挑一道题开始写作，题干、提纲、采分点与评分标准会显示在这里。
+              </p>
+            </div>
+          </article>
+
+          <section class="writing-editor" aria-labelledby="editorTitle">
+            <div class="writing-panel-head">
+              <h2 id="editorTitle">我的作文</h2>
+              <span id="draftStatus" class="writing-panel-hint" role="status" aria-live="polite">
+                草稿自动保存在本机
+              </span>
+            </div>
+            <textarea
+              id="essayInput"
+              class="writing-input"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="在这里写作文；也可以先粘一段草稿，再点“批改作文”。"
+              aria-label="作文正文"
+            ></textarea>
+            <div class="writing-editor-foot">
+              <div class="writing-word-meter" aria-hidden="true">
+                <span id="wordMeterBar"></span>
+              </div>
+              <span id="wordCount" class="writing-word-count">0 词</span>
+              <div class="writing-editor-actions">
+                <button id="gradeButton" class="tool-button is-primary" type="button">
+                  批改作文
+                </button>
+                <button id="modelButton" class="tool-button" type="button">
+                  范文参考
+                </button>
+                <button id="speakModelButton" class="tool-button" type="button">
+                  朗读范文
+                </button>
+              </div>
+            </div>
+            <p id="gradeStatus" class="writing-status" role="status" aria-live="polite"></p>
+          </section>
+
+          <section
+            id="gradeResult"
+            class="writing-result"
+            aria-live="polite"
+            aria-label="批改结果"
+          ></section>
+        </div>
+      </section>
+
+      <section id="templateSection" class="writing-templates" aria-labelledby="templateTitle">
+        <div class="writing-templates-head">
+          <div>
+            <h2 id="templateTitle">作文模板库</h2>
+            <p class="writing-templates-intro">
+              按考试挑骨架：每套模板给出一句一槽的段落骨架、可替换的功能句、示例段落与自查清单。
+              骨架是本站原创整理，不是官方范文；套用后必须替换花括号内容并补足自己的例子。
+            </p>
+          </div>
+          <span id="templateMeta" class="writing-templates-meta" role="status" aria-live="polite">
+            滚动到这里时再加载模板
+          </span>
+        </div>
+
+        <div class="writing-templates-toolbar">
+          <div
+            id="templateExamTabs"
+            class="segmented-control"
+            role="group"
+            aria-label="模板对应的考试类型"
+          >
+            <button class="segment-button is-active" type="button" data-exam="cet4" aria-pressed="true">
+              四级
+            </button>
+            <button class="segment-button" type="button" data-exam="cet6" aria-pressed="false">
+              六级
+            </button>
+            <button class="segment-button" type="button" data-exam="english-i" aria-pressed="false">
+              考研一
+            </button>
+            <button class="segment-button" type="button" data-exam="english-ii" aria-pressed="false">
+              考研二
+            </button>
+          </div>
+          <div
+            id="templateKindTabs"
+            class="segmented-control"
+            role="group"
+            aria-label="模板类型"
+          >
+            <button class="segment-button is-active" type="button" data-kind="all" aria-pressed="true">
+              全部
+            </button>
+            <button class="segment-button" type="button" data-kind="small" aria-pressed="false">
+              小作文
+            </button>
+            <button class="segment-button" type="button" data-kind="large" aria-pressed="false">
+              大作文
+            </button>
+          </div>
+        </div>
+
+        <div class="writing-templates-body">
+          <div
+            id="templateList"
+            class="writing-template-list"
+            role="list"
+            aria-label="模板列表"
+          >
+            <p class="writing-template-empty">模板按考试分片懒加载，滚到此处后自动读取。</p>
+          </div>
+          <article id="templateDetail" class="writing-template-detail">
+            <p class="writing-template-empty">挑一个模板，这里会显示段落骨架、功能句、示例与自查清单。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="writing-attribution" aria-labelledby="writingCreditTitle">
+        <h2 id="writingCreditTitle">数据来源与开源借鉴</h2>
+        <ul>
+          <li>
+            批改规则与分项权重参考
+            <a
+              href="https://github.com/ZhaoyuanLiu23/CET-Prompt-Hub"
+              target="_blank"
+              rel="noopener noreferrer"
+            >ZhaoyuanLiu23/CET-Prompt-Hub</a>
+            的四六级写作评分思路，以及
+            <a
+              href="https://github.com/HoraceLuBFA/zh-en-translation-polish"
+              target="_blank"
+              rel="noopener noreferrer"
+            >HoraceLuBFA/zh-en-translation-polish</a>
+            的中式英语扫描（chinglish scan）写法。
+          </li>
+          <li>
+            作文模板库的段落骨架、功能句与自查清单按站内
+            <code>kaoyan-english</code>
+            skill 的任务完成、组织、语法、词汇等评分维度整理；模板均为本站原创整理，不是官方范文。
+            示例段落为压缩版，套用时必须替换花括号槽位、补充题目例子，并按考试目标词数扩写。
+          </li>
+          <li>
+            题库结构参考
+            <a
+              href="https://github.com/lilinji/English"
+              target="_blank"
+              rel="noopener noreferrer"
+            >lilinji/English</a>
+            的考试分类方式与
+            <a
+              href="https://github.com/tangshimin/MuJing"
+              target="_blank"
+              rel="noopener noreferrer"
+            >tangshimin/MuJing</a>
+            的逐句精读数据组织。
+          </li>
+          <li>
+            考研英语一/二写作题目来自站内 <code>kaoyan-data</code>；六级写作来自
+            <code>cet6-extra-data</code>；四级写作是站内按历年题材整理的题库，
+            标注为“题材整理”，不冒充官方真题原文。
+          </li>
+          <li>
+            逐段逐句讲解（审题拆解、原句→问题→修改→解释、提分优先级、复写清单）
+            借鉴以下 MIT 许可的批改类开源项目的思路，未直接复制其代码：
+            <a
+              href="https://github.com/Swcmb/kaoyan-english-grader"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Swcmb/kaoyan-english-grader</a>、
+            <a
+              href="https://github.com/TenminalKono/-National-Graduate-Entrance-Exam-writing-task-LLM-prompt-"
+              target="_blank"
+              rel="noopener noreferrer"
+            >TenminalKono 考研写作 prompt</a>、
+            <a
+              href="https://github.com/rice-awa/AutoGradAI"
+              target="_blank"
+              rel="noopener noreferrer"
+            >rice-awa/AutoGradAI</a>、
+            <a
+              href="https://github.com/hezkvectory/hermes-edu-skills"
+              target="_blank"
+              rel="noopener noreferrer"
+            >hezkvectory/hermes-edu-skills</a>、
+            <a
+              href="https://github.com/Risaner/iwrite-skill"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Risaner/iwrite-skill</a>。
+          </li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

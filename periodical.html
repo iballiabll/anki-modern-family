@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="外刊精读：按时间与主题导引，收录经济学人、卫报、巴伦周刊等 50 期外刊，逐段中英精读、点词查义、原文阅读、检验题作答与原件清单，单期懒加载不卡顿。"
+    />
+    <title>外刊精读 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./periodical.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./periodical-index.js" defer></script>
+    <script src="./periodical-papers.js" defer></script>
+    <script src="./periodical.js" defer></script>
+  </head>
+  <body class="periodical-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./kaoyan.html">考研英语</a>
+        <a class="topbar-link topbar-link-extra" href="./cet6.html">六级备考</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>外刊精读</strong>
+          <small>PERIODICAL READING CABIN</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./reading-intensive.html">
+        四级精读
+      </a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">ECONOMIST · GUARDIAN · BARRON'S</p>
+            <h1 id="pageTitle">外刊精读</h1>
+            <p class="hero-description">
+              本地外刊按时间轴和主题导引：逐段中英精读、点任意单词查释义并标记生词，原文按篇阅读，检验题可作答并一键开关答案，原件按类型归档。首屏只读取索引，每期数据单独下载，滚动到哪一期才加载哪一期。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="外刊统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="外刊筛选">
+            <div class="setting-group">
+              <label class="setting-label" for="issueSelect">期号</label>
+              <select id="issueSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="themeSelect">主题</label>
+              <select id="themeSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="sourceSelect">来源</label>
+              <select id="sourceSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">显示模式</span>
+              <div class="segmented-control" role="group" aria-label="显示模式">
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-display-mode="bilingual"
+                  aria-pressed="true"
+                >
+                  中英对照
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-display-mode="english"
+                  aria-pressed="false"
+                >
+                  只看英文
+                </button>
+              </div>
+            </div>
+
+            <div class="setting-group setting-group-wide">
+              <label class="setting-label" for="issueSearchInput">搜索</label>
+              <input
+                id="issueSearchInput"
+                class="paper-select periodical-search-input"
+                type="search"
+                placeholder="标题 / 来源 / 主题关键词"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="tool-actions">
+              <button id="answerToggleButton" class="tool-button" type="button">
+                显示本期答案
+              </button>
+              <button id="markSummaryButton" class="tool-button" type="button">
+                我的生词 0
+              </button>
+              <button id="readAllButton" class="tool-button is-primary" type="button">
+                全文播放
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="periodicalLayout" class="intensive-layout periodical-layout">
+        <nav
+          id="issueNavigation"
+          class="piece-navigation periodical-navigation"
+          aria-label="外刊时间轴"
+        ></nav>
+
+        <section id="periodicalContent" class="intensive-content">
+          <div class="loading-state">
+            <strong>正在读取外刊索引</strong>
+            <span>共 50 期，每期正文单独加载。</span>
+          </div>
+        </section>
+
+        <aside
+          id="wordPanel"
+          class="word-panel periodical-word-panel"
+          aria-labelledby="wordPanelTitle"
+          aria-hidden="true"
+          hidden
+        >
+          <div class="word-panel-head">
+            <span>外刊生词</span>
+            <button id="closeWordPanelButton" class="icon-button" type="button">
+              关闭
+            </button>
+          </div>
+
+          <div class="word-actions">
+            <button id="markUnknownButton" class="mark-button is-unknown" type="button">
+              不会
+            </button>
+            <button id="markKnownButton" class="mark-button is-known" type="button">
+              掌握
+            </button>
+          </div>
+
+          <p class="word-panel-footnote">
+            标记后保存在本机浏览器，复习页可继续使用。
+          </p>
+
+          <div class="word-heading">
+            <h2 id="wordPanelTitle" lang="en"></h2>
+            <button id="speakWordButton" class="compact-button" type="button">
+              朗读
+            </button>
+          </div>
+          <p id="wordPanelPhonetic" class="word-phonetic" lang="en"></p>
+          <p id="wordLookupStatus" class="word-lookup-status" role="status"></p>
+          <div id="wordMeanings" class="word-meanings"></div>
+
+          <section id="wordPhraseSection" class="word-block" hidden>
+            <span class="word-block-label">固定搭配</span>
+            <div id="wordPhrases" class="word-phrases"></div>
+          </section>
+
+          <section id="wordExampleSection" class="word-block" hidden>
+            <span class="word-block-label">例句</span>
+            <div id="wordExamples" class="word-examples"></div>
+          </section>
+
+          <div class="word-context">
+            <span>当前语境</span>
+            <p id="wordContextSentence" lang="en"></p>
+            <p id="wordContextTranslation"></p>
+          </div>
+        </aside>
+      </div>
+
+      <section class="periodical-credits" aria-label="数据与开源说明">
+        <h2>数据与开源说明</h2>
+        <p>
+          原文、精读与检验题来自本地资料目录 <code>D:\外刊</code>，已归入站点静态资源，仅作个人学习使用，版权归原作者与出版机构所有。
+          检验题为第三方模拟练习，<strong>非官方真题</strong>，答案与解析按原始资料如实呈现，未作改写。
+        </p>
+        <p>
+          页面交互借鉴本站考研板块的<strong>按套懒加载 + 空闲预取</strong>思路，查词走本站
+          <code>/api/word</code> 自有接口；未引入任何需要署名的第三方 UI 框架。
+        </p>
+      </section>
+    </main>
+
+  </body>
+</html>

@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="上传四六级或考研题目，生成双语阅读并点词加入复习。"
+    />
+    <title>题目阅读 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./reading.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+  <script src="./account-store.js" defer></script>
+  <script src="./speech-transport.js" defer></script>
+  <script src="./deck-data.js" defer></script>
+  <script src="./vocab-index.js" defer></script>
+  <script src="./session-guard.js" defer></script>
+  <script src="./reading.js" defer></script>
+  </head>
+  <body>
+    <header class="reading-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./kaoyan.html">考研英语</a>
+      </span>
+      <a class="reading-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span>
+          <strong>题目阅读</strong>
+          <small>IBALL'S LISTENING CABIN</small>
+        </span>
+      </a>
+      <button id="newReadingButton" class="topbar-button" type="button">
+        新建上传
+      </button>
+    </header>
+
+    <main class="reading-shell">
+      <aside class="reading-sidebar" aria-label="上传的阅读题目">
+        <div class="sidebar-heading">
+          <div>
+            <span>阅读题目</span>
+            <strong id="readingCount">0</strong>
+          </div>
+          <button id="sidebarNewButton" class="compact-button" type="button">
+            新建
+          </button>
+        </div>
+        <div id="readingList" class="reading-list"></div>
+      </aside>
+
+      <div class="reading-workspace">
+        <section
+          id="uploadPanel"
+          class="upload-panel"
+          aria-labelledby="uploadTitle"
+        >
+          <div class="upload-heading">
+            <p class="section-kicker">四六级 / 考研</p>
+            <h1 id="uploadTitle">上传题目，生成双语阅读</h1>
+            <p>可粘贴文本，也可导入 TXT、Markdown、DOCX、PDF。</p>
+          </div>
+
+          <form id="uploadForm" class="upload-form">
+            <div class="form-grid">
+              <label class="field" for="readingTitle">
+                <span>题目名称</span>
+                <input
+                  id="readingTitle"
+                  name="title"
+                  type="text"
+                  maxlength="120"
+                  placeholder="例如：2024 年 6 月四级阅读第二篇"
+                  required
+                />
+              </label>
+
+              <label class="field" for="readingCategory">
+                <span>一级分类</span>
+                <select id="readingCategory" name="category">
+                  <option value="四级">四级</option>
+                  <option value="六级">六级</option>
+                  <option value="考研">考研</option>
+                </select>
+              </label>
+
+              <label class="field" for="readingSection">
+                <span>题目类型</span>
+                <input
+                  id="readingSection"
+                  name="section"
+                  type="text"
+                  maxlength="60"
+                  value="阅读理解"
+                />
+              </label>
+            </div>
+
+            <label
+              id="fileDropZone"
+              class="file-drop-zone"
+              for="readingFile"
+            >
+              <input
+                id="readingFile"
+                type="file"
+                accept=".txt,.md,.markdown,.html,.htm,.docx,.pdf,text/plain,text/markdown,text/html,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              />
+              <strong>选择题目文件</strong>
+              <span id="fileLabel">TXT / Markdown / DOCX / PDF</span>
+            </label>
+
+            <label class="field" for="readingText">
+              <span>也可以直接粘贴英文原文</span>
+              <textarea
+                id="readingText"
+                name="text"
+                rows="12"
+                placeholder="Paste the passage here..."
+              ></textarea>
+            </label>
+
+            <div class="upload-actions">
+              <button id="createReadingButton" class="primary-button" type="submit">
+                生成阅读
+              </button>
+              <button id="clearUploadButton" class="secondary-button" type="button">
+                清空
+              </button>
+            </div>
+            <p id="uploadStatus" class="form-status" role="status"></p>
+          </form>
+        </section>
+
+        <section
+          id="documentPanel"
+          class="document-panel"
+          aria-labelledby="documentTitle"
+          hidden
+        >
+          <header class="document-heading">
+            <div class="document-title-block">
+              <p id="documentMeta" class="section-kicker"></p>
+              <h1 id="documentTitle"></h1>
+              <p id="documentStats" class="document-stats"></p>
+            </div>
+            <div class="document-actions">
+              <button id="deleteReadingButton" class="danger-button" type="button">
+                删除
+              </button>
+            </div>
+          </header>
+
+          <div class="reader-toolbar">
+            <div class="segmented-control" role="group" aria-label="显示模式">
+              <button
+                class="segment-button is-active"
+                type="button"
+                data-display-mode="bilingual"
+                aria-pressed="true"
+              >
+                中英对照
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-display-mode="english"
+                aria-pressed="false"
+              >
+                只看英文
+              </button>
+            </div>
+            <div class="reader-tools">
+              <button id="translateButton" class="tool-button" type="button">
+                翻译全文
+              </button>
+              <button id="readAllButton" class="tool-button is-primary" type="button">
+                全文播放
+              </button>
+            </div>
+          </div>
+
+          <div class="translation-progress" aria-hidden="true">
+            <span id="translationProgressBar"></span>
+          </div>
+
+          <div id="readerContent" class="reader-content"></div>
+        </section>
+      </div>
+
+      <aside
+        id="wordPanel"
+        class="word-panel"
+        aria-labelledby="wordPanelTitle"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="word-panel-head">
+          <span>阅读生词</span>
+          <button id="closeWordPanelButton" class="icon-button" type="button">
+            关闭
+          </button>
+        </div>
+
+        <div class="word-actions">
+          <button id="markUnknownButton" class="mark-button is-unknown" type="button">
+            不会
+          </button>
+          <button id="markKnownButton" class="mark-button is-known" type="button">
+            掌握
+          </button>
+        </div>
+
+        <div class="word-heading">
+          <h2 id="wordPanelTitle" lang="en"></h2>
+          <button id="speakWordButton" class="compact-button" type="button">
+            朗读
+          </button>
+        </div>
+        <p id="wordPanelPhonetic" class="word-phonetic" lang="en"></p>
+        <p id="wordLookupStatus" class="word-lookup-status" role="status"></p>
+        <div id="wordMeanings" class="word-meanings"></div>
+
+        <div class="word-context">
+          <span>当前语境</span>
+          <p id="wordContextSentence" lang="en"></p>
+          <p id="wordContextTranslation"></p>
+        </div>
+
+        <label class="word-note-field" for="wordNoteInput">
+          <span>补充释义</span>
+          <textarea
+            id="wordNoteInput"
+            rows="3"
+            maxlength="800"
+            placeholder="可手动补充词义或记忆提示"
+          ></textarea>
+        </label>
+
+      </aside>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,0 +1,643 @@
+/*
+ * 美剧台词精读页专用样式。
+ *
+ * 基础版式（顶栏、hero、侧栏、单词面板、toast）与听力精读页共用
+ * intensive.css，这里只补充台词列表、翻译来源标签、替换说法与
+ * 考试词标记这几块专有内容。
+ */
+
+.movie-page {
+  --movie-accent: #6d4a72;
+  --movie-accent-deep: #3f2b45;
+  --movie-accent-soft: #f4eef5;
+}
+
+.movie-page .hero-eyebrow {
+  color: var(--movie-accent);
+}
+
+.movie-page .tool-button.is-primary {
+  background: var(--movie-accent);
+  border-color: var(--movie-accent);
+}
+
+.movie-page .tool-button.is-primary:hover {
+  background: var(--movie-accent-deep);
+  border-color: var(--movie-accent-deep);
+}
+
+.movie-page .navigation-link.is-active .navigation-number {
+  color: #ffffff;
+  background: var(--movie-accent);
+}
+
+.movie-page .intensive-brand .brand-mark {
+  background: var(--movie-accent);
+}
+
+/* ------------------------------------------------------------ 场景卡片 */
+
+.movie-scene {
+  scroll-margin-top: 88px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.055);
+}
+
+.movie-scene-head {
+  padding: 22px 26px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  background: #f7f8f3;
+  border-bottom: 1px solid var(--line);
+}
+
+.movie-scene-copy {
+  min-width: 0;
+}
+
+.movie-scene-kicker {
+  margin: 0 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #75877f;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.movie-scene-tag {
+  padding: 3px 7px;
+  color: #ffffff;
+  background: var(--movie-accent);
+  border-radius: 5px;
+  letter-spacing: 0;
+}
+
+.movie-scene-head h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  line-height: 1.25;
+}
+
+.movie-scene-meta {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.movie-scene-play {
+  min-width: 92px;
+  min-height: 42px;
+  padding: 0 13px;
+  flex: 0 0 auto;
+  color: var(--forest);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.movie-scene-play:hover {
+  border-color: #9db7ac;
+}
+
+.movie-scene-play.is-playing {
+  color: #ffffff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+/* -------------------------------------------------------------- 台词行 */
+
+.movie-line-list {
+  padding: 0 26px;
+}
+
+.movie-line {
+  position: relative;
+  padding: 22px 0 22px 46px;
+  border-bottom: 1px solid #e3e9e5;
+  scroll-margin-top: 92px;
+}
+
+.movie-line:last-child {
+  border-bottom: 0;
+}
+
+.movie-line::before {
+  content: "";
+  position: absolute;
+  top: 27px;
+  bottom: 27px;
+  left: 38px;
+  width: 2px;
+  background: #e2e9e5;
+}
+
+.movie-line.is-highlighted::before {
+  background: var(--movie-accent);
+}
+
+.movie-line-number {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  width: 30px;
+  color: #93a29b;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.movie-line-body {
+  min-width: 0;
+}
+
+.movie-dialogue {
+  display: grid;
+  gap: 5px;
+}
+
+.movie-dialogue-line {
+  margin: 0;
+  color: #203b34;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.72;
+}
+
+.movie-speaker {
+  margin-right: 7px;
+  color: var(--movie-accent);
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.movie-stage {
+  display: block;
+  margin: 1px 0 0;
+  color: #8d9b95;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.movie-translation {
+  margin: 11px 0 0;
+  padding-left: 12px;
+  color: #5f736c;
+  border-left: 3px solid #d3dfd8;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.movie-grammar-notes {
+  margin-top: 11px;
+  padding: 10px 12px;
+  border-left: 3px solid #66806f;
+  border-radius: 0 6px 6px 0;
+  background: #f2f6f2;
+}
+
+.movie-grammar-label {
+  display: block;
+  color: #496558;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.movie-grammar-list {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  color: #566861;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.movie-grammar-list li + li {
+  margin-top: 4px;
+}
+
+.movie-line-foot {
+  margin-top: 11px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.movie-source-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.movie-source-badge.is-curated {
+  color: #7a5a12;
+  background: #fbf0d8;
+  border-color: #efd9a4;
+}
+
+.movie-source-badge.is-card {
+  color: #2f5f76;
+  background: #e8f1f6;
+  border-color: #c3dbe7;
+}
+
+.movie-source-badge.is-machine {
+  color: #8a4a42;
+  background: #fbeeec;
+  border-color: #eccfcb;
+}
+
+.movie-source-badge.is-missing {
+  color: #6b7a74;
+  background: #eef2f0;
+  border-color: #dbe3df;
+}
+
+.movie-machine-hint {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.movie-play-button {
+  min-height: 30px;
+  padding: 0 10px;
+  color: #48645b;
+  background: #f1f5f2;
+  border: 1px solid #d6e1db;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.movie-play-button:hover {
+  border-color: #9db7ac;
+}
+
+.movie-play-button.is-playing {
+  color: #ffffff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+.movie-loop-button {
+  min-height: 30px;
+  padding: 0 10px;
+  color: #5b5f8a;
+  background: #f2f2fa;
+  border: 1px solid #d9d9ec;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.movie-loop-button:hover {
+  border-color: #a9a9d3;
+}
+
+.movie-loop-button.is-playing {
+  color: #ffffff;
+  background: #5b5f8a;
+  border-color: #5b5f8a;
+}
+
+/* 播放中的台词：整行留一道底色，具体那一句再加一条竖线。 */
+.movie-line.is-speaking {
+  background: linear-gradient(90deg, rgba(232, 244, 238, 0.9), rgba(232, 244, 238, 0));
+  border-radius: 10px;
+}
+
+.movie-dialogue-line.is-speaking-line {
+  border-left: 3px solid var(--coral);
+  padding-left: 8px;
+  margin-left: -11px;
+}
+
+.movie-line.is-loop-range {
+  box-shadow: inset 3px 0 0 #5b5f8a;
+}
+
+.movie-line.is-loop-start {
+  box-shadow: inset 3px 0 0 var(--coral);
+}
+
+.tool-button.is-active {
+  color: #ffffff;
+  background: #5b5f8a;
+  border-color: #5b5f8a;
+}
+
+/* ------------------------------------------------------------ 逐句词汇 */
+
+.movie-sentence-vocab {
+  margin-top: 13px;
+  padding: 11px 12px;
+  background: #f4f8f5;
+  border: 1px solid #dce8e1;
+  border-radius: 8px;
+}
+
+.movie-sentence-vocab-label {
+  display: block;
+  color: #6f857c;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.movie-sentence-vocab-list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.sentence-vocab-chip {
+  min-width: 0;
+  max-width: 100%;
+  padding: 7px 9px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  color: #355149;
+  background: #ffffff;
+  border: 1px solid #d3e1da;
+  border-radius: 7px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sentence-vocab-chip:hover,
+.sentence-vocab-chip:focus-visible {
+  background: #eef6f1;
+  border-color: #9dbdaf;
+  outline: none;
+}
+
+.sentence-vocab-head {
+  min-width: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.sentence-vocab-head > strong {
+  color: #26483e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.sentence-vocab-phonetic {
+  color: #71847d;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.sentence-vocab-meaning {
+  max-width: min(320px, 72vw);
+  color: #5c7169;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* --------------------------------------------------- 固定搭配与替换说法 */
+
+.movie-phrase-row {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.movie-phrase-label {
+  color: #7b8e86;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.movie-alternatives {
+  margin-top: 12px;
+  padding: 11px 13px;
+  background: #f7f8f3;
+  border: 1px solid #e3e9e5;
+  border-radius: 8px;
+}
+
+.movie-alternatives-label {
+  display: block;
+  color: #7b8e86;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.movie-alternative-list {
+  margin: 7px 0 0;
+  padding-left: 17px;
+  display: grid;
+  gap: 4px;
+  color: #4c6159;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.movie-alternative-list li > strong {
+  margin-right: 6px;
+  color: #2b4a41;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13.5px;
+}
+
+/* --------------------------------------------------------- 考试词标记 */
+
+body.marks-levels .word-token[data-levels~="四级"] {
+  border-bottom: 2px solid rgba(209, 165, 72, 0.85);
+}
+
+body.marks-levels .word-token[data-levels~="六级"] {
+  border-bottom: 2px solid rgba(66, 109, 128, 0.85);
+}
+
+body.marks-levels .word-token[data-levels~="考研"] {
+  border-bottom: 2px solid rgba(201, 90, 79, 0.8);
+}
+
+body.marks-levels .word-token.is-unknown-token,
+body.marks-levels .word-token.is-known-token {
+  border-bottom-width: 2px;
+}
+
+.movie-legend {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.movie-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.movie-legend-line {
+  width: 22px;
+  height: 0;
+  border-top: 2px solid transparent;
+}
+
+.movie-legend-line.is-cet4 {
+  border-top-color: rgba(209, 165, 72, 0.85);
+}
+
+.movie-legend-line.is-cet6 {
+  border-top-color: rgba(66, 109, 128, 0.85);
+}
+
+.movie-legend-line.is-kaoyan {
+  border-top-color: rgba(201, 90, 79, 0.8);
+}
+
+/* ---------------------------------------------------------- 显示模式 */
+
+body.is-english-only .movie-translation,
+body.is-english-only .movie-grammar-notes,
+body.is-english-only .movie-alternatives,
+body.is-english-only .movie-machine-hint {
+  display: none;
+}
+
+body.is-chinese-only .movie-dialogue,
+body.is-chinese-only .movie-phrase-row,
+body.is-chinese-only .movie-alternatives,
+body.is-chinese-only .movie-legend {
+  display: none;
+}
+
+body.hides-alternatives .movie-alternatives {
+  display: none;
+}
+
+body.hides-sentence-vocab .movie-sentence-vocab {
+  display: none;
+}
+
+body.hides-levels .word-token[data-levels] {
+  border-bottom-width: 1px;
+  border-bottom-style: dotted;
+  border-bottom-color: rgba(66, 109, 128, 0.46);
+}
+
+/* ------------------------------------------------------------ 开源说明 */
+
+.movie-attribution {
+  width: min(1240px, calc(100% - 44px));
+  margin: 22px auto 44px;
+  padding: 20px 22px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #3f554d;
+}
+
+.movie-attribution h2 {
+  margin: 0 0 9px;
+  font-size: 16px;
+  color: var(--movie-accent-deep);
+}
+
+.movie-attribution p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.movie-attribution a {
+  color: var(--movie-accent);
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------------------ 响应式 */
+
+@media (max-width: 1080px) {
+  .movie-line-list {
+    padding: 0 20px;
+  }
+
+  .movie-scene-head {
+    padding: 18px 20px 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .movie-scene-head {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .movie-scene-play {
+    width: 100%;
+  }
+
+  .movie-line-list {
+    padding: 0 15px;
+  }
+
+  .movie-line {
+    padding: 18px 0 18px 34px;
+  }
+
+  .movie-line::before {
+    left: 27px;
+  }
+
+  .movie-line-number {
+    width: 22px;
+    font-size: 10px;
+  }
+
+  .movie-dialogue-line {
+    font-size: 16px;
+  }
+
+  .movie-translation {
+    font-size: 12.5px;
+  }
+
+  .movie-attribution {
+    width: calc(100% - 24px);
+    padding: 17px 16px;
+  }
+}

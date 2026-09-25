@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="单词测试：四级、考研、全词库分级出题，自动判分、错词入库，并提供总榜与分榜排名。"
+    />
+    <title>单词测试 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153c35'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./quiz.css" />
+    <script src="./account-store.js?v=20260925-authflow" defer></script>
+    <script src="./session-guard.js?v=20260925-authflow" defer></script>
+    <script src="./quiz.js?v=20260925-authflow" defer></script>
+  </head>
+  <body class="quiz-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./vocab.html">词汇库</a>
+        <a class="topbar-link" href="./review.html">错词复习</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>单词测试</strong>
+          <small>WORD QUIZ</small>
+        </span>
+      </a>
+      <span id="accountChip" class="quiz-account" hidden></span>
+    </header>
+
+    <main class="quiz-main">
+      <section id="gate" class="quiz-gate" hidden>
+        <strong id="gateTitle">需要登录后参加测试</strong>
+        <p id="gateCopy">
+          测试成绩、错词和榜单都按账号保存。请先回到首页登录，再打开这一页。
+        </p>
+        <div class="quiz-gate-actions">
+          <a
+            id="gateAction"
+            class="quiz-button primary"
+            href="./index.html?next=%2Fquiz.html#login"
+            >去登录</a
+          >
+          <a
+            id="gateRegister"
+            class="quiz-button ghost"
+            href="./index.html?next=%2Fquiz.html#register"
+            >还没有账号？注册</a
+          >
+        </div>
+      </section>
+
+      <div id="quizBody" hidden>
+        <section class="quiz-hero">
+          <div>
+            <p class="quiz-eyebrow">WORD QUIZ</p>
+            <h1>单词测试与榜单</h1>
+            <p class="quiz-lead">
+              选择范围后开始答题，服务端判卷，错词自动进入你的错词表，最好成绩计入榜单。
+            </p>
+          </div>
+          <dl id="poolStats" class="quiz-pool-stats"></dl>
+        </section>
+
+        <div class="quiz-tabs" role="tablist" aria-label="测试范围">
+          <button class="quiz-tab is-active" type="button" role="tab" data-scope="cet4">
+            四级
+          </button>
+          <button class="quiz-tab" type="button" role="tab" data-scope="kaoyan">
+            考研
+          </button>
+          <button class="quiz-tab" type="button" role="tab" data-scope="all">
+            所有单词
+          </button>
+          <button class="quiz-tab" type="button" role="tab" data-scope="total">
+            总榜单
+          </button>
+        </div>
+
+        <section id="startPanel" class="quiz-panel">
+          <div class="quiz-panel-head">
+            <h2 id="startTitle">四级测试</h2>
+            <p id="startSubtitle">20 题，中英双向随机</p>
+          </div>
+
+          <div class="quiz-controls">
+            <label class="quiz-field">
+              <span>题量</span>
+              <select id="quizSize">
+                <option value="10">10 题</option>
+                <option value="20" selected>20 题</option>
+                <option value="30">30 题</option>
+                <option value="50">50 题</option>
+              </select>
+            </label>
+            <label class="quiz-field">
+              <span>方向</span>
+              <select id="quizDirection">
+                <option value="en-zh" selected>看英文选中文</option>
+                <option value="zh-en">看中文选英文</option>
+              </select>
+            </label>
+            <button id="startQuizButton" class="quiz-button primary" type="button">
+              开始测试
+            </button>
+          </div>
+
+          <div id="bestSummary" class="quiz-best" hidden></div>
+          <p id="startMessage" class="quiz-message" role="status" hidden></p>
+        </section>
+
+        <section id="questionPanel" class="quiz-panel" hidden>
+          <div class="quiz-progress-row">
+            <span id="questionCounter">第 1 / 20 题</span>
+            <span id="questionScore">已作答 0</span>
+          </div>
+          <div class="quiz-progress-track">
+            <div id="questionProgressBar" class="quiz-progress-bar"></div>
+          </div>
+          <h2 id="questionPrompt" class="quiz-prompt"></h2>
+          <p id="questionPhonetic" class="quiz-phonetic"></p>
+          <div id="questionOptions" class="quiz-options"></div>
+          <div class="quiz-question-actions">
+            <button id="questionPrev" class="quiz-button ghost" type="button">
+              上一题
+            </button>
+            <button id="questionNext" class="quiz-button" type="button">
+              下一题
+            </button>
+            <button id="questionSubmit" class="quiz-button primary" type="button" hidden>
+              交卷
+            </button>
+          </div>
+          <p id="questionMessage" class="quiz-message" role="status" hidden></p>
+        </section>
+
+        <section id="resultPanel" class="quiz-panel" hidden>
+          <div class="quiz-result-head">
+            <div id="resultRing" class="quiz-result-ring">
+              <span id="resultPercent">0%</span>
+            </div>
+            <div>
+              <h2 id="resultTitle">测试完成</h2>
+              <p id="resultSubtitle"></p>
+            </div>
+          </div>
+
+          <div id="wrongList" class="quiz-wrong-list"></div>
+
+          <div class="quiz-question-actions">
+            <button id="retryButton" class="quiz-button" type="button">
+              再考一次
+            </button>
+            <button id="resultBoardButton" class="quiz-button" type="button">
+              看本范围榜单
+            </button>
+            <button id="backToStartButton" class="quiz-button ghost" type="button">
+              返回范围选择
+            </button>
+            <a class="quiz-button primary" href="./review.html">去复习错词</a>
+          </div>
+        </section>
+
+        <section id="boardPanel" class="quiz-panel" hidden>
+          <div class="quiz-panel-head">
+            <h2>榜单</h2>
+            <p id="boardSubtitle"></p>
+          </div>
+          <div
+            class="quiz-tabs quiz-board-tabs"
+            role="tablist"
+            aria-label="榜单范围"
+          >
+            <button
+              class="quiz-board-tab"
+              type="button"
+              role="tab"
+              data-board-scope="cet4"
+            >
+              四级榜
+            </button>
+            <button
+              class="quiz-board-tab"
+              type="button"
+              role="tab"
+              data-board-scope="kaoyan"
+            >
+              考研榜
+            </button>
+            <button
+              class="quiz-board-tab"
+              type="button"
+              role="tab"
+              data-board-scope="all"
+            >
+              全词库榜
+            </button>
+            <button
+              class="quiz-board-tab is-active"
+              type="button"
+              role="tab"
+              data-board-scope="total"
+            >
+              总榜
+            </button>
+          </div>
+          <p id="boardMessage" class="quiz-message" role="status" hidden></p>
+          <div id="boardMe" class="quiz-board-me" hidden></div>
+          <ol id="boardList" class="quiz-board-list"></ol>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

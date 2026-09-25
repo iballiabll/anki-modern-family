@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="2022 至 2026 年四级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。"
+    />
+    <title>四级听力全文精读 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./deck-data.js" defer></script>
+    <script src="./vocab-index.js" defer></script>
+    <script src="./collocation-index.js" defer></script>
+    <script src="./intensive-papers.js" defer></script>
+    <script src="./intensive.js" defer></script>
+  </head>
+  <body>
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./kaoyan.html">考研英语</a>
+        <a class="topbar-link topbar-link-extra" href="./periodical.html">
+          外刊精读
+        </a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>听力精读</strong>
+          <small>IBALL'S LISTENING CABIN</small>
+        </span>
+      </a>
+      <a
+        id="sourceLink"
+        class="topbar-link topbar-source"
+        href="https://english-exam.lazynote.cn/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        原文出处
+      </a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">CET-4 LISTENING</p>
+            <h1 id="pageTitle">四级听力全文精读</h1>
+            <p class="hero-description">
+              逐段对照翻译，标注爱出答案的位置，点击单词看释义与固定搭配。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="精读内容统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="阅读设置">
+            <div class="setting-group">
+              <label class="setting-label" for="paperSelect">选择试卷</label>
+              <select id="paperSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">显示模式</span>
+              <div class="segmented-control" role="group" aria-label="显示模式">
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-display-mode="bilingual"
+                  aria-pressed="true"
+                >
+                  中英对照
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-display-mode="english"
+                  aria-pressed="false"
+                >
+                  只看英文
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <button id="cueToggleButton" class="tool-button" type="button">
+                隐藏答案提示
+              </button>
+              <button id="grammarToggleButton" class="tool-button" type="button">
+                展开全部语法
+              </button>
+              <button id="readAllButton" class="tool-button is-primary" type="button">
+                全文播放
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="intensiveLayout" class="intensive-layout">
+        <nav
+          id="pieceNavigation"
+          class="piece-navigation"
+          aria-label="听力篇目导航"
+        ></nav>
+
+        <section id="intensiveContent" class="intensive-content">
+          <div class="loading-state">
+            <strong>正在读取精读内容</strong>
+            <span>请稍候。</span>
+          </div>
+        </section>
+
+        <aside
+          id="wordPanel"
+          class="word-panel"
+          aria-labelledby="wordPanelTitle"
+          aria-hidden="true"
+          hidden
+        >
+          <div class="word-panel-head">
+            <span>听力生词</span>
+            <button id="closeWordPanelButton" class="icon-button" type="button">
+              关闭
+            </button>
+          </div>
+
+          <div class="word-actions">
+            <button id="markUnknownButton" class="mark-button is-unknown" type="button">
+              不会
+            </button>
+            <button id="markKnownButton" class="mark-button is-known" type="button">
+              掌握
+            </button>
+          </div>
+
+          <p class="word-panel-footnote">
+            标记后进入四级不会/掌握卡组，手机端可直接滑动复习。
+          </p>
+
+          <div class="word-heading">
+            <h2 id="wordPanelTitle" lang="en"></h2>
+            <button id="speakWordButton" class="compact-button" type="button">
+              朗读
+            </button>
+          </div>
+          <p id="wordPanelPhonetic" class="word-phonetic" lang="en"></p>
+          <p id="wordLevelBadges" class="word-levels" hidden></p>
+          <p id="wordLookupStatus" class="word-lookup-status" role="status"></p>
+          <div id="wordMeanings" class="word-meanings"></div>
+
+          <section id="wordPhraseSection" class="word-block" hidden>
+            <span class="word-block-label">固定搭配</span>
+            <div id="wordPhrases" class="word-phrases"></div>
+          </section>
+
+          <section id="wordExampleSection" class="word-block" hidden>
+            <span class="word-block-label">例句</span>
+            <div id="wordExamples" class="word-examples"></div>
+          </section>
+
+          <div class="word-context">
+            <span>当前语境</span>
+            <p id="wordContextSentence" lang="en"></p>
+            <p id="wordContextTranslation"></p>
+          </div>
+
+          <label class="word-note-field" for="wordNoteInput">
+            <span>补充释义</span>
+            <textarea
+              id="wordNoteInput"
+              rows="3"
+              maxlength="800"
+              placeholder="可手动补充词义或记忆提示"
+            ></textarea>
+          </label>
+
+        </aside>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,0 +1,1854 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="iball的小屋：按上传素材整理、复习英语听力词汇，并进行口语跟读练习。"
+    />
+    <title>iball的小屋 · 听力词汇与口语练习</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260925-convo1" />
+    <link rel="stylesheet" href="./speech-transport.css?v=20260925-perf1" />
+    <script src="./account-store.js?v=20260925-perf1" defer></script>
+    <script src="./speech-transport.js?v=20260925-perf1" defer></script>
+    <script src="./deck-data.js?v=20260925-perf1" defer></script>
+    <script src="./vocab-index.js?v=20260925-perf1" defer></script>
+    <script src="./session-guard.js?v=20260925-perf1" defer></script>
+    <script src="./app.js?v=20260925-convo1" defer></script>
+  </head>
+  <body>
+    <div
+      id="welcomeOverlay"
+      class="welcome-overlay"
+      hidden
+      role="status"
+      aria-live="polite"
+    >
+      <div class="welcome-inner">
+        <span class="welcome-eyebrow">IBALL'S LISTENING CABIN</span>
+        <strong class="welcome-title">欢迎光临 iball 的小屋</strong>
+        <span class="welcome-sub">小屋的灯已经点亮，慢慢进来就好。</span>
+      </div>
+    </div>
+
+    <section id="loginView" class="login-view" aria-labelledby="loginTitle">
+      <div class="login-shell">
+        <div class="login-story">
+          <div class="login-brand">
+            <span class="brand-mark" aria-hidden="true">ib</span>
+            <span class="brand-name">iball的小屋</span>
+          </div>
+          <p class="eyebrow">IBALL'S LISTENING CABIN</p>
+          <h1 id="loginTitle">听见单词，<br />也记住它出现的场景。</h1>
+          <p class="login-copy">
+            每次上传的剧集、真题或资料，都会成为小屋里的独立素材分类。
+          </p>
+          <div class="login-features" aria-label="网站特点">
+            <span>按上传素材分类</span>
+            <span>逐条标记掌握</span>
+            <span>浏览器直接发音</span>
+            <span>口语跟读评分</span>
+          </div>
+          <p class="login-usage">仅供个人学习使用，非商业用途。</p>
+        </div>
+
+        <div class="login-panel">
+          <div>
+            <p id="authKicker" class="panel-kicker">欢迎回来</p>
+            <h2 id="authTitle">进入小屋</h2>
+            <p id="authCopy" class="panel-copy">
+              使用账号密码继续你的听力词汇复习。
+            </p>
+          </div>
+
+          <div class="auth-mode-switch" role="tablist" aria-label="登录或注册">
+            <button
+              id="authModeLogin"
+              class="auth-mode-button is-active"
+              type="button"
+              role="tab"
+              aria-selected="true"
+            >
+              登录
+            </button>
+            <button
+              id="authModeRegister"
+              class="auth-mode-button"
+              type="button"
+              role="tab"
+              aria-selected="false"
+            >
+              注册
+            </button>
+          </div>
+
+          <p id="authNotice" class="auth-notice" hidden></p>
+
+          <p id="authMirror" class="auth-mirror" hidden>
+            这里是只读镜像，没有可写的账号目录：登录和注册都会失败。请到主站操作。
+            <a id="authMirrorLink" href="https://app.iball.top/">打开主站 app.iball.top</a>
+          </p>
+
+          <form id="loginForm" class="login-form">
+            <label for="username">账号</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              placeholder="请输入账号"
+              required
+            />
+
+            <div id="emailField" class="auth-extra-field" hidden>
+              <label for="email">邮箱（可选）</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="用于记账号，可留空"
+              />
+            </div>
+
+            <label for="password">密码</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="请输入密码"
+                required
+              />
+              <button
+                id="passwordVisibilityButton"
+                class="password-visibility-button"
+                type="button"
+                aria-label="显示密码"
+                aria-pressed="false"
+              >
+                显示
+              </button>
+            </div>
+
+            <p id="passwordHint" class="field-hint" hidden>
+              密码至少 8 位，不要和账号相同。
+            </p>
+
+            <div id="inviteField" class="auth-extra-field" hidden>
+              <label for="inviteCode">邀请码</label>
+              <input
+                id="inviteCode"
+                name="inviteCode"
+                type="text"
+                autocomplete="off"
+                placeholder="请输入站长提供的邀请码"
+              />
+            </div>
+
+            <button
+              id="forgotPasswordButton"
+              class="link-button"
+              type="button"
+            >
+              忘记密码？
+            </button>
+
+            <button id="loginButton" class="primary-button" type="submit">
+              登录
+            </button>
+            <p id="loginError" class="form-message" role="alert" hidden></p>
+          </form>
+
+          <form id="resetForm" class="login-form" hidden>
+            <p class="panel-copy">
+              输入账号或注册邮箱生成一次性重置码，再凭重置码设置新密码。
+            </p>
+
+            <label for="resetAccount">账号或邮箱</label>
+            <input
+              id="resetAccount"
+              name="resetAccount"
+              type="text"
+              autocomplete="username"
+              placeholder="请输入账号或注册邮箱"
+            />
+
+            <button
+              id="resetRequestButton"
+              class="secondary-button"
+              type="button"
+            >
+              生成重置码
+            </button>
+
+            <p id="resetRequestMessage" class="form-message" role="status" hidden></p>
+
+            <div id="resetTokenFields" class="reset-token-fields" hidden>
+              <label for="resetToken">重置码</label>
+              <input
+                id="resetToken"
+                name="resetToken"
+                type="text"
+                autocomplete="one-time-code"
+                placeholder="粘贴站长发给你的重置码"
+              />
+
+              <label for="resetNewPassword">新密码</label>
+              <input
+                id="resetNewPassword"
+                name="resetNewPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="至少 8 位，不要和账号相同"
+              />
+
+              <button
+                id="resetSubmitButton"
+                class="primary-button"
+                type="button"
+              >
+                重设密码
+              </button>
+            </div>
+
+            <p id="resetError" class="form-message" role="alert" hidden></p>
+
+            <button
+              id="resetBackButton"
+              class="link-button"
+              type="button"
+            >
+              返回登录
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div id="appView" class="app-view" hidden>
+      <aside class="library-panel">
+        <div class="library-top">
+          <div class="library-brand">
+            <span class="brand-mark" aria-hidden="true">ib</span>
+            <div>
+              <strong>iball的小屋</strong>
+              <span>听力词汇素材库</span>
+            </div>
+          </div>
+
+          <div class="account-row">
+            <span id="userLabel" class="user-label"></span>
+            <a
+              id="adminLink"
+              class="account-link"
+              href="./admin.html"
+              hidden
+            >
+              控制台
+            </a>
+            <button id="logoutButton" class="logout-button" type="button">
+              退出
+            </button>
+          </div>
+        </div>
+
+        <nav class="library-shortcuts" aria-label="学习工具">
+          <a class="library-shortcut" href="./quiz.html">
+            <strong>单词测试</strong>
+            <span>分级出题 · 排行榜</span>
+          </a>
+          <a class="library-shortcut" href="./vocab.html">
+            <strong>词汇库</strong>
+            <span>考研 · 四六级</span>
+          </a>
+          <a class="library-shortcut" href="./review.html">
+            <strong>错词复习</strong>
+            <span>收藏与生词本</span>
+          </a>
+          <a class="library-shortcut" href="./speaking.html">
+            <strong>口语房间</strong>
+            <span>真人式陪聊 · 可接自己的接口</span>
+          </a>
+        </nav>
+
+        <div class="library-heading">
+          <span class="library-heading-label">
+            <span>素材分类</span>
+            <strong id="resourceCount">0</strong>
+          </span>
+          <button
+            id="libraryCollapseAllButton"
+            class="library-collapse-all-button"
+            type="button"
+            hidden
+          >
+            收起全部
+          </button>
+        </div>
+        <button
+          id="libraryToggleButton"
+          class="library-toggle-button"
+          type="button"
+          aria-expanded="false"
+          aria-controls="resourceList"
+        >
+          <span class="library-toggle-copy">
+            <strong>素材导航</strong>
+            <span id="libraryToggleMeta">按分类浏览素材</span>
+          </span>
+          <span class="library-toggle-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <label class="material-search-field" for="materialSearchInput">
+          <span class="search-symbol" aria-hidden="true">⌕</span>
+          <input
+            id="materialSearchInput"
+            type="search"
+            placeholder="搜索素材或分类"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
+        <nav
+          id="resourceList"
+          class="resource-list"
+          aria-label="上传素材分类"
+        ></nav>
+
+      </aside>
+
+      <main class="workspace">
+        <header class="workspace-header">
+          <div class="workspace-title">
+            <button
+              id="backToLibraryButton"
+              class="back-to-library-button"
+              type="button"
+            >
+              <span aria-hidden="true">←</span>
+              返回素材导航
+            </button>
+            <p class="section-label">当前素材</p>
+            <h1 id="activeTitle">正在加载素材</h1>
+            <p id="activeDescription" class="active-description">
+              请稍候，正在整理小屋里的词汇卡片。
+            </p>
+          </div>
+
+          <div class="progress-panel" aria-live="polite">
+            <div id="progressRing" class="progress-ring">
+              <span id="progressPercent">0%</span>
+            </div>
+            <div>
+              <strong>学习进度</strong>
+              <span id="progressText">0 / 0 已掌握</span>
+            </div>
+          </div>
+        </header>
+
+        <section
+          id="vocabularyToolbar"
+          class="toolbar"
+          aria-label="词汇工具"
+        >
+          <div class="toolbar-search-row">
+            <label class="search-field" for="searchInput">
+              <span class="search-symbol" aria-hidden="true">⌕</span>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="搜索短语、释义、句子或音标"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </label>
+            <p class="result-count" aria-live="polite">
+              显示 <strong id="visibleCount">0</strong> 条
+            </p>
+          </div>
+
+          <div
+            class="meaning-controls"
+            role="group"
+            aria-label="词汇释义显示控制"
+          >
+            <span class="meaning-controls-label">词汇释义</span>
+            <div class="meaning-control-actions">
+              <button
+                id="showAllMeaningsButton"
+                class="meaning-control-button"
+                type="button"
+              >
+                全部显示释义
+              </button>
+              <button
+                id="hideAllMeaningsButton"
+                class="meaning-control-button is-active"
+                type="button"
+              >
+                全部关闭释义
+              </button>
+            </div>
+          </div>
+
+          <div class="toolbar-view-row">
+            <div
+              id="viewSwitcher"
+              class="view-switcher"
+              role="group"
+              aria-label="切换词汇视图"
+            >
+              <button
+                class="view-button is-active"
+                type="button"
+                data-view="all"
+                aria-pressed="true"
+              >
+                本素材
+              </button>
+              <button
+                class="view-button"
+                type="button"
+                data-view="favorites"
+                aria-pressed="false"
+              >
+                收藏集
+                <span id="favoriteCount" class="view-count">0</span>
+              </button>
+              <button
+                class="view-button"
+                type="button"
+                data-view="unknown"
+                aria-pressed="false"
+              >
+                不会的单词
+                <span id="unknownCount" class="view-count">0</span>
+              </button>
+            </div>
+            <div class="toolbar-actions">
+              <button
+                id="reviewButton"
+                class="review-launch-button"
+                type="button"
+              >
+                在线复习
+              </button>
+              <button
+                id="ankiExportButton"
+                class="anki-export-launch-button"
+                type="button"
+                aria-expanded="false"
+                aria-controls="ankiExportPanel"
+              >
+                导出 Anki CSV
+              </button>
+              <button
+                id="practiceButton"
+                class="practice-launch-button"
+                type="button"
+              >
+                口语练习
+              </button>
+              <button
+                id="openSourceButton"
+                class="open-source-launch-button"
+                type="button"
+                aria-expanded="false"
+                aria-controls="openSourcePanel"
+              >
+                开源方案索引
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="ankiExportPanel"
+            class="anki-export-panel"
+            aria-labelledby="ankiExportTitle"
+            hidden
+          >
+            <div class="anki-export-head">
+              <div>
+                <span class="section-label">ANKI EXPORT</span>
+                <strong id="ankiExportTitle">导出 Anki CSV</strong>
+              </div>
+              <button
+                id="ankiExportCloseButton"
+                class="anki-export-close-button"
+                type="button"
+              >
+                关闭
+              </button>
+            </div>
+
+            <div class="anki-export-fields">
+              <label class="practice-field" for="ankiExportCategory">
+                <span>一级分类</span>
+                <select id="ankiExportCategory"></select>
+              </label>
+              <label class="practice-field" for="ankiExportSection">
+                <span>二级小节</span>
+                <select id="ankiExportSection"></select>
+              </label>
+            </div>
+
+            <div class="anki-export-footer">
+              <p class="anki-export-summary">
+                <strong id="ankiExportCount">0</strong>
+                <span>条词卡</span>
+                <span id="ankiExportScope" class="anki-export-scope"></span>
+              </p>
+              <button
+                id="ankiExportDownloadButton"
+                class="practice-primary-button"
+                type="button"
+                disabled
+              >
+                下载 CSV
+              </button>
+            </div>
+            <p
+              id="ankiExportStatus"
+              class="anki-export-status"
+              aria-live="polite"
+            ></p>
+          </div>
+
+          <div
+            id="collectionFilters"
+            class="collection-filters"
+            aria-label="收藏集分类"
+            hidden
+          >
+            <span id="collectionFilterLabel" class="collection-filter-label">
+              收藏集分类
+            </span>
+            <div
+              id="collectionFilterList"
+              class="collection-filter-list"
+              role="group"
+            ></div>
+          </div>
+        </section>
+
+        <section
+          id="practiceStudio"
+          class="practice-studio"
+          aria-labelledby="practiceHeading"
+          hidden
+        >
+          <header class="practice-header">
+            <div>
+              <p class="section-label">SPEAKING PRACTICE</p>
+              <h2 id="practiceHeading">口语练习</h2>
+              <p id="practiceSource" class="practice-source"></p>
+            </div>
+            <button
+              id="practiceExitButton"
+              class="practice-secondary-button"
+              type="button"
+            >
+              返回词汇
+            </button>
+          </header>
+
+          <div
+            class="practice-section-switch"
+            role="group"
+            aria-label="口语练习模式"
+          >
+            <button
+              id="practiceShadowTab"
+              class="practice-section-tab is-active"
+              type="button"
+              data-practice-section="shadow"
+              aria-pressed="true"
+            >
+              素材跟读
+            </button>
+            <button
+              id="practiceDialogueTab"
+              class="practice-section-tab"
+              type="button"
+              data-practice-section="dialogue"
+              aria-pressed="false"
+            >
+              情景对话
+            </button>
+            <button
+              id="practiceFreeTab"
+              class="practice-section-tab"
+              type="button"
+              data-practice-section="free"
+              aria-pressed="false"
+            >
+              自由对话
+            </button>
+            <button
+              id="practiceIeltsTab"
+              class="practice-section-tab"
+              type="button"
+              data-practice-section="ielts"
+              aria-pressed="false"
+            >
+              雅思口语
+            </button>
+          </div>
+
+          <div class="practice-layout">
+            <article class="practice-stage">
+              <div id="shadowPracticeView" class="practice-stage-view">
+              <div class="practice-stage-top">
+                <span id="practiceCounter" class="practice-counter"></span>
+                <span
+                  id="practiceStatus"
+                  class="practice-status"
+                  aria-live="polite"
+                ></span>
+              </div>
+
+              <div class="practice-target-block">
+                <span class="practice-block-label">跟读句子</span>
+                <p
+                  id="practiceTarget"
+                  class="practice-target"
+                  lang="en"
+                ></p>
+                <p
+                  id="practiceTranslation"
+                  class="practice-translation"
+                ></p>
+              </div>
+
+              <div class="practice-controls">
+                <label class="practice-rate-field" for="practiceRate">
+                  <span>示范速度</span>
+                  <select id="practiceRate">
+                    <option value="0.75">0.75x 慢速</option>
+                    <option value="0.9" selected>0.9x 标准</option>
+                    <option value="1">1x 原速</option>
+                  </select>
+                </label>
+                <label class="practice-rate-field" for="practiceVoice">
+                  <span>示范声线</span>
+                  <select id="practiceVoice">
+                    <option value="auto">自动美音</option>
+                    <option value="female">自然女声</option>
+                    <option value="male">自然男声</option>
+                    <option value="device">设备默认</option>
+                  </select>
+                </label>
+                <button
+                  id="practiceListenButton"
+                  class="practice-primary-button"
+                  type="button"
+                >
+                  听示范
+                </button>
+                <button
+                  id="practiceRecordButton"
+                  class="practice-record-button"
+                  type="button"
+                >
+                  开始跟读
+                </button>
+                <button
+                  id="practiceStopButton"
+                  class="practice-stop-button"
+                  type="button"
+                  hidden
+                >
+                  结束跟读
+                </button>
+              </div>
+              <p
+                id="practiceVoiceStatus"
+                class="practice-voice-status"
+                aria-live="polite"
+              ></p>
+
+              <div class="practice-transcript-block">
+                <div class="practice-transcript-head">
+                  <span>你的发音</span>
+                  <span id="practiceRecognitionState"></span>
+                </div>
+                <p
+                  id="practiceTranscript"
+                  class="practice-transcript"
+                  lang="en"
+                  aria-live="polite"
+                ></p>
+              </div>
+
+              <div id="practiceNotice" class="practice-notice" hidden></div>
+
+              <div id="practiceResult" class="practice-result" hidden>
+                <div class="practice-result-head">
+                  <div class="practice-score">
+                    <strong id="practiceScore">0%</strong>
+                    <span>单词匹配度</span>
+                  </div>
+                  <p id="practiceFeedback" class="practice-feedback"></p>
+                </div>
+                <div class="practice-comparison">
+                  <div>
+                    <span class="practice-block-label">原句对照</span>
+                    <p id="practiceTargetDiff" class="practice-diff"></p>
+                  </div>
+                  <div>
+                    <span class="practice-block-label">识别到的额外词</span>
+                    <p
+                      id="practiceExtraWords"
+                      class="practice-extra-words"
+                      lang="en"
+                    ></p>
+                  </div>
+                </div>
+                <div class="practice-result-actions">
+                  <button
+                    id="practiceRetryButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    再练一次
+                  </button>
+                  <button
+                    id="practiceNextButton"
+                    class="practice-primary-button"
+                    type="button"
+                  >
+                    下一句
+                  </button>
+                </div>
+              </div>
+
+              <div class="practice-navigation">
+                <button
+                  id="practicePreviousButton"
+                  class="practice-secondary-button"
+                  type="button"
+                >
+                  上一句
+                </button>
+                <button
+                  id="practiceShuffleButton"
+                  class="practice-secondary-button"
+                  type="button"
+                >
+                  随机一句
+                </button>
+              </div>
+              </div>
+
+              <div
+                id="dialoguePracticeView"
+                class="practice-stage-view dialogue-stage"
+                hidden
+              >
+                <div class="dialogue-scenario-picker">
+                  <div class="dialogue-scenario-head">
+                    <div>
+                      <span class="practice-block-label">情景选择</span>
+                      <h3>选择一个真实场景开始练习</h3>
+                    </div>
+                    <span
+                      id="dialogueScenarioMeta"
+                      class="dialogue-scenario-meta"
+                    ></span>
+                  </div>
+                  <div
+                    id="dialogueScenarioFilters"
+                    class="dialogue-scenario-filters"
+                    role="group"
+                    aria-label="场景筛选"
+                  ></div>
+                  <div
+                    id="dialogueScenarioList"
+                    class="dialogue-scenario-list"
+                    role="group"
+                    aria-label="口语情景"
+                  ></div>
+                </div>
+
+                <div class="dialogue-conversation">
+                  <div class="dialogue-conversation-head">
+                    <div>
+                      <span
+                        id="dialoguePartnerLabel"
+                        class="practice-block-label"
+                      ></span>
+                      <strong id="dialogueScenarioTitle"></strong>
+                    </div>
+                    <span
+                      id="dialogueTurnCounter"
+                      class="dialogue-turn-counter"
+                    ></span>
+                  </div>
+
+                  <div
+                    id="dialogueMessages"
+                    class="dialogue-messages"
+                    aria-live="polite"
+                  ></div>
+
+                  <div class="dialogue-reply-block">
+                    <label for="dialogueAnswerInput">你的回答</label>
+                    <textarea
+                      id="dialogueAnswerInput"
+                      rows="3"
+                      lang="en"
+                      autocomplete="off"
+                      spellcheck="false"
+                      placeholder="说出或输入你的英文回答..."
+                    ></textarea>
+                    <div class="practice-realtime-bar">
+                      <button
+                        id="dialogueRealtimeButton"
+                        class="practice-realtime-button"
+                        type="button"
+                        aria-pressed="false"
+                      >
+                        开始实时对话
+                      </button>
+                      <span
+                        id="dialogueRealtimeStatus"
+                        class="practice-realtime-status"
+                        aria-live="polite"
+                      ></span>
+                    </div>
+                    <div class="dialogue-reply-actions">
+                      <button
+                        id="dialogueListenButton"
+                        class="practice-secondary-button"
+                        type="button"
+                      >
+                        播放提问
+                      </button>
+                      <button
+                        id="dialogueHintButton"
+                        class="practice-secondary-button"
+                        type="button"
+                      >
+                        参考表达
+                      </button>
+                      <button
+                        id="dialogueRecordButton"
+                        class="practice-record-button"
+                        type="button"
+                      >
+                        开口回答
+                      </button>
+                      <button
+                        id="dialogueStopButton"
+                        class="practice-stop-button"
+                        type="button"
+                        hidden
+                      >
+                        结束回答
+                      </button>
+                      <button
+                        id="dialogueSubmitButton"
+                        class="practice-primary-button"
+                        type="button"
+                      >
+                        提交回答
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    id="dialogueHint"
+                    class="dialogue-hint"
+                    hidden
+                  ></div>
+                  <div
+                    id="dialogueNotice"
+                    class="practice-notice"
+                    hidden
+                  ></div>
+                  <div
+                    id="dialogueResult"
+                    class="dialogue-result"
+                    hidden
+                  >
+                    <div class="dialogue-result-score">
+                      <strong id="dialogueScore">0%</strong>
+                      <span>关键信息覆盖</span>
+                    </div>
+                    <div class="dialogue-result-copy">
+                      <p id="dialogueFeedback"></p>
+                      <div
+                        id="dialogueKeyPoints"
+                        class="dialogue-key-points"
+                      ></div>
+                      <div class="dialogue-coach">
+                        <div class="dialogue-coach-head">
+                          <span class="practice-block-label">教练建议</span>
+                          <span
+                            id="dialogueCoachLevel"
+                            class="dialogue-coach-level"
+                          ></span>
+                        </div>
+                        <p
+                          id="dialogueCoachMessage"
+                          class="dialogue-coach-message"
+                        ></p>
+                        <ul
+                          id="dialogueCoachTips"
+                          class="dialogue-coach-tips"
+                        ></ul>
+                        <p class="dialogue-coach-task">
+                          <span>下一步</span>
+                          <strong id="dialogueCoachTask"></strong>
+                        </p>
+                      </div>
+                      <p class="dialogue-sample-label">参考表达</p>
+                      <p
+                        id="dialogueSampleAnswer"
+                        class="dialogue-sample-answer"
+                        lang="en"
+                      ></p>
+                    </div>
+                    <div class="dialogue-result-actions">
+                      <button
+                        id="dialogueRetryButton"
+                        class="practice-secondary-button"
+                        type="button"
+                      >
+                        再说一次
+                      </button>
+                      <button
+                        id="dialogueNextButton"
+                        class="practice-primary-button"
+                        type="button"
+                      >
+                        下一轮
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                id="ieltsPracticeView"
+                class="practice-stage-view ielts-stage"
+                hidden
+              >
+                <div class="ielts-head">
+                  <div class="ielts-head-copy">
+                    <span class="practice-block-label">IELTS SPEAKING</span>
+                    <h3>按考场顺序走完 Part 1 → Part 2 → Part 3</h3>
+                    <p id="ieltsModeSummary" class="ielts-mode-summary"></p>
+                  </div>
+                  <div class="ielts-head-side">
+                    <span id="ieltsTimer" class="ielts-timer">未计时</span>
+                    <span id="ieltsProgress" class="ielts-progress"></span>
+                  </div>
+                </div>
+
+                <div class="ielts-toolbar">
+                  <label class="ielts-card-field" for="ieltsCardSelect">
+                    <span>Part 2 题卡</span>
+                    <select id="ieltsCardSelect"></select>
+                  </label>
+                  <button
+                    id="ieltsStartButton"
+                    class="practice-primary-button"
+                    type="button"
+                  >
+                    开始模拟
+                  </button>
+                  <button
+                    id="ieltsPrepSkipButton"
+                    class="practice-secondary-button"
+                    type="button"
+                    hidden
+                  >
+                    提前开始作答
+                  </button>
+                  <button
+                    id="ieltsRestartButton"
+                    class="practice-secondary-button"
+                    type="button"
+                    hidden
+                  >
+                    重新开始
+                  </button>
+                </div>
+
+                <div id="ieltsIntroPanel" class="ielts-intro">
+                  <p>
+                    一次完整模拟包含 5 道 Part 1 日常问答、1 分钟准备加 2
+                    分钟个人陈述，以及 4 道 Part 3 深入讨论。计时器走完会自动进入下一段，你也可以随时提前提交。
+                  </p>
+                </div>
+
+                <div id="ieltsPromptBlock" class="ielts-prompt-block" hidden>
+                  <span id="ieltsPartLabel" class="practice-block-label"></span>
+                  <p id="ieltsPrompt" class="ielts-prompt" lang="en"></p>
+                  <p id="ieltsPromptZh" class="ielts-prompt-zh"></p>
+                  <ul id="ieltsBullets" class="ielts-bullets" hidden></ul>
+                </div>
+
+                <div id="ieltsAnswerBlock" class="ielts-answer-block" hidden>
+                  <label for="ieltsAnswerInput">你的英文回答</label>
+                  <textarea
+                    id="ieltsAnswerInput"
+                    rows="4"
+                    lang="en"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="先开口说，再检查文字；也可以直接手打回答..."
+                  ></textarea>
+                  <div class="ielts-actions">
+                    <button
+                      id="ieltsPlayButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      播放考官提问
+                    </button>
+                    <button
+                      id="ieltsHintButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      参考表达
+                    </button>
+                    <button
+                      id="ieltsRecordButton"
+                      class="practice-record-button"
+                      type="button"
+                    >
+                      开口回答
+                    </button>
+                    <button
+                      id="ieltsStopButton"
+                      class="practice-stop-button"
+                      type="button"
+                      hidden
+                    >
+                      结束回答
+                    </button>
+                    <button
+                      id="ieltsSubmitButton"
+                      class="practice-primary-button"
+                      type="button"
+                    >
+                      提交回答
+                    </button>
+                  </div>
+                </div>
+
+                <div id="ieltsHint" class="dialogue-hint" hidden></div>
+                <div id="ieltsNotice" class="practice-notice" hidden></div>
+
+                <div id="ieltsReport" class="ielts-report" hidden>
+                  <div class="ielts-report-head">
+                    <div>
+                      <span class="practice-block-label">练习报告</span>
+                      <h3 id="ieltsReportTitle"></h3>
+                    </div>
+                    <span
+                      id="ieltsReportOverall"
+                      class="ielts-report-overall"
+                    ></span>
+                  </div>
+                  <p id="ieltsReportSummary" class="ielts-report-summary"></p>
+                  <div id="ieltsReportParts" class="ielts-report-parts"></div>
+                  <div
+                    id="ieltsReportDimensions"
+                    class="ielts-report-dimensions"
+                  ></div>
+                  <p class="ielts-report-note">
+                    分数是本地文本规则给出的练习估算，用来定位下一步练什么，不等于官方雅思成绩。正式评估请以持证考官为准。
+                  </p>
+                </div>
+              </div>
+
+              <div
+                id="freePracticeView"
+                class="practice-stage-view free-stage"
+                hidden
+              >
+                <div class="free-conversation-head">
+                  <div>
+                    <span class="practice-block-label">FREE CONVERSATION</span>
+                    <h3>和美音陪练自由聊天</h3>
+                    <p id="freeModeSummary" class="free-mode-summary"></p>
+                  </div>
+                  <span id="freeTurnCounter" class="free-turn-counter">
+                    第 0 轮
+                  </span>
+                </div>
+
+                <div class="free-topic-bar">
+                  <label class="free-topic-field" for="freeTopic">
+                    <span>练习话题</span>
+                    <select id="freeTopic">
+                      <option value="daily" selected>日常交流</option>
+                      <option value="study">学习与考试</option>
+                      <option value="travel">旅行与城市</option>
+                      <option value="work">工作与职业</option>
+                      <option value="technology">科技与媒体</option>
+                      <option value="culture">文化与生活</option>
+                    </select>
+                  </label>
+                  <label class="free-auto-speak" for="freeAutoSpeak">
+                    <input id="freeAutoSpeak" type="checkbox" checked />
+                    <span>自动美音朗读</span>
+                  </label>
+                  <button
+                    id="freeRestartButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    新对话
+                  </button>
+                </div>
+
+                <div
+                  id="freeMessages"
+                  class="free-messages"
+                  aria-live="polite"
+                ></div>
+
+                <div class="free-reply-block">
+                  <label for="freeAnswerInput">你的英文</label>
+                  <textarea
+                    id="freeAnswerInput"
+                    rows="3"
+                    lang="en"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="用英语说出或输入你的想法，按 Ctrl + Enter 发送..."
+                  ></textarea>
+                  <div class="practice-realtime-bar">
+                    <button
+                      id="freeRealtimeButton"
+                      class="practice-realtime-button"
+                      type="button"
+                      aria-pressed="false"
+                    >
+                      开始实时对话
+                    </button>
+                    <span
+                      id="freeRealtimeStatus"
+                      class="practice-realtime-status"
+                      aria-live="polite"
+                    ></span>
+                  </div>
+                  <div class="free-reply-actions">
+                    <button
+                      id="freeListenButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      播放回复
+                    </button>
+                    <button
+                      id="freeHintButton"
+                      class="practice-secondary-button"
+                      type="button"
+                    >
+                      思路提示
+                    </button>
+                    <button
+                      id="freeRecordButton"
+                      class="practice-record-button"
+                      type="button"
+                    >
+                      开口说
+                    </button>
+                    <button
+                      id="freeStopButton"
+                      class="practice-stop-button"
+                      type="button"
+                      hidden
+                    >
+                      结束回答
+                    </button>
+                    <button
+                      id="freeSubmitButton"
+                      class="practice-primary-button"
+                      type="button"
+                    >
+                      发送
+                    </button>
+                  </div>
+                </div>
+
+                <div id="freeHint" class="free-hint" hidden></div>
+                <div id="freeNotice" class="practice-notice" hidden></div>
+              </div>
+            </article>
+
+            <aside class="practice-sidebar" aria-label="口语练习记录">
+              <div class="practice-service-settings">
+                <div class="practice-service-head">
+                  <div>
+                    <span class="practice-block-label">语音识别</span>
+                    <h3>识别方式</h3>
+                  </div>
+                  <span id="practiceModeStatus" class="practice-mode-status">
+                    浏览器免费
+                  </span>
+                </div>
+                <label class="practice-field" for="practiceMode">
+                  <span>识别服务</span>
+                  <select id="practiceMode">
+                    <option value="browser" selected>浏览器免费</option>
+                    <option value="api">自定义 API</option>
+                    <option value="off">关闭识别</option>
+                  </select>
+                </label>
+                <div id="practiceApiFields" class="practice-api-fields" hidden>
+                  <label class="practice-field" for="practiceApiUrl">
+                    <span>接口地址</span>
+                    <input
+                      id="practiceApiUrl"
+                      type="url"
+                      autocomplete="off"
+                      placeholder="https://example.com/v1/audio/transcriptions"
+                    />
+                  </label>
+                  <label class="practice-field" for="practiceApiModel">
+                    <span>模型名称（可选择或输入）</span>
+                    <input
+                      id="practiceApiModel"
+                      type="text"
+                      list="practiceApiModelOptions"
+                      autocomplete="off"
+                      placeholder="whisper-1"
+                    />
+                    <datalist id="practiceApiModelOptions">
+                      <option value="v4flash"></option>
+                      <option value="v4pro"></option>
+                      <option value="whisper-1"></option>
+                      <option value="gpt-4o-mini-transcribe"></option>
+                    </datalist>
+                  </label>
+                  <label class="practice-field" for="practiceApiKey">
+                    <span>API Key</span>
+                    <input
+                      id="practiceApiKey"
+                      type="password"
+                      autocomplete="off"
+                      placeholder="可留空"
+                    />
+                  </label>
+                  <label class="practice-field" for="practiceApiAuth">
+                    <span>鉴权方式</span>
+                    <select id="practiceApiAuth">
+                      <option value="bearer" selected>Bearer</option>
+                      <option value="x-api-key">x-api-key</option>
+                      <option value="none">无鉴权</option>
+                    </select>
+                  </label>
+                  <button
+                    id="practiceApiSaveButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    保存接口配置
+                  </button>
+                  <p
+                    id="practiceApiStatus"
+                    class="practice-api-status"
+                    aria-live="polite"
+                  ></p>
+                  <p class="practice-api-note">
+                    API Key 仅保存在当前浏览器，并直接发送到所填接口。接口需
+                    允许跨域访问（CORS）。
+                  </p>
+                </div>
+              </div>
+
+              <div
+                id="freeServiceSettings"
+                class="practice-service-settings"
+                hidden
+              >
+                <div class="practice-service-head">
+                  <div>
+                    <span class="practice-block-label">自由对话</span>
+                    <h3>对话服务</h3>
+                  </div>
+                  <span
+                    id="freeChatModeStatus"
+                    class="practice-mode-status"
+                  >
+                    本地免费
+                  </span>
+                </div>
+                <label class="practice-field" for="freeChatMode">
+                  <span>AI 来源</span>
+                  <select id="freeChatMode">
+                    <option value="local" selected>本地免费陪练</option>
+                    <option value="api">自定义 Chat API</option>
+                    <option value="off">关闭自动回复</option>
+                  </select>
+                </label>
+                <div id="freeChatApiFields" class="practice-api-fields" hidden>
+                  <label class="practice-field" for="freeChatApiUrl">
+                    <span>Chat 接口地址</span>
+                    <input
+                      id="freeChatApiUrl"
+                      type="url"
+                      autocomplete="off"
+                      placeholder="https://api.openai.com/v1/chat/completions"
+                    />
+                  </label>
+                  <label class="practice-field" for="freeChatApiModel">
+                    <span>模型名称（可选择或输入）</span>
+                    <input
+                      id="freeChatApiModel"
+                      type="text"
+                      list="freeChatApiModelOptions"
+                      autocomplete="off"
+                      placeholder="gpt-4o-mini"
+                    />
+                    <datalist id="freeChatApiModelOptions">
+                      <option value="v4flash"></option>
+                      <option value="v4pro"></option>
+                      <option value="gpt-4o-mini"></option>
+                      <option value="gpt-4o"></option>
+                      <option value="deepseek-chat"></option>
+                    </datalist>
+                  </label>
+                  <label class="practice-field" for="freeChatApiKey">
+                    <span>API Key</span>
+                    <input
+                      id="freeChatApiKey"
+                      type="password"
+                      autocomplete="off"
+                      placeholder="可留空"
+                    />
+                  </label>
+                  <label class="practice-field" for="freeChatApiAuth">
+                    <span>鉴权方式</span>
+                    <select id="freeChatApiAuth">
+                      <option value="bearer" selected>Bearer</option>
+                      <option value="x-api-key">x-api-key</option>
+                      <option value="none">无鉴权</option>
+                    </select>
+                  </label>
+                  <button
+                    id="freeChatApiSaveButton"
+                    class="practice-secondary-button"
+                    type="button"
+                  >
+                    保存 Chat API 配置
+                  </button>
+                  <p
+                    id="freeChatApiStatus"
+                    class="practice-api-status"
+                    aria-live="polite"
+                  ></p>
+                  <p class="practice-api-note">
+                    浏览器会直接请求所填的 OpenAI 兼容 Chat Completions
+                    接口。API Key 只保存在本机，接口需要允许 CORS；费用由你
+                    自己的服务商结算。
+                  </p>
+                </div>
+                <p class="free-service-note">
+                  本地免费模式提供规则式追问、纠错和雅思练习建议。填写 Chat
+                  API 后才会进行完整的 AI 自由对话。
+                </p>
+              </div>
+
+              <div class="practice-sidebar-head">
+                <div>
+                  <span class="practice-block-label">学习数据</span>
+                  <h3>本机练习记录</h3>
+                </div>
+                <button
+                  id="practiceClearButton"
+                  class="practice-text-button"
+                  type="button"
+                >
+                  清空
+                </button>
+              </div>
+              <div class="practice-stat-grid">
+                <div>
+                  <strong id="practiceAttemptCount">0</strong>
+                  <span>练习次数</span>
+                </div>
+                <div>
+                  <strong id="practiceSentenceCount">0</strong>
+                  <span>涉及句子</span>
+                </div>
+                <div>
+                  <strong id="practiceAverageScore">0%</strong>
+                  <span>平均匹配</span>
+                </div>
+                <div>
+                  <strong id="practiceBestScore">0%</strong>
+                  <span>最佳匹配</span>
+                </div>
+              </div>
+              <div id="practiceHistory" class="practice-history"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section
+          id="reviewStudio"
+          class="review-studio"
+          aria-labelledby="reviewHeading"
+          hidden
+        >
+          <header class="review-header">
+            <div>
+              <p class="section-label">SPACED REPETITION</p>
+              <h2 id="reviewHeading">在线复习</h2>
+              <p id="reviewSource" class="review-source"></p>
+            </div>
+            <button
+              id="reviewExitButton"
+              class="practice-secondary-button"
+              type="button"
+            >
+              返回词汇
+            </button>
+          </header>
+
+          <div class="review-controls">
+            <label class="practice-field" for="reviewCategory">
+              <span>复习范围</span>
+              <select id="reviewCategory"></select>
+            </label>
+            <label class="practice-field" for="reviewSection">
+              <span>二级小节</span>
+              <select id="reviewSection"></select>
+            </label>
+            <label class="practice-field" for="reviewUnit">
+              <span>学习单元</span>
+              <select id="reviewUnit"></select>
+            </label>
+            <label class="practice-field" for="reviewNewLimit">
+              <span>今日新卡上限</span>
+              <select id="reviewNewLimit">
+                <option value="0">只复习旧卡</option>
+                <option value="10">10 张</option>
+                <option value="20" selected>20 张</option>
+                <option value="40">40 张</option>
+              </select>
+            </label>
+            <div class="review-control-actions">
+              <button
+                id="reviewRestartButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                重新排队
+              </button>
+              <button
+                id="reviewExportButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                导出进度
+              </button>
+              <button
+                id="reviewImportButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                导入进度
+              </button>
+              <button
+                id="reviewClearButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                清空进度
+              </button>
+              <input
+                id="reviewImportInput"
+                type="file"
+                accept=".json,application/json"
+                hidden
+              />
+            </div>
+          </div>
+
+          <div class="review-stat-grid">
+            <div>
+              <strong id="reviewDueCount">0</strong>
+              <span>到期复习</span>
+            </div>
+            <div>
+              <strong id="reviewNewCount">0</strong>
+              <span>可学新卡</span>
+            </div>
+            <div>
+              <strong id="reviewDoneCount">0</strong>
+              <span>本次完成</span>
+            </div>
+            <div>
+              <strong id="reviewTotalCount">0</strong>
+              <span>范围内卡片</span>
+            </div>
+          </div>
+
+          <article id="reviewCard" class="review-card">
+            <div class="review-card-meta">
+              <span id="reviewCardScope"></span>
+              <span id="reviewCardProgress"></span>
+            </div>
+
+            <div class="review-card-front">
+              <p
+                id="reviewCardSentence"
+                class="review-card-sentence"
+                lang="en"
+              ></p>
+              <p id="reviewCardPrompt" class="review-card-prompt"></p>
+            </div>
+
+            <div id="reviewCardAnswer" class="review-card-answer" hidden>
+              <div class="review-answer-row">
+                <strong id="reviewCardPhrase" lang="en"></strong>
+                <span
+                  id="reviewCardPhonetic"
+                  class="review-answer-phonetic"
+                  lang="en"
+                ></span>
+              </div>
+              <p id="reviewCardMeaning" class="review-answer-meaning"></p>
+              <p
+                id="reviewCardTranslation"
+                class="review-answer-translation"
+              ></p>
+            </div>
+
+            <div class="review-card-actions">
+              <button
+                id="reviewSpeakButton"
+                class="practice-secondary-button"
+                type="button"
+              >
+                朗读句子
+              </button>
+              <button
+                id="reviewShowButton"
+                class="practice-primary-button"
+                type="button"
+              >
+                显示答案
+              </button>
+            </div>
+
+            <div id="reviewMarkActions" class="review-mark-actions">
+              <button
+                id="reviewUnknownButton"
+                class="review-mark-button is-unknown"
+                type="button"
+                aria-pressed="false"
+              >
+                不会
+              </button>
+              <button
+                id="reviewKnownButton"
+                class="review-mark-button is-known"
+                type="button"
+                aria-pressed="false"
+              >
+                标记掌握
+              </button>
+            </div>
+
+            <div id="reviewGradeActions" class="review-grade-actions" hidden>
+              <button
+                class="review-grade-button is-again"
+                data-review-grade="again"
+                type="button"
+              >
+                <strong>忘记</strong>
+                <span id="reviewIntervalAgain"></span>
+              </button>
+              <button
+                class="review-grade-button is-hard"
+                data-review-grade="hard"
+                type="button"
+              >
+                <strong>模糊</strong>
+                <span id="reviewIntervalHard"></span>
+              </button>
+              <button
+                class="review-grade-button is-good"
+                data-review-grade="good"
+                type="button"
+              >
+                <strong>记得</strong>
+                <span id="reviewIntervalGood"></span>
+              </button>
+              <button
+                class="review-grade-button is-easy"
+                data-review-grade="easy"
+                type="button"
+              >
+                <strong>简单</strong>
+                <span id="reviewIntervalEasy"></span>
+              </button>
+            </div>
+
+            <p id="reviewStatus" class="review-status" aria-live="polite"></p>
+          </article>
+
+          <p class="review-footnote">
+            卡片调度参考开源的间隔重复思路，复习进度只保存在当前浏览器，
+            也可以导出备份文件。
+          </p>
+        </section>
+
+        <section
+          id="cardGrid"
+          class="card-grid"
+          aria-label="听力词汇卡片"
+        ></section>
+
+        <div id="emptyState" class="empty-state">
+          <strong>正在准备卡片</strong>
+          <span>素材加载完成后会显示在这里。</span>
+        </div>
+
+        <footer class="workspace-footer">
+          <span>iball的小屋</span>
+          <span id="footerResource">听力词汇素材库</span>
+          <span>仅供个人学习使用，非商业用途。</span>
+          <span>
+            借鉴开源项目：
+            <a
+              href="https://github.com/yin-yizhen/SpeakHub"
+              target="_blank"
+              rel="noreferrer"
+            >
+              SpeakHub
+            </a>
+            ·
+            <a
+              href="https://github.com/shadcn-ui/ui"
+              target="_blank"
+              rel="noreferrer"
+            >
+              shadcn-ui/ui
+            </a>
+            （组件默认值与键盘可访问性，MIT）
+            ·
+            <a
+              href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill"
+              target="_blank"
+              rel="noreferrer"
+            >
+              ui-ux-pro-max-skill
+            </a>
+            （UI/UX 检查清单，MIT）
+          </span>
+          <span>
+            情景对话参考：
+            <a
+              href="https://github.com/EthanLyu30/spoken"
+              target="_blank"
+              rel="noreferrer"
+            >
+              spoken
+            </a>
+            · MIT
+          </span>
+          <span>
+            口语反馈参考：
+            <a
+              href="https://github.com/luyou666/english-speaking-coach"
+              target="_blank"
+              rel="noreferrer"
+            >
+              english-speaking-coach
+            </a>
+            · MIT
+          </span>
+          <span>
+            自由对话与雅思反馈参考：
+            <a
+              href="https://github.com/Luxshan2000/ielts-prep"
+              target="_blank"
+              rel="noreferrer"
+            >
+              IELTS Prep
+            </a>
+            · MIT
+          </span>
+          <span>
+            纠错思路参考：
+            <a
+              href="https://github.com/anticipate218/EchoMentor"
+              target="_blank"
+              rel="noreferrer"
+            >
+              EchoMentor
+            </a>
+            · MIT
+          </span>
+          <span>
+            间隔重复思路参考：
+            <a
+              href="https://github.com/open-spaced-repetition/fsrs4anki"
+              target="_blank"
+              rel="noreferrer"
+            >
+              FSRS4Anki
+            </a>
+            · MIT
+          </span>
+          <span>
+            界面设计参考：
+            <a
+              href="https://github.com/huangshiyu13/webtemplate"
+              target="_blank"
+              rel="noreferrer"
+            >
+              webtemplate
+            </a>
+            · Apache-2.0
+          </span>
+          <span>
+            写作评分标准：考研英语 Skill（本地技能库的五档口径，分数为模拟练习估算）
+          </span>
+          <span>
+            口语场景与语音管线调研：
+            <a
+              href="https://github.com/xiaochong/hi-kid-fun"
+              target="_blank"
+              rel="noreferrer"
+            >
+              hi-kid-fun
+            </a>
+            · ISC
+          </span>
+          <span>
+            考研资料结构参考：
+            <a
+              href="https://github.com/Echo1LZJY/echo-kaoyan-english-skill"
+              target="_blank"
+              rel="noreferrer"
+            >
+              echo-kaoyan-english-skill
+            </a>
+            · 仅借鉴公开结构
+          </span>
+        </footer>
+      </main>
+    </div>
+
+    <div
+      id="wordPopover"
+      class="word-popover"
+      role="dialog"
+      aria-labelledby="wordPopoverWord"
+      hidden
+    >
+      <div class="word-popover-head">
+        <div>
+          <strong id="wordPopoverWord" class="word-popover-word"></strong>
+          <span
+            id="wordPopoverPhonetic"
+            class="word-popover-phonetic"
+            lang="en"
+          ></span>
+        </div>
+        <button
+          id="wordPopoverClose"
+          class="word-popover-close"
+          type="button"
+          aria-label="关闭单词释义"
+        >
+          关闭
+        </button>
+      </div>
+      <div id="wordPopoverContent" class="word-popover-content"></div>
+    </div>
+
+    <div
+      id="openSourcePanel"
+      class="open-source-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="openSourceTitle"
+      hidden
+    >
+      <div class="open-source-scrim" data-open-source-dismiss></div>
+      <article
+        id="openSourceCard"
+        class="open-source-card"
+        tabindex="-1"
+      >
+        <header class="open-source-head">
+          <div>
+            <span class="section-label">OPEN SOURCE RESEARCH</span>
+            <h2 id="openSourceTitle">开源方案索引</h2>
+          </div>
+          <button
+            id="openSourceClose"
+            class="open-source-close-button"
+            type="button"
+            aria-label="关闭开源方案索引"
+          >
+            关闭
+          </button>
+        </header>
+
+        <p class="open-source-intro">
+          按训练模块整理调研过的公开仓库，只借鉴思路、数据结构与版式，
+          未复制其代码与受版权保护的正文。需要更多方案时可直接去 GitHub 检索。
+        </p>
+
+        <form
+          id="openSourceForm"
+          class="open-source-search"
+          role="search"
+        >
+          <input
+            id="openSourceQuery"
+            class="open-source-input"
+            type="search"
+            autocomplete="off"
+            placeholder="关键词，例如 雅思口语 评分"
+            aria-label="开源项目关键词"
+          />
+          <button
+            id="openSourceSubmit"
+            class="open-source-search-button"
+            type="submit"
+          >
+            在 GitHub 搜索
+          </button>
+        </form>
+
+        <div
+          id="openSourceFilters"
+          class="open-source-filters"
+          role="group"
+          aria-label="按训练模块筛选"
+        ></div>
+
+        <p
+          id="openSourceStatus"
+          class="open-source-status"
+          aria-live="polite"
+        ></p>
+
+        <ul id="openSourceList" class="open-source-list"></ul>
+      </article>
+    </div>
+  </body>
+</html>

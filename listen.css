@@ -1,0 +1,673 @@
+/**
+ * 听句精听页面样式。
+ * 只作用于 body.listen-page，避免影响站内其它模块。
+ * 版式：顶部固定播放器 + 可滚动句子列表 + 列表下方答题区。
+ */
+
+.listen-page {
+  --listen-radius: 8px;
+  --listen-topbar: 64px;
+}
+
+/* ------------------------------------------------------------ 顶部固定播放器 */
+
+.listen-player {
+  position: sticky;
+  top: var(--listen-topbar);
+  z-index: 30;
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+  padding: 14px 18px;
+  display: grid;
+  gap: 10px;
+  background: var(--forest-deep);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--listen-radius);
+  box-shadow: 0 12px 30px rgba(11, 41, 37, 0.24);
+}
+
+.listen-player-main {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.listen-progress {
+  color: #cfe3dc;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.listen-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listen-player .icon-button {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #e6f2ed;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  border-radius: var(--listen-radius);
+}
+
+.listen-player .icon-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.listen-player .icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.listen-player .icon-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.listen-play-button {
+  min-width: 132px;
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--forest-deep);
+  background: linear-gradient(180deg, #f6d98a, var(--gold));
+  border: 0;
+  border-radius: var(--listen-radius);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.listen-play-button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentcolor;
+  stroke: none;
+}
+
+.listen-play-button:hover {
+  box-shadow: 0 8px 18px rgba(209, 165, 72, 0.32);
+}
+
+.listen-play-button.is-playing {
+  color: #ffffff;
+  background: linear-gradient(180deg, #d9695f, var(--coral));
+}
+
+.listen-loop {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #cfe3dc;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.listen-loop input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+}
+
+.listen-player-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #a8c4bb;
+  font-size: 12px;
+}
+
+.listen-source-meta {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.listen-timer {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  color: #e6f2ed;
+}
+
+/* --------------------------------------------------------------- 主体两栏 */
+
+.listen-board {
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+  display: grid;
+  gap: 16px;
+}
+
+.listen-list-panel,
+.listen-answer-panel,
+.listen-wrong-panel {
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+  box-shadow: 0 8px 24px rgba(12, 43, 37, 0.06);
+}
+
+.listen-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.listen-panel-head h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.listen-panel-hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------ 句子列表 */
+
+.listen-list {
+  max-height: min(56vh, 640px);
+  overflow: auto;
+  padding: 4px;
+  display: grid;
+  gap: 6px;
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.listen-list:focus-visible {
+  border-color: #75a695;
+}
+
+.listen-item {
+  width: 100%;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  text-align: left;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.listen-item:hover {
+  border-color: #8eada0;
+}
+
+.listen-item.is-current {
+  background: #f2f8f5;
+  border-color: var(--forest);
+  box-shadow: inset 3px 0 0 var(--forest);
+}
+
+.listen-item.is-playing {
+  background: #fdf3ef;
+  border-color: var(--coral);
+}
+
+.listen-item-index {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+
+.listen-item-body {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.listen-item-en {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.listen-item-zh {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* 未揭晓原文时把英文糊掉，仍然可以点击跳到该句 */
+.listen-list.is-masked .listen-item:not(.is-revealed) .listen-item-en {
+  filter: blur(5px);
+  user-select: none;
+}
+
+.listen-list.is-masked .listen-item:not(.is-revealed) .listen-item-zh {
+  filter: blur(5px);
+  user-select: none;
+}
+
+.listen-item-state {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  color: var(--muted);
+  background: #eef3f0;
+  border-radius: var(--listen-radius);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.listen-item-state[data-state="hit"] {
+  color: #1f6b4f;
+  background: #e2f2e9;
+}
+
+.listen-item-state[data-state="miss"] {
+  color: #a53f36;
+  background: #fbe6e3;
+}
+
+/* ------------------------------------------------------------- 答题区 */
+
+.listen-answer-number {
+  margin: 0;
+  color: var(--forest);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.listen-answer-audio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.listen-attempts {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.listen-input-field {
+  display: grid;
+  gap: 7px;
+}
+
+.listen-input-field span {
+  color: #6e8179;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.listen-input-field textarea {
+  width: 100%;
+  min-height: 92px;
+  padding: 11px 12px;
+  resize: vertical;
+  color: var(--ink);
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.listen-input-field textarea:focus {
+  border-color: #75a695;
+  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  outline: 0;
+}
+
+.listen-answer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.listen-result {
+  min-height: 0;
+}
+
+.listen-result:empty {
+  display: none;
+}
+
+.listen-score {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #f7f8f3;
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+}
+
+.listen-score-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.listen-score-value {
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.listen-score-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.listen-diff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  line-height: 1.6;
+}
+
+.listen-diff span {
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.listen-diff .diff-hit {
+  color: #1f6b4f;
+  background: #e2f2e9;
+}
+
+.listen-diff .diff-miss {
+  color: #a53f36;
+  background: #fbe6e3;
+  text-decoration: line-through;
+}
+
+.listen-diff .diff-extra {
+  color: #8a6416;
+  background: #fdf1d8;
+  font-style: italic;
+}
+
+.listen-reference {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  background: #eef5f1;
+  border-left: 3px solid var(--forest);
+  border-radius: var(--listen-radius);
+}
+
+.listen-reference p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.listen-reference-en {
+  color: var(--forest-deep);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.listen-reference-zh {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------- 错题本 */
+
+.listen-wrong-panel {
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+}
+
+.listen-wrong-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.listen-wrong-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(50vh, 520px);
+  overflow: auto;
+}
+
+.listen-wrong-item {
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+  background: #fbfcfb;
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+}
+
+.listen-wrong-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.listen-wrong-source {
+  color: var(--forest);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.listen-wrong-actions-inline {
+  display: flex;
+  gap: 6px;
+}
+
+.listen-wrong-line {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.listen-wrong-line strong {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.listen-empty {
+  padding: 20px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  background: #fbfcfb;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--listen-radius);
+}
+
+/* ---------------------------------------------------------- 页脚借鉴声明 */
+
+.listen-page .kaoyan-attribution {
+  width: min(1160px, calc(100% - 44px));
+  margin: 22px auto 46px;
+  padding: 22px 24px;
+  display: grid;
+  gap: 12px;
+  background: #f7f8f3;
+  border: 1px solid var(--line);
+  border-radius: var(--listen-radius);
+}
+
+.listen-page .kaoyan-attribution h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.listen-page .kaoyan-attribution p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.listen-page .kaoyan-attribution ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+  color: #4c635b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.listen-page .kaoyan-attribution a {
+  color: var(--forest);
+  font-weight: 800;
+}
+
+.listen-page .kaoyan-attribution code {
+  padding: 1px 5px;
+  background: #e7ede9;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------- 响应式 */
+
+@media (min-width: 1080px) {
+  .listen-board {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    align-items: start;
+  }
+
+  .listen-list {
+    max-height: min(62vh, 680px);
+  }
+}
+
+@media (max-width: 900px) {
+  .listen-player,
+  .listen-board,
+  .listen-wrong-panel,
+  .listen-page .kaoyan-attribution {
+    width: calc(100% - 32px);
+  }
+}
+
+@media (max-width: 640px) {
+  .listen-page {
+    --listen-topbar: 58px;
+  }
+
+  .listen-player {
+    margin-top: 12px;
+    padding: 12px 14px;
+  }
+
+  .listen-player-main {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 10px;
+  }
+
+  .listen-progress {
+    order: -1;
+  }
+
+  .listen-player-actions {
+    justify-content: center;
+  }
+
+  .listen-play-button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .listen-loop {
+    justify-self: center;
+  }
+
+  .listen-list-panel,
+  .listen-answer-panel,
+  .listen-wrong-panel {
+    padding: 14px 14px 16px;
+  }
+
+  .listen-list {
+    max-height: min(48vh, 460px);
+  }
+
+  .listen-item {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .listen-item-state {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .listen-answer-actions .tool-button {
+    flex: 1 1 140px;
+  }
+}
+
+@media (max-width: 380px) {
+  .listen-player-actions {
+    gap: 6px;
+  }
+
+  .listen-player .icon-button {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listen-list {
+    scroll-behavior: auto;
+  }
+
+  .listen-item,
+  .listen-play-button {
+    transition: none;
+  }
+}
