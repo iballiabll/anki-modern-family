@@ -720,7 +720,9 @@
    * before any vocabulary file is downloaded.
    */
   async function fetchLibraryManifest(manifestPath = MANIFEST_PATH) {
-    const manifestResponse = await fetch(manifestPath, { cache: "no-store" });
+    // 走 HTTP 缓存：resources.json 由部署时的 Cache-Control 决定新鲜度，
+    // 本地 dev server 对未加版本号的文件一律发 no-cache，不会读到旧清单。
+    const manifestResponse = await fetch(manifestPath);
     if (!manifestResponse.ok) {
       throw new Error(`资源清单加载失败：${manifestResponse.status}`);
     }

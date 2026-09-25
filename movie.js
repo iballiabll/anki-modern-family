@@ -800,6 +800,8 @@
     state.audioManifestId = id;
     state.audioManifest = null;
     try {
+      // 逐句清单刻意不走缓存：它和 S01E24.mp3 精灵音频必须同版本，
+      // 缓存到旧清单配上新音频，就会串到别的台词上。清单本身只有 20KB。
       const response = await fetch(
         `${AUDIO_MANIFEST_DIR}${encodeURIComponent(id)}.json`,
         { cache: "no-store" },
