@@ -26,7 +26,8 @@ iballiabll.github.io/anki-modern-family/  → GitHub Pages  最后一层兜底
 
 ## 1. 准备 VPS
 
-搬瓦工下单时选 **Ubuntu 22.04 或 24.04**。登录后用 root 操作。
+搬瓦工下单时选 **Debian 12** 或 **Ubuntu 22.04 / 24.04** 都行，下面命令
+两者通用。登录后用 root 操作。
 
 ```bash
 # 装 Node 20
@@ -40,7 +41,8 @@ mkdir -p /srv/iball-cabin /var/lib/iball-cabin/data
 chown -R iball:iball /var/lib/iball-cabin
 ```
 
-> 仓库带音频素材，约 190 MB，`git clone` 慢一点是正常的。
+> 仓库带音频素材，clone 下来约 420 MB，`git clone --depth 1` 会快一些
+> （部署脚本本来也只关心最新一次提交）。
 
 ```bash
 cd /srv/iball-cabin
@@ -95,7 +97,65 @@ journalctl -u iball-cabin -n 50 --no-pager
 
 ---
 
-## 4. Nginx + HTTPS
+## 4. 公网 HTTPS 入口
+
+这里分两种情况。**如果这台机器上 443 已经被 xray / 其它服务占着，用 4A**；
+如果 443 是空的，用 4B 更省事（多一层 Nginx 缓存和 Range 处理）。
+
+两种情况都先确认 Node 本机是通的：
+
+```bash
+curl -s http://127.0.0.1:4175/healthz
+```
+
+### 4A. Cloudflare Tunnel（443 被占用时推荐）
+
+Tunnel 是 cloudflared 主动往外连，所以**不占任何入站端口**，也不碰 xray
+的 443，不需要给 VPS 申请证书。
+
+```bash
+# 装 cloudflared（Debian/Ubuntu 直接用官方二进制最省事）
+curl -fsSL -o /usr/local/bin/cloudflared \
+  https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod +x /usr/local/bin/cloudflared
+cloudflared --version
+
+# 登录并授权（会打印一条 dash.cloudflare.com 链接，在浏览器里选中域名）
+cloudflared tunnel login
+
+# 建隧道 + 指向本机 Node
+cloudflared tunnel create iball-cabin
+cloudflared tunnel route dns iball-cabin app.iball.top
+```
+
+写 `/root/.cloudflared/config.yml`（把 `<TUNNEL-ID>` 换成 create 输出里的
+那串 UUID）：
+
+```yaml
+tunnel: <TUNNEL-ID>
+credentials-file: /root/.cloudflared/<TUNNEL-ID>.json
+
+ingress:
+  - hostname: app.iball.top
+    service: http://127.0.0.1:4175
+  - service: http_status:404
+```
+
+装成开机自启的服务：
+
+```bash
+cloudflared service install
+systemctl enable --now cloudflared
+systemctl status cloudflared --no-pager
+```
+
+> `service install` 会把 `config.yml` 的内容搬进 `/etc/cloudflared/config.yml`，
+> 以后改配置改那个文件再 `systemctl restart cloudflared`。
+>
+> 隧道模式下 VPS 不需要开放 80/443，也不需要 `certbot`，证书由 Cloudflare
+> 边缘负责，续期不用管。
+
+### 4B. Nginx + Let's Encrypt（443 空闲时）
 
 ```bash
 cp /srv/iball-cabin/app/deploy/nginx.conf /etc/nginx/sites-available/iball-cabin
@@ -109,7 +169,7 @@ rm -f /etc/nginx/sites-enabled/default
 ```bash
 nginx -t && systemctl reload nginx
 
-# 申请证书（85 端口不用管，certbot 会自动改配置）
+# 申请证书（80 端口会被 certbot 临时用一下，别把 80 也占死）
 apt-get install -y certbot python3-certbot-nginx
 certbot --nginx -d app.iball.top
 ```
@@ -124,15 +184,30 @@ certbot renew --dry-run
 
 ## 5. 改 DNS
 
-到域名 DNS 面板（现在是 Vercel 在管）加一条记录：
+`app.iball.top` 要指向这台 VPS。两种入口的加法不一样：
+
+**走了 4A（Tunnel）**：`cloudflared tunnel route dns` 已经自动建好记录，
+不用手动加，去 DNS 面板看一眼 `app` 这条 CNAME 是不是指向
+`<TUNNEL-ID>.cfargotunnel.com` 且是**已代理**（橙云）即可。
+
+**走了 4B（Nginx）**：到 Cloudflare DNS 面板加一条记录：
 
 ```
 类型   A
 名称   app
-值     你的搬瓦工 IP
+值     你的搬瓦工 IP        # 灰云（DNS only），让 certbot 能完成验证
 ```
 
 等几分钟生效，然后打开 `https://app.iball.top`，注册一个账号试试。
+
+验证是不是真的走通了（关键看 `storageReady`）：
+
+```bash
+curl -s https://app.iball.top/api/auth
+```
+
+`storageReady` 必须是 `true`。如果是 `false`，说明请求打到了 Vercel
+之类的无状态入口，账号和榜单都存不下来。
 
 > 主域名 `iball.top` / `www` 建议继续留给 Vercel。这样 VPS 被封时主域名
 > 还能立刻顶上，不会出现“两个一起挂”。
