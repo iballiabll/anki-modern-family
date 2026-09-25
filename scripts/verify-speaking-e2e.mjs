@@ -845,6 +845,138 @@ async function verifyDailyListening(page) {
   console.log(`   截图: ${shot}`);
 }
 
+/**
+ * 独立口语房间：从主站入口点进去，换人、开场、接一轮、看复盘。
+ * 把「像打电话」这件事拆成可断言的行为，顺带守住移动端不横向溢出。
+ */
+const SPOKEN_LINE =
+  "I spent most of the weekend fixing my bike, and now my hands are covered in grease.";
+
+async function verifySpeakingRoom(page, { mobile = false } = {}) {
+  const tag = mobile ? "移动端" : "桌面端";
+  console.log(`\n== ${tag}：独立口语房间`);
+  const { errors, requests } = attachDiagnostics(page);
+
+  await page.goto(`${base}/index.html`, { waitUntil: "load", timeout: 30000 });
+  const entry = page.locator('a.library-shortcut[href="./speaking.html"]');
+  check(
+    `${tag}：主站素材库有口语房间入口`,
+    await entry.count() > 0,
+    "library-shortcuts",
+  );
+
+  await page.goto(`${base}/speaking.html`, {
+    waitUntil: "load",
+    timeout: 30000,
+  });
+  await page.waitForSelector(".persona-card", { timeout: 15000 });
+
+  const personaCount = await page.locator(".persona-card").count();
+  check(`${tag}：人物卡片渲染`, personaCount >= 8, `${personaCount} 个`);
+
+  const topicCount = await page.locator("#speakingTopic option").count();
+  check(`${tag}：开场话题可选`, topicCount >= 10, `${topicCount} 个`);
+
+  // Headless 里没有可用音源，切到「只看文本」，同时也验证了模式开关。
+  await page.click('#modeGroup [data-mode="quiet"]');
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector('#modeGroup [data-mode="quiet"]')
+        ?.classList.contains("is-active"),
+    { timeout: 5000 },
+  );
+  check(`${tag}：陪聊方式可以切换`, true, "只看文本");
+
+  // 挑最后一张卡片，确认换人真的会改通话对象。
+  const target = page.locator(".persona-card").nth(personaCount - 1);
+  const targetName = (
+    (await target.locator(".persona-name strong").textContent()) || ""
+  ).trim();
+  await target.click();
+  const callName = ((await page.locator("#callName").textContent()) || "").trim();
+  check(
+    `${tag}：换人后通话栏跟着换`,
+    callName === targetName && callName.length > 0,
+    `${callName || "(空)"}`,
+  );
+
+  await page.click("#speakingStartButton");
+  await page.waitForFunction(
+    () => document.querySelectorAll(".call-message.is-partner").length >= 1,
+    { timeout: 10000 },
+  );
+  const opener = (
+    (await page.locator(".call-message.is-partner .call-bubble").first().textContent()) ||
+    ""
+  ).trim();
+  check(
+    `${tag}：开场白由对方先说`,
+    opener.length > 0,
+    opener.slice(0, 40),
+  );
+
+  await page.fill("#speakingInput", SPOKEN_LINE);
+  await page.click("#speakingSendButton");
+  await page.waitForSelector(".call-message.is-user", { timeout: 10000 });
+  await page.waitForFunction(
+    () => document.querySelectorAll(".call-message.is-partner").length >= 2,
+    { timeout: 15000 },
+  );
+
+  const userLine = (
+    (await page.locator(".call-message.is-user .call-bubble").first().textContent()) ||
+    ""
+  ).trim();
+  check(`${tag}：我这句话进了通话记录`, userLine === SPOKEN_LINE, "");
+
+  const reply = (
+    (await page.locator(".call-message.is-partner .call-bubble").last().textContent()) ||
+    ""
+  ).trim();
+  check(
+    `${tag}：对方接了话而不是复读`,
+    reply.length > 0 && reply !== opener && reply !== SPOKEN_LINE,
+    reply.slice(0, 40),
+  );
+  check(
+    `${tag}：本地陪聊不碰外部接口`,
+    !requests.some((url) => url.includes("chat/completions")),
+    "0 次外部请求",
+  );
+
+  await page.click("#speakingRecapButton");
+  await page.waitForSelector("#speakingRecapPanel:not([hidden])", {
+    timeout: 10000,
+  });
+  const statCount = await page.locator(".recap-stat").count();
+  const blockCount = await page.locator("#recapBody .recap-block").count();
+  check(
+    `${tag}：复盘给出统计和三块建议`,
+    statCount >= 3 && blockCount >= 3,
+    `${statCount} 个统计 / ${blockCount} 块`,
+  );
+
+  const metrics = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  check(
+    `${tag}：口语房间没有横向溢出`,
+    metrics.scrollWidth <= metrics.clientWidth + 1,
+    `scrollWidth=${metrics.scrollWidth} clientWidth=${metrics.clientWidth}`,
+  );
+  check(
+    `${tag}：口语房间没有控制台报错`,
+    errors.length === 0,
+    errors.slice(0, 3).join(" | ") || "无",
+  );
+
+  const shot = path.join(outDir, `speaking-room-${mobile ? "mobile" : "desktop"}.png`);
+  await page.screenshot({ path: shot, fullPage: false });
+  console.log(`   截图: ${shot}`);
+}
+
 async function main() {
   await fs.mkdir(outDir, { recursive: true });
   console.log(`验收目标：${base}`);
@@ -861,6 +993,7 @@ async function main() {
     });
     await verifyPracticeStudio(await desktop.newPage(), { mockApi });
     await verifyOpenSourcePanel(await desktop.newPage());
+    await verifySpeakingRoom(await desktop.newPage());
     await desktop.close();
 
     const mobile = await browser.newContext({
@@ -874,6 +1007,7 @@ async function main() {
       mockApi,
     });
     await verifyOpenSourcePanel(await mobile.newPage(), { mobile: true });
+    await verifySpeakingRoom(await mobile.newPage(), { mobile: true });
     await mobile.close();
 
     const listen = await browser.newContext({
