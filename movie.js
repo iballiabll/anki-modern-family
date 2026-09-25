@@ -552,27 +552,101 @@
     const run = state.audioRun;
     const audio = getAudioElement();
     let index = 0;
+    let frameHandle = 0;
+    let timerHandle = 0;
+
+    const clearWatcher = () => {
+      if (frameHandle) {
+        cancelAnimationFrame(frameHandle);
+        frameHandle = 0;
+      }
+      if (timerHandle) {
+        clearTimeout(timerHandle);
+        timerHandle = 0;
+      }
+    };
 
     const cleanup = () => {
+      clearWatcher();
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("ended", handleEnded);
       audio.removeEventListener("error", handleError);
       state.audioCleanup = null;
     };
 
+    const resetButton = () => {
+      if (state.audioButton) {
+        setSpeechButtonState(state.audioButton, false);
+        state.audioButton = null;
+      }
+    };
+
+    /**
+     * 精灵音频是整集台词首尾相接拼成的，只要元素还在播放，就会顺着播到
+     * 后面几句，听感上就是“这一句里混进了别的台词”。所以收工时必须真正暂停。
+     */
     const finish = (message) => {
       if (!isCurrentAudioRun(run)) {
         return;
       }
       cleanup();
+      audio.pause();
       state.audioCue = null;
-      if (state.audioButton) {
-        setSpeechButtonState(state.audioButton, false);
-        state.audioButton = null;
-      }
+      resetButton();
       if (message) {
         showToast(message);
       }
+    };
+
+    const advance = () => {
+      if (!isCurrentAudioRun(run)) {
+        return;
+      }
+      clearWatcher();
+      index += 1;
+      playNext();
+    };
+
+    /**
+     * timeupdate 只有每秒四次的精度，靠它收句会多播 0.2 秒以上，正好把下一句的
+     * 开头带出来。这里逐帧盯住播放位置，把停止点收到一帧之内；再用定时器兜底，
+     * 因为标签页切到后台时 requestAnimationFrame 会被浏览器挂起。
+     */
+    const watchCue = (cue) => {
+      const end = Number(cue.end);
+      const tick = () => {
+        frameHandle = 0;
+        if (!isCurrentAudioRun(run) || state.audioCue !== cue) {
+          return;
+        }
+        if (audio.currentTime >= end - 0.02) {
+          advance();
+          return;
+        }
+        frameHandle = requestAnimationFrame(tick);
+      };
+      frameHandle = requestAnimationFrame(tick);
+
+      const guard = () => {
+        timerHandle = 0;
+        if (!isCurrentAudioRun(run) || state.audioCue !== cue) {
+          return;
+        }
+        const remaining = end - audio.currentTime;
+        if (remaining <= 0.15) {
+          advance();
+          return;
+        }
+        timerHandle = setTimeout(
+          guard,
+          Math.min(Math.max(remaining * 1000, 60), 400),
+        );
+      };
+      const initial = end - audio.currentTime;
+      timerHandle = setTimeout(
+        guard,
+        Math.min(Math.max(initial * 1000, 60), 400),
+      );
     };
 
     const playNext = () => {
@@ -583,6 +657,7 @@
         finish("原声播放完成");
         return;
       }
+      clearWatcher();
       const cue = usable[index];
       state.audioCue = cue;
       try {
@@ -597,14 +672,13 @@
             return;
           }
           cleanup();
+          audio.pause();
           state.audioCue = null;
-          if (state.audioButton) {
-            setSpeechButtonState(state.audioButton, false);
-            state.audioButton = null;
-          }
+          resetButton();
           showToast("原声加载失败，可点击“朗读”使用浏览器语音");
         });
       }
+      watchCue(cue);
     };
 
     function handleTimeUpdate() {
@@ -616,8 +690,7 @@
         return;
       }
       if (audio.currentTime >= Number(cue.end) - 0.03) {
-        index += 1;
-        playNext();
+        advance();
       }
     }
 
@@ -625,8 +698,7 @@
       if (!isCurrentAudioRun(run)) {
         return;
       }
-      index += 1;
-      playNext();
+      advance();
     }
 
     function handleError() {
@@ -634,11 +706,9 @@
         return;
       }
       cleanup();
+      audio.pause();
       state.audioCue = null;
-      if (state.audioButton) {
-        setSpeechButtonState(state.audioButton, false);
-        state.audioButton = null;
-      }
+      resetButton();
       showToast("原声文件不可用，可点击“朗读”使用浏览器语音");
     }
 
@@ -1080,13 +1150,28 @@
       renderHeroStats(data);
       renderPage();
       updateReadAllButton();
-      refreshIndices();
+      scheduleIndexRefresh();
     } catch (error) {
       renderError(error?.message || "台词数据加载失败。");
     }
   }
 
   /* ------------------------------------------------------- 站内词库索引 */
+
+  /**
+   * 词库与搭配索引合起来有 1.6MB 左右，只用来加考试词标记和“本句词汇”。
+   * 首屏先出台词，索引等浏览器空闲再拉，避免大 JSON 解析和正文渲染抢主线程。
+   */
+  function scheduleIndexRefresh() {
+    const start = () => {
+      void refreshIndices();
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(start, { timeout: 2500 });
+    } else {
+      window.setTimeout(start, 700);
+    }
+  }
 
   async function loadCollocations() {
     const index = window.CollocationIndex;

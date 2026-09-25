@@ -2520,7 +2520,16 @@
         : papers[0].id;
 
     openPaper(initialId, { push: false });
-    refreshCollocationHighlights();
+
+    // 搭配索引 280KB 左右，只影响标记高亮；先出正文，空闲后再拉。
+    const warmCollocations = () => {
+      refreshCollocationHighlights();
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(warmCollocations, { timeout: 2500 });
+    } else {
+      window.setTimeout(warmCollocations, 700);
+    }
   }
 
   let collocationRefreshRun = 0;
