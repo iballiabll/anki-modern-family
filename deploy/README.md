@@ -103,8 +103,8 @@ ln -sf /etc/nginx/sites-available/iball-cabin /etc/nginx/sites-enabled/iball-cab
 rm -f /etc/nginx/sites-enabled/default
 ```
 
-先把 `nginx.conf` 里的 `server_name` 改成你实际要用的域名，例如
-`app.iball.top`，然后：
+`nginx.conf` 默认就是 `server_name app.iball.top`。如果你想用别的域名，
+先把它改掉，然后：
 
 ```bash
 nginx -t && systemctl reload nginx
@@ -194,8 +194,20 @@ chmod +x /etc/cron.daily/iball-cabin-backup
 https://iballiabll.github.io/anki-modern-family/
 ```
 
-打开它应该能看到完整页面，顶栏会显示「本地模式」。这就是 VPS 被封时
-你还能用的入口。
+> **注意**：仓库根目录有个 `CNAME` 文件写着 `iball.top`。在没切换
+> Source 之前，Pages 是从 `main` 构建的，`github.io` 地址会被 301
+> 跳回 `iball.top`，兜底等于没用。切成 `gh-pages` 之后，`gh-pages`
+> 分支里不含 CNAME，301 就会消失。
+
+验证一下（`Location:` 那行不该再出现）：
+
+```bash
+curl -sI https://iballiabll.github.io/anki-modern-family/ | head -5
+```
+
+如果还在 301，去 Settings → Pages 把 **Custom domain** 清空再保存。
+正常后打开镜像应该能看到完整页面，顶栏显示「本地模式」。这就是 VPS
+被封时你还能用的入口。
 
 ---
 
