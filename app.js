@@ -8755,6 +8755,40 @@ function renderAuthNotice(text = "", tone = "info") {
 const MAIN_SITE_URL = "https://app.iball.top/";
 
 /**
+ * 登录页可能由其它页面带 ?next= 跳进来。只接受本站绝对路径，
+ * 防止把用户带到外部地址，也避免协议相对地址造成开放重定向。
+ */
+function requestedPostAuthPath() {
+  try {
+    const raw = new URLSearchParams(window.location.search).get("next") || "";
+    if (
+      !raw.startsWith("/") ||
+      raw.startsWith("//") ||
+      raw.includes("\\")
+    ) {
+      return "";
+    }
+    const target = new URL(raw, window.location.origin);
+    if (target.origin !== window.location.origin) {
+      return "";
+    }
+    return `${target.pathname}${target.search}${target.hash}`;
+  } catch {
+    return "";
+  }
+}
+
+/** 登录成功后返回请求页；没有合法目标时返回 false，让调用方继续首页流程。 */
+function redirectToRequestedPage() {
+  const next = requestedPostAuthPath();
+  if (!next) {
+    return false;
+  }
+  window.location.replace(next);
+  return true;
+}
+
+/**
  * 只读镜像判定：接口在，但服务器没有可写账号目录（典型是 Vercel 那份部署）。
  * 这种站点登录、注册都写不进去，必须把用户引到主站，否则只会反复撞「账号或密码不正确」。
  */
@@ -8945,6 +8979,9 @@ async function checkSession() {
     if (reloading) {
       return;
     }
+    if (redirectToRequestedPage()) {
+      return;
+    }
     removeWelcomeOverlay();
     await showApp(session.user || "用户");
     return;
@@ -9078,6 +9115,9 @@ async function handleAuthSubmit(event) {
     state.isAdmin = Boolean(data.admin);
     const reloading = await activateAccount(data.account);
     if (reloading) {
+      return;
+    }
+    if (redirectToRequestedPage()) {
       return;
     }
     // 注册成功后服务端已经下发会话，直接进入小屋。

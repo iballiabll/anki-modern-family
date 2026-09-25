@@ -37,9 +37,13 @@
     boardScope: "total",
     submitting: false,
     boardLoading: false,
+    authenticated: false,
+    overviewLoaded: false,
   };
 
   const elements = {};
+  let sessionProbe = null;
+  let overviewPromise = null;
 
   function $(id) {
     return document.getElementById(id);
@@ -169,6 +173,27 @@
   }
 
   /**
+   * 交给登录页一个本站返回地址，登录或注册成功后直接回到测试页，
+   * 不再让用户自己点回来而看到旧的「需要登录」页面。
+   */
+  function prepareGateLinks() {
+    const returnTo = `${window.location.pathname}${window.location.search}`;
+    const loginTarget = new URL("./index.html", window.location.href);
+    loginTarget.searchParams.set("next", returnTo || "/quiz.html");
+    loginTarget.hash = "login";
+
+    const registerTarget = new URL(loginTarget.href);
+    registerTarget.hash = "register";
+
+    if (elements.gateAction) {
+      elements.gateAction.href = loginTarget.href;
+    }
+    if (elements.gateRegister) {
+      elements.gateRegister.href = registerTarget.href;
+    }
+  }
+
+  /**
    * 总榜平均分。接口里叫 totalScore（新）或 total（旧字段），
    * 考过任意一个范围就会出现数字，否则返回 null。
    */
@@ -292,6 +317,28 @@
     }
     renderPoolStats();
     renderStartPanel();
+  }
+
+  async function loadOverviewOnce() {
+    if (state.overviewLoaded) {
+      return;
+    }
+    if (!overviewPromise) {
+      overviewPromise = loadOverview()
+        .then(() => {
+          state.overviewLoaded = true;
+        })
+        .catch((error) => {
+          setMessage(
+            elements.startMessage,
+            error?.message || "测试服务暂时不可用。",
+          );
+        })
+        .finally(() => {
+          overviewPromise = null;
+        });
+    }
+    return overviewPromise;
   }
 
   async function refreshLeaderboard() {
@@ -615,22 +662,11 @@
     elements.backToStartButton.addEventListener("click", backToStart);
   }
 
-  async function init() {
-    collectElements();
-    bindEvents();
-    renderTabs();
-    renderBoardTabs();
-
-    const session = window.iballSession
-      ? await window.iballSession.probe()
-      : null;
-
+  async function applySession(session) {
     if (!session || session.mode !== "server" || !session.authenticated) {
-      showGate();
-      applyMirrorGate(session);
-      return;
+      return false;
     }
-
+    state.authenticated = true;
     state.username = session.user || "用户";
     state.admin = Boolean(session.admin);
     if (window.iballAccounts) {
@@ -639,15 +675,61 @@
     elements.accountChip.textContent = state.username;
     elements.accountChip.hidden = false;
     showBody();
+    await loadOverviewOnce();
+    return true;
+  }
 
-    try {
-      await loadOverview();
-    } catch (error) {
-      setMessage(
-        elements.startMessage,
-        error?.message || "测试服务暂时不可用。",
-      );
+  async function probeSession(options = {}) {
+    if (sessionProbe) {
+      return sessionProbe;
     }
+    sessionProbe = (async () => {
+      const session = window.iballSession
+        ? await window.iballSession.probe(options)
+        : null;
+      const authenticated = await applySession(session);
+      if (!authenticated) {
+        showGate();
+        applyMirrorGate(session);
+      }
+      return authenticated;
+    })().finally(() => {
+      sessionProbe = null;
+    });
+    return sessionProbe;
+  }
+
+  async function refreshSessionWhenVisible() {
+    if (state.authenticated) {
+      return;
+    }
+    try {
+      await probeSession({ force: true });
+    } catch (error) {
+      console.error(error);
+      showGate();
+    }
+  }
+
+  async function init() {
+    collectElements();
+    bindEvents();
+    renderTabs();
+    renderBoardTabs();
+    prepareGateLinks();
+    await probeSession();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        refreshSessionWhenVisible();
+      }
+    });
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted || !state.authenticated) {
+        refreshSessionWhenVisible();
+      }
+    });
+    window.addEventListener("focus", refreshSessionWhenVisible);
   }
 
   init().catch((error) => {

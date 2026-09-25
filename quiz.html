@@ -19,9 +19,9 @@
     />
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./quiz.css" />
-    <script src="./account-store.js" defer></script>
-    <script src="./session-guard.js" defer></script>
-    <script src="./quiz.js" defer></script>
+    <script src="./account-store.js?v=20260925-authflow" defer></script>
+    <script src="./session-guard.js?v=20260925-authflow" defer></script>
+    <script src="./quiz.js?v=20260925-authflow" defer></script>
   </head>
   <body class="quiz-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
@@ -49,8 +49,18 @@
           测试成绩、错词和榜单都按账号保存。请先回到首页登录，再打开这一页。
         </p>
         <div class="quiz-gate-actions">
-          <a id="gateAction" class="quiz-button primary" href="./index.html">去登录</a>
-          <a id="gateRegister" class="quiz-button ghost" href="./index.html#register">还没有账号？注册</a>
+          <a
+            id="gateAction"
+            class="quiz-button primary"
+            href="./index.html?next=%2Fquiz.html#login"
+            >去登录</a
+          >
+          <a
+            id="gateRegister"
+            class="quiz-button ghost"
+            href="./index.html?next=%2Fquiz.html#register"
+            >还没有账号？注册</a
+          >
         </div>
       </section>
 
