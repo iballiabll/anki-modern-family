@@ -11,7 +11,10 @@
     cet4: { label: "四级", description: "四级核心词" },
     kaoyan: { label: "考研", description: "考研英语词表" },
     all: { label: "所有单词", description: "基础 + 四级 + 六级 + 考研" },
-    total: { label: "总榜单", description: "三个范围的平均正确率" },
+    total: {
+      label: "总榜单",
+      description: "已完成范围的平均正确率，考过一个就能上榜",
+    },
   };
 
   const state = {
@@ -22,6 +25,8 @@
     defaultSize: 20,
     bests: {},
     total: null,
+    totalCompleted: 0,
+    totalRanges: 3,
     lastScope: "",
     session: null,
     answers: [],
@@ -128,7 +133,7 @@
 
   /**
    * 总榜平均分。接口里叫 totalScore（新）或 total（旧字段），
-   * 只有三个范围都考过才会有数字，否则返回 null。
+   * 考过任意一个范围就会出现数字，否则返回 null。
    */
   function toTotalScore(data) {
     const raw = data?.totalScore !== undefined ? data.totalScore : data?.total;
@@ -137,6 +142,25 @@
     }
     const value = Number(raw);
     return Number.isFinite(value) ? value : null;
+  }
+
+  function toTotalCompleted(data) {
+    const value = Number(data?.totalCompleted);
+    return Number.isFinite(value) && value >= 0 ? value : 0;
+  }
+
+  function toTotalRanges(data) {
+    const value = Number(data?.totalRanges);
+    return Number.isFinite(value) && value > 0 ? value : 3;
+  }
+
+  /** 总榜里没考过的范围要到的是 null，不能当成 0 分显示。 */
+  function formatBoardPart(value) {
+    if (value === null || value === undefined || value === "") {
+      return "—";
+    }
+    const num = Number(value);
+    return Number.isFinite(num) ? `${num}%` : "—";
   }
 
   function formatDate(value) {
@@ -204,7 +228,7 @@
     }
     const totalHint =
       Number.isFinite(state.total)
-        ? `　总榜平均：<strong>${state.total}%</strong>`
+        ? `　总榜综合：<strong>${state.total}%</strong>（已考 ${state.totalCompleted}/${state.totalRanges}）`
         : "";
     elements.bestSummary.innerHTML = `本范围最好成绩：<strong>${best.score}/${best.total}（${best.percent}%）</strong>　${formatDate(best.at)}${totalHint}`;
     elements.bestSummary.hidden = false;
@@ -224,6 +248,8 @@
     state.defaultSize = Number(data.defaultSize) || 20;
     state.bests = data.bests || {};
     state.total = toTotalScore(data);
+    state.totalCompleted = toTotalCompleted(data);
+    state.totalRanges = toTotalRanges(data);
     if (state.defaultSize === 20) {
       elements.quizSize.value = "20";
     }
@@ -247,8 +273,11 @@
         scope,
       )} · 共 ${data.players || 0} 人上榜`;
 
-      if (data.me && data.me.rank > 50) {
-        elements.boardMe.innerHTML = `我的排名：第 <strong>${data.me.rank}</strong> 名　${data.me.percent}%（${data.me.score}/${data.me.total}）`;
+      if (data.me) {
+        const meProgress = data.me.parts
+          ? `　已考 ${data.me.completed || 0}/${data.me.totalRanges || 3}`
+          : "";
+        elements.boardMe.innerHTML = `我的排名：第 <strong>${data.me.rank}</strong> 名　${data.me.percent}%（${data.me.score}/${data.me.total}）${meProgress}`;
         elements.boardMe.hidden = false;
       } else {
         elements.boardMe.hidden = true;
@@ -257,9 +286,7 @@
 
       if (!data.top || data.top.length === 0) {
         elements.boardList.innerHTML =
-          scope === "total"
-            ? '<li class="quiz-board-row"><span class="quiz-board-rank">—</span><span class="quiz-board-name">总榜要求四级、考研、全词库三份成绩都考过，目前还没有人集齐。</span><span></span></li>'
-            : '<li class="quiz-board-row"><span class="quiz-board-rank">—</span><span class="quiz-board-name">还没有人上这个榜，来当第一个吧。</span><span></span></li>';
+          '<li class="quiz-board-row"><span class="quiz-board-rank">—</span><span class="quiz-board-name">还没有人上这个榜，考一套就能占住第一。</span><span></span></li>';
         return;
       }
 
@@ -268,7 +295,11 @@
         .map((row) => {
           const isMe = row.username === meName;
           const parts = row.parts
-            ? `四级 ${row.parts.cet4}% · 考研 ${row.parts.kaoyan}% · 全部 ${row.parts.all}%`
+            ? `已考 ${row.completed || 0}/${row.totalRanges || 3} · 四级 ${formatBoardPart(
+                row.parts.cet4,
+              )} · 考研 ${formatBoardPart(row.parts.kaoyan)} · 全部 ${formatBoardPart(
+                row.parts.all,
+              )}`
             : formatDate(row.at);
           return `<li class="quiz-board-row${isMe ? " is-me" : ""}">
             <span class="quiz-board-rank">${row.rank}</span>
@@ -433,6 +464,8 @@
       });
       state.bests = data.bests || state.bests;
       state.total = toTotalScore(data);
+      state.totalCompleted = toTotalCompleted(data);
+      state.totalRanges = toTotalRanges(data);
       renderResult(data);
       setActivePanel("result");
     } catch (error) {

@@ -396,13 +396,43 @@ async function bestsForUser(userId) {
   return store.bests[String(userId)] || {};
 }
 
-/** 总榜按三个范围的最佳正确率取平均，三个范围都考过才计入。 */
-function totalScoreFor(bests = {}) {
-  const values = SCOPES.map((scope) => Number(bests[scope]?.percent));
-  if (values.some((value) => !Number.isFinite(value))) {
+/**
+ * 总榜条目：考过任意一个范围就能进榜。
+ *
+ * 旧规则要求三个范围都考过，人少的时候总榜长期是空的，看起来像摆设。
+ * 现在综合分取已完成范围正确率的平均，completed 记录考过几个范围，
+ * 排序时用于同分裁决，避免「只考一门」压过「考满三门」。
+ * parts 里没考过的范围是 null，前端要显示成占位符而不是 0 分。
+ */
+function totalEntryFor(bests = {}) {
+  const parts = {};
+  const done = [];
+
+  for (const scope of SCOPES) {
+    const value = Number(bests[scope]?.percent);
+    if (Number.isFinite(value)) {
+      parts[scope] = value;
+      done.push(value);
+    } else {
+      parts[scope] = null;
+    }
+  }
+
+  if (done.length === 0) {
     return null;
   }
-  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+
+  return {
+    percent: Math.round(done.reduce((sum, value) => sum + value, 0) / done.length),
+    completed: done.length,
+    totalRanges: SCOPES.length,
+    parts,
+  };
+}
+
+/** 兼容旧调用：总榜综合分，一个范围都没考过时返回 null。 */
+function totalScoreFor(bests = {}) {
+  return totalEntryFor(bests)?.percent ?? null;
 }
 
 async function allBests() {
@@ -449,5 +479,6 @@ module.exports = {
   poolSummary,
   quizStats,
   saveBest,
+  totalEntryFor,
   totalScoreFor,
 };

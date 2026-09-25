@@ -26,6 +26,7 @@ const {
   normalizeScope,
   poolSummary,
   saveBest,
+  totalEntryFor,
   totalScoreFor,
 } = require("./_quiz-store.js");
 const telemetry = require("./_telemetry.js");
@@ -109,6 +110,7 @@ async function handler(request, response) {
         poolSummary().catch(() => ({})),
       ]);
       const totalScore = totalScoreFor(bests);
+      const totalSummary = totalEntryFor(bests);
       response.status(200).json({
         ok: true,
         scopes: SCOPES,
@@ -117,6 +119,8 @@ async function handler(request, response) {
         bests,
         total: totalScore,
         totalScore,
+        totalCompleted: totalSummary?.completed || 0,
+        totalRanges: SCOPES.length,
       });
       return;
     }
@@ -160,6 +164,7 @@ async function handler(request, response) {
       );
       const bests = await bestsForUser(user.id);
       const totalScore = totalScoreFor(bests);
+      const totalSummary = totalEntryFor(bests);
       telemetry.setMeta(response, {
         scope: result.scope,
         score: result.score,
@@ -180,6 +185,8 @@ async function handler(request, response) {
         best: saved.best,
         bests,
         totalScore,
+        totalCompleted: totalSummary?.completed || 0,
+        totalRanges: SCOPES.length,
         wrongWords: wrongStore,
       });
       return;

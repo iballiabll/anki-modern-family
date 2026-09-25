@@ -267,9 +267,16 @@ curl -sI https://iballiabll.github.io/anki-modern-family/ | head -5
 
 ### 单词测试榜单
 
-`/quiz.html` 有四张榜：四级、考研、全部、总榜。总榜取三个分榜的平均分，
-三个榜都考过才会进总榜。答案只存在服务端 `DATA_DIR/quiz-sessions.json`，
-前端拿不到正确答案，每份卷子只能交一次，所以改前端分数没用。
+`/quiz.html` 有四张榜：四级、考研、全部、总榜。单榜取该范围的最好成绩。
+总榜取**已完成范围**的平均正确率：考过一个范围就能上榜，榜上标「已考 x/3」，
+综合分相同时完成范围多的排在前面（旧规则要求三榜全考才进总榜，人少时榜单
+长期是空的）。答案只存在服务端 `DATA_DIR/quiz-sessions.json`，前端拿不到
+正确答案，每份卷子只能交一次，所以改前端分数没用。
+
+> 榜单按账号存在 `DATA_DIR/quiz.json`，所以**只有在能写磁盘的主站
+> （VPS 上的 `server.mjs`）才会积累**。Vercel 是无状态函数，`/api/auth`
+> 会返回 `storageReady:false`，那里注册不了账号，榜单自然一直是空的。
+> 排查时先 `curl -s https://你的域名/api/auth` 看 `storageReady`。
 
 ---
 
