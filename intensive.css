@@ -54,6 +54,9 @@ button {
 
 button:focus-visible,
 a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
 summary:focus-visible {
   outline: 3px solid rgba(77, 143, 122, 0.35);
   outline-offset: 2px;
@@ -100,6 +103,24 @@ summary:focus-visible {
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
+}
+
+.topbar-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* 额外的兄弟板块入口：桌面显示，窄屏隐藏，避免顶栏挤压重叠 */
+.topbar-link-extra {
+  display: none;
+}
+
+@media (min-width: 641px) {
+  .topbar-links .topbar-link-extra {
+    display: inline-flex;
+  }
 }
 
 .topbar-link:hover {
@@ -1866,6 +1887,19 @@ body.is-cues-hidden .cue-count {
     grid-template-columns: 74px minmax(0, 1fr) 74px;
     min-height: 58px;
     gap: 7px;
+  }
+
+  .topbar-links {
+    gap: 6px;
+  }
+
+  .topbar-links .topbar-back {
+    font-size: 0;
+  }
+
+  .topbar-links .topbar-back::before {
+    content: "←";
+    font-size: 12px;
   }
 
   .topbar-link {

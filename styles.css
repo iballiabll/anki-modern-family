@@ -3682,6 +3682,96 @@ p {
   background: #c8f0e3;
 }
 
+.resource-button.is-cet6-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 110, 199, 0.26),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(122, 166, 232, 0.4);
+  text-decoration: none;
+}
+
+.resource-button.is-cet6-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 110, 199, 0.34),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(150, 190, 244, 0.58);
+}
+
+.resource-button.is-cet6-entry .resource-index {
+  background: #7ea8e8;
+  color: #112b52;
+}
+
+.resource-button.is-cet6-entry .resource-count {
+  color: #16386b;
+  background: #d3e4fb;
+}
+
+.resource-button.is-cet6-extra-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(214, 138, 74, 0.24),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(232, 168, 112, 0.4);
+  text-decoration: none;
+}
+
+.resource-button.is-cet6-extra-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(214, 138, 74, 0.32),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(240, 190, 142, 0.58);
+}
+
+.resource-button.is-cet6-extra-entry .resource-index {
+  background: #e8b078;
+  color: #4a2a0d;
+}
+
+.resource-button.is-cet6-extra-entry .resource-count {
+  color: #6b3b12;
+  background: #f7dfc2;
+}
+
+.resource-button.is-periodical-entry {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(46, 148, 128, 0.26),
+    rgba(255, 255, 255, 0.055)
+  );
+  border-color: rgba(110, 200, 178, 0.42);
+  text-decoration: none;
+}
+
+.resource-button.is-periodical-entry:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(46, 148, 128, 0.34),
+    rgba(255, 255, 255, 0.08)
+  );
+  border-color: rgba(146, 222, 202, 0.6);
+}
+
+.resource-button.is-periodical-entry .resource-index {
+  background: #86d4bf;
+  color: #0d3730;
+}
+
+.resource-button.is-periodical-entry .resource-count {
+  color: #10453c;
+  background: #cdeee4;
+}
+
 /* Welcome curtain */
 
 .welcome-overlay {

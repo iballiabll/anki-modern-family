@@ -1,0 +1,683 @@
+/* 考研英语真题精读：基础令牌与组件复用 intensive.css，这里只补充本页专用样式。 */
+
+/* 篇目导航跟随正文滚动，避免长文阅读时左侧面板一直悬停遮挡内容 */
+.kaoyan-page .piece-navigation {
+  position: static;
+  top: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+.kaoyan-overview {
+  padding: 22px 26px 20px;
+  background: linear-gradient(180deg, #f7f8f3, #ffffff);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.05);
+}
+
+.kaoyan-overview h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.25;
+}
+
+.kaoyan-overview > p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.kaoyan-overview-grid {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 9px;
+}
+
+.kaoyan-overview-card {
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  color: var(--forest);
+  background: #f6f8f4;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.kaoyan-overview-card:hover {
+  border-color: #b4cabe;
+  background: #f1f6f2;
+}
+
+.kaoyan-overview-card strong {
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.kaoyan-overview-card span {
+  color: #82958d;
+  font-size: 10.5px;
+}
+
+.kaoyan-badges {
+  margin-top: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.kaoyan-badge {
+  padding: 4px 9px;
+  color: #45615a;
+  background: #eef3ef;
+  border: 1px solid #d6e2db;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.kaoyan-badge.is-source {
+  color: #7a5f16;
+  background: #faf1d8;
+  border-color: #e7d8a8;
+  font-weight: 700;
+}
+
+.kaoyan-callout {
+  margin: 0 26px 20px;
+  padding: 12px 14px;
+  color: #5d6a52;
+  background: #f8f6ef;
+  border: 1px solid #e6dfc9;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.kaoyan-callout strong {
+  color: #6a4d0b;
+}
+
+.kaoyan-callout a {
+  color: var(--forest);
+  font-weight: 800;
+}
+
+/* ---------------------------------------------------------- 完形填空空格 */
+
+.kaoyan-blank {
+  margin: 0 2px;
+  padding: 2px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  vertical-align: baseline;
+  color: var(--forest-deep);
+  background: #eef3ef;
+  border: 1px solid #c9dcd2;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.84em;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.kaoyan-blank:hover {
+  border-color: #8eada0;
+}
+
+.kaoyan-blank-number {
+  color: #82958d;
+  font-size: 0.82em;
+}
+
+.kaoyan-blank-pick {
+  min-width: 15px;
+  color: var(--blue);
+  font-family: Georgia, "Times New Roman", serif;
+  text-align: center;
+}
+
+.kaoyan-blank.is-correct {
+  color: #2f7a4b;
+  background: #e8f6ec;
+  border-color: #a9cdb2;
+}
+
+.kaoyan-blank.is-wrong {
+  color: #b14a3e;
+  background: #fdeceb;
+  border-color: #e2b3ac;
+}
+
+.kaoyan-question-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 12px;
+}
+
+/* ------------------------------------------------------- 新题型/判断题 */
+
+.kaoyan-letter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
+  gap: 7px;
+}
+
+.kaoyan-letter-grid .question-option {
+  min-height: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.kaoyan-letter-grid .option-letter {
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: #3d6d7f;
+  font-size: 14px;
+}
+
+.kaoyan-letter-grid .question-option.is-selected .option-letter {
+  color: #ffffff;
+  background: transparent;
+}
+
+.kaoyan-truth-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kaoyan-truth-options .question-option {
+  min-width: 118px;
+  display: inline-grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+}
+
+.kaoyan-pool-list {
+  margin: 0 26px 20px;
+  display: grid;
+  gap: 9px;
+}
+
+.kaoyan-pool-item {
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 10px;
+  background: #f9faf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.kaoyan-pool-letter {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: var(--blue);
+  border-radius: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.kaoyan-pool-text {
+  margin: 0;
+  color: #2b433c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------ 翻译与解析 */
+
+.kaoyan-segments {
+  padding: 0 26px 4px;
+  display: grid;
+  gap: 12px;
+}
+
+.kaoyan-segment {
+  padding: 15px 16px;
+  background: #fdfdfb;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.kaoyan-segment-head {
+  margin-bottom: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.kaoyan-segment-number {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: var(--forest);
+  background: #e7eee9;
+  border-radius: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.kaoyan-segment-head span:last-child {
+  color: #83958e;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.kaoyan-reference {
+  margin-top: 11px;
+  padding: 11px 13px;
+  color: #54685f;
+  background: #f5f8f4;
+  border-left: 3px solid var(--forest);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.kaoyan-reference-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #7f918a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+body.is-english-only .kaoyan-reference,
+body.is-english-only .kaoyan-enrichment {
+  display: none;
+}
+
+.kaoyan-enrichment {
+  margin: 0 26px 22px;
+  padding: 15px 17px;
+  display: grid;
+  gap: 9px;
+  background: #f7faf7;
+  border: 1px dashed #cfdcd5;
+  border-radius: 8px;
+}
+
+.kaoyan-enrichment h4 {
+  margin: 3px 0 0;
+  color: var(--forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+}
+
+.kaoyan-enrichment p {
+  margin: 0;
+  color: #51675f;
+  font-size: 12.5px;
+  line-height: 1.8;
+}
+
+.kaoyan-enrichment p.is-note {
+  color: #8a6d2a;
+  font-size: 11.5px;
+}
+
+.kaoyan-enrichment ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: #51675f;
+  font-size: 12.5px;
+  line-height: 1.75;
+}
+
+/* ------------------------------------------------------------ 写作板块 */
+
+.kaoyan-writing-grid {
+  padding: 0 26px 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.kaoyan-writing-card {
+  padding: 17px 18px 18px;
+  display: grid;
+  gap: 13px;
+  background: #fdfdfb;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.kaoyan-writing-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.kaoyan-writing-head strong {
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+}
+
+.kaoyan-writing-head span {
+  color: #7f918a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.kaoyan-writing-prompt {
+  margin: 0;
+  padding: 13px 15px;
+  color: #2b433c;
+  background: #f7f9f6;
+  border: 1px solid #e3eae5;
+  border-radius: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14.5px;
+  line-height: 1.78;
+}
+
+.kaoyan-writing-block {
+  display: grid;
+  gap: 9px;
+}
+
+.kaoyan-writing-block > strong {
+  color: var(--forest);
+  font-size: 12.5px;
+}
+
+.kaoyan-writing-block > span.kaoyan-writing-hint {
+  color: #8b9d95;
+  font-size: 11px;
+}
+
+.kaoyan-template-steps {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+  list-style: none;
+}
+
+.kaoyan-template-step {
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  color: #4c635b;
+  background: #f8faf7;
+  border: 1px solid #e4ebe6;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.75;
+}
+
+.kaoyan-template-step em {
+  color: var(--gold);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.kaoyan-phrase-list {
+  display: grid;
+  gap: 7px;
+}
+
+.kaoyan-phrase-row {
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.kaoyan-phrase-row strong {
+  color: #2b433c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.kaoyan-phrase-row span {
+  color: #7f918a;
+  font-size: 11.5px;
+}
+
+.kaoyan-draft {
+  display: grid;
+  gap: 8px;
+}
+
+.kaoyan-draft textarea {
+  width: 100%;
+  min-height: 168px;
+  padding: 12px 13px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.75;
+  resize: vertical;
+}
+
+.kaoyan-draft textarea:focus {
+  border-color: #75a695;
+  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  outline: 0;
+}
+
+.kaoyan-draft-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.kaoyan-word-count {
+  color: #7f918a;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.kaoyan-word-count.is-ready {
+  color: #2f7a4b;
+}
+
+.kaoyan-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.kaoyan-checklist {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.kaoyan-checklist li {
+  position: relative;
+  padding-left: 19px;
+  color: #5d6f68;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.kaoyan-checklist li::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+.kaoyan-ref-list {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.kaoyan-ref-chip {
+  padding: 5px 10px;
+  color: var(--forest);
+  background: #f1f6f2;
+  border: 1px solid #d9e5de;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.kaoyan-ref-chip:hover {
+  border-color: #8eada0;
+}
+
+/* ------------------------------------------------------------ 署名与页脚 */
+
+.kaoyan-attribution {
+  width: min(1160px, calc(100% - 44px));
+  margin: 0 auto 46px;
+  padding: 22px 24px;
+  display: grid;
+  gap: 12px;
+  background: #f7f8f3;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.kaoyan-attribution h2 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.kaoyan-attribution p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.kaoyan-attribution ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+  color: #4c635b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.kaoyan-attribution a {
+  color: var(--forest);
+  font-weight: 800;
+}
+
+.kaoyan-attribution code {
+  padding: 1px 5px;
+  color: #6a4d0b;
+  background: #f6efd8;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .kaoyan-page .piece-navigation {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .kaoyan-question-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kaoyan-callout,
+  .kaoyan-pool-list,
+  .kaoyan-enrichment,
+  .kaoyan-segments,
+  .kaoyan-writing-grid {
+    margin-right: 18px;
+    margin-left: 18px;
+  }
+
+  .kaoyan-segments,
+  .kaoyan-writing-grid {
+    padding: 0 0 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .kaoyan-overview {
+    padding: 18px;
+  }
+
+  .kaoyan-overview h2 {
+    font-size: 21px;
+  }
+
+  .kaoyan-callout,
+  .kaoyan-pool-list,
+  .kaoyan-enrichment {
+    margin: 0 14px 16px;
+    padding: 12px 13px;
+  }
+
+  .kaoyan-segments,
+  .kaoyan-writing-grid {
+    margin: 0 14px;
+    padding: 0 0 4px;
+  }
+
+  .kaoyan-segment {
+    padding: 13px 14px;
+  }
+
+  .kaoyan-writing-card {
+    padding: 15px;
+  }
+
+  .kaoyan-pool-item {
+    padding: 11px;
+  }
+
+  .kaoyan-attribution {
+    width: calc(100% - 28px);
+    padding: 18px;
+  }
+
+  .kaoyan-draft-foot {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

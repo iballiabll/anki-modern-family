@@ -44,6 +44,15 @@ const grammarNotesPath = path.join(
   showDirectory,
   `${episode.toLowerCase()}-grammar-notes.json`,
 );
+const scenesConfigPath = path.join(
+  showDirectory,
+  `${episode.toLowerCase()}-scenes.json`,
+);
+const cuesPath = path.join(
+  showDirectory,
+  episode,
+  `${episode}-cues.json`,
+);
 
 const GOOGLE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const MYMEMORY_ENDPOINT = "https://api.mymemory.translated.net/get";
@@ -52,7 +61,10 @@ const MAX_TRANSLATION_BATCH = 10;
 const TRANSLATION_CONCURRENCY = 1;
 let googleTranslationAvailable = true;
 
-const SCENE_RANGES = [
+// Hand-curated scene map for S01E01. Later episodes get a per-episode
+// <id>-scenes.json when one exists, otherwise scenes are derived from the
+// largest dialogue gaps so the layout script stays episode-agnostic.
+const S01E01_SCENE_RANGES = [
   { start: 1, end: 25, title: "开场：Claire 叫大家吃早餐" },
   { start: 26, end: 48, title: "Gloria、Manny 与足球赛" },
   { start: 49, end: 93, title: "领养 Lily：机场与初见" },
@@ -817,6 +829,7 @@ function buildSegments(
   machineCache,
   reviewedTranslations,
   grammarNotes,
+  cueTranslations,
 ) {
   const segments = [];
   const covered = new Set();
@@ -853,17 +866,26 @@ function buildSegments(
     const reviewedTranslation = cleanText(
       reviewedTranslations[String(block.i)],
     );
+    // The bilingual subtitle pass already carries a translation for every
+    // cue; use it when the reviewed map has a gap so nothing renders blank.
+    const cueTranslation = reviewedTranslation
+      ? ""
+      : cleanText(cueTranslations?.get(block.i));
     const translation =
-      reviewedTranslation || cleanText(machineCache[String(block.i)]);
+      reviewedTranslation ||
+      cueTranslation ||
+      cleanText(machineCache[String(block.i)]);
     segments.push({
       start: block.i,
       end: block.i,
       translation,
       translationSource: reviewedTranslation
         ? "reviewed"
-        : translation
-          ? "machine"
-          : "missing",
+        : cueTranslation
+          ? "reviewed"
+          : translation
+            ? "machine"
+            : "missing",
       matchScore: null,
       keyPhrase: "",
       meaning: "",
@@ -879,8 +901,151 @@ function buildSegments(
   return segments.sort((left, right) => left.start - right.start);
 }
 
-function buildScenes(segments) {
-  return SCENE_RANGES.map((scene, index) => ({
+function truncateTitle(text, limit) {
+  const cleaned = cleanText(text)
+    .replace(/\s+/g, " ")
+    .replace(/^[-–—\s]+/, "")
+    .split(/\s+[-–—]\s+/)[0]
+    .trim();
+  if (!cleaned) {
+    return "";
+  }
+  return cleaned.length > limit ? `${cleaned.slice(0, limit - 1)}…` : cleaned;
+}
+
+function autoSceneRanges(blocks) {
+  const usable = blocks.filter(
+    (block) => Number.isFinite(block.start) && Number.isFinite(block.end),
+  );
+  if (usable.length < 4) {
+    return [];
+  }
+
+  const duration = usable[usable.length - 1].end - usable[0].start;
+  const targetScenes = Math.min(
+    18,
+    Math.max(10, Math.round((Number.isFinite(duration) ? duration : 1200) / 110)),
+  );
+  // Keep every scene long enough to read as a scene: a handful of unusually
+  // long silences would otherwise produce one-line fragments.
+  const minBlocks = Math.max(6, Math.floor(usable.length / (targetScenes * 2)));
+
+  const gaps = [];
+  for (let index = 1; index < usable.length; index += 1) {
+    const gap = usable[index].start - usable[index - 1].end;
+    if (gap > 0) {
+      gaps.push({ gap, index });
+    }
+  }
+  gaps.sort((left, right) => right.gap - left.gap);
+
+  let ranges = [{ start: 0, end: usable.length - 1 }];
+  gaps.forEach((gap) => {
+    if (ranges.length >= targetScenes) {
+      return;
+    }
+    const host = ranges.find(
+      (range) => gap.index > range.start && gap.index <= range.end,
+    );
+    if (!host) {
+      return;
+    }
+    const leftSize = gap.index - host.start;
+    const rightSize = host.end - gap.index + 1;
+    if (leftSize < minBlocks || rightSize < minBlocks) {
+      return;
+    }
+    const replacement = [
+      { start: host.start, end: gap.index - 1 },
+      { start: gap.index, end: host.end },
+    ];
+    ranges = ranges
+      .flatMap((range) => (range === host ? replacement : [range]))
+      .sort((left, right) => left.start - right.start);
+  });
+
+  // Absorb any still-short tail into its neighbour so no scene is a stub.
+  for (let pass = 0; pass < 4; pass += 1) {
+    const small = ranges.findIndex(
+      (range) => range.end - range.start + 1 < minBlocks,
+    );
+    if (small === -1 || ranges.length < 3) {
+      break;
+    }
+    const target =
+      small === 0
+        ? 1
+        : small === ranges.length - 1
+          ? small - 1
+          : ranges[small - 1].end - ranges[small - 1].start <
+              ranges[small + 1].end - ranges[small + 1].start
+            ? small - 1
+            : small + 1;
+    const merged = {
+      start: Math.min(ranges[small].start, ranges[target].start),
+      end: Math.max(ranges[small].end, ranges[target].end),
+    };
+    ranges = ranges
+      .filter((_, index) => index !== small && index !== target)
+      .concat(merged)
+      .sort((left, right) => left.start - right.start);
+  }
+
+  return ranges.map((range) => ({
+    start: usable[range.start].i,
+    end: usable[range.end].i,
+  }));
+}
+
+function titleFromBlocks(range, lineById) {
+  const first = lineById.get(range.start);
+  const zh = truncateTitle(first?.zh, 16);
+  if (zh) {
+    return zh;
+  }
+  const en = truncateTitle(first?.text, 34);
+  return en || `Scene ${range.start}`;
+}
+
+async function resolveSceneRanges(blocks, cues) {
+  if (episode === "S01E01") {
+    return S01E01_SCENE_RANGES;
+  }
+
+  const raw = await readOptional(scenesConfigPath);
+  if (raw.trim()) {
+    const parsed = JSON.parse(raw);
+    const list = Array.isArray(parsed) ? parsed : parsed.scenes;
+    if (Array.isArray(list) && list.length) {
+      return list
+        .filter((scene) => Number.isFinite(scene?.start) && Number.isFinite(scene?.end))
+        .map((scene) => ({
+          start: scene.start,
+          end: scene.end,
+          title: cleanText(scene.title) || `Scene ${scene.start}`,
+        }));
+    }
+  }
+
+  const timeline = cues.length
+    ? cues.map((cue) => ({
+        i: cue.index,
+        start: cue.sourceStart,
+        end: cue.sourceEnd,
+      }))
+    : blocks;
+  const lineById = cues.length
+    ? new Map(cues.map((cue) => [cue.index, { text: cue.en, zh: cue.zh }]))
+    : new Map(blocks.map((block) => [block.i, block]));
+
+  return autoSceneRanges(timeline).map((range) => ({
+    ...range,
+    title: titleFromBlocks(range, lineById),
+  }));
+}
+
+function buildScenes(segments, sceneRanges) {
+  const scenes = sceneRanges.map((scene, index) => ({
     id: `scene-${index + 1}`,
     start: scene.start,
     end: scene.end,
@@ -890,6 +1055,26 @@ function buildScenes(segments) {
         segment.start >= scene.start && segment.start <= scene.end,
     ),
   })).filter((scene) => scene.segments.length > 0);
+
+  // A curated range list can be shorter than the transcript (the subtitle
+  // pass finds lines the older edit did not). Anything left over is attached
+  // to the closest preceding scene so no dialogue is dropped from the page.
+  const placed = new Set(
+    scenes.flatMap((scene) => scene.segments.map((segment) => segment.start)),
+  );
+  const orphans = segments.filter((segment) => !placed.has(segment.start));
+  orphans.forEach((segment) => {
+    const host =
+      scenes.filter((scene) => scene.end <= segment.start).pop() || scenes[0];
+    if (host) {
+      host.end = Math.max(host.end, segment.end);
+      host.segments.push(segment);
+    }
+  });
+  scenes.forEach((scene) => {
+    scene.segments.sort((left, right) => left.start - right.start);
+  });
+  return scenes;
 }
 
 async function readOptional(filePath) {
@@ -927,6 +1112,8 @@ async function main() {
     readOptional(reviewedTranslationsPath),
     readOptional(grammarNotesPath),
   ]);
+  const cuesRaw = await readOptional(cuesPath);
+  const cues = cuesRaw ? (JSON.parse(cuesRaw).clips ?? []) : [];
   const cards = cardsRaw ? parseAnkiCards(cardsRaw) : [];
   const entries = markdownRaw ? parseCuratedEntries(markdownRaw) : [];
   const reviewedTranslations = parseJsonObject(
@@ -949,8 +1136,15 @@ async function main() {
 
   const uncoveredBlocks = blocks.filter((block) => !covered.has(block.i));
   const machineCache = await loadMachineCache();
+  const cueTranslations = new Map(
+    cues
+      .filter((cue) => cleanText(cue.zh))
+      .map((cue) => [cue.index, cue.zh]),
+  );
   const translationFallbackBlocks = uncoveredBlocks.filter(
-    (block) => !cleanText(reviewedTranslations[String(block.i)]),
+    (block) =>
+      !cleanText(reviewedTranslations[String(block.i)]) &&
+      !cueTranslations.has(block.i),
   );
   await fillMachineTranslations(translationFallbackBlocks, machineCache);
   const segments = buildSegments(
@@ -959,8 +1153,10 @@ async function main() {
     machineCache,
     reviewedTranslations,
     grammarNotes,
+    cueTranslations,
   );
-  const scenes = buildScenes(segments);
+  const sceneRanges = await resolveSceneRanges(blocks, cues);
+  const scenes = buildScenes(segments, sceneRanges);
 
   const translatedCount = segments.filter(
     (segment) => segment.translationSource !== "missing",
@@ -979,6 +1175,12 @@ async function main() {
   ).length;
   const missingCount = segments.length - translatedCount;
 
+  const vocabulary = new Set();
+  blocks.forEach((block) => {
+    const matches = String(block?.text || "").match(/[A-Za-z]+(?:['’][A-Za-z]+)*/g);
+    (matches || []).forEach((word) => vocabulary.add(word.toLowerCase()));
+  });
+
   const payload = {
     episode,
     show: "摩登家庭",
@@ -988,6 +1190,7 @@ async function main() {
     source: transcript.source || `${episode} 台词原文.txt`,
     blockCount: blocks.length,
     wordCount: Number(transcript.wordCount) || 0,
+    vocabCount: vocabulary.size,
     sceneCount: scenes.length,
     segmentCount: segments.length,
     translationStats: {
@@ -1028,6 +1231,7 @@ async function main() {
     file: `./movie-data/${episode}.js`,
     blockCount: payload.blockCount,
     wordCount: payload.wordCount,
+    vocabCount: payload.vocabCount,
     sceneCount: payload.sceneCount,
     translationStats: payload.translationStats,
   };

@@ -21,19 +21,50 @@
     saveReadingDocument,
   } = Deck;
 
-  const papers = Array.isArray(window.IBALL_INTENSIVE_PAPERS)
-    ? window.IBALL_INTENSIVE_PAPERS.slice()
-    : [];
-  const library = (window.IBALL_INTENSIVE_LIBRARY =
-    window.IBALL_INTENSIVE_LIBRARY || {});
+  const LISTENING_LEVEL =
+    window.IBALL_INTENSIVE_LEVEL === "cet6" ? "cet6" : "cet4";
+  const LEVEL_CONFIG =
+    LISTENING_LEVEL === "cet6"
+      ? {
+          label: "六级",
+          category: "六级",
+          section: "六级听力精读",
+          eyebrow: "CET-6 LISTENING",
+          title: "六级听力全文精读",
+          description:
+            "2015 至 2026 年六级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。",
+          storagePrefix: "iball-cet6-listening",
+          papers: Array.isArray(window.IBALL_CET6_LISTENING_PAPERS)
+            ? window.IBALL_CET6_LISTENING_PAPERS.slice()
+            : [],
+          library: (window.IBALL_CET6_LISTENING_LIBRARY =
+            window.IBALL_CET6_LISTENING_LIBRARY || {}),
+        }
+      : {
+          label: "四级",
+          category: "四级",
+          section: "四级听力精读",
+          eyebrow: "CET-4 LISTENING",
+          title: "四级听力全文精读",
+          description:
+            "2022 至 2026 年四级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。",
+          storagePrefix: "iball-intensive",
+          papers: Array.isArray(window.IBALL_INTENSIVE_PAPERS)
+            ? window.IBALL_INTENSIVE_PAPERS.slice()
+            : [],
+          library: (window.IBALL_INTENSIVE_LIBRARY =
+            window.IBALL_INTENSIVE_LIBRARY || {}),
+        };
+  const papers = LEVEL_CONFIG.papers;
+  const library = LEVEL_CONFIG.library;
   const WORD_PATTERN = /[A-Za-z]+(?:['’\-][A-Za-z]+)*/g;
   const PHONETIC_PLACEHOLDERS = new Set(["暂无音标", "音标查询中"]);
-  const INTENSIVE_CATEGORY = "四级";
-  const INTENSIVE_SECTION = "四级听力精读";
-  const PAPER_STORAGE_KEY = "iball-intensive-paper";
-  const CUE_STORAGE_KEY = "iball-intensive-cues";
-  const DISPLAY_STORAGE_KEY = "iball-intensive-display-mode";
-  const ANSWER_STORAGE_KEY = "iball-intensive-answers";
+  const INTENSIVE_CATEGORY = LEVEL_CONFIG.category;
+  const INTENSIVE_SECTION = LEVEL_CONFIG.section;
+  const PAPER_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-paper`;
+  const CUE_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-cues`;
+  const DISPLAY_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-display-mode`;
+  const ANSWER_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-answers`;
 
   const state = {
     paperId: "",
@@ -486,7 +517,7 @@
       script.async = true;
       script.dataset.paperSource = meta.id;
       script.addEventListener("load", () => {
-        const data = window.IBALL_INTENSIVE_LIBRARY?.[meta.id];
+        const data = library[meta.id];
         if (data) {
           resolve(data);
         } else {
@@ -620,7 +651,9 @@
   /* ------------------------------------------------------------- marking */
 
   function getIntensiveDocumentId() {
-    return `intensive-${state.paperId}`;
+    const prefix =
+      LISTENING_LEVEL === "cet6" ? "cet6-intensive" : "intensive";
+    return `${prefix}-${state.paperId}`;
   }
 
   function getIntensiveDocument() {
@@ -744,7 +777,7 @@
     updateWordPanelMarkState();
     showToast(
       mark === "unknown"
-        ? `${item.phrase} 已加入四级不会`
+        ? `${item.phrase} 已加入${INTENSIVE_CATEGORY}不会`
         : `${item.phrase} 已标记为掌握`,
     );
   }
@@ -1399,13 +1432,13 @@
       if (local) {
         add({
           ...local,
-          levels: local.levels.length ? local.levels : ["四级"],
+          levels: local.levels.length ? local.levels : [INTENSIVE_CATEGORY],
           mask: local.mask || 1,
           seeded: true,
         });
         return;
       }
-      add({ phrase, levels: ["四级"], mask: 1, seeded: true });
+      add({ phrase, levels: [INTENSIVE_CATEGORY], mask: 1, seeded: true });
     });
 
     if (typeof index?.findInText === "function") {
@@ -2318,10 +2351,10 @@
       0,
     );
 
-    document.title = `${data.meta?.title || "四级听力"} · 听力精读 · iball的小屋`;
+    document.title = `${data.meta?.title || `${LEVEL_CONFIG.label}听力`} · 听力精读 · iball的小屋`;
     if (elements.heroEyebrow) {
       elements.heroEyebrow.textContent =
-        data.meta?.title || "CET-4 LISTENING";
+        data.meta?.title || LEVEL_CONFIG.eyebrow;
     }
     if (elements.heroDescription) {
       elements.heroDescription.textContent =
@@ -2461,6 +2494,15 @@
   }
 
   function initialize() {
+    document.title = `${LEVEL_CONFIG.title} · iball的小屋`;
+    const pageTitle = document.querySelector("#pageTitle");
+    if (pageTitle) {
+      pageTitle.textContent = LEVEL_CONFIG.title;
+    }
+    const description = document.querySelector(".hero-description");
+    if (description) {
+      description.textContent = LEVEL_CONFIG.description;
+    }
     if (!papers.length) {
       renderError("没有找到可用的听力精读试卷。");
       return;

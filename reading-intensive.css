@@ -153,6 +153,7 @@
 /* ------------------------------------------------------------ 选项与作答 */
 
 .option-translation {
+  grid-column: 1 / -1;
   margin: 3px 0 0;
   color: #7c8d86;
   font-size: 12px;

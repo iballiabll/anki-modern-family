@@ -1,2343 +1,2486 @@
 {
   "episode": "S01E01",
-  "generatedBy": "scripts/build-movie-script.mjs",
-  "source": "S01E01 台词原文.txt",
-  "blockCount": 461,
-  "wordCount": 3675,
+  "source": "Modern Family S01E01 Pilot.��Ӣ.ass",
   "blocks": [
     {
       "i": 1,
-      "speaker": "Claire",
+      "speaker": "",
       "text": "Kids, breakfast!"
     },
     {
       "i": 2,
       "speaker": "",
-      "text": "Kids? [Sighs] Phil, would you get them?",
-      "stage": "Video Game Sounds"
+      "text": "Kids?"
     },
     {
       "i": 3,
       "speaker": "",
-      "text": "Yeah. Just a sec."
+      "text": "Phil, would you get them?"
     },
     {
       "i": 4,
       "speaker": "",
-      "text": "Kids!"
+      "text": "Yeah. Just a sec."
     },
     {
       "i": 5,
       "speaker": "",
-      "text": "That is- Okay."
+      "text": "Kids!"
     },
     {
       "i": 6,
       "speaker": "",
-      "text": "Kids? Get down here!"
+      "text": "- That is - Okay."
     },
     {
       "i": 7,
       "speaker": "",
-      "text": "Why are you guys yelling at us when we're way upstairs?"
+      "text": "Kids? Get down here!"
     },
     {
       "i": 8,
       "speaker": "",
-      "text": "Just text me. All right. That's not gonna happen."
+      "text": "Why are you guys yelling at us when we're way upstairs?"
     },
     {
       "i": 9,
       "speaker": "",
-      "text": "And, wow! You're not wearing that outfit."
+      "text": "- Just text me. - All right. That's not gonna happen."
     },
     {
       "i": 10,
       "speaker": "",
-      "text": "What's wrong with it? Honey, do you have anything to say to your daughter..."
+      "text": "And, wow! You're not wearing that outfit."
     },
     {
       "i": 11,
       "speaker": "",
-      "text": "about her skirt? Sorry."
+      "text": "What's wrong with it?"
     },
     {
       "i": 12,
       "speaker": "",
-      "text": "- Oh, yeah. That looks really cute, sweetheart. - Thanks."
+      "text": "Honey, do you have anything to say"
     },
     {
       "i": 13,
       "speaker": "",
-      "text": "No. It's way too short. People know you're a girl. You don't need to prove it to them."
+      "text": "- to your daughter about her skirt? - Sorry."
     },
     {
       "i": 14,
       "speaker": "",
-      "text": "Luke got his head stuck in the banister again."
+      "text": "- Oh, yeah. That looks really cute, sweetheart. - Thanks."
     },
     {
       "i": 15,
       "speaker": "",
-      "text": "I got it. Where's the baby oil?"
+      "text": "No. It's way too short."
     },
     {
       "i": 16,
       "speaker": "",
-      "text": "It's on our bedside tab- I don't know. Find it."
+      "text": "People know you're a girl."
     },
     {
       "i": 17,
       "speaker": "",
-      "text": "Come on!"
+      "text": "You don't need to prove it to them."
     },
     {
       "i": 18,
       "speaker": "",
-      "text": "I was out of control growing up."
+      "text": "Luke got his head stuck in the banister again."
     },
     {
       "i": 19,
       "speaker": "",
-      "text": "There, you know? I said it."
+      "text": "I got it. Where's the baby oil?"
     },
     {
       "i": 20,
       "speaker": "",
-      "text": "I-I just don't want my kids..."
+      "text": "It's on our bedside tab- I don't know. Find it."
     },
     {
       "i": 21,
       "speaker": "",
-      "text": "to make the same bad mistakes I made."
+      "text": "Come on!"
     },
     {
       "i": 22,
       "speaker": "",
-      "text": "I-If Haley never wakes up on a beach in Florida, half-naked,"
+      "text": "I was out of control growing up."
     },
     {
       "i": 23,
       "speaker": "",
-      "text": "I've done my job."
+      "text": "There, you know? I said it."
     },
     {
       "i": 24,
       "speaker": "",
-      "text": "Our job. Right."
+      "text": "I-I just don't want my kids..."
     },
     {
       "i": 25,
       "speaker": "",
-      "text": "I've done our job."
+      "text": "to make the same bad mistakes I made."
     },
     {
       "i": 26,
       "speaker": "",
-      "text": "¡Vamos, Manny! Kick it! Kick it!"
+      "text": "I-If Haley never wakes up on a beach in Florida, half-naked,"
     },
     {
       "i": 27,
       "speaker": "",
-      "text": "Don't let him- Kick it!"
+      "text": "I've done my job."
     },
     {
       "i": 28,
       "speaker": "",
-      "text": "Manny, go! ¡A la derecha! ¡A la derecha!"
+      "text": "- Our job. - Right."
     },
     {
       "i": 29,
       "speaker": "",
-      "text": "No! No, no."
+      "text": "I've done our job."
     },
     {
       "i": 30,
       "speaker": "",
-      "text": "- He tripped him, Jay. Where's the penalty? - [Whistle Blows]"
+      "text": "Vamos, Manny! Kick it! Kick it!"
     },
     {
       "i": 31,
       "speaker": "",
-      "text": "Gloria, they're 0 and 6. Let's take it down a notch.",
-      "stage": "Chuckles"
+      "text": "Don't let him- Kick it!"
     },
     {
       "i": 32,
       "speaker": "",
-      "text": "We're very different."
+      "text": "Manny, go! A la derecha! A la derecha!"
     },
     {
       "i": 33,
       "speaker": "",
-      "text": "Jay's from the city."
+      "text": "No! No, no."
     },
     {
       "i": 34,
       "speaker": "",
-      "text": "He has a big business."
+      "text": "He tripped him, Jay. Where's the penalty?"
     },
     {
       "i": 35,
       "speaker": "",
-      "text": "I come from a small village."
+      "text": "Gloria, they're 0 and 6."
     },
     {
       "i": 36,
       "speaker": "",
-      "text": "Very poor but very, very beautiful."
+      "text": "Let's take it down a notch."
     },
     {
       "i": 37,
       "speaker": "",
-      "text": "It's the number one village in all Colombia for all the-"
+      "text": "We're very different."
     },
     {
       "i": 38,
       "speaker": "",
-      "text": "What's the word?"
+      "text": "Jay's from the city."
     },
     {
       "i": 39,
       "speaker": "",
-      "text": "Murders. Yes. The murders."
+      "text": "He has a big business."
     },
     {
       "i": 40,
       "speaker": "",
-      "text": "Manny, stop him!"
+      "text": "I come from a small village."
     },
     {
       "i": 41,
       "speaker": "",
-      "text": "Stop him! You can do it!"
+      "text": "Very poor but very, very beautiful."
     },
     {
       "i": 42,
-      "speaker": "Boy",
-      "text": "Damn it, Manny!"
+      "speaker": "",
+      "text": "It's the number one village in all Colombia for all the-"
     },
     {
       "i": 43,
       "speaker": "",
-      "text": "Come on, Coach. You gotta take that kid out."
+      "text": "What's the word?"
     },
     {
       "i": 44,
       "speaker": "",
-      "text": "You wanna take him out? How about I take you out?"
+      "text": "Murders."
     },
     {
       "i": 45,
       "speaker": "",
-      "text": "- Honey, honey. - Why don't you worry about your son?"
+      "text": "Yes. The murders."
     },
     {
       "i": 46,
       "speaker": "",
-      "text": "He spent the first half with his hand in his pants!",
-      "stage": "Mouths Word"
+      "text": "Manny, stop him!"
     },
     {
       "i": 47,
       "speaker": "",
-      "text": "I've wanted to tell her off for the last six weeks."
+      "text": "Stop him! You can do it!"
     },
     {
       "i": 48,
       "speaker": "",
-      "text": "I'm Josh. Ryan's dad."
+      "text": "Damn it, Manny!"
     },
     {
       "i": 49,
       "speaker": "",
-      "text": "Hi, I'm Gloria Pritchett. Manny's mother."
+      "text": "Come on, coach. You gotta take that kid out."
     },
     {
       "i": 50,
       "speaker": "",
-      "text": "- Oh, and this must be your dad. - Her dad?"
+      "text": "You wanna take him out? How about I take you out?"
     },
     {
       "i": 51,
       "speaker": "",
-      "text": "Yeah. No, no. That's funny."
+      "text": "- Honey, honey. - Why don't you worry about your son?"
     },
     {
       "i": 52,
       "speaker": "",
-      "text": "Actually, no, I'm her husband."
+      "text": "He spent the first half with his hand in his pants!"
     },
     {
       "i": 53,
       "speaker": "",
-      "text": "Don't be fooled by the, uh-"
+      "text": "I've wanted to tell her off for the last six weeks."
     },
     {
       "i": 54,
       "speaker": "",
-      "text": "Give me a second here."
+      "text": "I'm Josh. Ryan's dad."
     },
     {
       "i": 55,
       "speaker": "",
-      "text": "Who is a good girl? Who's that?"
+      "text": "Hi, I'm Gloria Pritchett. Manny's mother."
     },
     {
       "i": 56,
       "speaker": "",
-      "text": "Who's that?"
+      "text": "- Oh, and this must be your dad. - Her dad?"
     },
     {
       "i": 57,
       "speaker": "",
-      "text": "- Oh, she's adorable. - Oh, thank you."
+      "text": "- Yeah. - No, no. That's funny."
     },
     {
       "i": 58,
       "speaker": "",
-      "text": "Hi, precious. Hello.",
-      "stage": "Blows Raspberry"
+      "text": "Actually, no, I'm her husband."
     },
     {
       "i": 59,
       "speaker": "",
-      "text": "Hi. Hi."
+      "text": "Don't be fooled by the, uh-"
     },
     {
       "i": 60,
       "speaker": "",
-      "text": "Uh, we just, uh- We just adopted her from Vietnam."
+      "text": "Give me a second here."
     },
     {
       "i": 61,
       "speaker": "",
-      "text": "And we're bringing her home for the first time, huh?"
+      "text": "Who is a good girl? Who's that?"
     },
     {
       "i": 62,
       "speaker": "",
-      "text": "She's an angel. You and your wife must be thrilled."
+      "text": "Who's that?"
     },
     {
       "i": 63,
       "speaker": "",
-      "text": "Sorry, sorry, sorry. Daddy needed snacks."
+      "text": "- Oh, she's adorable. - Oh, thank you."
     },
     {
       "i": 64,
       "speaker": "",
-      "text": "Hi.",
-      "stage": "Grunts"
+      "text": "Hi, precious. Hello."
     },
     {
       "i": 65,
       "speaker": "",
-      "text": "So, what are we talking about?"
+      "text": "Uh, we just, uh- We just adopted her from Vietnam."
     },
     {
       "i": 66,
       "speaker": "",
-      "text": "Uh, we have been together for-"
+      "text": "And we're bringing her home for the first time, huh?"
     },
     {
       "i": 67,
       "speaker": "",
-      "text": "guh, five- five years now?"
+      "text": "She's an angel. You and your wife must be thrilled."
     },
     {
       "i": 68,
       "speaker": "",
-      "text": "And, uh, we just- we decided we really wanted to have a baby."
+      "text": "Sorry, sorry, sorry. Daddy needed snacks."
     },
     {
       "i": 69,
       "speaker": "",
-      "text": "So, we had initially asked one of our lesbian friends to be a surrogate, but-"
+      "text": "So, what are we talking about?"
     },
     {
       "i": 70,
       "speaker": "",
-      "text": "Then we figured, they're already mean enough."
+      "text": "Uh, we have been together for- guh, five- five years now?"
     },
     {
       "i": 71,
       "speaker": "",
-      "text": "Can you imagine one of 'em pregnant? Pregnant, no."
+      "text": "And, uh, we just- we decided we really wanted to have a baby."
     },
     {
       "i": 72,
       "speaker": "",
-      "text": "No, thank you. Ick."
+      "text": "So, we had initially asked one of our"
     },
     {
       "i": 73,
       "speaker": "",
-      "text": "You saw that, right? Everybody fawning over Lily,"
+      "text": "lesbian friends to be a surrogate, but-"
     },
     {
       "i": 74,
       "speaker": "",
-      "text": "and then you walk on and suddenly it's all,"
+      "text": "Then we figured, they're already mean enough."
     },
     {
       "i": 75,
       "speaker": "",
-      "text": "\"Ooh, SkyMall."
+      "text": "Can you imagine one of 'em pregnant? Pregnant, no."
     },
     {
       "i": 76,
       "speaker": "",
-      "text": "I gotta buy a motorized tie rack.\""
+      "text": "No, thank you. Ick."
     },
     {
       "i": 77,
       "speaker": "",
-      "text": "All right, you know, I'm gonna give the speech. You are not giving the speech."
+      "text": "You saw that, right? Everybody fawning over Lily,"
     },
     {
       "i": 78,
       "speaker": "",
-      "text": "You're gonna be stuck with these people for the next five hours."
+      "text": "and then you walk on and suddenly it's all,"
     },
     {
       "i": 79,
       "speaker": "",
-      "text": "You're right, you're right. Okay. I'm sorry."
+      "text": "\"Ooh, SkyMall."
     },
     {
       "i": 80,
       "speaker": "",
-      "text": "- Look at that baby with those cream puffs. - Okay. Excuse me."
+      "text": "I gotta buy a motorized tie rack.\""
     },
     {
       "i": 81,
       "speaker": "",
-      "text": "Excuse me."
+      "text": "All right, you know, I'm gonna give the speech."
     },
     {
       "i": 82,
       "speaker": "",
-      "text": "This baby would have grown up in a crowded orphanage if it wasn't for us \"cream puffs.\""
+      "text": "You are not giving the speech."
     },
     {
       "i": 83,
       "speaker": "",
-      "text": "And you know what? Note to all of you who judge- Mitchell!"
+      "text": "You're gonna be stuck with these people for the next five hours."
     },
     {
       "i": 84,
       "speaker": "",
-      "text": "- Hear this. Love knows no race, creed- - Mitchell."
+      "text": "You're right, you're right. Okay. I'm sorry."
     },
     {
       "i": 85,
       "speaker": "",
-      "text": "Or gender."
+      "text": "- Look at that baby with those cream puffs. - Okay. Excuse me."
     },
     {
       "i": 86,
       "speaker": "",
-      "text": "And shame on you, you small-minded, ignorant few- Mitchell."
+      "text": "Excuse me."
     },
     {
       "i": 87,
       "speaker": "",
-      "text": "Mitchell! What?",
-      "stage": "Whispers"
+      "text": "This baby would have grown up in a crowded orphanage"
     },
     {
       "i": 88,
       "speaker": "",
-      "text": "She's got the cream puffs."
+      "text": "if it wasn't for us \"Cream puffs.\""
     },
     {
       "i": 89,
       "speaker": "",
-      "text": "Oh."
+      "text": "- And you know what? Note to all of you who judge- - Mitchell!"
     },
     {
       "i": 90,
       "speaker": "",
-      "text": "We would like to pay for everyone's headsets."
+      "text": "Hear this. Love knows no race, creed-"
     },
     {
       "i": 91,
-      "speaker": "Man",
-      "text": "♪ Hey, hey ♪"
+      "speaker": "",
+      "text": "Or gender."
     },
     {
       "i": 92,
       "speaker": "",
-      "text": "♪ Hey, hey Hey, hey ♪"
+      "text": "- And shame on you, - Mitchell."
     },
     {
       "i": 93,
       "speaker": "",
-      "text": "♪ Hey, hey Hey ♪♪"
+      "text": "- you small-minded, ignorant few - Mitchell!"
     },
     {
       "i": 94,
       "speaker": "",
-      "text": "Buddy. Why do you keep getting stuck like this?"
+      "text": "- What? -She's got the cream puffs."
     },
     {
       "i": 95,
       "speaker": "",
-      "text": "I thought I could get out this time."
+      "text": "We would like to pay for everyone's headsets."
     },
     {
       "i": 96,
       "speaker": "",
-      "text": "I'm just gonna say it. He needs to be checked by a specialist."
+      "text": "Buddy. Why do you keep getting stuck like this?"
     },
     {
       "i": 97,
       "speaker": "",
-      "text": "Ow! There. Be free."
+      "text": "I thought I could get out this time."
     },
     {
       "i": 98,
       "speaker": "",
-      "text": "Excalibur.",
-      "stage": "Chuckles"
+      "text": "I'm just gonna say it. He needs to be checked by a specialist."
     },
     {
       "i": 99,
       "speaker": "",
-      "text": "I'm having a friend over today. Who?"
+      "text": "There. Be free."
     },
     {
       "i": 100,
       "speaker": "",
-      "text": "Uh, you don't know him. Him? Him?"
+      "text": "Excalibur."
     },
     {
       "i": 101,
       "speaker": "",
-      "text": "Ooh, a boy. You gonna kiss him?"
+      "text": "- I'm having a friend over today. - Who?"
     },
     {
       "i": 102,
       "speaker": "",
-      "text": "- Shut up. - [Phil] Easy. Easy."
+      "text": "- Uh, you don't know him. - Him? Him?"
     },
     {
       "i": 103,
       "speaker": "",
-      "text": "Yeah, shut up! No, you shut up!"
+      "text": "Ooh, a boy. You gonna kiss him?"
     },
     {
       "i": 104,
       "speaker": "",
-      "text": "- Luke, Alex, why don't you take it outside, okay? - And do what?"
+      "text": "- Shut up. - Easy. Easy."
     },
     {
       "i": 105,
       "speaker": "",
-      "text": "Fight in the sun. It'll be a nice change. Haley."
+      "text": "- Yeah, shut up! - No, you shut up!"
     },
     {
       "i": 106,
-      "speaker": "Phil",
-      "text": "I'm kidding. Who's the boy?"
+      "speaker": "",
+      "text": "Luke, Alex, why don't you take it outside, okay?"
     },
     {
       "i": 107,
       "speaker": "",
-      "text": "His name is Dylan."
+      "text": "And do what?"
     },
     {
       "i": 108,
       "speaker": "",
-      "text": "I might as well tell him not to come..."
+      "text": "- Fight in the sun. It'll be a nice change. - Haley."
     },
     {
       "i": 109,
       "speaker": "",
-      "text": "because you guys are just going to embarrass me again."
+      "text": "- I'm kidding. - Who's the boy?"
     },
     {
       "i": 110,
       "speaker": "",
-      "text": "Sweetie, hang on a second."
+      "text": "His name is Dylan."
     },
     {
       "i": 111,
       "speaker": "",
-      "text": "You're 15, and it's the first time you've had a boy over."
+      "text": "I might as well tell him not to come..."
     },
     {
       "i": 112,
       "speaker": "",
-      "text": "I'm bound to be a little surprised, but I'm not gonna embarrass you."
+      "text": "Because you guys are just going to embarrass me again."
     },
     {
       "i": 113,
       "speaker": "",
-      "text": "- I better charge the camcorder. - [Cries Out]"
+      "text": "Sweetie, hang on a second."
     },
     {
       "i": 114,
       "speaker": "",
-      "text": "I'm kidding. Come on. Who are you talking to?"
+      "text": "You're 15, and it's the first time you've had a boy over."
     },
     {
       "i": 115,
       "speaker": "",
-      "text": "I'm the cool dad. That's- That's my thing."
+      "text": "I'm bound to be a little surprised,"
     },
     {
       "i": 116,
       "speaker": "",
-      "text": "I'm hip. I- I surf the Web."
+      "text": "but I'm not gonna embarrass you."
     },
     {
       "i": 117,
       "speaker": "",
-      "text": "I text. \"LOL\"- Laugh out loud. \"OMG\"- Oh, my God."
+      "text": "I better charge the camcorder."
     },
     {
       "i": 118,
       "speaker": "",
-      "text": "\"WTF\"- Why the face?"
+      "text": "I'm kidding. Come on. Who are you talking to?"
     },
     {
       "i": 119,
       "speaker": "",
-      "text": "Um, you know, I know all the dances to High School Musical, so-",
-      "stage": "With Recording"
+      "text": "I'm the cool dad. That's- That's my thing."
     },
     {
       "i": 120,
       "speaker": "",
-      "text": "♪ We're all in this together ♪"
+      "text": "I'm hip. I- I surf the Web."
     },
     {
       "i": 121,
       "speaker": "",
-      "text": "♪ Yes, we are ♪"
+      "text": "I text. \"LOL\"- Laugh out loud."
     },
     {
       "i": 122,
       "speaker": "",
-      "text": "♪ We're all stars Something, something you know it ♪♪"
+      "text": "\"OMG\"- Oh, my God."
     },
     {
       "i": 123,
-      "speaker": "Alex",
-      "text": "Mom! Dad!"
+      "speaker": "",
+      "text": "\"WTF\"- Why the face?"
     },
     {
       "i": 124,
-      "speaker": "Claire",
-      "text": "What happened?"
+      "speaker": "",
+      "text": "Um, you know, I know all the dances to High School Musical, so-"
     },
     {
       "i": 125,
       "speaker": "",
-      "text": "Luke just shot me! I didn't mean to."
+      "text": "*We're all in this together *"
     },
     {
       "i": 126,
       "speaker": "",
-      "text": "Are you okay? No."
+      "text": "*Yes, we are*"
     },
     {
       "i": 127,
       "speaker": "",
-      "text": "- The little bitch shot me. - [Chuckles]"
+      "text": "*We're all stars Something, something you know it*"
     },
     {
       "i": 128,
       "speaker": "",
-      "text": "- Language! - They're only plastic BBs. It was an accident."
+      "text": "- Mom! Dad! - What happened?"
     },
     {
       "i": 129,
       "speaker": "",
-      "text": "What did I tell you would happen if you got him a gun?"
+      "text": "- Luke just shot me! - I didn't mean to."
     },
     {
       "i": 130,
       "speaker": "",
-      "text": "Deal with this. Buddy, uncool."
+      "text": "- Are you okay? - No."
     },
     {
       "i": 131,
       "speaker": "",
-      "text": "That's it? That's- No, no, no, no."
+      "text": "The little bitch shot me."
     },
     {
       "i": 132,
       "speaker": "",
-      "text": "The agreement was that if he shoots someone, you shoot him."
+      "text": "- Language! They're only plastic BBs. It was an accident."
     },
     {
       "i": 133,
       "speaker": "",
-      "text": "We were serious about that? Yes, we were."
+      "text": "What did I tell you would happen if you got him a gun?"
     },
     {
       "i": 134,
       "speaker": "",
-      "text": "And now you have to follow through."
+      "text": "- Deal with this. - Buddy, uncool."
     },
     {
       "i": 135,
       "speaker": "",
-      "text": "- [Crying] I'm so sorry. - Liar."
+      "text": "That's it? That's- No, no, no, no."
     },
     {
       "i": 136,
       "speaker": "",
-      "text": "Go. He's got a birthday party."
+      "text": "The agreement was that if he shoots someone, you shoot him."
     },
     {
       "i": 137,
       "speaker": "",
-      "text": "- What's more important here, Dad? - You can shoot him afterwards."
+      "text": "- We were serious about that? - Yes, we were."
     },
     {
       "i": 138,
       "speaker": "",
-      "text": "He'll be home at 2:00. I can't shoot him at 2:00. I'm showing a house at 2:00."
+      "text": "And now you have to follow through."
     },
     {
       "i": 139,
       "speaker": "",
-      "text": "- What about 3:00? - No, he's got a soccer game at 3:00."
+      "text": "- I'm so sorry. - Liar."
     },
     {
       "i": 140,
       "speaker": "",
-      "text": "And then- Oh, we gotta leave for that dinner thing at 5:00."
+      "text": "- Go. - He's got a birthday party."
     },
     {
       "i": 141,
       "speaker": "",
-      "text": "4:15. You could shoot him at 4:15."
+      "text": "What's more important here, Dad?"
     },
     {
       "i": 142,
       "speaker": "",
-      "text": "Yeah, I guess that works for me. Oh!"
+      "text": "You can shoot him afterwards. He'll be home at 2:00."
     },
     {
       "i": 143,
       "speaker": "",
-      "text": "\"Shoot Luke.\" Sorry, dude. It's on the calendar."
+      "text": "I can't shoot him at 2:00."
     },
     {
       "i": 144,
       "speaker": "",
-      "text": "Oh, come on!"
+      "text": "I'm showing a house at 2:00."
     },
     {
       "i": 145,
       "speaker": "",
-      "text": "I'm quitting soccer. It is a game for children."
+      "text": "- What about 3:00? - No, he's got a soccer game at 3:00."
     },
     {
       "i": 146,
       "speaker": "",
-      "text": "No, you're not quitting."
+      "text": "And then- Oh, we gotta leave for that dinner thing at 5:00."
     },
     {
       "i": 147,
       "speaker": "",
-      "text": "You would have stopped that goal if you weren't staring at that little girl."
+      "text": "4:15. You could shoot him at 4:15."
     },
     {
       "i": 148,
       "speaker": "",
-      "text": "She is not a girl. She's a woman."
+      "text": "Yeah, I guess that works for me. Oh!"
     },
     {
       "i": 149,
       "speaker": "",
-      "text": "You know, Gloria, that little blowup with that other mom-"
+      "text": "- \"Shoot Luke.\" - Sorry, dude. It's on the calendar."
     },
     {
       "i": 150,
       "speaker": "",
-      "text": "Why do you have to do things like that?"
+      "text": "Oh, come on!"
     },
     {
       "i": 151,
       "speaker": "",
-      "text": "If somebody says something about my family, I'm going to- I'm just saying."
+      "text": "I'm quitting soccer. It is a game for children."
     },
     {
       "i": 152,
       "speaker": "",
-      "text": "You could take it down here a little bit. That's all."
+      "text": "No, you're not quitting."
     },
     {
       "i": 153,
       "speaker": "",
-      "text": "Oh, yeah. 'Cause that's where you live, down here."
+      "text": "You would have stopped that goal"
     },
     {
       "i": 154,
       "speaker": "",
-      "text": "But I live up here! Yeah, but you don't have to be so emotional all the time."
+      "text": "if you weren't staring at that little girl."
     },
     {
       "i": 155,
       "speaker": "",
-      "text": "That's all I'm saying. Manny, you're with me on this, right?"
+      "text": "She is not a girl. She's a woman."
     },
     {
       "i": 156,
       "speaker": "",
-      "text": "I wanna tell Brenda Feldman I love her. Oh, for God sakes."
+      "text": "You know, Gloria, that little blowup with that other mom"
     },
     {
       "i": 157,
       "speaker": "",
-      "text": "Manny, she's 16. Oh. It's okay for you to take an older lover?"
+      "text": "Why do you have to do things like that?"
     },
     {
       "i": 158,
       "speaker": "",
-      "text": "Hey, watch it. I wanna go to the mall where she works."
+      "text": "If somebody says something about my family,"
     },
     {
       "i": 159,
       "speaker": "",
-      "text": "But first I need to get my white shirt, the silk one."
+      "text": "- I'm going to - I'm just saying."
     },
     {
       "i": 160,
       "speaker": "",
-      "text": "Okay. If that's what you really want to do. Seriously."
+      "text": "You could take it down here a little bit. That's all."
     },
     {
       "i": 161,
       "speaker": "",
-      "text": "Not to be the evil stepdad, but if you put on a puffy white shirt..."
+      "text": "Oh, yeah. 'Cause that's where you live, down here."
     },
     {
       "i": 162,
       "speaker": "",
-      "text": "and declare your love for a 16-year-old,"
+      "text": "- But I live up here! - Yeah, but,"
     },
     {
       "i": 163,
       "speaker": "",
-      "text": "you're gonna be swinging from the flagpole in your puffy white underpants."
+      "text": "you don't have to be so emotional all the time.That's all I'm saying."
     },
     {
       "i": 164,
       "speaker": "",
-      "text": "Stop the car. Oh, where are you going?",
-      "stage": "Car Horn Honking"
+      "text": "Manny, you're with me on this, right?"
     },
     {
       "i": 165,
       "speaker": "",
-      "text": "See? You hurt his feelings. Ah- Well, if it toughens him up a little bit then-"
+      "text": "I wanna tell Brenda Feldman I love her."
     },
     {
       "i": 166,
       "speaker": "",
-      "text": "Oh, geez. He's picking flowers."
+      "text": "- Oh, for God sakes. - Manny, she's 16."
     },
     {
       "i": 167,
       "speaker": "",
-      "text": "Manny's very passionate, just like his father."
+      "text": "Oh. It's okay for you to take an older lover?"
     },
     {
       "i": 168,
       "speaker": "",
-      "text": "My first husband- he's very handsome, but too crazy."
+      "text": "- Hey, watch it. - I wanna go to the mall where she works."
     },
     {
       "i": 169,
       "speaker": "",
-      "text": "It seemed like all we did was fight and make love, fight and make love, fight and make love."
+      "text": "But first I need to get my white shirt, the silk one."
     },
     {
       "i": 170,
       "speaker": "",
-      "text": "One time, I'm not kidding you, we fell out the window together.",
-      "stage": "Laughing"
+      "text": "Okay. If that's what you really want to do."
     },
     {
       "i": 171,
       "speaker": "",
-      "text": "Which- Which one were you doing?",
-      "stage": "Chuckles"
+      "text": "Seriously. Not to be the evil stepdad,"
     },
     {
       "i": 172,
       "speaker": "",
-      "text": "I'm hearing this for the first time."
+      "text": "but if you put on a puffy white shirt..."
     },
     {
       "i": 173,
       "speaker": "",
-      "text": "This doesn't worry you?"
+      "text": "and declare your love for a 16-year-old,"
     },
     {
       "i": 174,
       "speaker": "",
-      "text": "She barely slept on the plane and she's still wide awake."
+      "text": "you're gonna be swinging from the flagpole"
     },
     {
       "i": 175,
       "speaker": "",
-      "text": "- Oh, stop worrying. - I can't."
+      "text": "in your puffy white underpants."
     },
     {
       "i": 176,
       "speaker": "",
-      "text": "That- That orphanage was all women."
+      "text": "- Stop the car. - Oh, where are you going?"
     },
     {
       "i": 177,
       "speaker": "",
-      "text": "Maybe she just- she can't fall asleep unless she feels a woman's shape."
+      "text": "See? You hurt his feelings."
     },
     {
       "i": 178,
       "speaker": "",
-      "text": "I guess that's possible. So here."
+      "text": "Ah- Well, if it toughens him up a little bit then-"
     },
     {
       "i": 179,
       "speaker": "",
-      "text": "What the hell is that supposed to mean?"
+      "text": "Oh, geez. He's picking flowers."
     },
     {
       "i": 180,
       "speaker": "",
-      "text": "Yes, I've gained a few extra pounds while we were expecting the baby,"
+      "text": "Manny's very passionate, just like his father."
     },
     {
       "i": 181,
       "speaker": "",
-      "text": "which has been very difficult."
+      "text": "My first husband- he's very handsome, but too crazy."
     },
     {
       "i": 182,
       "speaker": "",
-      "text": "But apparently your body does a nesting, very maternal, primal thing..."
+      "text": "It seemed like all we did was fight and make love,"
     },
     {
       "i": 183,
       "speaker": "",
-      "text": "where it retains nutrients- some sort of molecular physiology thing."
+      "text": "fight and make love, fight and make love."
     },
     {
       "i": 184,
       "speaker": "",
-      "text": "But that's science."
+      "text": "One time, I'm not kidding you, we fell out the window together."
     },
     {
       "i": 185,
       "speaker": "",
-      "text": "You can't- You can't fight it, so-"
+      "text": "Which- Which one were you doing?"
     },
     {
       "i": 186,
       "speaker": "",
-      "text": "- I'm not saying anything. - You're saying everything."
+      "text": "I'm hearing this for the first time."
     },
     {
       "i": 187,
       "speaker": "",
-      "text": "Count to three. One, two-"
+      "text": "This doesn't worry you?"
     },
     {
       "i": 188,
       "speaker": "",
-      "text": "Three. Okay."
+      "text": "She barely slept on the plane and she's still wide awake."
     },
     {
       "i": 189,
       "speaker": "",
-      "text": "Oh, Cam. This is beautiful. Oh, my God. Do you love it?"
+      "text": "- Oh, stop worrying. - I can't."
     },
     {
       "i": 190,
       "speaker": "",
-      "text": "Yes, I-"
+      "text": "That- That orphanage was all women."
     },
     {
       "i": 191,
       "speaker": "",
-      "text": "What the hell is that?"
+      "text": "Maybe she just- she can't fall asleep unless she feels a woman's shape."
     },
     {
       "i": 192,
       "speaker": "",
-      "text": "I had Andre do it while we were gone. Is that us, with wings?"
+      "text": "- I guess that's possible. - So here."
     },
     {
       "i": 193,
       "speaker": "",
-      "text": "We're floating above her, always there to protect her."
+      "text": "What the hell is that supposed to mean?"
     },
     {
       "i": 194,
       "speaker": "",
-      "text": "Okay. Well, that's reassuring, right, Lily?"
+      "text": "Yes,"
     },
     {
       "i": 195,
       "speaker": "",
-      "text": "Yes, we tore you away from everything you know, but don't worry, things are normal here."
+      "text": "I've gained a few extra pounds while we were expecting the baby,"
     },
     {
       "i": 196,
       "speaker": "",
-      "text": "Your fathers are floating fairies. No, can you call Andre,"
+      "text": "which has been very difficult."
     },
     {
       "i": 197,
       "speaker": "",
-      "text": "have him paint something a little less gay?"
+      "text": "But apparently your body"
     },
     {
       "i": 198,
       "speaker": "",
-      "text": "By the way, we need to stop having friends with names like Andre."
+      "text": "does a nesting, very maternal, primal thing..."
     },
     {
       "i": 199,
       "speaker": "",
-      "text": "Redheaded dad is angry daddy. No, I'm not."
+      "text": "where it retains nutrients-"
     },
     {
       "i": 200,
       "speaker": "",
-      "text": "Yes, you are. Even Pepper pointed it out on the way home from the airport."
+      "text": "some sort of molecular physiology thing."
     },
     {
       "i": 201,
       "speaker": "",
-      "text": "Okay, that's another one- Pepper."
+      "text": "But that's science."
     },
     {
       "i": 202,
       "speaker": "",
-      "text": "Okay, what's up?"
+      "text": "You can't- You can't fight it, so-"
     },
     {
       "i": 203,
       "speaker": "",
-      "text": "All right, look. I-"
+      "text": "- I'm not saying anything. - You're saying everything."
     },
     {
       "i": 204,
       "speaker": "",
-      "text": "I- I never told my family we were adopting a baby."
+      "text": "- Count to three. - One, two-"
     },
     {
       "i": 205,
       "speaker": "",
-      "text": "And- I know."
+      "text": "- Three. - Okay."
     },
     {
       "i": 206,
       "speaker": "",
-      "text": "You do? Yeah, and I don't blame you. I know your family."
+      "text": "- Oh, Cam. This is beautiful. - Oh, my God. Do you love it?"
     },
     {
       "i": 207,
       "speaker": "",
-      "text": "You'd tell 'em. They'd say something judgmental."
+      "text": "Yes, I-"
     },
     {
       "i": 208,
       "speaker": "",
-      "text": "Exactly. You'd get mad."
+      "text": "What the hell is that?"
     },
     {
       "i": 209,
       "speaker": "",
-      "text": "I know. And then something that's supposed to be nothing but joyful..."
+      "text": "I had Andre do it while we were gone."
     },
     {
       "i": 210,
       "speaker": "",
-      "text": "suddenly turns into this huge fight."
+      "text": "Is that us, with wings?"
     },
     {
       "i": 211,
       "speaker": "",
-      "text": "And who wants a big, emotional scene like that? Thank you. Thank you."
+      "text": "We're floating above her, always there to protect her."
     },
     {
       "i": 212,
       "speaker": "",
-      "text": "I'm so- I'm so relieved you understand."
+      "text": "Okay. Well, that's reassuring, right, Lily?"
     },
     {
       "i": 213,
       "speaker": "",
-      "text": "I invited them over for dinner tonight."
+      "text": "Yes, we tore you away from everything you know,"
     },
     {
       "i": 214,
       "speaker": "",
-      "text": "What? I had to."
+      "text": "but don't worry, things are normal here."
     },
     {
       "i": 215,
       "speaker": "",
-      "text": "This would have gone on forever. You're an avoider."
+      "text": "Your fathers are floating fairies."
     },
     {
       "i": 216,
       "speaker": "",
-      "text": "No. No. No. Cam, I'm calling them right now and canceling."
+      "text": "No, can you call Andre,"
     },
     {
       "i": 217,
       "speaker": "",
-      "text": "No, you're not. You're telling your family you adopted a baby, tonight."
+      "text": "have him paint something a little less gay?"
     },
     {
       "i": 218,
       "speaker": "",
-      "text": "And you do have avoidance issues. Even Longinus said so."
+      "text": "By the way, we need to stop having friends"
     },
     {
       "i": 219,
       "speaker": "",
-      "text": "Are- Are you really not hearing these names?",
-      "stage": "Doorbell Rings"
+      "text": "with names like Andre."
     },
     {
       "i": 220,
-      "speaker": "Haley",
-      "text": "Don't answer it! I'll get it!"
+      "speaker": "",
+      "text": "- Redheaded dad is angry daddy. - No, I'm not."
     },
     {
       "i": 221,
       "speaker": "",
-      "text": "Hi. Hey, you must be Dylan."
+      "text": "Yes, you are."
     },
     {
       "i": 222,
       "speaker": "",
-      "text": "Hey. Dylan. Yeah. I'm Haley's mother."
+      "text": "Even Pepper pointed it out on the way home from the airport."
     },
     {
       "i": 223,
       "speaker": "",
-      "text": "Hey. Mm-hmm."
+      "text": "Okay, that's another one- Pepper."
     },
     {
       "i": 224,
       "speaker": "",
-      "text": "Come on. Let's go. Okay. Um-",
-      "stage": "Clears Throat"
+      "text": "Okay, what's up?"
     },
     {
       "i": 225,
       "speaker": "",
-      "text": "Hang on one second. Um- Whoa."
+      "text": "All right, look. I-"
     },
     {
       "i": 226,
       "speaker": "",
-      "text": "Dylan, you're still in high school?"
+      "text": "I- I never told my family we were adopting a baby."
     },
     {
       "i": 227,
       "speaker": "",
-      "text": "Yeah, I'm a senior. A senior. Okay. Cool."
+      "text": "- And... - I know."
     },
     {
       "i": 228,
       "speaker": "",
-      "text": "Hey, Phil. Sweetie. Honey. He is Dylan, and he is a senior.",
-      "stage": "Whispers"
+      "text": "- You do? - Yeah, and I don't blame you. I know your family."
     },
     {
       "i": 229,
       "speaker": "",
-      "text": "You have to scare him."
+      "text": "You'd tell 'em. They'd say something judgmental."
     },
     {
       "i": 230,
       "speaker": "",
-      "text": "Let me meet this \"playa.\""
+      "text": "- Exactly. - You'd get mad."
     },
     {
       "i": 231,
       "speaker": "",
-      "text": "Phil Dunphy, yo."
+      "text": "I know. And then something that's supposed to be nothing but joyful"
     },
     {
       "i": 232,
       "speaker": "",
-      "text": "It's like that. You just- You just stare down at 'em,"
+      "text": "suddenly turns into this huge fight."
     },
     {
       "i": 233,
       "speaker": "",
-      "text": "let the eyes do the work."
+      "text": "And who wants a big, emotional scene like that?"
     },
     {
       "i": 234,
       "speaker": "",
-      "text": "Your mouth might be saying, \"Hey, we cool,\""
+      "text": "Thank you. Thank you."
     },
     {
       "i": 235,
       "speaker": "",
-      "text": "but your eyes are like, \"No, we not.\""
+      "text": "I'm so- I'm so relieved you understand."
     },
     {
       "i": 236,
       "speaker": "",
-      "text": "\"Nice to meet you.\" \"No, it's not.\""
+      "text": "I invited them over for dinner tonight."
     },
     {
       "i": 237,
       "speaker": "",
-      "text": "\"It's all good.\"",
-      "stage": "Mutters"
+      "text": "- What? - I had to."
     },
     {
       "i": 238,
       "speaker": "",
-      "text": "Yo. Yo."
+      "text": "This would have gone on forever. You're an avoider."
     },
     {
       "i": 239,
       "speaker": "",
-      "text": "Okay, I see you two guys- Wait, wait, wait."
+      "text": "No. No. No. Cam, I'm calling them right now and canceling."
     },
     {
       "i": 240,
       "speaker": "",
-      "text": "You two-"
+      "text": "No, you're not."
     },
     {
       "i": 241,
       "speaker": "",
-      "text": "You two keep it real, know what I mean, son?"
+      "text": "You're telling your family you adopted a baby, tonight."
     },
     {
       "i": 242,
       "speaker": "",
-      "text": "Not really."
+      "text": "And you do have avoidance issues. Even Longinus said so."
     },
     {
       "i": 243,
       "speaker": "",
-      "text": "Please, stop. That's cool."
+      "text": "Are- Are you really not hearing these names?"
     },
     {
       "i": 244,
       "speaker": "",
-      "text": "Ow. Oh, God! That's my back. Oh, honey. Sweetheart."
+      "text": "Don't answer it! I'll get it!"
     },
     {
       "i": 245,
       "speaker": "",
-      "text": "Ow! Oh! I slipped in the baby oil."
+      "text": "Hi. Hey, you must be Dylan."
     },
     {
       "i": 246,
       "speaker": "",
-      "text": "\"Oh, where you from originally?\""
+      "text": "- Hey. Dylan. Yeah. - I'm Haley's mother."
     },
     {
       "i": 247,
       "speaker": "",
-      "text": "\"I could defeat you if it came to a physical confrontation.\""
+      "text": "- Come on. Let's go. - Okay. Um-"
     },
     {
       "i": 248,
       "speaker": "",
-      "text": "Ow! Ow! Ow! Ow! I don't know about this. Should I call a doctor?"
+      "text": "Hang on one second."
     },
     {
       "i": 249,
       "speaker": "",
-      "text": "No, no, no, no, no. Okay."
+      "text": "Dylan, you're still in high school?"
     },
     {
       "i": 250,
       "speaker": "",
-      "text": "You're very strong, homes. Thanks."
+      "text": "- Yeah, I'm a senior. -A senior. Okay. Cool."
     },
     {
       "i": 251,
       "speaker": "",
-      "text": "Okay. Nice- Nice soft landing. There you go."
+      "text": "Hey, Phil. Sweetie. Honey. He is Dylan, and he is a senior."
     },
     {
       "i": 252,
       "speaker": "",
-      "text": "Okay. I am on my side though. Okay, let's go. Come on."
+      "text": "You have to scare him."
     },
     {
       "i": 253,
       "speaker": "",
-      "text": "So just flip me right back, and we're good.",
-      "stage": "Sighs"
+      "text": "Let me meet this \"Playa.\""
     },
     {
       "i": 254,
       "speaker": "",
-      "text": "We'll be good."
+      "text": "Phil Dunphy, yo."
     },
     {
       "i": 255,
       "speaker": "",
-      "text": "I just need to get flipped right on my back, and we should be fine. So-"
+      "text": "It's like that. You just- You just stare down at 'em,"
     },
     {
       "i": 256,
       "speaker": "",
-      "text": "Brenda Feldman."
+      "text": "let the eyes do the work."
     },
     {
       "i": 257,
       "speaker": "",
-      "text": "What is that? A poem I have written for Brenda Feldman."
+      "text": "Your mouth might be saying, \"Hey, we cool,\""
     },
     {
       "i": 258,
       "speaker": "",
-      "text": "- Of course it is. - I put my thoughts into words and now my words into action."
+      "text": "but your eyes are like, \"No, we not.\""
     },
     {
       "i": 259,
       "speaker": "",
-      "text": "Hey, I'll give you 50 bucks not to do this."
+      "text": "\"Nice to meet you.\" \"No, it's not.\""
     },
     {
       "i": 260,
       "speaker": "",
-      "text": "I'm 11 years old. What am I gonna do with money?"
+      "text": "\"It's all good.\""
     },
     {
       "i": 261,
       "speaker": "",
-      "text": "What are you gonna do with a 16-year-old?"
+      "text": "\"No, it's not.\""
     },
     {
       "i": 262,
       "speaker": "",
-      "text": "He's like a bullfighter. Mmm. You ever see a bullfight?"
+      "text": "- Okay, I see you two guys- - Wait, wait, wait."
     },
     {
       "i": 263,
       "speaker": "",
-      "text": "- I can't watch this. - You're in such a bad mood."
+      "text": "You two-"
     },
     {
       "i": 264,
       "speaker": "",
-      "text": "And I know why. It's because that man thought you were my father."
+      "text": "You two keep it real, know what I mean, son?"
     },
     {
       "i": 265,
       "speaker": "",
-      "text": "No. Yes."
+      "text": "Not really."
     },
     {
       "i": 266,
       "speaker": "",
-      "text": "No. When you say \"No\" like that, it's always \"Yes.\""
+      "text": "- Please, stop. - That's cool."
     },
     {
       "i": 267,
       "speaker": "",
-      "text": "Come on. We're in the mall. Let's get you, like, some younger clothes."
+      "text": "- Ow. Oh, God! That's my back. - Oh, honey. Sweetheart."
     },
     {
       "i": 268,
       "speaker": "",
-      "text": "There's a store there. I don't need any younger clothes."
+      "text": "Ow! Oh! I slipped in the baby oil."
     },
     {
       "i": 269,
       "speaker": "",
-      "text": "And I don't care what some jackass in a pair of ripped jeans thinks about me."
+      "text": "\"Oh, where you from originally?\""
     },
     {
       "i": 270,
       "speaker": "",
-      "text": "Good. You shouldn't."
+      "text": "\"I could defeat you if it came to a physical confrontation.\""
     },
     {
       "i": 271,
       "speaker": "",
-      "text": "You should only care what I think."
+      "text": "I don't know about this. Should I call a doctor?"
     },
     {
       "i": 272,
       "speaker": "",
-      "text": "I love you, and I don't care how old you are."
+      "text": "No, no, no, no, no. Okay."
     },
     {
       "i": 273,
       "speaker": "",
-      "text": "So stop being a gloomy goose and stop being so hard on Manny."
+      "text": "- You're very strong, homes. - Thanks."
     },
     {
       "i": 274,
       "speaker": "",
-      "text": "The only reason I'm hard on Manny..."
+      "text": "- Okay. Nice- Nice soft landing. - There you go."
     },
     {
       "i": 275,
       "speaker": "",
-      "text": "is just because I don't wanna see him make a fool of himself."
+      "text": "- Okay, let's go. Come on. - I am on my side though."
     },
     {
       "i": 276,
       "speaker": "",
-      "text": "And I can smell that hair goo of his from here."
+      "text": "So just flip me right back, and we're good."
     },
     {
       "i": 277,
       "speaker": "",
-      "text": "Look, I don't know what's gonna happen to him over there."
+      "text": "We'll be good."
     },
     {
       "i": 278,
       "speaker": "",
-      "text": "But you're his family now, and that means only one thing-"
+      "text": "I just need to get flipped right on my back,"
     },
     {
       "i": 279,
       "speaker": "",
-      "text": "You be the wind in his back, not the spit in his face."
+      "text": "and we should be fine. So-"
     },
     {
       "i": 280,
       "speaker": "",
-      "text": "What? It's something my mom always says."
+      "text": "Brenda Feldman."
     },
     {
       "i": 281,
       "speaker": "",
-      "text": "It's gorgeous in Spanish. Look, he's there."
+      "text": "- What is that? - A poem I have written for Brenda Feldman."
     },
     {
       "i": 282,
       "speaker": "",
-      "text": "She has a boyfriend. Oh, I'm sorry, mi niño."
+      "text": "Of course it is."
     },
     {
       "i": 283,
       "speaker": "",
-      "text": "I gave her my heart,"
+      "text": "I put my thoughts into words and now my words into action."
     },
     {
       "i": 284,
       "speaker": "",
-      "text": "she gave me a picture of me as an old-time sheriff."
+      "text": "Hey, I'll give you 50 bucks not to do this."
     },
     {
       "i": 285,
       "speaker": "",
-      "text": "Oh."
+      "text": "I'm 11 years old. What am I gonna do with money?"
     },
     {
       "i": 286,
       "speaker": "",
-      "text": "That was pretty stupid of me, wasn't it? No, mi amor."
+      "text": "What are you gonna do with a 16-year-old?"
     },
     {
       "i": 287,
       "speaker": "",
-      "text": "It was brave. Right, Jay? Brave."
+      "text": "- He's like a bullfighter. - Mmm. You ever see a bullfight?"
     },
     {
       "i": 288,
       "speaker": "",
-      "text": "W-Well, you'll know better next time."
+      "text": "I can't watch this. - You're in such a bad mood."
     },
     {
       "i": 289,
       "speaker": "",
-      "text": "Come on. Let's get a pretzel."
+      "text": "And I know why. It's because that man thought you were my father."
     },
     {
       "i": 290,
       "speaker": "",
-      "text": "Mentira. A mí sí me gusta."
+      "text": "- No. - Yes."
     },
     {
       "i": 291,
       "speaker": "",
-      "text": "Uh, excuse me, sir. We ask that all mall-walkers stay to the right."
+      "text": "- No. - When you say \"No\" like that, it's always \"Yes.\""
     },
     {
       "i": 292,
-      "speaker": "Haley",
-      "text": "Alex, get out! Mom!"
+      "speaker": "",
+      "text": "Come on. We're in the mall."
     },
     {
       "i": 293,
       "speaker": "",
-      "text": "Alex, leave your sister alone."
+      "text": "Let's get you, like, some younger clothes."
     },
     {
       "i": 294,
       "speaker": "",
-      "text": "I was just getting my book. Gosh."
+      "text": "- There's a store there. - I don't need any younger clothes."
     },
     {
       "i": 295,
       "speaker": "",
-      "text": "I know, sweetie. But you need to respect their privacy."
+      "text": "And I don't care what some jackass"
     },
     {
       "i": 296,
       "speaker": "",
-      "text": "What are they doing up there? Nothing."
+      "text": "in a pair of ripped jeans thinks about me."
     },
     {
       "i": 297,
       "speaker": "",
-      "text": "Lying on her bed, watching a movie."
+      "text": "Good. You shouldn't."
     },
     {
       "i": 298,
       "speaker": "",
-      "text": "Okay. Okay."
+      "text": "You should only care what I think."
     },
     {
       "i": 299,
       "speaker": "",
-      "text": "Um, I'm making a cake for tonight. You wanna help me with the frosting?"
+      "text": "I love you, and I don't care how old you are."
     },
     {
       "i": 300,
       "speaker": "",
-      "text": "Sure."
+      "text": "So stop being a gloomy goose and stop being so hard on Manny."
     },
     {
       "i": 301,
       "speaker": "",
-      "text": "So, you know, if Haley got pregnant,"
+      "text": "The only reason I'm hard on Manny..."
     },
     {
       "i": 302,
       "speaker": "",
-      "text": "would you ever pretend she has mono for a few months,"
+      "text": "Is just because I don't wanna see him make a fool of himself."
     },
     {
       "i": 303,
       "speaker": "",
-      "text": "and then, like, tell everyone the baby's yours?"
+      "text": "And I can smell that hair goo of his from here."
     },
     {
       "i": 304,
       "speaker": "",
-      "text": "What? This senior at school was \"out sick\" for four months,"
+      "text": "Look, I don't know what's gonna happen to him over there."
     },
     {
       "i": 305,
       "speaker": "",
-      "text": "but Jenna Resnick swears she saw her breast-feeding at a coin-op car wash.",
-      "stage": "Sighs"
+      "text": "But you're his family now, and that means only one thing-"
     },
     {
       "i": 306,
       "speaker": "",
-      "text": "Buddy, what are you wearing?"
+      "text": "You be the wind in his back, not the spit in his face."
     },
     {
       "i": 307,
       "speaker": "",
-      "text": "- Nothing. - Uh-uh. No jacket."
+      "text": "- What? -It's something my mom always says."
     },
     {
       "i": 308,
       "speaker": "",
-      "text": "One hat. How many pairs of underwear do you have on?"
+      "text": "It's gorgeous in Spanish."
     },
     {
       "i": 309,
       "speaker": "",
-      "text": "One. Six.",
-      "stage": "Sighs"
+      "text": "Look, he's there."
     },
     {
       "i": 310,
       "speaker": "",
-      "text": "First of all, it would be really cool to see Haley that fat."
+      "text": "- She has a boyfriend. - Oh, I'm sorry, mi nino."
     },
     {
       "i": 311,
       "speaker": "",
-      "text": "And how awesome would it be to have a fake little brother who's really my nephew."
+      "text": "I gave her my heart,"
     },
     {
       "i": 312,
       "speaker": "",
-      "text": "Haley is not getting pregnant.",
-      "stage": "Clears Throat"
+      "text": "she gave me a picture of me as an old-time sheriff."
     },
     {
       "i": 313,
       "speaker": "",
-      "text": "Just saying \"if.\" I know."
+      "text": "- That was pretty stupid of me, wasn't it? - No, mi amor."
     },
     {
       "i": 314,
       "speaker": "",
-      "text": "And I know you like to make trouble for your sister, but it's not gonna work this time."
+      "text": "It was brave. Right, Jay? Brave."
     },
     {
       "i": 315,
       "speaker": "",
-      "text": "You know why? 'Cause your sister's a good girl."
+      "text": "W-Well, you'll know better next time."
     },
     {
       "i": 316,
       "speaker": "",
-      "text": "I know. I was just like her when I was-"
+      "text": "Come on. Let's get a pretzel."
     },
     {
       "i": 317,
       "speaker": "",
-      "text": "I want you to know, I'm not enjoying this."
+      "text": "Mentira. A me se me gusta."
     },
     {
       "i": 318,
       "speaker": "",
-      "text": "But this is an important lesson that you're learning."
+      "text": "Uh, excuse me, sir."
     },
     {
       "i": 319,
       "speaker": "",
-      "text": "So, soak it. Keep it.",
-      "stage": "Clearing Throat"
+      "text": "We ask that all mall-walkers stay to the right."
     },
     {
       "i": 320,
       "speaker": "",
-      "text": "You're too close. It's gonna hurt."
+      "text": "Alex, get out! Mom!"
     },
     {
       "i": 321,
       "speaker": "",
-      "text": "It's supposed to hurt."
+      "text": "Alex, leave your sister alone."
     },
     {
       "i": 322,
       "speaker": "",
-      "text": "- And why are you smiling? - I'm- What?"
+      "text": "I was just getting my book. Gosh."
     },
     {
       "i": 323,
       "speaker": "",
-      "text": "Oh, forget it. I can't do this."
+      "text": "I know, sweetie. But you need to respect their privacy."
     },
     {
       "i": 324,
       "speaker": "",
-      "text": "The point is you're scared. I think you've learned your lesson.",
-      "stage": "Shoots"
+      "text": "- What are they doing up there? - Nothing."
     },
     {
       "i": 325,
       "speaker": "",
-      "text": "Wow."
+      "text": "Lying on her bed, watching a movie."
     },
     {
       "i": 326,
       "speaker": "",
-      "text": "Ow!"
+      "text": "Okay. Okay."
     },
     {
       "i": 327,
       "speaker": "",
-      "text": "Mom! What are you doing?"
+      "text": "Um, I'm making a cake for tonight."
     },
     {
       "i": 328,
       "speaker": "",
-      "text": "Oh, hey! I was just, um, dropping off some laundry."
+      "text": "You wanna help me with the frosting?"
     },
     {
       "i": 329,
       "speaker": "",
-      "text": "- Is this a bad time? - Yeah."
+      "text": "Sure."
     },
     {
       "i": 330,
       "speaker": "",
-      "text": "Oh. Okay."
+      "text": "So, you know, if Haley got pregnant,"
     },
     {
       "i": 331,
       "speaker": "",
-      "text": "Uh, can you shut the door, please?"
+      "text": "would you ever pretend she has mono for a few months,"
     },
     {
       "i": 332,
       "speaker": "",
-      "text": "Actually, we're just gonna go ahead and leave that open."
+      "text": "and then, like, tell everyone the baby's yours?"
     },
     {
       "i": 333,
       "speaker": "",
-      "text": "Why?"
+      "text": "- What? - This senior at school was \"Out sick\" for four months,"
     },
     {
       "i": 334,
       "speaker": "",
-      "text": "Because I have, uh, seen this little show before-"
+      "text": "but Jenna Resnick swears she saw her breast-feeding"
     },
     {
       "i": 335,
       "speaker": "",
-      "text": "lying on the bed with a tall senior."
+      "text": "at a coin-op car wash."
     },
     {
       "i": 336,
       "speaker": "",
-      "text": "One minute you're just friends, watching Falcon Crest,"
+      "text": "Buddy, what are you wearing?"
     },
     {
       "i": 337,
       "speaker": "",
-      "text": "and the next you're lying underneath the air hockey table with your bra in your pocket."
+      "text": "- Nothing. - Uh-uh. No jacket."
     },
     {
       "i": 338,
       "speaker": "",
-      "text": "Whoa. Mom!"
+      "text": "One hat."
     },
     {
       "i": 339,
       "speaker": "",
-      "text": "- [Whimpering] You hit my bone! - It was an accident!"
+      "text": "How many pairs of underwear do you have on?"
     },
     {
       "i": 340,
       "speaker": "",
-      "text": "- I thought you were my friend! - I am your friend."
+      "text": "One."
     },
     {
       "i": 341,
       "speaker": "",
-      "text": "Dad! Dad, Dad. You have got to talk to Mom."
+      "text": "Six."
     },
     {
       "i": 342,
       "speaker": "",
-      "text": "She is, like, completely freaking out and embarrassing me!"
+      "text": "First of all, it would be really cool to see Haley that fat."
     },
     {
       "i": 343,
       "speaker": "",
-      "text": "Honey, your mom isn't always as cool about things as-"
+      "text": "And how awesome would it be"
     },
     {
       "i": 344,
       "speaker": "",
-      "text": "- [Shoots] - Ow!"
+      "text": "to have a fake little brother who's really my nephew."
     },
     {
       "i": 345,
       "speaker": "",
-      "text": "What is with this thing?",
-      "stage": "Shoots"
+      "text": "Haley is not getting pregnant."
     },
     {
       "i": 346,
       "speaker": "",
-      "text": "Ow!"
+      "text": "- Just saying \"If.\" - I know."
     },
     {
       "i": 347,
       "speaker": "",
-      "text": "My dad. Uh, my dad still isn't completely comfortable with this."
+      "text": "And I know you like to make trouble for your sister,"
     },
     {
       "i": 348,
       "speaker": "",
-      "text": "Um- He-He still does this thing. It's been five years now."
+      "text": "but it's not gonna work this time."
     },
     {
       "i": 349,
       "speaker": "",
-      "text": "And he still does this thing where he announces himself..."
+      "text": "You know why? 'Cause your sister's a good girl."
     },
     {
       "i": 350,
       "speaker": "",
-      "text": "before walking into any room we're in..."
+      "text": "I know. I was just like her when I was-"
     },
     {
       "i": 351,
       "speaker": "",
-      "text": "just to make sure he doesn't have to ever see us kiss."
+      "text": "I want you to know, I'm not enjoying this."
     },
     {
       "i": 352,
       "speaker": "",
-      "text": "Wish my mother had that system."
+      "text": "But this is an important lesson that you're learning."
     },
     {
       "i": 353,
       "speaker": "",
-      "text": "Remember? Not now."
+      "text": "So, soak it. Keep it."
     },
     {
       "i": 354,
       "speaker": "",
-      "text": "I still can't believe you did this to me."
+      "text": "You're too close. It's gonna hurt."
     },
     {
       "i": 355,
       "speaker": "",
-      "text": "Would you get in the spirit of things? It's a celebration.",
-      "stage": "Doorbell Rings"
+      "text": "It's supposed to hurt."
     },
     {
       "i": 356,
       "speaker": "",
-      "text": "- Oh, God. - Okay, I'm gonna go get Lily ready."
+      "text": "- And why are you smiling? - I'm- What?"
     },
     {
       "i": 357,
       "speaker": "",
-      "text": "Okay. And I want you to just come straight out with it."
+      "text": "Oh, forget it. I can't do this."
     },
     {
       "i": 358,
       "speaker": "",
-      "text": "All right. Okay. You can do this."
+      "text": "The point is you're scared. I think you've learned your lesson."
     },
     {
       "i": 359,
       "speaker": "",
-      "text": "Yeah. Sports guy chest bump."
+      "text": "Mom! What are you doing?"
     },
     {
       "i": 360,
       "speaker": "",
-      "text": "No. Sports guy chest bump."
+      "text": "Oh, hey! I was just, um, dropping off some laundry."
     },
     {
       "i": 361,
       "speaker": "",
-      "text": "Cam. Oh! All right. Go. Do it. Go."
+      "text": "- Is this a bad time? - Yeah."
     },
     {
       "i": 362,
       "speaker": "",
-      "text": "Sorry. Oh.",
-      "stage": "Exhales"
+      "text": "Oh. Okay."
     },
     {
       "i": 363,
       "speaker": "",
-      "text": "Hey. Hi. Hey."
+      "text": "Uh, can you shut the door, please?"
     },
     {
       "i": 364,
       "speaker": "",
-      "text": "How are you? Hi, guys. Hey."
+      "text": "Actually, we're just gonna go ahead and leave that open."
     },
     {
       "i": 365,
       "speaker": "",
-      "text": "That looks good. Oh, thank you. Thanks."
+      "text": "Why?"
     },
     {
       "i": 366,
       "speaker": "",
-      "text": "Don't thank us. Open it. Dad is coming right behind.",
-      "stage": "Doorbell Ringing；Knocking"
+      "text": "Because I have, uh, seen this little show before-"
     },
     {
       "i": 367,
-      "speaker": "Jay",
-      "text": "Knock, knock! We're here. Coming in!"
+      "speaker": "",
+      "text": "Lying on the bed with a tall senior."
     },
     {
       "i": 368,
       "speaker": "",
-      "text": "Don't worry, Dad. Nothing gay going on here."
+      "text": "One minute you're just friends, watching Falcon Crest,"
     },
     {
       "i": 369,
       "speaker": "",
-      "text": "May I take your multicolored coat and bejeweled cap?"
+      "text": "and the next you're lying underneath the air hockey table"
     },
     {
       "i": 370,
       "speaker": "",
-      "text": "Yeah. Yeah. Hey, Jay."
+      "text": "with your bra in your pocket."
     },
     {
       "i": 371,
       "speaker": "",
-      "text": "Gloria, hi. Hi."
+      "text": "Mom!"
     },
     {
       "i": 372,
       "speaker": "",
-      "text": "How are you? Hi, Dad. Hi, Gloria. How are you?"
+      "text": "- You hit my bone! - It was an accident!"
     },
     {
       "i": 373,
       "speaker": "",
-      "text": "Oh, what a beautiful dress. Ay, thank you, Phil."
+      "text": "- I thought you were my friend! - I am your friend."
     },
     {
       "i": 374,
       "speaker": "",
-      "text": "Okay. Oh, hey- Phil."
+      "text": "Dad! Dad, Dad. You have got to talk to Mom."
     },
     {
       "i": 375,
       "speaker": "",
-      "text": "That's how she says \"Phil.\" Not \"feel.\" Phil. Oh."
+      "text": "She is, like, completely freaking out and embarrassing me!"
     },
     {
       "i": 376,
       "speaker": "",
-      "text": "- So how was your trip? - It was good. It was good actually."
+      "text": "Honey, your mom isn't always as cool about things as-"
     },
     {
       "i": 377,
       "speaker": "",
-      "text": "But, um, about that, I- I have something that I need to tell you guys."
+      "text": "What is with this thing?"
     },
     {
       "i": 378,
       "speaker": "",
-      "text": "Um- Uh, we didn't just go to Vietnam for pleasure."
+      "text": "My dad."
     },
     {
       "i": 379,
       "speaker": "",
-      "text": "We, uh, kind of have some big news."
+      "text": "Uh, my dad still isn't completely comfortable with this."
     },
     {
       "i": 380,
       "speaker": "",
-      "text": "Oh, God. If Cam comes out here with boobs, I'm leaving."
+      "text": "Um- He-He still does this thing. It's been five years now."
     },
     {
       "i": 381,
       "speaker": "",
-      "text": "- [Claire] Dad. - I hope he didn't embarrass you, Mom."
+      "text": "And he still does this thing where he announces himself..."
     },
     {
       "i": 382,
       "speaker": "",
-      "text": "Oh, don't mind her. Haley had her first boy over today..."
+      "text": "before walking into any room we're in..."
     },
     {
       "i": 383,
       "speaker": "",
-      "text": "and Phil shot him."
+      "text": "just to make sure he doesn't have to ever see us kiss."
     },
     {
       "i": 384,
       "speaker": "",
-      "text": "Anyway, um, so, about- about a year ago,"
+      "text": "Wish my mother had that system."
     },
     {
       "i": 385,
       "speaker": "",
-      "text": "Cam and I started feeling this longing, you know,"
+      "text": "- Remember? - Not now."
     },
     {
       "i": 386,
       "speaker": "",
-      "text": "for something more, like, uh, maybe a baby?"
+      "text": "I still can't believe you did this to me."
     },
     {
       "i": 387,
       "speaker": "",
-      "text": "- Ooh, that's a bad idea. - What do you mean, \"bad idea\"?"
+      "text": "Would you get in the spirit of things? It's a celebration."
     },
     {
       "i": 388,
       "speaker": "",
-      "text": "Well, kids need a mother. I mean if you two guys are bored, get a dog."
+      "text": "Oh, God."
     },
     {
       "i": 389,
       "speaker": "",
-      "text": "Okay, we're not bored, Dad."
+      "text": "- Okay, I'm gonna go get Lily ready. - Okay."
     },
     {
       "i": 390,
       "speaker": "",
-      "text": "I support you, Mitchell, even though you're not my son."
+      "text": "- And I want you to just come straight out with it. - All right."
     },
     {
       "i": 391,
       "speaker": "",
-      "text": "I-I-I-I think what Dad is trying to say..."
+      "text": "Okay. You can do this."
     },
     {
       "i": 392,
       "speaker": "",
-      "text": "is that, Mitchell, you're a little uptight."
+      "text": "Yeah. Sports guy chest bump."
     },
     {
       "i": 393,
       "speaker": "",
-      "text": "- Kids bring chaos, and- and you don't handle it well. - That's not what Dad's saying."
+      "text": "- No. - Sports guy chest bump."
     },
     {
       "i": 394,
       "speaker": "",
-      "text": "That's what you're saying. And it's insulting in a whole different way."
+      "text": "- Cam. Oh! All right. Go - Do it."
     },
     {
       "i": 395,
       "speaker": "",
-      "text": "Okay, people. Let's all \"chillax.\""
+      "text": "Sorry."
     },
     {
       "i": 396,
       "speaker": "",
-      "text": "Hey, where's Uncle Cameron? Thank you. Thank you."
+      "text": "- How are you? - Hi, guys. Hey."
     },
     {
       "i": 397,
       "speaker": "",
-      "text": "Someone who's not insulting me notices he's not here."
+      "text": "That looks good. Oh, thank you. Thanks."
     },
     {
       "i": 398,
       "speaker": "",
-      "text": "Oh, so that's the big announcement, huh? You two broke up."
+      "text": "Don't thank us. Open it. Dad is coming right behind."
     },
     {
       "i": 399,
       "speaker": "",
-      "text": "Well- Well, a baby wasn't gonna help that anyway."
+      "text": "Knock, knock! We're here. Coming in!"
     },
     {
       "i": 400,
       "speaker": "",
-      "text": "And let me tell you. You're better off, because he was a bit of a drama queen."
+      "text": "Don't worry, Dad. Nothing gay going on here."
     },
     {
       "i": 401,
       "speaker": "",
-      "text": "No, no, no. Stop. Stop. No."
+      "text": "May I take your multicolored coat and bejeweled cap?"
     },
     {
       "i": 402,
       "speaker": "",
-      "text": "You come into my house and you insult me and my boyfriend,"
+      "text": "- Yeah. Yeah. - Hey, Jay."
     },
     {
       "i": 403,
       "speaker": "",
-      "text": "who, by the way, is not that dramatic-"
+      "text": "- Gloria, hi. - Hi."
     },
     {
       "i": 404,
       "speaker": "",
-      "text": "♪♪ [Stereo: Man Singing In Zulu] Oh, God."
+      "text": "- How are you? Hi, Dad. - Hi, Gloria. How are you?"
     },
     {
       "i": 405,
       "speaker": "",
-      "text": "♪♪ [Chorus Singing In Zulu]"
+      "text": "- Oh, what a beautiful dress. - Ay, thank you, Phil."
     },
     {
       "i": 406,
-      "speaker": "Man",
-      "text": "♪ It's the circle of life ♪"
+      "speaker": "",
+      "text": "Okay."
     },
     {
       "i": 407,
       "speaker": "",
-      "text": "We adopted a baby. ♪ And it moves us all ♪"
+      "text": "Oh, hey, Phil."
     },
     {
       "i": 408,
       "speaker": "",
-      "text": "Her name is Lily. Oh."
+      "text": "That's how she says \"Phil.\" Not \"Feel.\" Phil."
     },
     {
       "i": 409,
       "speaker": "",
-      "text": "Exciting! Just turn it off."
+      "text": "- So how was your trip? - It was good. It was good actually."
     },
     {
       "i": 410,
       "speaker": "",
-      "text": "I can't turn it off. It's who I am."
+      "text": "But, um, about that, I- I"
     },
     {
       "i": 411,
       "speaker": "",
-      "text": "The music. Oh, yes, the music.",
-      "stage": "Chuckles"
+      "text": "have something that I need to tell you guys."
     },
     {
       "i": 412,
       "speaker": "",
-      "text": "♪♪ [Stops] Come say hi to Lily."
+      "text": "Um- Uh, we didn't just go to Vietnam for pleasure."
     },
     {
       "i": 413,
       "speaker": "",
-      "text": "Ay, miren a la princesita. The little princess."
+      "text": "We, uh, kind of have some big news."
     },
     {
       "i": 414,
-      "speaker": "Haley",
-      "text": "She's so cute!"
+      "speaker": "",
+      "text": "Oh, God. If Cam comes out here with boobs, I'm leaving."
     },
     {
       "i": 415,
       "speaker": "",
-      "text": "So cute. Thank you."
+      "text": "- Dad. - I hope he didn't embarrass you, Mom."
     },
     {
       "i": 416,
-      "speaker": "Claire",
-      "text": "Let me see her. Let me see her. Let me see her."
+      "speaker": "",
+      "text": "Oh, don't mind her. Haley had her first boy over today..."
     },
     {
       "i": 417,
       "speaker": "",
-      "text": "Hi there, Lily."
+      "text": "And Phil shot him."
     },
     {
       "i": 418,
       "speaker": "",
-      "text": "\"Lily.\" Isn't that gonna be hard for her to say?"
+      "text": "Anyway, um, so, about- about a year ago,"
     },
     {
       "i": 419,
-      "speaker": "Haley",
-      "text": "So cute."
+      "speaker": "",
+      "text": "Cam and I started feeling this longing, you know,"
     },
     {
       "i": 420,
       "speaker": "",
-      "text": "Phil. Excuse me."
+      "text": "for something more, like, uh, maybe a baby?"
     },
     {
       "i": 421,
       "speaker": "",
-      "text": "Okay, I-I-I know that I said I thought this was a bad idea."
+      "text": "- Ooh, that's a bad idea. - What do you mean, \"Bad idea\"?"
     },
     {
       "i": 422,
       "speaker": "",
-      "text": "But, uh, what do I know?"
+      "text": "Well, kids need a mother."
     },
     {
       "i": 423,
       "speaker": "",
-      "text": "I mean, it's not like I wrote the book on fatherhood."
+      "text": "I mean if you two guys are bored, get a dog."
     },
     {
       "i": 424,
       "speaker": "",
-      "text": "Been trying all my life to get it right. I'm still screwing up."
+      "text": "Okay, we're not bored, Dad."
     },
     {
       "i": 425,
       "speaker": "",
-      "text": "- Right, Manny? - I wrote a song about it in the car."
+      "text": "I support you, Mitchell, even though you're not my son."
     },
     {
       "i": 426,
       "speaker": "",
-      "text": "Of course you did. Uh-"
+      "text": "I-I-I-I think what Dad is trying to say..."
     },
     {
       "i": 427,
       "speaker": "",
-      "text": "Anyway, I'm happy for you. And, uh, you should know that, uh,"
+      "text": "is that, Mitchell, you're a little uptight."
     },
     {
       "i": 428,
       "speaker": "",
-      "text": "I'm not here to spit in your face,"
+      "text": "Kids bring chaos, and- and you don't handle it well."
     },
     {
       "i": 429,
       "speaker": "",
-      "text": "I'm here to... blow at your back."
+      "text": "That's not what Dad's saying."
     },
     {
       "i": 430,
       "speaker": "",
-      "text": "I don't understand what that means. I don't-"
+      "text": "That's what you're saying."
     },
     {
       "i": 431,
       "speaker": "",
-      "text": "Well, it's- it's supposed to sound better in Spanish."
+      "text": "And it's insulting in a whole different way."
     },
     {
       "i": 432,
       "speaker": "",
-      "text": "Voy a ser la brisa en tu espalda, no quien te escupa en la frente."
+      "text": "Okay, people. Let's all \"Chillax.\""
     },
     {
       "i": 433,
       "speaker": "",
-      "text": "Oh, that's beautiful. That's really nice."
+      "text": "- Hey, where's Uncle Cameron? - Thank you. Thank you."
     },
     {
       "i": 434,
       "speaker": "",
-      "text": "And thank you too."
+      "text": "Someone who's not insulting me notices he's not here."
     },
     {
       "i": 435,
       "speaker": "",
-      "text": "Anyhow, Mitch, uh-"
+      "text": "Oh, so that's the big announcement, huh?"
     },
     {
       "i": 436,
       "speaker": "",
-      "text": "- No, Dad, it's- it's- - [Lily Crying]"
+      "text": "You two broke up."
     },
     {
       "i": 437,
       "speaker": "",
-      "text": "I got her. I got her. Oh, she's crying."
+      "text": "Well- Well, a baby wasn't gonna help that anyway."
     },
     {
       "i": 438,
       "speaker": "",
-      "text": "She wants her grandpa! She wants her daddy!"
+      "text": "And let me tell you. You're better off,"
     },
     {
       "i": 439,
       "speaker": "",
-      "text": "Do you wanna meet Grandpa? What? Are you kidding?"
+      "text": "because he was a bit of a drama queen."
     },
     {
       "i": 440,
       "speaker": "",
-      "text": "She's one of us now. Let me see the little pot sticker.",
-      "stage": "Chuckling"
+      "text": "No, no, no. Stop. Stop. No."
     },
     {
       "i": 441,
       "speaker": "",
-      "text": "Hey, you're a cutie, aren't you?"
+      "text": "You come into my house and you insult me and my boyfriend,"
     },
     {
       "i": 442,
       "speaker": "",
-      "text": "Ah. Look at this.",
-      "stage": "All Fussing"
+      "text": "who, by the way, is not that dramatic-"
     },
     {
       "i": 443,
-      "speaker": "Jay",
-      "text": "We're from different worlds, yet we somehow fit together."
+      "speaker": "",
+      "text": "We adopted a baby."
     },
     {
       "i": 444,
       "speaker": "",
-      "text": "Love is what binds us,"
+      "text": "Her name is Lily."
     },
     {
       "i": 445,
       "speaker": "",
-      "text": "through fair or stormy weather."
+      "text": "- Exciting! - Just turn it off."
     },
     {
       "i": 446,
       "speaker": "",
-      "text": "I stand before you now with only one agenda-"
+      "text": "I can't turn it off. It's who I am."
     },
     {
       "i": 447,
       "speaker": "",
-      "text": "\"To let you know my heart is yours,"
+      "text": "- The music. - Oh, yes, the music."
     },
     {
       "i": 448,
       "speaker": "",
-      "text": "Feldman comma Brenda.\""
+      "text": "Come say hi to Lily."
     },
     {
       "i": 449,
       "speaker": "",
-      "text": "I mean, seriously."
+      "text": "Ay, miren a la princesita."
     },
     {
       "i": 450,
       "speaker": "",
-      "text": "Luke, so far, hasn't beaten me in basketball."
+      "text": "The little princess."
     },
     {
       "i": 451,
       "speaker": "",
-      "text": "It's 2-0. 2-0. Okay. Okay.",
-      "stage": "Grunting"
+      "text": "- She's so cute! - Thank you."
     },
     {
       "i": 452,
       "speaker": "",
-      "text": "Get that weak stuff out of my kitchen! Dad, stop it!"
+      "text": "Let me see her. Let me see her."
     },
     {
       "i": 453,
       "speaker": "",
-      "text": "Can you do me a favor? Just grab-"
+      "text": "Hi there, Lily."
     },
     {
       "i": 454,
       "speaker": "",
-      "text": "Ooh! How's the weather down there?"
+      "text": "\"Lily.\" Isn't that gonna be hard for her to say?"
     },
     {
       "i": 455,
       "speaker": "",
-      "text": "But when the day comes that he does win-"
+      "text": "- Phil. - Excuse me."
     },
     {
       "i": 456,
       "speaker": "",
-      "text": "if- you know- if/when-"
+      "text": "Okay, I-I-I know that I said I thought this was a bad idea."
     },
     {
       "i": 457,
       "speaker": "",
-      "text": "he beats me, I'm just gonna be like,"
+      "text": "But, uh, what do I know?"
     },
     {
       "i": 458,
       "speaker": "",
-      "text": "\"Well done. Well done.\""
+      "text": "I mean, it's not like I wrote the book on fatherhood."
     },
     {
       "i": 459,
       "speaker": "",
-      "text": "Just, like, let him- Just support him..."
+      "text": "Been trying all my life to get it right. I'm still screwing up."
     },
     {
       "i": 460,
       "speaker": "",
-      "text": "in- in- in that kind of stuff."
+      "text": "- Right, Manny? - I wrote a song about it in the car."
     },
     {
       "i": 461,
       "speaker": "",
-      "text": "I mean, I'd probably want to go, like, two out of three and just see what happens there, but-"
+      "text": "Of course you did."
+    },
+    {
+      "i": 462,
+      "speaker": "",
+      "text": "Anyway, I'm happy for you."
+    },
+    {
+      "i": 463,
+      "speaker": "",
+      "text": "And, uh, you should know that, uh,"
+    },
+    {
+      "i": 464,
+      "speaker": "",
+      "text": "I'm not here to spit in your face,"
+    },
+    {
+      "i": 465,
+      "speaker": "",
+      "text": "I'm here to... blow at your back."
+    },
+    {
+      "i": 466,
+      "speaker": "",
+      "text": "- I don't understand what that means. - I don't-"
+    },
+    {
+      "i": 467,
+      "speaker": "",
+      "text": "Well, it's- it's supposed to sound better in Spanish."
+    },
+    {
+      "i": 468,
+      "speaker": "",
+      "text": "Oh, that's beautiful. That's really nice."
+    },
+    {
+      "i": 469,
+      "speaker": "",
+      "text": "And thank you too."
+    },
+    {
+      "i": 470,
+      "speaker": "",
+      "text": "Anyhow, Mitch, uh-"
+    },
+    {
+      "i": 471,
+      "speaker": "",
+      "text": "No, Dad, it's- it's- -"
+    },
+    {
+      "i": 472,
+      "speaker": "",
+      "text": "- I got her. I got her. - Oh, she's crying."
+    },
+    {
+      "i": 473,
+      "speaker": "",
+      "text": "She wants her grandpa! She wants her daddy!"
+    },
+    {
+      "i": 474,
+      "speaker": "",
+      "text": "- Do you wanna meet Grandpa? - What? Are you kidding?"
+    },
+    {
+      "i": 475,
+      "speaker": "",
+      "text": "She's one of us now. Let me see the little pot sticker."
+    },
+    {
+      "i": 476,
+      "speaker": "",
+      "text": "Hey, you're a cutie, aren't you?"
+    },
+    {
+      "i": 477,
+      "speaker": "",
+      "text": "Ah. Look at this."
+    },
+    {
+      "i": 478,
+      "speaker": "",
+      "text": "We're from different worlds, yet we somehow fit together."
+    },
+    {
+      "i": 479,
+      "speaker": "",
+      "text": "Love is what binds us, through fair or stormy weather."
+    },
+    {
+      "i": 480,
+      "speaker": "",
+      "text": "I stand before you now with only one agenda-"
+    },
+    {
+      "i": 481,
+      "speaker": "",
+      "text": "\"To let you know my heart is yours,"
+    },
+    {
+      "i": 482,
+      "speaker": "",
+      "text": "Feldman comma Brenda.\""
+    },
+    {
+      "i": 483,
+      "speaker": "",
+      "text": "I mean, seriously."
+    },
+    {
+      "i": 484,
+      "speaker": "",
+      "text": "Luke, so far, hasn't beaten me in basketball."
+    },
+    {
+      "i": 485,
+      "speaker": "",
+      "text": "It's 2-0. 2-0. Okay. Okay."
+    },
+    {
+      "i": 486,
+      "speaker": "",
+      "text": "- Get that weak stuff out of my kitchen! - Dad, stop it!"
+    },
+    {
+      "i": 487,
+      "speaker": "",
+      "text": "Can you do me a favor? Just grab-"
+    },
+    {
+      "i": 488,
+      "speaker": "",
+      "text": "How's the weather down there?"
+    },
+    {
+      "i": 489,
+      "speaker": "",
+      "text": "But when the day comes that he does win-"
+    },
+    {
+      "i": 490,
+      "speaker": "",
+      "text": "if- you know- if/when-"
+    },
+    {
+      "i": 491,
+      "speaker": "",
+      "text": "he beats me, I'm just gonna be like,"
+    },
+    {
+      "i": 492,
+      "speaker": "",
+      "text": "\"Well done. Well done.\""
+    },
+    {
+      "i": 493,
+      "speaker": "",
+      "text": "Just, like, let him- Just support him..."
+    },
+    {
+      "i": 494,
+      "speaker": "",
+      "text": "in- in- in that kind of stuff."
+    },
+    {
+      "i": 495,
+      "speaker": "",
+      "text": "I mean, I'd probably want to go, like,"
+    },
+    {
+      "i": 496,
+      "speaker": "",
+      "text": "two out of three and just see what happens there, but-"
     }
   ]
 }

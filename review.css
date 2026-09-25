@@ -96,6 +96,14 @@ select:focus-visible,
   justify-self: start;
 }
 
+.review-topbar .topbar-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  justify-self: start;
+}
+
 .topbar-button {
   min-height: 38px;
   padding: 0 12px;
@@ -637,6 +645,19 @@ select:focus-visible,
   .review-topbar {
     grid-template-columns: 74px 1fr 78px;
     gap: 8px;
+  }
+
+  .review-topbar .topbar-links {
+    gap: 6px;
+  }
+
+  .review-topbar .topbar-back {
+    font-size: 0;
+  }
+
+  .review-topbar .topbar-back::before {
+    content: "←";
+    font-size: 11px;
   }
 
   .review-brand {

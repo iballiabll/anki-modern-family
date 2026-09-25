@@ -8,6 +8,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2026-06-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -48,6 +49,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2026-06-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -88,6 +90,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2026-06-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -128,6 +131,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2025-12-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -168,6 +172,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2025-12-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -208,6 +213,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2025-12-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -248,6 +254,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2025-06-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -288,6 +295,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2025-06-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -328,6 +336,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2025-06-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -368,6 +377,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2024-12-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -408,6 +418,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2024-12-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -448,6 +459,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2024-12-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -488,6 +500,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2024-06-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -528,6 +541,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2024-06-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -568,6 +582,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2024-06-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -608,6 +623,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2023-12-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -648,6 +664,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2023-12-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -688,6 +705,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2023-12-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -728,6 +746,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2023-06-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -768,6 +787,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2023-06-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -808,6 +828,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2023-06-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -848,6 +869,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2023-03-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -888,6 +910,7 @@ window.IBALL_READING_PAPERS = [
     "set": 3,
     "file": "./reading-data/2022-12-3.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -928,6 +951,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2022-12-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -968,6 +992,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2022-12-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -1008,6 +1033,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2022-09-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -1048,6 +1074,7 @@ window.IBALL_READING_PAPERS = [
     "set": 2,
     "file": "./reading-data/2022-06-2.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",
@@ -1088,6 +1115,7 @@ window.IBALL_READING_PAPERS = [
     "set": 1,
     "file": "./reading-data/2022-06-1.js",
     "pieceCount": 4,
+    "missing": [],
     "types": [
       {
         "kind": "cloze",

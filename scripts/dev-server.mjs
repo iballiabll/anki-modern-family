@@ -1,4 +1,5 @@
 import http from "node:http";
+import { createReadStream } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -19,6 +20,10 @@ const MIME_TYPES = {
   ".json": "application/json; charset=utf-8",
   ".mjs": "text/javascript; charset=utf-8",
   ".mp3": "audio/mpeg",
+  ".doc": "application/msword",
+  ".docx":
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".pdf": "application/pdf",
   ".png": "image/png",
   ".svg": "image/svg+xml",
   ".txt": "text/plain; charset=utf-8",
@@ -131,7 +136,6 @@ async function serveStatic(response, pathname, request) {
   }
 
   try {
-    const body = await readFile(filePath);
     const contentType =
       MIME_TYPES[path.extname(filePath).toLowerCase()] ||
       "application/octet-stream";
@@ -142,6 +146,7 @@ async function serveStatic(response, pathname, request) {
     );
     const etag = `W/"${info.size}-${Math.floor(info.mtimeMs).toString(36)}"`;
     const headers = {
+      "accept-ranges": "bytes",
       etag,
       "cache-control": versioned
         ? "public, max-age=31536000, immutable"
@@ -155,6 +160,37 @@ async function serveStatic(response, pathname, request) {
       return;
     }
 
+    // Audio sprites are seeked by the player, so honour byte ranges the way
+    // static hosting does. Without this a <audio> element cannot scrub.
+    const rangeMatch = /^bytes=(\d*)-(\d*)$/.exec(request.headers.range || "");
+    if (rangeMatch && (rangeMatch[1] || rangeMatch[2])) {
+      const suffixLength = rangeMatch[1] ? 0 : Number(rangeMatch[2]);
+      const start = suffixLength
+        ? Math.max(0, info.size - suffixLength)
+        : Number(rangeMatch[1]);
+      const requestedEnd = rangeMatch[2]
+        ? Number(rangeMatch[2])
+        : info.size - 1;
+      const end = Math.min(requestedEnd, info.size - 1);
+      if (start >= info.size || start > end) {
+        response.writeHead(416, {
+          ...headers,
+          "content-range": `bytes */${info.size}`,
+        });
+        response.end();
+        return;
+      }
+      response.writeHead(206, {
+        ...headers,
+        "content-range": `bytes ${start}-${end}/${info.size}`,
+        "content-length": end - start + 1,
+      });
+      createReadStream(filePath, { start, end }).pipe(response);
+      return;
+    }
+
+    const body = await readFile(filePath);
+    headers["content-length"] = info.size;
     response.writeHead(200, headers);
     response.end(body);
   } catch {

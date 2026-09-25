@@ -98,6 +98,14 @@ a:focus-visible {
   text-decoration: none;
 }
 
+.topbar-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  justify-self: start;
+}
+
 .topbar-link:hover {
   color: #ffffff;
 }
@@ -1049,6 +1057,19 @@ body.has-word-panel .reading-shell {
   .reading-topbar {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 9px;
+  }
+
+  .topbar-links {
+    gap: 6px;
+  }
+
+  .topbar-links .topbar-back {
+    font-size: 0;
+  }
+
+  .topbar-links .topbar-back::before {
+    content: "←";
+    font-size: 12px;
   }
 
   .topbar-link {

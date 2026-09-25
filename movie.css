@@ -302,6 +302,83 @@
   border-color: var(--coral);
 }
 
+/* ------------------------------------------------------------ 逐句词汇 */
+
+.movie-sentence-vocab {
+  margin-top: 13px;
+  padding: 11px 12px;
+  background: #f4f8f5;
+  border: 1px solid #dce8e1;
+  border-radius: 8px;
+}
+
+.movie-sentence-vocab-label {
+  display: block;
+  color: #6f857c;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.movie-sentence-vocab-list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.sentence-vocab-chip {
+  min-width: 0;
+  max-width: 100%;
+  padding: 7px 9px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  color: #355149;
+  background: #ffffff;
+  border: 1px solid #d3e1da;
+  border-radius: 7px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sentence-vocab-chip:hover,
+.sentence-vocab-chip:focus-visible {
+  background: #eef6f1;
+  border-color: #9dbdaf;
+  outline: none;
+}
+
+.sentence-vocab-head {
+  min-width: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.sentence-vocab-head > strong {
+  color: #26483e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.sentence-vocab-phonetic {
+  color: #71847d;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.sentence-vocab-meaning {
+  max-width: min(320px, 72vw);
+  color: #5c7169;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
 /* --------------------------------------------------- 固定搭配与替换说法 */
 
 .movie-phrase-row {
@@ -422,6 +499,10 @@ body.is-chinese-only .movie-legend {
 }
 
 body.hides-alternatives .movie-alternatives {
+  display: none;
+}
+
+body.hides-sentence-vocab .movie-sentence-vocab {
   display: none;
 }
 

@@ -1,0 +1,916 @@
+/* 外刊精读：基础令牌与阅读组件复用 intensive.css，这里只补本页专用样式。 */
+
+.periodical-page .setting-group-wide {
+  grid-column: 1 / -1;
+}
+
+.periodical-search-input {
+  appearance: none;
+}
+
+.periodical-layout {
+  align-items: start;
+}
+
+.periodical-navigation {
+  position: static;
+  top: auto;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------- 时间轴 */
+
+.periodical-timeline {
+  display: grid;
+  gap: 14px;
+}
+
+.periodical-search {
+  position: sticky;
+  top: 76px;
+  z-index: 12;
+  padding: 12px;
+  background: rgba(251, 250, 245, 0.96);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(14, 49, 42, 0.06);
+  backdrop-filter: blur(6px);
+}
+
+.periodical-search label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--forest-deep);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.periodical-search input {
+  width: 100%;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+}
+
+.periodical-search-meta {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.periodical-month {
+  position: relative;
+  padding-left: 14px;
+}
+
+.periodical-month::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 3px;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(209, 165, 72, 0.75),
+    rgba(21, 60, 53, 0.18)
+  );
+  border-radius: 2px;
+}
+
+.periodical-month-title {
+  margin: 0 0 6px;
+  color: var(--forest);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.periodical-month-title span {
+  margin-left: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.periodical-issue-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.periodical-issue-button {
+  position: relative;
+  width: 100%;
+  padding: 8px 10px 8px 12px;
+  display: grid;
+  gap: 3px;
+  text-align: left;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.periodical-issue-button::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  left: -13px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+}
+
+.periodical-issue-button:hover {
+  border-color: #b4cabe;
+  background: #f5f9f6;
+}
+
+.periodical-issue-button.is-active {
+  color: var(--forest-deep);
+  background: #eef5f0;
+  border-color: #9dbfae;
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.periodical-issue-button.is-active::before {
+  background: var(--gold);
+  border-color: #a97f24;
+}
+
+.periodical-issue-button strong {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.periodical-issue-button small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.periodical-issue-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.periodical-mini-tag {
+  padding: 1px 6px;
+  color: #45615a;
+  background: #eef3ef;
+  border: 1px solid #dbe6e0;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.periodical-mini-tag.is-theme {
+  color: #7a5f16;
+  background: #faf1d8;
+  border-color: #e7d8a8;
+}
+
+.periodical-timeline-empty {
+  padding: 12px;
+  color: var(--muted);
+  background: #fff;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------- 期号头 */
+
+.periodical-issue-head {
+  padding: 20px 24px 18px;
+  background:
+    linear-gradient(180deg, #f7f8f3, #ffffff);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.05);
+}
+
+.periodical-issue-head h2 {
+  margin: 6px 0 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.periodical-issue-head h2 span {
+  display: block;
+  margin-top: 4px;
+  color: var(--forest);
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.periodical-issue-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.periodical-issue-summary {
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.periodical-chip {
+  padding: 4px 10px;
+  color: #3f5b53;
+  background: #eef3ef;
+  border: 1px solid #d9e4de;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.periodical-chip.is-accent {
+  color: #7a5f16;
+  background: #faf1d8;
+  border-color: #e7d8a8;
+}
+
+.periodical-chip.is-source {
+  color: #7c443c;
+  background: #fbeceb;
+  border-color: #eed4d1;
+}
+
+/* ----------------------------------------------------------- 板块切换 */
+
+.periodical-tabs {
+  position: sticky;
+  top: 68px;
+  z-index: 14;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(237, 241, 236, 0.97) 62%,
+    rgba(237, 241, 236, 0)
+  );
+}
+
+.periodical-tab {
+  padding: 7px 13px;
+  color: var(--forest);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.periodical-tab:hover {
+  border-color: #b4cabe;
+}
+
+.periodical-tab.is-active {
+  color: #fff;
+  background: var(--forest);
+  border-color: var(--forest-deep);
+}
+
+.periodical-tab small {
+  margin-left: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* ------------------------------------------------------------- 通用块 */
+
+.periodical-block {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.periodical-card {
+  padding: 18px 20px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(14, 49, 42, 0.045);
+}
+
+.periodical-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.periodical-card-head h3 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.periodical-card-head p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.periodical-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.periodical-note {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  color: #5d6a52;
+  background: #f8f6ef;
+  border: 1px solid #e6dfc9;
+  border-radius: 6px;
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.periodical-note strong {
+  color: #6a4d0b;
+}
+
+/* --------------------------------------------------------- 精读/原文段 */
+
+.periodical-paragraphs {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.periodical-paragraph {
+  position: relative;
+  padding: 12px 14px 12px 46px;
+  background: #fdfcf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-paragraph:hover {
+  border-color: #c3d5ca;
+}
+
+.periodical-paragraph-index {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--forest);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.periodical-paragraph-tools {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.periodical-paragraph:hover .periodical-paragraph-tools,
+.periodical-paragraph:focus-within .periodical-paragraph-tools {
+  opacity: 1;
+}
+
+.periodical-icon-button {
+  padding: 3px 8px;
+  color: var(--forest);
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.periodical-icon-button:hover {
+  background: var(--forest-soft);
+}
+
+.periodical-icon-button.is-playing {
+  color: #fff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+.periodical-en {
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15.5px;
+  line-height: 1.85;
+}
+
+.periodical-zh {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  color: #4c615a;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.periodical-zh.is-empty {
+  color: #9aa8a2;
+  font-size: 11.5px;
+}
+
+.periodical-page.is-english-only .periodical-zh {
+  display: none;
+}
+
+.word-token.is-unknown-token {
+  color: #8a4a12;
+  background: #fdf1dd;
+  border-bottom: 2px solid #e5b96a;
+}
+
+/* ----------------------------------------------------------- 检验题 */
+
+.periodical-test {
+  padding: 18px 20px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-test-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.periodical-test-head h3 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.periodical-test-head span {
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.periodical-test-instructions {
+  margin: 12px 0 0;
+  color: #55665f;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.periodical-question {
+  margin-top: 14px;
+  padding: 14px;
+  background: #fdfcf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-question-stem {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.periodical-question-number {
+  flex: 0 0 auto;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  background: var(--blue);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.periodical-options {
+  margin: 10px 0 0;
+  display: grid;
+  gap: 6px;
+}
+
+.periodical-option {
+  padding: 8px 10px;
+  display: flex;
+  gap: 8px;
+  text-align: left;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.periodical-option:hover {
+  border-color: #b4cabe;
+  background: #f6faf7;
+}
+
+.periodical-option.is-picked {
+  background: #eef3ef;
+  border-color: #9dbfae;
+}
+
+.periodical-option-key {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--forest);
+  background: var(--forest-soft);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.periodical-option.is-correct,
+.periodical-answer-box.is-correct {
+  color: #14532d;
+  background: #eaf6ee;
+  border-color: #9fd0ae;
+}
+
+.periodical-option.is-wrong {
+  color: #7f1d1d;
+  background: #fdeeee;
+  border-color: #e7b4b4;
+}
+
+.periodical-option.is-correct .periodical-option-key {
+  color: #fff;
+  background: #2f855a;
+}
+
+.periodical-option.is-wrong .periodical-option-key {
+  color: #fff;
+  background: var(--coral);
+}
+
+.periodical-answer-row {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.periodical-answer-box {
+  padding: 5px 12px;
+  color: #14532d;
+  background: #eaf6ee;
+  border: 1px solid #9fd0ae;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.periodical-analysis {
+  margin: 10px 0 0;
+  padding: 12px;
+  color: #4d5d57;
+  background: #f7f8f3;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 11.5px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.periodical-cloze-passage {
+  margin-top: 12px;
+  padding: 14px;
+  color: var(--ink);
+  background: #fdfcf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14.5px;
+  line-height: 2;
+}
+
+.periodical-blank {
+  margin: 0 2px;
+  padding: 1px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: baseline;
+  color: var(--forest-deep);
+  background: #eef3ef;
+  border: 1px solid #c9dcd2;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 0.82em;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.periodical-blank.is-answered {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.periodical-blank.is-correct {
+  color: #fff;
+  background: #2f855a;
+  border-color: #2f855a;
+}
+
+.periodical-blank.is-wrong {
+  color: #fff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+.periodical-candidates {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  background: #f6f8f4;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-candidates h4 {
+  margin: 0 0 8px;
+  color: var(--forest);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.periodical-candidates ol {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+/* --------------------------------------------------------------- 答疑 */
+
+.periodical-qa-item {
+  margin-top: 12px;
+  padding: 14px;
+  background: #fdfcf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-qa-sentence {
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.periodical-qa-label {
+  margin: 10px 0 3px;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.periodical-qa-body {
+  margin: 0;
+  color: #4d5d57;
+  font-size: 12.5px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* --------------------------------------------------------------- 原件 */
+
+.periodical-original-filters {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.periodical-original-filter {
+  padding: 5px 11px;
+  color: var(--forest);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.periodical-original-filter.is-active {
+  color: #fff;
+  background: var(--forest);
+  border-color: var(--forest-deep);
+}
+
+.periodical-original-list {
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+
+.periodical-original-item {
+  padding: 11px 13px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #fdfcf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-original-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.periodical-original-copy strong {
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.periodical-original-copy span {
+  color: var(--muted);
+  font-size: 10.5px;
+  overflow-wrap: anywhere;
+}
+
+.periodical-original-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.periodical-empty {
+  margin-top: 14px;
+  padding: 18px;
+  color: var(--muted);
+  background: #fff;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------- 页脚 */
+
+.periodical-credits {
+  margin: 30px auto 46px;
+  width: min(1180px, calc(100% - 32px));
+  padding: 18px 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-credits h2 {
+  margin: 0 0 8px;
+  color: var(--forest-deep);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.periodical-credits p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.8;
+}
+
+.periodical-credits code {
+  padding: 1px 5px;
+  color: var(--forest);
+  background: #eef3ef;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.periodical-credits strong {
+  color: var(--forest);
+}
+
+/* ------------------------------------------------------------- 移动端 */
+
+@media (max-width: 980px) {
+  .periodical-search {
+    position: static;
+  }
+
+  .periodical-tabs {
+    top: 60px;
+  }
+
+  .periodical-paragraph {
+    padding: 12px 12px 12px 12px;
+  }
+
+  .periodical-paragraph-index {
+    position: static;
+    margin-bottom: 8px;
+  }
+
+  .periodical-paragraph-tools {
+    position: static;
+    margin-bottom: 8px;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .periodical-page .hero-tools,
+  .periodical-page .setting-group {
+    width: 100%;
+  }
+
+  .periodical-en {
+    font-size: 14.5px;
+  }
+
+  .periodical-card,
+  .periodical-test,
+  .periodical-issue-head {
+    padding: 14px;
+  }
+
+  .periodical-original-item {
+    align-items: flex-start;
+  }
+}

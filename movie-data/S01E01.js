@@ -4,16 +4,17 @@
   "show": "摩登家庭",
   "title": "Modern Family S01E01",
   "generatedBy": "scripts/build-movie-library.mjs",
-  "generatedAt": "2026-09-17",
-  "source": "S01E01 台词原文.txt",
-  "blockCount": 461,
-  "wordCount": 3675,
+  "generatedAt": "2026-09-25",
+  "source": "Modern Family S01E01 Pilot.��Ӣ.ass",
+  "blockCount": 496,
+  "wordCount": 0,
+  "vocabCount": 835,
   "sceneCount": 15,
-  "segmentCount": 315,
+  "segmentCount": 329,
   "translationStats": {
-    "curated": 85,
+    "curated": 89,
     "card": 12,
-    "reviewed": 218,
+    "reviewed": 228,
     "machine": 0,
     "missing": 0
   },
@@ -2580,7 +2581,7 @@
       "segments": [
         {
           "start": 1,
-          "end": 3,
+          "end": 4,
           "translation": "孩子们，吃早饭了！孩子们？菲尔，你叫一下他们好吗？好，稍等一下。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -2605,26 +2606,30 @@
           "blocks": [
             {
               "i": 1,
-              "speaker": "Claire",
+              "speaker": "",
               "text": "Kids, breakfast!"
             },
             {
               "i": 2,
               "speaker": "",
-              "text": "Kids? [Sighs] Phil, would you get them?",
-              "stage": "Video Game Sounds"
+              "text": "Kids?"
             },
             {
               "i": 3,
+              "speaker": "",
+              "text": "Phil, would you get them?"
+            },
+            {
+              "i": 4,
               "speaker": "",
               "text": "Yeah. Just a sec."
             }
           ]
         },
         {
-          "start": 4,
-          "end": 4,
-          "translation": "孩子们！",
+          "start": 5,
+          "end": 5,
+          "translation": "孩子们",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -2636,15 +2641,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 4,
+              "i": 5,
               "speaker": "",
               "text": "Kids!"
             }
           ]
         },
         {
-          "start": 5,
-          "end": 8,
+          "start": 6,
+          "end": 9,
           "translation": "那就……孩子们，下来！你们为什么冲我们喊？我们在楼上时，给我发短信就行。",
           "translationSource": "curated",
           "matchScore": 0.952,
@@ -2654,7 +2659,8 @@
           "sourceId": "entry-2",
           "sourceText": "That is so - Kids, get down here! Why are you guys yelling at us? When we're way upstairs, just text me.",
           "grammarNotes": [
-            "Why ... when ...? 用 when 引导时间状语，意思是“既然我们在楼上，你们为什么还冲我们喊？”when 在这里带有质问语气。"
+            "Why ... when ...? 用 when 引导时间状语，意思是“既然我们在楼上，你们为什么还冲我们喊？”when 在这里带有质问语气。",
+            "You're not wearing that outfit. 表面是陈述，实际是家长式禁止：“你可不能穿那身衣服。”"
           ],
           "alternatives": [
             {
@@ -2667,31 +2673,31 @@
           ],
           "blocks": [
             {
-              "i": 5,
-              "speaker": "",
-              "text": "That is- Okay."
-            },
-            {
               "i": 6,
               "speaker": "",
-              "text": "Kids? Get down here!"
+              "text": "- That is - Okay."
             },
             {
               "i": 7,
               "speaker": "",
-              "text": "Why are you guys yelling at us when we're way upstairs?"
+              "text": "Kids? Get down here!"
             },
             {
               "i": 8,
               "speaker": "",
-              "text": "Just text me. All right. That's not gonna happen."
+              "text": "Why are you guys yelling at us when we're way upstairs?"
+            },
+            {
+              "i": 9,
+              "speaker": "",
+              "text": "- Just text me. - All right. That's not gonna happen."
             }
           ]
         },
         {
-          "start": 9,
-          "end": 9,
-          "translation": "还有，哇，你可别想穿这身出门。",
+          "start": 10,
+          "end": 10,
+          "translation": "你不能穿这套衣服出门",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -2699,21 +2705,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "And, wow! You're not wearing that outfit.",
-          "grammarNotes": [
-            "You're not wearing that outfit. 表面是陈述，实际是家长式禁止：“你可不能穿那身衣服。”"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 9,
+              "i": 10,
               "speaker": "",
               "text": "And, wow! You're not wearing that outfit."
             }
           ]
         },
         {
-          "start": 10,
-          "end": 13,
+          "start": 11,
+          "end": 17,
           "translation": "不，这裙子实在太短了。别人知道你是个女孩，你不需要向他们证明。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -2723,7 +2727,8 @@
           "sourceId": "entry-3",
           "sourceText": "What's wrong with it? - Honey, do you have anything to say to your daughter about her skirt? Sorry? Oh yeah, that looks really cute, sweetheart! Thanks! - No, it's way too short, people know you're a girl you don't need to prove it to them.",
           "grammarNotes": [
-            "way too short 中 way 用来加强 too，表示“实在太……”。people know you're a girl 用一般现在时陈述客观事实。"
+            "way too short 中 way 用来加强 too，表示“实在太……”。people know you're a girl 用一般现在时陈述客观事实。",
+            "get something stuck in ... 表示“把某物卡在……里”；again 暗示这是反复发生的事。"
           ],
           "alternatives": [
             {
@@ -2736,30 +2741,45 @@
           ],
           "blocks": [
             {
-              "i": 10,
-              "speaker": "",
-              "text": "What's wrong with it? Honey, do you have anything to say to your daughter..."
-            },
-            {
               "i": 11,
               "speaker": "",
-              "text": "about her skirt? Sorry."
+              "text": "What's wrong with it?"
             },
             {
               "i": 12,
               "speaker": "",
-              "text": "- Oh, yeah. That looks really cute, sweetheart. - Thanks."
+              "text": "Honey, do you have anything to say"
             },
             {
               "i": 13,
               "speaker": "",
-              "text": "No. It's way too short. People know you're a girl. You don't need to prove it to them."
+              "text": "- to your daughter about her skirt? - Sorry."
+            },
+            {
+              "i": 14,
+              "speaker": "",
+              "text": "- Oh, yeah. That looks really cute, sweetheart. - Thanks."
+            },
+            {
+              "i": 15,
+              "speaker": "",
+              "text": "No. It's way too short."
+            },
+            {
+              "i": 16,
+              "speaker": "",
+              "text": "People know you're a girl."
+            },
+            {
+              "i": 17,
+              "speaker": "",
+              "text": "You don't need to prove it to them."
             }
           ]
         },
         {
-          "start": 14,
-          "end": 14,
+          "start": 18,
+          "end": 18,
           "translation": "卢克的头又卡在栏杆里了。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -2769,7 +2789,7 @@
           "sourceId": "entry-4",
           "sourceText": "Luke got his head stuck in the banister again.",
           "grammarNotes": [
-            "get something stuck in ... 表示“把某物卡在……里”；again 暗示这是反复发生的事。"
+            "growing up 是现在分词短语作时间状语，相当于 when I was growing up。"
           ],
           "alternatives": [
             {
@@ -2782,16 +2802,16 @@
           ],
           "blocks": [
             {
-              "i": 14,
+              "i": 18,
               "speaker": "",
               "text": "Luke got his head stuck in the banister again."
             }
           ]
         },
         {
-          "start": 15,
-          "end": 15,
-          "translation": "我去弄。婴儿油放哪儿了？",
+          "start": 19,
+          "end": 19,
+          "translation": "我去吧 婴儿油在哪儿",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -2803,16 +2823,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 15,
+              "i": 19,
               "speaker": "",
               "text": "I got it. Where's the baby oil?"
             }
           ]
         },
         {
-          "start": 16,
-          "end": 16,
-          "translation": "在咱们床头柜——算了，我哪知道，你自己找。",
+          "start": 20,
+          "end": 20,
+          "translation": "在我们床头的 我不知道 你自己找",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -2820,19 +2840,21 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "It's on our bedside tab- I don't know. Find it.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "not want somebody to do something 是“不想让某人做某事”；否定的是 want 后面的动作，不是 want 本身。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 16,
+              "i": 20,
               "speaker": "",
               "text": "It's on our bedside tab- I don't know. Find it."
             }
           ]
         },
         {
-          "start": 17,
-          "end": 18,
+          "start": 21,
+          "end": 22,
           "translation": "拜托！我年轻时也毫无节制。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -2842,7 +2864,7 @@
           "sourceId": "entry-5",
           "sourceText": "Come on! Iwas out of control growing up.",
           "grammarNotes": [
-            "growing up 是现在分词短语作时间状语，相当于 when I was growing up。"
+            "If Haley never wakes up ..., I've done my job. 是“如果……就算完成职责”的条件句；half-naked 是复合形容词，放在名词后作补充说明。"
           ],
           "alternatives": [
             {
@@ -2855,21 +2877,21 @@
           ],
           "blocks": [
             {
-              "i": 17,
+              "i": 21,
               "speaker": "",
               "text": "Come on!"
             },
             {
-              "i": 18,
+              "i": 22,
               "speaker": "",
               "text": "I was out of control growing up."
             }
           ]
         },
         {
-          "start": 19,
-          "end": 19,
-          "translation": "看吧，我说出来了。",
+          "start": 23,
+          "end": 23,
+          "translation": "你看 我坦白了",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -2881,15 +2903,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 19,
+              "i": 23,
               "speaker": "",
               "text": "There, you know? I said it."
             }
           ]
         },
         {
-          "start": 20,
-          "end": 21,
+          "start": 24,
+          "end": 25,
           "translation": "我只是不想让孩子犯我犯过的同样错误。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -2898,90 +2920,18 @@
           "phonetic": "/meɪk ðə seɪm bæd mɪˈsteɪks/",
           "sourceId": "entry-6",
           "sourceText": "I just don't want my kids to make the same bad mistakes I made.",
-          "grammarNotes": [
-            "not want somebody to do something 是“不想让某人做某事”；否定的是 want 后面的动作，不是 want 本身。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 20,
-              "speaker": "",
-              "text": "I-I just don't want my kids..."
-            },
-            {
-              "i": 21,
-              "speaker": "",
-              "text": "to make the same bad mistakes I made."
-            }
-          ]
-        },
-        {
-          "start": 22,
-          "end": 23,
-          "translation": "如果海莉没有半裸着在佛罗里达的海滩上醒来，我就算尽到责任了。",
-          "translationSource": "curated",
-          "matchScore": 0.938,
-          "keyPhrase": "half-naked",
-          "meaning": "半裸的",
-          "phonetic": "/ˌhæf ˈneɪkɪd/",
-          "sourceId": "entry-7",
-          "sourceText": "If Hayley never wakes up on a beach in Florida, half-naked I've done my job.",
-          "grammarNotes": [
-            "If Haley never wakes up ..., I've done my job. 是“如果……就算完成职责”的条件句；half-naked 是复合形容词，放在名词后作补充说明。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 22,
-              "speaker": "",
-              "text": "I-If Haley never wakes up on a beach in Florida, half-naked,"
-            },
-            {
-              "i": 23,
-              "speaker": "",
-              "text": "I've done my job."
-            }
-          ]
-        },
-        {
-          "start": 24,
-          "end": 24,
-          "translation": "“我们”算当到位。对。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Our job. Right.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
               "i": 24,
               "speaker": "",
-              "text": "Our job. Right."
-            }
-          ]
-        },
-        {
-          "start": 25,
-          "end": 25,
-          "translation": "我们就算当到位了。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I've done our job.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "I-I just don't want my kids..."
+            },
             {
               "i": 25,
               "speaker": "",
-              "text": "I've done our job."
+              "text": "to make the same bad mistakes I made."
             }
           ]
         }
@@ -2995,29 +2945,97 @@
       "segments": [
         {
           "start": 26,
-          "end": 26,
-          "translation": "加油，曼尼！踢啊！踢！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "¡Vamos, Manny! Kick it! Kick it!",
+          "end": 27,
+          "translation": "如果海莉没有半裸着在佛罗里达的海滩上醒来，我就算尽到责任了。",
+          "translationSource": "curated",
+          "matchScore": 0.938,
+          "keyPhrase": "half-naked",
+          "meaning": "半裸的",
+          "phonetic": "/ˌhæf ˈneɪkɪd/",
+          "sourceId": "entry-7",
+          "sourceText": "If Hayley never wakes up on a beach in Florida, half-naked I've done my job.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
               "i": 26,
               "speaker": "",
-              "text": "¡Vamos, Manny! Kick it! Kick it!"
+              "text": "I-If Haley never wakes up on a beach in Florida, half-naked,"
+            },
+            {
+              "i": 27,
+              "speaker": "",
+              "text": "I've done my job."
             }
           ]
         },
         {
-          "start": 27,
-          "end": 27,
-          "translation": "别让他——快踢！",
+          "start": 28,
+          "end": 28,
+          "translation": "-我俩的任务 -对",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Our job. - Right.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 28,
+              "speaker": "",
+              "text": "- Our job. - Right."
+            }
+          ]
+        },
+        {
+          "start": 29,
+          "end": 29,
+          "translation": "我就算完成了我俩的任务",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I've done our job.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 29,
+              "speaker": "",
+              "text": "I've done our job."
+            }
+          ]
+        },
+        {
+          "start": 30,
+          "end": 30,
+          "translation": "加油 曼尼 踢球啊 踢啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Vamos, Manny! Kick it! Kick it!",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 30,
+              "speaker": "",
+              "text": "Vamos, Manny! Kick it! Kick it!"
+            }
+          ]
+        },
+        {
+          "start": 31,
+          "end": 31,
+          "translation": "别让他 踢啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3025,41 +3043,43 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Don't let him- Kick it!",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "take it down a notch 是口语固定表达，表示“收敛一点、别这么激动”；they're 0 and 6 指球队零胜六负。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 27,
+              "i": 31,
               "speaker": "",
               "text": "Don't let him- Kick it!"
             }
           ]
         },
         {
-          "start": 28,
-          "end": 28,
-          "translation": "曼尼，冲！往右！往右！",
+          "start": 32,
+          "end": 32,
+          "translation": "曼尼 加油 往右跑 往右",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Manny, go! ¡A la derecha! ¡A la derecha!",
+          "sourceText": "Manny, go! A la derecha! A la derecha!",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 28,
+              "i": 32,
               "speaker": "",
-              "text": "Manny, go! ¡A la derecha! ¡A la derecha!"
+              "text": "Manny, go! A la derecha! A la derecha!"
             }
           ]
         },
         {
-          "start": 29,
-          "end": 29,
-          "translation": "不！不不。",
+          "start": 33,
+          "end": 33,
+          "translation": "不 不 不要啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3071,15 +3091,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 29,
+              "i": 33,
               "speaker": "",
               "text": "No! No, no."
             }
           ]
         },
         {
-          "start": 30,
-          "end": 31,
+          "start": 34,
+          "end": 36,
           "translation": "那是个犯规！格洛丽亚，他们零胜六负，别那么激动。",
           "translationSource": "curated",
           "matchScore": 0.8,
@@ -3088,9 +3108,7 @@
           "phonetic": "/teɪk ɪt daʊn ə nɑːtʃ/",
           "sourceId": "entry-8",
           "sourceText": "That was a penalty! Gloria, they're 0 and 6, let's take it down a notch.",
-          "grammarNotes": [
-            "take it down a notch 是口语固定表达，表示“收敛一点、别这么激动”；they're 0 and 6 指球队零胜六负。"
-          ],
+          "grammarNotes": [],
           "alternatives": [
             {
               "phrase": "take it down a notch",
@@ -3102,22 +3120,26 @@
           ],
           "blocks": [
             {
-              "i": 30,
+              "i": 34,
               "speaker": "",
-              "text": "- He tripped him, Jay. Where's the penalty? - [Whistle Blows]"
+              "text": "He tripped him, Jay. Where's the penalty?"
             },
             {
-              "i": 31,
+              "i": 35,
               "speaker": "",
-              "text": "Gloria, they're 0 and 6. Let's take it down a notch.",
-              "stage": "Chuckles"
+              "text": "Gloria, they're 0 and 6."
+            },
+            {
+              "i": 36,
+              "speaker": "",
+              "text": "Let's take it down a notch."
             }
           ]
         },
         {
-          "start": 32,
-          "end": 32,
-          "translation": "我们俩差别很大。",
+          "start": 37,
+          "end": 37,
+          "translation": "我们是不同世界的人",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3125,20 +3147,22 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "We're very different.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "the number one village in all Colombia 用最高级结构；for all the ... 后面话没说完，属于口语中的自我打断。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 32,
+              "i": 37,
               "speaker": "",
               "text": "We're very different."
             }
           ]
         },
         {
-          "start": 33,
-          "end": 33,
-          "translation": "杰伊是城里人。",
+          "start": 38,
+          "end": 38,
+          "translation": "杰来自城市",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3150,16 +3174,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 33,
+              "i": 38,
               "speaker": "",
               "text": "Jay's from the city."
             }
           ]
         },
         {
-          "start": 34,
-          "end": 34,
-          "translation": "他生意做得很大。",
+          "start": 39,
+          "end": 39,
+          "translation": "他的生意做得很大",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3171,16 +3195,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 34,
+              "i": 39,
               "speaker": "",
               "text": "He has a big business."
             }
           ]
         },
         {
-          "start": 35,
-          "end": 35,
-          "translation": "我来自一个小村庄。",
+          "start": 40,
+          "end": 40,
+          "translation": "我来自一个小山村",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3192,16 +3216,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 35,
+              "i": 40,
               "speaker": "",
               "text": "I come from a small village."
             }
           ]
         },
         {
-          "start": 36,
-          "end": 36,
-          "translation": "很穷，但真的非常非常美。",
+          "start": 41,
+          "end": 41,
+          "translation": "穷困潦倒 但风景怡人",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3213,16 +3237,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 36,
+              "i": 41,
               "speaker": "",
               "text": "Very poor but very, very beautiful."
             }
           ]
         },
         {
-          "start": 37,
-          "end": 37,
-          "translation": "那是全哥伦比亚数一数二的村子，因为那里的——",
+          "start": 42,
+          "end": 42,
+          "translation": "我们村拥有全哥伦比亚最多的",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3230,22 +3254,20 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "It's the number one village in all Colombia for all the-",
-          "grammarNotes": [
-            "the number one village in all Colombia 用最高级结构；for all the ... 后面话没说完，属于口语中的自我打断。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 37,
+              "i": 42,
               "speaker": "",
               "text": "It's the number one village in all Colombia for all the-"
             }
           ]
         },
         {
-          "start": 38,
-          "end": 38,
-          "translation": "那个词怎么说来着？",
+          "start": 43,
+          "end": 43,
+          "translation": "那个词怎么说来着",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3253,41 +3275,66 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "What's the word?",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "gotta 是 have got to 的口语缩略，等于 have to；take that kid out 在球赛语境里是“把那孩子换下场”，不是“带出去”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 38,
+              "i": 43,
               "speaker": "",
               "text": "What's the word?"
             }
           ]
         },
         {
-          "start": 39,
-          "end": 39,
-          "translation": "谋杀案。对，就是谋杀案。",
+          "start": 44,
+          "end": 44,
+          "translation": "凶杀案",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Murders. Yes. The murders.",
-          "grammarNotes": [],
+          "sourceText": "Murders.",
+          "grammarNotes": [
+            "How about I take you out? 中用 How about + 句子提出带挑衅意味的建议；这里 take you out 是“把你撂倒、收拾你”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 39,
+              "i": 44,
               "speaker": "",
-              "text": "Murders. Yes. The murders."
+              "text": "Murders."
             }
           ]
         },
         {
-          "start": 40,
-          "end": 40,
-          "translation": "曼尼，拦住他！",
+          "start": 45,
+          "end": 45,
+          "translation": "没错 凶杀案",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Yes. The murders.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 45,
+              "speaker": "",
+              "text": "Yes. The murders."
+            }
+          ]
+        },
+        {
+          "start": 46,
+          "end": 46,
+          "translation": "曼尼 拦住他",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3299,16 +3346,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 40,
+              "i": 46,
               "speaker": "",
               "text": "Manny, stop him!"
             }
           ]
         },
         {
-          "start": 41,
-          "end": 41,
-          "translation": "拦住他！你能行！",
+          "start": 47,
+          "end": 47,
+          "translation": "拦住他 你可以的",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3316,20 +3363,22 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Stop him! You can do it!",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "tell somebody off 是“训斥、骂某人”；for the last six weeks 与现在完成时搭配，强调从过去持续到现在。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 41,
+              "i": 47,
               "speaker": "",
               "text": "Stop him! You can do it!"
             }
           ]
         },
         {
-          "start": 42,
-          "end": 42,
-          "translation": "该死，曼尼！",
+          "start": 48,
+          "end": 48,
+          "translation": "你真烂 曼尼",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3341,150 +3390,9 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 42,
-              "speaker": "Boy",
-              "text": "Damn it, Manny!"
-            }
-          ]
-        },
-        {
-          "start": 43,
-          "end": 43,
-          "translation": "你得把那孩子换下场！",
-          "translationSource": "card",
-          "matchScore": 0.833,
-          "keyPhrase": "",
-          "meaning": "把某人换下场；教训某人",
-          "phonetic": "/teɪk ˈsʌmwʌn aʊt/",
-          "sourceId": "card-6",
-          "sourceText": "You've gotta take that kid out!",
-          "grammarNotes": [
-            "gotta 是 have got to 的口语缩略，等于 have to；take that kid out 在球赛语境里是“把那孩子换下场”，不是“带出去”。"
-          ],
-          "alternatives": [
-            {
-              "phrase": "take that kid out",
-              "alternatives": [
-                "sub him out",
-                "pull him from the game"
-              ]
-            }
-          ],
-          "blocks": [
-            {
-              "i": 43,
-              "speaker": "",
-              "text": "Come on, Coach. You gotta take that kid out."
-            }
-          ]
-        },
-        {
-          "start": 44,
-          "end": 44,
-          "translation": "你想把他换下去？要不要我把你撂倒？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "You wanna take him out? How about I take you out?",
-          "grammarNotes": [
-            "How about I take you out? 中用 How about + 句子提出带挑衅意味的建议；这里 take you out 是“把你撂倒、收拾你”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 44,
-              "speaker": "",
-              "text": "You wanna take him out? How about I take you out?"
-            }
-          ]
-        },
-        {
-          "start": 45,
-          "end": 45,
-          "translation": "别担心。",
-          "translationSource": "card",
-          "matchScore": 0.6,
-          "keyPhrase": "",
-          "meaning": "别担心；没关系",
-          "phonetic": "/doʊnt ˈwɜːri əˈbaʊt ɪt/",
-          "sourceId": "card-236",
-          "sourceText": "Don't worry about it.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 45,
-              "speaker": "",
-              "text": "- Honey, honey. - Why don't you worry about your son?"
-            }
-          ]
-        },
-        {
-          "start": 46,
-          "end": 46,
-          "translation": "他上半场一直把手插在裤子里！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "He spent the first half with his hand in his pants!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 46,
-              "speaker": "",
-              "text": "He spent the first half with his hand in his pants!",
-              "stage": "Mouths Word"
-            }
-          ]
-        },
-        {
-          "start": 47,
-          "end": 47,
-          "translation": "过去六个星期，我一直想好好骂她一顿。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I've wanted to tell her off for the last six weeks.",
-          "grammarNotes": [
-            "tell somebody off 是“训斥、骂某人”；for the last six weeks 与现在完成时搭配，强调从过去持续到现在。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 47,
-              "speaker": "",
-              "text": "I've wanted to tell her off for the last six weeks."
-            }
-          ]
-        },
-        {
-          "start": 48,
-          "end": 48,
-          "translation": "我是乔什，瑞恩的爸爸。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I'm Josh. Ryan's dad.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
               "i": 48,
               "speaker": "",
-              "text": "I'm Josh. Ryan's dad."
+              "text": "Damn it, Manny!"
             }
           ]
         }
@@ -3499,35 +3407,43 @@
         {
           "start": 49,
           "end": 49,
-          "translation": "你好，我是格洛丽亚·普里切特，曼尼的妈妈。",
-          "translationSource": "reviewed",
-          "matchScore": null,
+          "translation": "你得把那孩子换下场！",
+          "translationSource": "card",
+          "matchScore": 0.833,
           "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Hi, I'm Gloria Pritchett. Manny's mother.",
+          "meaning": "把某人换下场；教训某人",
+          "phonetic": "/teɪk ˈsʌmwʌn aʊt/",
+          "sourceId": "card-6",
+          "sourceText": "You've gotta take that kid out!",
           "grammarNotes": [],
-          "alternatives": [],
+          "alternatives": [
+            {
+              "phrase": "take that kid out",
+              "alternatives": [
+                "sub him out",
+                "pull him from the game"
+              ]
+            }
+          ],
           "blocks": [
             {
               "i": 49,
               "speaker": "",
-              "text": "Hi, I'm Gloria Pritchett. Manny's mother."
+              "text": "Come on, coach. You gotta take that kid out."
             }
           ]
         },
         {
           "start": 50,
           "end": 50,
-          "translation": "——哦，这位一定是你爸爸。——她爸爸？",
+          "translation": "你想让他下场吗 不如我让你\"下场\"如何",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "- Oh, and this must be your dad. - Her dad?",
+          "sourceText": "You wanna take him out? How about I take you out?",
           "grammarNotes": [
             "this must be ... 表示依据眼前情况作出肯定推测：“这位一定就是……”。口语中常用来介绍或确认身份。"
           ],
@@ -3536,35 +3452,163 @@
             {
               "i": 50,
               "speaker": "",
-              "text": "- Oh, and this must be your dad. - Her dad?"
+              "text": "You wanna take him out? How about I take you out?"
             }
           ]
         },
         {
           "start": 51,
           "end": 51,
-          "translation": "是啊。不不，真有意思。",
-          "translationSource": "reviewed",
-          "matchScore": null,
+          "translation": "别担心。",
+          "translationSource": "card",
+          "matchScore": 0.6,
           "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Yeah. No, no. That's funny.",
+          "meaning": "别担心；没关系",
+          "phonetic": "/doʊnt ˈwɜːri əˈbaʊt ɪt/",
+          "sourceId": "card-236",
+          "sourceText": "Don't worry about it.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
               "i": 51,
               "speaker": "",
-              "text": "Yeah. No, no. That's funny."
+              "text": "- Honey, honey. - Why don't you worry about your son?"
             }
           ]
         },
         {
           "start": 52,
           "end": 52,
-          "translation": "其实不是，我是她丈夫。",
+          "translation": "他整个上半场光忙着抓裤裆了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "He spent the first half with his hand in his pants!",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 52,
+              "speaker": "",
+              "text": "He spent the first half with his hand in his pants!"
+            }
+          ]
+        },
+        {
+          "start": 53,
+          "end": 53,
+          "translation": "那话我6周来一直想对她说来着",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I've wanted to tell her off for the last six weeks.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 53,
+              "speaker": "",
+              "text": "I've wanted to tell her off for the last six weeks."
+            }
+          ]
+        },
+        {
+          "start": 54,
+          "end": 54,
+          "translation": "我叫乔希 莱恩的爸爸",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I'm Josh. Ryan's dad.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 54,
+              "speaker": "",
+              "text": "I'm Josh. Ryan's dad."
+            }
+          ]
+        },
+        {
+          "start": 55,
+          "end": 55,
+          "translation": "我叫歌洛莉亚·普里契特 曼尼的妈妈",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Hi, I'm Gloria Pritchett. Manny's mother.",
+          "grammarNotes": [
+            "Who is a good girl? 是逗婴儿或宠物时的固定说法，不是真的在问身份；Who's that? 同样带有亲昵逗弄语气。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 55,
+              "speaker": "",
+              "text": "Hi, I'm Gloria Pritchett. Manny's mother."
+            }
+          ]
+        },
+        {
+          "start": 56,
+          "end": 56,
+          "translation": "-这位是你父亲吧 -她父亲?",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Oh, and this must be your dad. - Her dad?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 56,
+              "speaker": "",
+              "text": "- Oh, and this must be your dad. - Her dad?"
+            }
+          ]
+        },
+        {
+          "start": 57,
+          "end": 57,
+          "translation": "-是啊 -不 不是 真搞笑",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Yeah. - No, no. That's funny.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 57,
+              "speaker": "",
+              "text": "- Yeah. - No, no. That's funny."
+            }
+          ]
+        },
+        {
+          "start": 58,
+          "end": 58,
+          "translation": "怎么可能 我是她老公",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3576,15 +3620,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 52,
+              "i": 58,
               "speaker": "",
               "text": "Actually, no, I'm her husband."
             }
           ]
         },
         {
-          "start": 53,
-          "end": 54,
+          "start": 59,
+          "end": 60,
           "translation": "别被...骗了，等我组织一下语言。",
           "translationSource": "card",
           "matchScore": 1,
@@ -3597,21 +3641,21 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 53,
+              "i": 59,
               "speaker": "",
               "text": "Don't be fooled by the, uh-"
             },
             {
-              "i": 54,
+              "i": 60,
               "speaker": "",
               "text": "Give me a second here."
             }
           ]
         },
         {
-          "start": 55,
-          "end": 55,
-          "translation": "谁是好姑娘呀？那是谁呀？",
+          "start": 61,
+          "end": 61,
+          "translation": "谁是乖宝宝啊 是谁啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3619,22 +3663,20 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Who is a good girl? Who's that?",
-          "grammarNotes": [
-            "Who is a good girl? 是逗婴儿或宠物时的固定说法，不是真的在问身份；Who's that? 同样带有亲昵逗弄语气。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 55,
+              "i": 61,
               "speaker": "",
               "text": "Who is a good girl? Who's that?"
             }
           ]
         },
         {
-          "start": 56,
-          "end": 56,
-          "translation": "那是谁呀？",
+          "start": 62,
+          "end": 62,
+          "translation": "是谁啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3646,16 +3688,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 56,
+              "i": 62,
               "speaker": "",
               "text": "Who's that?"
             }
           ]
         },
         {
-          "start": 57,
-          "end": 57,
-          "translation": "——哦，她太可爱了。——哦，谢谢。",
+          "start": 63,
+          "end": 63,
+          "translation": "-她真可爱 -谢谢",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3663,20 +3705,22 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "- Oh, she's adorable. - Oh, thank you.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "daddy needed snacks 用 third person 称呼自己，是父母对幼儿说话时的常见口语方式。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 57,
+              "i": 63,
               "speaker": "",
               "text": "- Oh, she's adorable. - Oh, thank you."
             }
           ]
         },
         {
-          "start": 58,
-          "end": 58,
-          "translation": "嗨，小宝贝。你好呀。",
+          "start": 64,
+          "end": 64,
+          "translation": "你好 小公主",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3688,37 +3732,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 58,
+              "i": 64,
               "speaker": "",
-              "text": "Hi, precious. Hello.",
-              "stage": "Blows Raspberry"
+              "text": "Hi, precious. Hello."
             }
           ]
         },
         {
-          "start": 59,
-          "end": 59,
-          "translation": "嗨。嗨。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Hi. Hi.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 59,
-              "speaker": "",
-              "text": "Hi. Hi."
-            }
-          ]
-        },
-        {
-          "start": 60,
-          "end": 61,
+          "start": 65,
+          "end": 66,
           "translation": "我们刚从越南领养了她，这是第一次带她回家。",
           "translationSource": "curated",
           "matchScore": 0.933,
@@ -3731,20 +3753,20 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 60,
+              "i": 65,
               "speaker": "",
               "text": "Uh, we just, uh- We just adopted her from Vietnam."
             },
             {
-              "i": 61,
+              "i": 66,
               "speaker": "",
               "text": "And we're bringing her home for the first time, huh?"
             }
           ]
         },
         {
-          "start": 62,
-          "end": 63,
+          "start": 67,
+          "end": 68,
           "translation": "你和你妻子一定激动坏了！",
           "translationSource": "curated",
           "matchScore": 0.923,
@@ -3753,48 +3775,24 @@
           "phonetic": "/mʌst biː θrɪld/",
           "sourceId": "entry-14",
           "sourceText": "You and you're wife must be thrilled! Sorry, sorry, sorry, daddy needed snacks.",
-          "grammarNotes": [
-            "daddy needed snacks 用 third person 称呼自己，是父母对幼儿说话时的常见口语方式。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 62,
+              "i": 67,
               "speaker": "",
               "text": "She's an angel. You and your wife must be thrilled."
             },
             {
-              "i": 63,
+              "i": 68,
               "speaker": "",
               "text": "Sorry, sorry, sorry. Daddy needed snacks."
             }
           ]
         },
         {
-          "start": 64,
-          "end": 64,
-          "translation": "嗨。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Hi.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 64,
-              "speaker": "",
-              "text": "Hi.",
-              "stage": "Grunts"
-            }
-          ]
-        },
-        {
-          "start": 65,
-          "end": 72,
+          "start": 69,
+          "end": 76,
           "translation": "我们最初请一位同性恋朋友做代孕母亲。",
           "translationSource": "curated",
           "matchScore": 0.79,
@@ -3803,7 +3801,9 @@
           "phonetic": "/biː ə ˈsɜːrəɡeɪt/",
           "sourceId": "entry-15",
           "sourceText": "So, what are we talking about? We have been together for five years now? And we decided we really wanted to have a baby so, we initially asked one of our lesbian friends to be a surrogate Then we figured, they're already mean enough, can you imagine one of them pregnant? No, thank you.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "walk on 表示“继续往前走”；and suddenly it's all ... 是口语省略结构，it's all 后面接脑海中的对白。"
+          ],
           "alternatives": [
             {
               "phrase": "be a surrogate",
@@ -3815,50 +3815,50 @@
           ],
           "blocks": [
             {
-              "i": 65,
+              "i": 69,
               "speaker": "",
               "text": "So, what are we talking about?"
             },
             {
-              "i": 66,
-              "speaker": "",
-              "text": "Uh, we have been together for-"
-            },
-            {
-              "i": 67,
-              "speaker": "",
-              "text": "guh, five- five years now?"
-            },
-            {
-              "i": 68,
-              "speaker": "",
-              "text": "And, uh, we just- we decided we really wanted to have a baby."
-            },
-            {
-              "i": 69,
-              "speaker": "",
-              "text": "So, we had initially asked one of our lesbian friends to be a surrogate, but-"
-            },
-            {
               "i": 70,
               "speaker": "",
-              "text": "Then we figured, they're already mean enough."
+              "text": "Uh, we have been together for- guh, five- five years now?"
             },
             {
               "i": 71,
               "speaker": "",
-              "text": "Can you imagine one of 'em pregnant? Pregnant, no."
+              "text": "And, uh, we just- we decided we really wanted to have a baby."
             },
             {
               "i": 72,
+              "speaker": "",
+              "text": "So, we had initially asked one of our"
+            },
+            {
+              "i": 73,
+              "speaker": "",
+              "text": "lesbian friends to be a surrogate, but-"
+            },
+            {
+              "i": 74,
+              "speaker": "",
+              "text": "Then we figured, they're already mean enough."
+            },
+            {
+              "i": 75,
+              "speaker": "",
+              "text": "Can you imagine one of 'em pregnant? Pregnant, no."
+            },
+            {
+              "i": 76,
               "speaker": "",
               "text": "No, thank you. Ick."
             }
           ]
         },
         {
-          "start": 73,
-          "end": 74,
+          "start": 77,
+          "end": 78,
           "translation": "你就是不讲话，然后突然之间就说要致辞。",
           "translationSource": "curated",
           "matchScore": 0.591,
@@ -3868,26 +3868,27 @@
           "sourceId": "entry-16",
           "sourceText": "You saw that right? Everybody fonding up to Lillian, then you walk on and suddenly it's all I'm gonna give a speech.",
           "grammarNotes": [
-            "walk on 表示“继续往前走”；and suddenly it's all ... 是口语省略结构，it's all 后面接脑海中的对白。"
+            "be going to 表示已经作出的打算或决定；You are not giving the speech. 用现在进行时表达强烈的禁止和安排。",
+            "be stuck with somebody 表示“不得不和某人待在一起、摆脱不了某人”，这里的 with 不能换成 by。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 73,
+              "i": 77,
               "speaker": "",
               "text": "You saw that, right? Everybody fawning over Lily,"
             },
             {
-              "i": 74,
+              "i": 78,
               "speaker": "",
               "text": "and then you walk on and suddenly it's all,"
             }
           ]
         },
         {
-          "start": 75,
-          "end": 75,
-          "translation": "“哦，空中商城。",
+          "start": 79,
+          "end": 79,
+          "translation": "看机上购物杂志",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3899,16 +3900,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 75,
+              "i": 79,
               "speaker": "",
               "text": "\"Ooh, SkyMall."
             }
           ]
         },
         {
-          "start": 76,
-          "end": 76,
-          "translation": "我得买个电动领带架。”",
+          "start": 80,
+          "end": 80,
+          "translation": "考虑买个电动领带架什么的",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3920,39 +3921,58 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 76,
+              "i": 80,
               "speaker": "",
               "text": "I gotta buy a motorized tie rack.\""
             }
           ]
         },
         {
-          "start": 77,
-          "end": 77,
-          "translation": "行了，听着，致辞由我来讲。不准你讲。",
+          "start": 81,
+          "end": 81,
+          "translation": "我得教育一下这帮人",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "All right, you know, I'm gonna give the speech. You are not giving the speech.",
-          "grammarNotes": [
-            "be going to 表示已经作出的打算或决定；You are not giving the speech. 用现在进行时表达强烈的禁止和安排。"
-          ],
+          "sourceText": "All right, you know, I'm gonna give the speech.",
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 77,
+              "i": 81,
               "speaker": "",
-              "text": "All right, you know, I'm gonna give the speech. You are not giving the speech."
+              "text": "All right, you know, I'm gonna give the speech."
             }
           ]
         },
         {
-          "start": 78,
-          "end": 78,
-          "translation": "接下来五个小时，你可得跟这些人待在一起。",
+          "start": 82,
+          "end": 82,
+          "translation": "千万别这么做",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "You are not giving the speech.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 82,
+              "speaker": "",
+              "text": "You are not giving the speech."
+            }
+          ]
+        },
+        {
+          "start": 83,
+          "end": 83,
+          "translation": "你还得和他们一起呆上5小时呢",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -3960,21 +3980,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "You're gonna be stuck with these people for the next five hours.",
-          "grammarNotes": [
-            "be stuck with somebody 表示“不得不和某人待在一起、摆脱不了某人”，这里的 with 不能换成 by。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 78,
+              "i": 83,
               "speaker": "",
               "text": "You're gonna be stuck with these people for the next five hours."
             }
           ]
         },
         {
-          "start": 79,
-          "end": 80,
+          "start": 84,
+          "end": 85,
           "translation": "亲爱的，看那个被这些娘娘腔抱着的宝宝。",
           "translationSource": "card",
           "matchScore": 0.75,
@@ -3987,172 +4005,77 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 79,
+              "i": 84,
               "speaker": "",
               "text": "You're right, you're right. Okay. I'm sorry."
             },
             {
-              "i": 80,
+              "i": 85,
               "speaker": "",
               "text": "- Look at that baby with those cream puffs. - Okay. Excuse me."
             }
           ]
         },
         {
-          "start": 81,
-          "end": 88,
+          "start": 86,
+          "end": 94,
           "translation": "爱不分种族、信仰或性别。",
           "translationSource": "curated",
-          "matchScore": 0.804,
+          "matchScore": 0.818,
           "keyPhrase": "love knows no race, creed or gender",
           "meaning": "爱不分种族、信仰或性别",
           "phonetic": "/lʌv noʊz noʊ reɪs kriːd ɔːr ˈdʒendər/",
           "sourceId": "entry-17",
           "sourceText": "But this baby would be growing up in a crowded orphanage if it wasn't for us creampuffs and you know what, to all of you who judge, hear this, love knows no race, creed or gender and shame on you! You small minded, ignorant fe- Mitchell? - What? She's got the creampuffs.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 81,
-              "speaker": "",
-              "text": "Excuse me."
-            },
-            {
-              "i": 82,
-              "speaker": "",
-              "text": "This baby would have grown up in a crowded orphanage if it wasn't for us \"cream puffs.\""
-            },
-            {
-              "i": 83,
-              "speaker": "",
-              "text": "And you know what? Note to all of you who judge- Mitchell!"
-            },
-            {
-              "i": 84,
-              "speaker": "",
-              "text": "- Hear this. Love knows no race, creed- - Mitchell."
-            },
-            {
-              "i": 85,
-              "speaker": "",
-              "text": "Or gender."
-            },
-            {
-              "i": 86,
-              "speaker": "",
-              "text": "And shame on you, you small-minded, ignorant few- Mitchell."
-            },
-            {
-              "i": 87,
-              "speaker": "",
-              "text": "Mitchell! What?",
-              "stage": "Whispers"
-            },
-            {
-              "i": 88,
-              "speaker": "",
-              "text": "She's got the cream puffs."
-            }
-          ]
-        },
-        {
-          "start": 89,
-          "end": 89,
-          "translation": "哦。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 89,
-              "speaker": "",
-              "text": "Oh."
-            }
-          ]
-        },
-        {
-          "start": 90,
-          "end": 90,
-          "translation": "我们想替所有人付耳机钱。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "We would like to pay for everyone's headsets.",
           "grammarNotes": [
             "pay for something 表示“为某物付钱”；everyone's headsets 是名词所有格，表示“所有人的耳机”。"
           ],
           "alternatives": [],
           "blocks": [
             {
+              "i": 86,
+              "speaker": "",
+              "text": "Excuse me."
+            },
+            {
+              "i": 87,
+              "speaker": "",
+              "text": "This baby would have grown up in a crowded orphanage"
+            },
+            {
+              "i": 88,
+              "speaker": "",
+              "text": "if it wasn't for us \"Cream puffs.\""
+            },
+            {
+              "i": 89,
+              "speaker": "",
+              "text": "- And you know what? Note to all of you who judge- - Mitchell!"
+            },
+            {
               "i": 90,
               "speaker": "",
-              "text": "We would like to pay for everyone's headsets."
-            }
-          ]
-        },
-        {
-          "start": 91,
-          "end": 91,
-          "translation": "——嘿，嘿——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "♪ Hey, hey ♪",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "Hear this. Love knows no race, creed-"
+            },
             {
               "i": 91,
-              "speaker": "Man",
-              "text": "♪ Hey, hey ♪"
-            }
-          ]
-        },
-        {
-          "start": 92,
-          "end": 95,
-          "translation": "伙计，你怎么老卡成这样？我这次能出来。",
-          "translationSource": "curated",
-          "matchScore": 0.609,
-          "keyPhrase": "get out this time",
-          "meaning": "这次能脱身",
-          "phonetic": "/ɡet aʊt ðɪs taɪm/",
-          "sourceId": "entry-19",
-          "sourceText": "MODERN FAMILY SEASON 1 EPISODE 1 Buddy, why do you keep getting stuk like this? I can get out this time.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "speaker": "",
+              "text": "Or gender."
+            },
             {
               "i": 92,
               "speaker": "",
-              "text": "♪ Hey, hey Hey, hey ♪"
+              "text": "- And shame on you, - Mitchell."
             },
             {
               "i": 93,
               "speaker": "",
-              "text": "♪ Hey, hey Hey ♪♪"
+              "text": "- you small-minded, ignorant few - Mitchell!"
             },
             {
               "i": 94,
               "speaker": "",
-              "text": "Buddy. Why do you keep getting stuck like this?"
-            },
-            {
-              "i": 95,
-              "speaker": "",
-              "text": "I thought I could get out this time."
+              "text": "- What? -She's got the cream puffs."
             }
           ]
         }
@@ -4165,8 +4088,39 @@
       "title": "Luke、Dylan 与家里的小冲突",
       "segments": [
         {
-          "start": 96,
-          "end": 96,
+          "start": 95,
+          "end": 97,
+          "translation": "伙计，你怎么老卡成这样？我这次能出来。",
+          "translationSource": "curated",
+          "matchScore": 0.609,
+          "keyPhrase": "get out this time",
+          "meaning": "这次能脱身",
+          "phonetic": "/ɡet aʊt ðɪs taɪm/",
+          "sourceId": "entry-19",
+          "sourceText": "MODERN FAMILY SEASON 1 EPISODE 1 Buddy, why do you keep getting stuk like this? I can get out this time.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 95,
+              "speaker": "",
+              "text": "We would like to pay for everyone's headsets."
+            },
+            {
+              "i": 96,
+              "speaker": "",
+              "text": "Buddy. Why do you keep getting stuck like this?"
+            },
+            {
+              "i": 97,
+              "speaker": "",
+              "text": "I thought I could get out this time."
+            }
+          ]
+        },
+        {
+          "start": 98,
+          "end": 98,
           "translation": "我直说了，他需要让专科医生检查一下。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -4179,15 +4133,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 96,
+              "i": 98,
               "speaker": "",
               "text": "I'm just gonna say it. He needs to be checked by a specialist."
             }
           ]
         },
         {
-          "start": 97,
-          "end": 99,
+          "start": 99,
+          "end": 101,
           "translation": "今天有个朋友要来家里。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -4197,55 +4151,55 @@
           "sourceId": "entry-21",
           "sourceText": "There! Be free, Excalibur! I'm having a friend over today.",
           "grammarNotes": [
-            "have a friend over 表示“请朋友来家里”；over 在这里是副词，强调到家里来。"
+            "have a friend over 表示“请朋友来家里”；over 在这里是副词，强调到家里来。",
+            "You don't know him. 用一般现在时说明当前状态；连续两个 Him? 是省略疑问句，表达惊讶和追问。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 97,
-              "speaker": "",
-              "text": "Ow! There. Be free."
-            },
-            {
-              "i": 98,
-              "speaker": "",
-              "text": "Excalibur.",
-              "stage": "Chuckles"
-            },
-            {
               "i": 99,
               "speaker": "",
-              "text": "I'm having a friend over today. Who?"
+              "text": "There. Be free."
+            },
+            {
+              "i": 100,
+              "speaker": "",
+              "text": "Excalibur."
+            },
+            {
+              "i": 101,
+              "speaker": "",
+              "text": "- I'm having a friend over today. - Who?"
             }
           ]
         },
         {
-          "start": 100,
-          "end": 100,
-          "translation": "呃，你不认识他。他？他？",
+          "start": 102,
+          "end": 102,
+          "translation": "-你不认识他 -是个男生吗",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Uh, you don't know him. Him? Him?",
+          "sourceText": "- Uh, you don't know him. - Him? Him?",
           "grammarNotes": [
-            "You don't know him. 用一般现在时说明当前状态；连续两个 Him? 是省略疑问句，表达惊讶和追问。"
+            "Easy. 是口语祈使句，表示“别激动、放松点”，不等于“简单”。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 100,
+              "i": 102,
               "speaker": "",
-              "text": "Uh, you don't know him. Him? Him?"
+              "text": "- Uh, you don't know him. - Him? Him?"
             }
           ]
         },
         {
-          "start": 101,
-          "end": 101,
-          "translation": "哦，是个男孩。你要亲他吗？",
+          "start": 103,
+          "end": 103,
+          "translation": "哇 男生 你会和他亲嘴吗",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4257,59 +4211,57 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 101,
+              "i": 103,
               "speaker": "",
               "text": "Ooh, a boy. You gonna kiss him?"
             }
           ]
         },
         {
-          "start": 102,
-          "end": 102,
-          "translation": "——闭嘴。——菲尔：别闹，别闹。",
+          "start": 104,
+          "end": 104,
+          "translation": "-闭嘴 -别激动 别激动",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "- Shut up. - [Phil] Easy. Easy.",
-          "grammarNotes": [
-            "Easy. 是口语祈使句，表示“别激动、放松点”，不等于“简单”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 102,
-              "speaker": "",
-              "text": "- Shut up. - [Phil] Easy. Easy."
-            }
-          ]
-        },
-        {
-          "start": 103,
-          "end": 103,
-          "translation": "对，闭嘴！不，你闭嘴！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Yeah, shut up! No, you shut up!",
+          "sourceText": "- Shut up. - Easy. Easy.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 103,
+              "i": 104,
               "speaker": "",
-              "text": "Yeah, shut up! No, you shut up!"
+              "text": "- Shut up. - Easy. Easy."
             }
           ]
         },
         {
-          "start": 104,
+          "start": 105,
           "end": 105,
+          "translation": "-闭嘴 -你才闭嘴",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Yeah, shut up! - No, you shut up!",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 105,
+              "speaker": "",
+              "text": "- Yeah, shut up! - No, you shut up!"
+            }
+          ]
+        },
+        {
+          "start": 106,
+          "end": 108,
           "translation": "卢克、亚历克斯，你们到外面去，好吗？",
           "translationSource": "curated",
           "matchScore": 0.762,
@@ -4322,20 +4274,25 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 104,
+              "i": 106,
               "speaker": "",
-              "text": "- Luke, Alex, why don't you take it outside, okay? - And do what?"
+              "text": "Luke, Alex, why don't you take it outside, okay?"
             },
             {
-              "i": 105,
+              "i": 107,
               "speaker": "",
-              "text": "Fight in the sun. It'll be a nice change. Haley."
+              "text": "And do what?"
+            },
+            {
+              "i": 108,
+              "speaker": "",
+              "text": "- Fight in the sun. It'll be a nice change. - Haley."
             }
           ]
         },
         {
-          "start": 106,
-          "end": 109,
+          "start": 109,
+          "end": 112,
           "translation": "我还不如直接叫他别来，因为你们肯定又会让我难堪。",
           "translationSource": "curated",
           "matchScore": 0.966,
@@ -4356,30 +4313,30 @@
           ],
           "blocks": [
             {
-              "i": 106,
-              "speaker": "Phil",
-              "text": "I'm kidding. Who's the boy?"
+              "i": 109,
+              "speaker": "",
+              "text": "- I'm kidding. - Who's the boy?"
             },
             {
-              "i": 107,
+              "i": 110,
               "speaker": "",
               "text": "His name is Dylan."
             },
             {
-              "i": 108,
+              "i": 111,
               "speaker": "",
               "text": "I might as well tell him not to come..."
             },
             {
-              "i": 109,
+              "i": 112,
               "speaker": "",
-              "text": "because you guys are just going to embarrass me again."
+              "text": "Because you guys are just going to embarrass me again."
             }
           ]
         },
         {
-          "start": 110,
-          "end": 111,
+          "start": 113,
+          "end": 114,
           "translation": "等一下，你才十五岁，这是你第一次请男孩来家里。",
           "translationSource": "curated",
           "matchScore": 0.875,
@@ -4388,7 +4345,9 @@
           "phonetic": "/hæŋ ɑːn ə ˈsekənd/",
           "sourceId": "entry-24",
           "sourceText": "Hang on a second, you're fifteen, it's the first time you've had a boy over.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "I better ... 是 I had better ... 的口语省略，表示“我最好……”。"
+          ],
           "alternatives": [
             {
               "phrase": "hang on a second",
@@ -4400,20 +4359,20 @@
           ],
           "blocks": [
             {
-              "i": 110,
+              "i": 113,
               "speaker": "",
               "text": "Sweetie, hang on a second."
             },
             {
-              "i": 111,
+              "i": 114,
               "speaker": "",
               "text": "You're 15, and it's the first time you've had a boy over."
             }
           ]
         },
         {
-          "start": 112,
-          "end": 113,
+          "start": 115,
+          "end": 117,
           "translation": "我难免会有点惊讶，但我们不会让你难堪！",
           "translationSource": "curated",
           "matchScore": 0.842,
@@ -4423,26 +4382,32 @@
           "sourceId": "entry-25",
           "sourceText": "I'm bound to be a little suprised, but We're not gonna embarrass you! I'd better go charge the camcorder.",
           "grammarNotes": [
-            "I better ... 是 I had better ... 的口语省略，表示“我最好……”。"
+            "That's my thing. 表示“那是我的风格、我的拿手好戏”；thing 在口语里常指个人特色，不译成“事情”。",
+            "surf the Web 是“上网浏览网页”的固定表达；hip 是“时髦、跟得上潮流”。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 112,
+              "i": 115,
               "speaker": "",
-              "text": "I'm bound to be a little surprised, but I'm not gonna embarrass you."
+              "text": "I'm bound to be a little surprised,"
             },
             {
-              "i": 113,
+              "i": 116,
               "speaker": "",
-              "text": "- I better charge the camcorder. - [Cries Out]"
+              "text": "but I'm not gonna embarrass you."
+            },
+            {
+              "i": 117,
+              "speaker": "",
+              "text": "I better charge the camcorder."
             }
           ]
         },
         {
-          "start": 114,
-          "end": 114,
-          "translation": "我开玩笑的。行了，你在跟谁说话？",
+          "start": 118,
+          "end": 118,
+          "translation": "逗你玩呢 别这样 也不看看我是谁",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4454,15 +4419,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 114,
+              "i": 118,
               "speaker": "",
               "text": "I'm kidding. Come on. Who are you talking to?"
             }
           ]
         },
         {
-          "start": 115,
-          "end": 115,
+          "start": 119,
+          "end": 119,
           "translation": "那是我的风格。",
           "translationSource": "card",
           "matchScore": 0.667,
@@ -4472,21 +4437,21 @@
           "sourceId": "card-16",
           "sourceText": "That's my thang.",
           "grammarNotes": [
-            "That's my thing. 表示“那是我的风格、我的拿手好戏”；thing 在口语里常指个人特色，不译成“事情”。"
+            "so 放在句末表示话没说完、让对方自己领会，是口语中常见的收尾方式。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 115,
+              "i": 119,
               "speaker": "",
               "text": "I'm the cool dad. That's- That's my thing."
             }
           ]
         },
         {
-          "start": 116,
-          "end": 116,
-          "translation": "我很潮。我——我会上网。",
+          "start": 120,
+          "end": 120,
+          "translation": "我酷毙了 我会上网",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4494,21 +4459,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "I'm hip. I- I surf the Web.",
-          "grammarNotes": [
-            "surf the Web 是“上网浏览网页”的固定表达；hip 是“时髦、跟得上潮流”。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 116,
+              "i": 120,
               "speaker": "",
               "text": "I'm hip. I- I surf the Web."
             }
           ]
         },
         {
-          "start": 117,
-          "end": 119,
+          "start": 121,
+          "end": 124,
           "translation": "我知道《歌舞青春》里所有的舞步。",
           "translationSource": "curated",
           "matchScore": 0.96,
@@ -4517,89 +4480,28 @@
           "phonetic": "/noʊ ɔːl ðə ˈdænsɪz/",
           "sourceId": "entry-27",
           "sourceText": "LOL, Laugh Out Loud, OMG, Oh My God WTF, Why The Face You know, I know all the dances to High School Musical, so.",
-          "grammarNotes": [
-            "so 放在句末表示话没说完、让对方自己领会，是口语中常见的收尾方式。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 117,
-              "speaker": "",
-              "text": "I text. \"LOL\"- Laugh out loud. \"OMG\"- Oh, my God."
-            },
-            {
-              "i": 118,
-              "speaker": "",
-              "text": "\"WTF\"- Why the face?"
-            },
-            {
-              "i": 119,
-              "speaker": "",
-              "text": "Um, you know, I know all the dances to High School Musical, so-",
-              "stage": "With Recording"
-            }
-          ]
-        },
-        {
-          "start": 120,
-          "end": 120,
-          "translation": "♪ 我们同舟共济 ♪",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "♪ We're all in this together ♪",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 120,
-              "speaker": "",
-              "text": "♪ We're all in this together ♪"
-            }
-          ]
-        },
-        {
-          "start": 121,
-          "end": 121,
-          "translation": "♪ 没错，我们就是 ♪",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "♪ Yes, we are ♪",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
               "i": 121,
               "speaker": "",
-              "text": "♪ Yes, we are ♪"
-            }
-          ]
-        },
-        {
-          "start": 122,
-          "end": 122,
-          "translation": "♪ 我们都是明星，什么什么，你知道的 ♪♪",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "♪ We're all stars Something, something you know it ♪♪",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "I text. \"LOL\"- Laugh out loud."
+            },
             {
               "i": 122,
               "speaker": "",
-              "text": "♪ We're all stars Something, something you know it ♪♪"
+              "text": "\"OMG\"- Oh, my God."
+            },
+            {
+              "i": 123,
+              "speaker": "",
+              "text": "\"WTF\"- Why the face?"
+            },
+            {
+              "i": 124,
+              "speaker": "",
+              "text": "Um, you know, I know all the dances to High School Musical, so-"
             }
           ]
         }
@@ -4612,8 +4514,71 @@
       "title": "BB 枪事件",
       "segments": [
         {
-          "start": 123,
-          "end": 130,
+          "start": 125,
+          "end": 125,
+          "translation": "*我们现在欢聚一堂*",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "*We're all in this together *",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 125,
+              "speaker": "",
+              "text": "*We're all in this together *"
+            }
+          ]
+        },
+        {
+          "start": 126,
+          "end": 126,
+          "translation": "*没错*",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "*Yes, we are*",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 126,
+              "speaker": "",
+              "text": "*Yes, we are*"
+            }
+          ]
+        },
+        {
+          "start": 127,
+          "end": 127,
+          "translation": "*我们都是大明星 嘻唰唰嘻唰唰*",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "*We're all stars Something, something you know it*",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 127,
+              "speaker": "",
+              "text": "*We're all stars Something, something you know it*"
+            }
+          ]
+        },
+        {
+          "start": 128,
+          "end": 134,
           "translation": "我不是故意的！",
           "translationSource": "curated",
           "matchScore": 0.917,
@@ -4622,55 +4587,53 @@
           "phonetic": "/ˈdɪdənt miːn tuː/",
           "sourceId": "entry-28",
           "sourceText": "MOM! DAD! - What happend? Luke just shot me! - I didn't mean to! Are you okay? - No, the little bitch shot me! Language! They're only plastic bb's! It was an accident! What did I tell you what happened if you got him a gun? Deal with this! Buddy Uncool.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "The agreement was that ... 是表语从句结构；if he shoots someone, you shoot him 用一般现在时陈述约定的规则。",
+            "follow through 是“坚持到底、兑现承诺”；have to 表示客观义务。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 123,
-              "speaker": "Alex",
-              "text": "Mom! Dad!"
-            },
-            {
-              "i": 124,
-              "speaker": "Claire",
-              "text": "What happened?"
-            },
-            {
-              "i": 125,
-              "speaker": "",
-              "text": "Luke just shot me! I didn't mean to."
-            },
-            {
-              "i": 126,
-              "speaker": "",
-              "text": "Are you okay? No."
-            },
-            {
-              "i": 127,
-              "speaker": "",
-              "text": "- The little bitch shot me. - [Chuckles]"
-            },
-            {
               "i": 128,
               "speaker": "",
-              "text": "- Language! - They're only plastic BBs. It was an accident."
+              "text": "- Mom! Dad! - What happened?"
             },
             {
               "i": 129,
               "speaker": "",
-              "text": "What did I tell you would happen if you got him a gun?"
+              "text": "- Luke just shot me! - I didn't mean to."
             },
             {
               "i": 130,
               "speaker": "",
-              "text": "Deal with this. Buddy, uncool."
+              "text": "- Are you okay? - No."
+            },
+            {
+              "i": 131,
+              "speaker": "",
+              "text": "The little bitch shot me."
+            },
+            {
+              "i": 132,
+              "speaker": "",
+              "text": "- Language! They're only plastic BBs. It was an accident."
+            },
+            {
+              "i": 133,
+              "speaker": "",
+              "text": "What did I tell you would happen if you got him a gun?"
+            },
+            {
+              "i": 134,
+              "speaker": "",
+              "text": "- Deal with this. - Buddy, uncool."
             }
           ]
         },
         {
-          "start": 131,
-          "end": 131,
-          "translation": "就这？这也——不不不不。",
+          "start": 135,
+          "end": 135,
+          "translation": "这就完了吗 不行 不行",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4682,16 +4645,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 131,
+              "i": 135,
               "speaker": "",
               "text": "That's it? That's- No, no, no, no."
             }
           ]
         },
         {
-          "start": 132,
-          "end": 132,
-          "translation": "说好了，他要是开枪打人，你就开枪打他。",
+          "start": 136,
+          "end": 136,
+          "translation": "我们说好他用枪射了别人 你就得射他的",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4699,21 +4662,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "The agreement was that if he shoots someone, you shoot him.",
-          "grammarNotes": [
-            "The agreement was that ... 是表语从句结构；if he shoots someone, you shoot him 用一般现在时陈述约定的规则。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 132,
+              "i": 136,
               "speaker": "",
               "text": "The agreement was that if he shoots someone, you shoot him."
             }
           ]
         },
         {
-          "start": 133,
-          "end": 134,
+          "start": 137,
+          "end": 138,
           "translation": "是的，我们是认真的，现在你必须说到做到。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -4723,7 +4684,7 @@
           "sourceId": "entry-29",
           "sourceText": "We were serious about that? Yes, we were and now you have to follow through.",
           "grammarNotes": [
-            "follow through 是“坚持到底、兑现承诺”；have to 表示客观义务。"
+            "I'm showing a house at 2:00. 用现在进行时表示已经安排好的将来日程。"
           ],
           "alternatives": [
             {
@@ -4736,62 +4697,62 @@
           ],
           "blocks": [
             {
-              "i": 133,
+              "i": 137,
               "speaker": "",
-              "text": "We were serious about that? Yes, we were."
+              "text": "- We were serious about that? - Yes, we were."
             },
             {
-              "i": 134,
+              "i": 138,
               "speaker": "",
               "text": "And now you have to follow through."
             }
           ]
         },
         {
-          "start": 135,
-          "end": 135,
-          "translation": "——（哭）我真的很抱歉。——撒谎。",
+          "start": 139,
+          "end": 139,
+          "translation": "-我错了 -你就装吧",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "- [Crying] I'm so sorry. - Liar.",
+          "sourceText": "- I'm so sorry. - Liar.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 135,
+              "i": 139,
               "speaker": "",
-              "text": "- [Crying] I'm so sorry. - Liar."
+              "text": "- I'm so sorry. - Liar."
             }
           ]
         },
         {
-          "start": 136,
-          "end": 136,
-          "translation": "去吧。他还要参加生日派对呢。",
+          "start": 140,
+          "end": 140,
+          "translation": "-去吧 -他还要去参加生日会呢",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Go. He's got a birthday party.",
+          "sourceText": "- Go. - He's got a birthday party.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 136,
+              "i": 140,
               "speaker": "",
-              "text": "Go. He's got a birthday party."
+              "text": "- Go. - He's got a birthday party."
             }
           ]
         },
         {
-          "start": 137,
-          "end": 138,
+          "start": 141,
+          "end": 142,
           "translation": "爸爸，这里更重要的是什么？",
           "translationSource": "curated",
           "matchScore": 0.933,
@@ -4801,76 +4762,6 @@
           "sourceId": "entry-31",
           "sourceText": "What's more importand here, dad? You can shoot him afterwards, he'll be home at two.",
           "grammarNotes": [
-            "I'm showing a house at 2:00. 用现在进行时表示已经安排好的将来日程。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 137,
-              "speaker": "",
-              "text": "- What's more important here, Dad? - You can shoot him afterwards."
-            },
-            {
-              "i": 138,
-              "speaker": "",
-              "text": "He'll be home at 2:00. I can't shoot him at 2:00. I'm showing a house at 2:00."
-            }
-          ]
-        },
-        {
-          "start": 139,
-          "end": 139,
-          "translation": "——那三点呢？——不行，他三点有足球赛。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "- What about 3:00? - No, he's got a soccer game at 3:00.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 139,
-              "speaker": "",
-              "text": "- What about 3:00? - No, he's got a soccer game at 3:00."
-            }
-          ]
-        },
-        {
-          "start": 140,
-          "end": 140,
-          "translation": "然后——哦，我们五点还得去那个晚宴。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "And then- Oh, we gotta leave for that dinner thing at 5:00.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 140,
-              "speaker": "",
-              "text": "And then- Oh, we gotta leave for that dinner thing at 5:00."
-            }
-          ]
-        },
-        {
-          "start": 141,
-          "end": 141,
-          "translation": "四点十五。你可以四点十五开枪打他。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "4:15. You could shoot him at 4:15.",
-          "grammarNotes": [
             "4:15. You could shoot him at 4:15. 中 could 不是过去式，而是提出一个可行的建议。"
           ],
           "alternatives": [],
@@ -4878,50 +4769,26 @@
             {
               "i": 141,
               "speaker": "",
-              "text": "4:15. You could shoot him at 4:15."
-            }
-          ]
-        },
-        {
-          "start": 142,
-          "end": 142,
-          "translation": "好，我觉得这个时间可以。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "works for me",
-          "meaning": "我没问题；对我合适",
-          "phonetic": "/wɜːrks fɔːr miː/",
-          "sourceId": "entry-33",
-          "sourceText": "- Yeah, I guess that works for me.",
-          "grammarNotes": [],
-          "alternatives": [
-            {
-              "phrase": "works for me",
-              "alternatives": [
-                "that works for me",
-                "I'm fine with that"
-              ]
-            }
-          ],
-          "blocks": [
+              "text": "What's more important here, Dad?"
+            },
             {
               "i": 142,
               "speaker": "",
-              "text": "Yeah, I guess that works for me. Oh!"
+              "text": "You can shoot him afterwards. He'll be home at 2:00."
             }
           ]
         },
         {
           "start": 143,
-          "end": 143,
-          "translation": "抱歉兄弟，这事儿已经排上日程了。",
-          "translationSource": "card",
-          "matchScore": 1,
-          "keyPhrase": "",
-          "meaning": "已经安排好了，板上钉钉",
-          "phonetic": "/ɪts ɑːn ðə ˈkæləndər/",
-          "sourceId": "card-19",
-          "sourceText": "Sorry dude, it's on the calendar.",
+          "end": 144,
+          "translation": "我两点不能开枪打他，两点有人来看我们的房子。",
+          "translationSource": "curated",
+          "matchScore": 0.615,
+          "keyPhrase": "showing our house at two",
+          "meaning": "两点带人来看房",
+          "phonetic": "/ˈʃoʊɪŋ aʊər haʊs æt tuː/",
+          "sourceId": "entry-32",
+          "sourceText": "- I can't shoot him at two, showing our house at two.",
           "grammarNotes": [
             "It's on the calendar. 字面是“在日程表上”，实际是“已经安排好了、改不了”；这里的幽默来自把玩笑当成正式日程。"
           ],
@@ -4930,28 +4797,12 @@
             {
               "i": 143,
               "speaker": "",
-              "text": "\"Shoot Luke.\" Sorry, dude. It's on the calendar."
-            }
-          ]
-        },
-        {
-          "start": 144,
-          "end": 144,
-          "translation": "哦，拜托！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh, come on!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "I can't shoot him at 2:00."
+            },
             {
               "i": 144,
               "speaker": "",
-              "text": "Oh, come on!"
+              "text": "I'm showing a house at 2:00."
             }
           ]
         }
@@ -4966,7 +4817,145 @@
         {
           "start": 145,
           "end": 145,
-          "translation": "我要退出足球队。这是小孩子玩的运动。",
+          "translation": "-三点吧 -不行 三点他有足球赛",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- What about 3:00? - No, he's got a soccer game at 3:00.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 145,
+              "speaker": "",
+              "text": "- What about 3:00? - No, he's got a soccer game at 3:00."
+            }
+          ]
+        },
+        {
+          "start": 146,
+          "end": 146,
+          "translation": "然后我们五点就得去赴宴",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "And then- Oh, we gotta leave for that dinner thing at 5:00.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 146,
+              "speaker": "",
+              "text": "And then- Oh, we gotta leave for that dinner thing at 5:00."
+            }
+          ]
+        },
+        {
+          "start": 147,
+          "end": 147,
+          "translation": "4点15吧 你可以在那时候射他",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "4:15. You could shoot him at 4:15.",
+          "grammarNotes": [
+            "would have stopped 是虚拟条件句的主句结构，表示“本来能做到但实际没做到”；if you weren't staring 是过去进行时条件。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 147,
+              "speaker": "",
+              "text": "4:15. You could shoot him at 4:15."
+            }
+          ]
+        },
+        {
+          "start": 148,
+          "end": 148,
+          "translation": "好，我觉得这个时间可以。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "works for me",
+          "meaning": "我没问题；对我合适",
+          "phonetic": "/wɜːrks fɔːr miː/",
+          "sourceId": "entry-33",
+          "sourceText": "- Yeah, I guess that works for me.",
+          "grammarNotes": [
+            "She is not a girl. She's a woman. 用不定冠词 a 表示类别身份；对比强调 Manny 把对方当作成熟女性。"
+          ],
+          "alternatives": [
+            {
+              "phrase": "works for me",
+              "alternatives": [
+                "that works for me",
+                "I'm fine with that"
+              ]
+            }
+          ],
+          "blocks": [
+            {
+              "i": 148,
+              "speaker": "",
+              "text": "Yeah, I guess that works for me. Oh!"
+            }
+          ]
+        },
+        {
+          "start": 149,
+          "end": 149,
+          "translation": "抱歉兄弟，这事儿已经排上日程了。",
+          "translationSource": "card",
+          "matchScore": 1,
+          "keyPhrase": "",
+          "meaning": "已经安排好了，板上钉钉",
+          "phonetic": "/ɪts ɑːn ðə ˈkæləndər/",
+          "sourceId": "card-19",
+          "sourceText": "Sorry dude, it's on the calendar.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 149,
+              "speaker": "",
+              "text": "- \"Shoot Luke.\" - Sorry, dude. It's on the calendar."
+            }
+          ]
+        },
+        {
+          "start": 150,
+          "end": 150,
+          "translation": "别这样啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Oh, come on!",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 150,
+              "speaker": "",
+              "text": "Oh, come on!"
+            }
+          ]
+        },
+        {
+          "start": 151,
+          "end": 151,
+          "translation": "我不想踢足球了 那是小孩儿玩的",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4978,16 +4967,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 145,
+              "i": 151,
               "speaker": "",
               "text": "I'm quitting soccer. It is a game for children."
             }
           ]
         },
         {
-          "start": 146,
-          "end": 146,
-          "translation": "不行，你不退。",
+          "start": 152,
+          "end": 152,
+          "translation": "不 你不能放弃",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -4999,15 +4988,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 146,
+              "i": 152,
               "speaker": "",
               "text": "No, you're not quitting."
             }
           ]
         },
         {
-          "start": 147,
-          "end": 147,
+          "start": 153,
+          "end": 154,
           "translation": "如果你没有一直盯着那个小女孩，你本来能拦住那个球。",
           "translationSource": "curated",
           "matchScore": 0.857,
@@ -5016,22 +5005,25 @@
           "phonetic": "/ˈsterɪŋ æt ðæt ˈlɪtəl ɡɜːrl/",
           "sourceId": "entry-35",
           "sourceText": "You would've stopped that goal if you weren't staring at that little girl.",
-          "grammarNotes": [
-            "would have stopped 是虚拟条件句的主句结构，表示“本来能做到但实际没做到”；if you weren't staring 是过去进行时条件。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 147,
+              "i": 153,
               "speaker": "",
-              "text": "You would have stopped that goal if you weren't staring at that little girl."
+              "text": "You would have stopped that goal"
+            },
+            {
+              "i": 154,
+              "speaker": "",
+              "text": "if you weren't staring at that little girl."
             }
           ]
         },
         {
-          "start": 148,
-          "end": 148,
-          "translation": "她不是小姑娘，她是个女人。",
+          "start": 155,
+          "end": 155,
+          "translation": "她不是小姑娘 她是成熟的女人",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -5040,20 +5032,20 @@
           "sourceId": "",
           "sourceText": "She is not a girl. She's a woman.",
           "grammarNotes": [
-            "She is not a girl. She's a woman. 用不定冠词 a 表示类别身份；对比强调 Manny 把对方当作成熟女性。"
+            "be with somebody on this 表示“在这件事上支持某人、和某人站一边”，不能按字面译为“和某人在一起”。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 148,
+              "i": 155,
               "speaker": "",
               "text": "She is not a girl. She's a woman."
             }
           ]
         },
         {
-          "start": 149,
-          "end": 152,
+          "start": 156,
+          "end": 160,
           "translation": "格洛丽亚，你和那位妈妈大吵了一架，你为什么非得这样？",
           "translationSource": "curated",
           "matchScore": 0.927,
@@ -5062,34 +5054,42 @@
           "phonetic": "/ˈbloʊʌp wɪð ðæt ˈʌðər mɑːm/",
           "sourceId": "entry-36",
           "sourceText": "You know Gloria, that blowup with that other mom, why do you have to do things like that? If someone sais somthing about my family, I'm going to - I'm just saying you could take it down here a little bit.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "for God's sake 是表达烦躁或无奈的感叹语，可译为“天哪、拜托”；不是正式的宗教表达。",
+            "But first ... 用于说明行动顺序；the silk one 是省略结构，完整为 the silk shirt。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 149,
+              "i": 156,
               "speaker": "",
-              "text": "You know, Gloria, that little blowup with that other mom-"
+              "text": "You know, Gloria, that little blowup with that other mom"
             },
             {
-              "i": 150,
+              "i": 157,
               "speaker": "",
               "text": "Why do you have to do things like that?"
             },
             {
-              "i": 151,
+              "i": 158,
               "speaker": "",
-              "text": "If somebody says something about my family, I'm going to- I'm just saying."
+              "text": "If somebody says something about my family,"
             },
             {
-              "i": 152,
+              "i": 159,
+              "speaker": "",
+              "text": "- I'm going to - I'm just saying."
+            },
+            {
+              "i": 160,
               "speaker": "",
               "text": "You could take it down here a little bit. That's all."
             }
           ]
         },
         {
-          "start": 153,
-          "end": 155,
+          "start": 161,
+          "end": 163,
           "translation": "你不必总是这么情绪化，我只是这个意思。",
           "translationSource": "curated",
           "matchScore": 0.833,
@@ -5098,54 +5098,78 @@
           "phonetic": "/ɪˈmoʊʃənəl ɔːl ðə taɪm/",
           "sourceId": "entry-37",
           "sourceText": "- Well yeah, but that's when you live down here but I live up here! You don't have to be so emotional all the time, that's all I'm saying.",
-          "grammarNotes": [
-            "be with somebody on this 表示“在这件事上支持某人、和某人站一边”，不能按字面译为“和某人在一起”。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 153,
+              "i": 161,
               "speaker": "",
               "text": "Oh, yeah. 'Cause that's where you live, down here."
             },
             {
-              "i": 154,
+              "i": 162,
               "speaker": "",
-              "text": "But I live up here! Yeah, but you don't have to be so emotional all the time."
+              "text": "- But I live up here! - Yeah, but,"
             },
             {
-              "i": 155,
+              "i": 163,
               "speaker": "",
-              "text": "That's all I'm saying. Manny, you're with me on this, right?"
+              "text": "you don't have to be so emotional all the time.That's all I'm saying."
             }
           ]
         },
         {
-          "start": 156,
-          "end": 156,
-          "translation": "我想告诉布伦达·费尔德曼我爱她。哦，天哪。",
+          "start": 164,
+          "end": 165,
+          "translation": "曼尼，这件事你站我这边，对吧？",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "with me on this",
+          "meaning": "在这件事上支持我",
+          "phonetic": "/wɪð miː ɑːn ðɪs/",
+          "sourceId": "entry-38",
+          "sourceText": "Manny, you're with me on this, right? - I wanna tell Brenda Feldman I love her.",
+          "grammarNotes": [
+            "if it toughens him up 是条件状语从句；toughen somebody up 表示“让某人变得坚强”。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 164,
+              "speaker": "",
+              "text": "Manny, you're with me on this, right?"
+            },
+            {
+              "i": 165,
+              "speaker": "",
+              "text": "I wanna tell Brenda Feldman I love her."
+            }
+          ]
+        },
+        {
+          "start": 166,
+          "end": 166,
+          "translation": "-天啊 -曼尼 她都16岁了",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "I wanna tell Brenda Feldman I love her. Oh, for God sakes.",
-          "grammarNotes": [
-            "for God's sake 是表达烦躁或无奈的感叹语，可译为“天哪、拜托”；不是正式的宗教表达。"
-          ],
+          "sourceText": "- Oh, for God sakes. - Manny, she's 16.",
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 156,
+              "i": 166,
               "speaker": "",
-              "text": "I wanna tell Brenda Feldman I love her. Oh, for God sakes."
+              "text": "- Oh, for God sakes. - Manny, she's 16."
             }
           ]
         },
         {
-          "start": 157,
-          "end": 158,
+          "start": 167,
+          "end": 168,
           "translation": "小心点！",
           "translationSource": "curated",
           "matchScore": 0.773,
@@ -5154,7 +5178,9 @@
           "phonetic": "/wɑːtʃ ɪt/",
           "sourceId": "entry-40",
           "sourceText": "- Oh, it's okay for you to take another lover? Watch it! I want to go to the mall where she works.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "first husband 表示“第一任丈夫”；but too crazy 省略了主语和系动词，是口语中的并列省略。"
+          ],
           "alternatives": [
             {
               "phrase": "watch it",
@@ -5166,21 +5192,21 @@
           ],
           "blocks": [
             {
-              "i": 157,
+              "i": 167,
               "speaker": "",
-              "text": "Manny, she's 16. Oh. It's okay for you to take an older lover?"
+              "text": "Oh. It's okay for you to take an older lover?"
             },
             {
-              "i": 158,
+              "i": 168,
               "speaker": "",
-              "text": "Hey, watch it. I wanna go to the mall where she works."
+              "text": "- Hey, watch it. - I wanna go to the mall where she works."
             }
           ]
         },
         {
-          "start": 159,
-          "end": 159,
-          "translation": "但首先我得拿到我的白衬衫，那件丝绸的。",
+          "start": 169,
+          "end": 169,
+          "translation": "不过我先得换上我的白衬衫 丝绸的那件",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -5188,21 +5214,40 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "But first I need to get my white shirt, the silk one.",
-          "grammarNotes": [
-            "But first ... 用于说明行动顺序；the silk one 是省略结构，完整为 the silk shirt。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 159,
+              "i": 169,
               "speaker": "",
               "text": "But first I need to get my white shirt, the silk one."
             }
           ]
         },
         {
-          "start": 160,
-          "end": 165,
+          "start": 170,
+          "end": 170,
+          "translation": "好吧 如果你真想这么做的话",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Okay. If that's what you really want to do.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 170,
+              "speaker": "",
+              "text": "Okay. If that's what you really want to do."
+            }
+          ]
+        },
+        {
+          "start": 171,
+          "end": 177,
           "translation": "向一个十六岁的女孩表白，你会穿着白色灯笼裤挂在旗杆上晃。",
           "translationSource": "curated",
           "matchScore": 0.94,
@@ -5212,187 +5257,46 @@
           "sourceId": "entry-42",
           "sourceText": "Seriously, not to be the evil stepdad, but if you put on a puffy white shirt and declare your love for a 16-year-old you're gonna be swinging from the flagpole in your puffy white underpants! Stop the car! Where you going? You hurt his feelings.",
           "grammarNotes": [
-            "if it toughens him up 是条件状语从句；toughen somebody up 表示“让某人变得坚强”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 160,
-              "speaker": "",
-              "text": "Okay. If that's what you really want to do. Seriously."
-            },
-            {
-              "i": 161,
-              "speaker": "",
-              "text": "Not to be the evil stepdad, but if you put on a puffy white shirt..."
-            },
-            {
-              "i": 162,
-              "speaker": "",
-              "text": "and declare your love for a 16-year-old,"
-            },
-            {
-              "i": 163,
-              "speaker": "",
-              "text": "you're gonna be swinging from the flagpole in your puffy white underpants."
-            },
-            {
-              "i": 164,
-              "speaker": "",
-              "text": "Stop the car. Oh, where are you going?",
-              "stage": "Car Horn Honking"
-            },
-            {
-              "i": 165,
-              "speaker": "",
-              "text": "See? You hurt his feelings. Ah- Well, if it toughens him up a little bit then-"
-            }
-          ]
-        },
-        {
-          "start": 166,
-          "end": 166,
-          "translation": "哦，天哪。他在摘花。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh, geez. He's picking flowers.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 166,
-              "speaker": "",
-              "text": "Oh, geez. He's picking flowers."
-            }
-          ]
-        },
-        {
-          "start": 167,
-          "end": 167,
-          "translation": "曼尼很有激情，跟他爸爸一样。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Manny's very passionate, just like his father.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 167,
-              "speaker": "",
-              "text": "Manny's very passionate, just like his father."
-            }
-          ]
-        },
-        {
-          "start": 168,
-          "end": 168,
-          "translation": "我第一任丈夫——他很帅，但太疯了。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "My first husband- he's very handsome, but too crazy.",
-          "grammarNotes": [
-            "first husband 表示“第一任丈夫”；but too crazy 省略了主语和系动词，是口语中的并列省略。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 168,
-              "speaker": "",
-              "text": "My first husband- he's very handsome, but too crazy."
-            }
-          ]
-        },
-        {
-          "start": 169,
-          "end": 169,
-          "translation": "我们似乎不是吵架就是做爱。",
-          "translationSource": "curated",
-          "matchScore": 0.917,
-          "keyPhrase": "make love",
-          "meaning": "做爱",
-          "phonetic": "/meɪk lʌv/",
-          "sourceId": "entry-45",
-          "sourceText": "It seemed like all what we did was fight and make love.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 169,
-              "speaker": "",
-              "text": "It seemed like all we did was fight and make love, fight and make love, fight and make love."
-            }
-          ]
-        },
-        {
-          "start": 170,
-          "end": 170,
-          "translation": "有一次，我没骗你，我们一起从窗户掉了下去。",
-          "translationSource": "curated",
-          "matchScore": 0.923,
-          "keyPhrase": "fell out of the window",
-          "meaning": "从窗户掉了下去",
-          "phonetic": "/fel aʊt əv ðə ˈwɪndoʊ/",
-          "sourceId": "entry-46",
-          "sourceText": "One time, I'm not kidding you, we fell out of the window together.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 170,
-              "speaker": "",
-              "text": "One time, I'm not kidding you, we fell out the window together.",
-              "stage": "Laughing"
-            }
-          ]
-        },
-        {
-          "start": 171,
-          "end": 174,
-          "translation": "她在飞机上几乎没睡，现在却还很清醒。",
-          "translationSource": "curated",
-          "matchScore": 0.926,
-          "keyPhrase": "barely slept",
-          "meaning": "几乎没睡",
-          "phonetic": "/ˈberli slept/",
-          "sourceId": "entry-47",
-          "sourceText": "Which one were you doing? I'm hearing this for the first time! This doesn't worry you? She barely slept in the plane, and she's stil wide awake.",
-          "grammarNotes": [
-            "barely 是半否定词，表示“几乎不”；still wide awake 中 wide 用来加强 awake，表示“完全清醒”。"
+            "barely 是半否定词，表示“几乎不”；still wide awake 中 wide 用来加强 awake，表示“完全清醒”。",
+            "all women 用 all 直接修饰复数名词，表示“全都是女性”；注意不能写成 all woman。",
+            "unless 表示“除非”，引导否定条件；feel a woman's shape 按字面是“感受到女性的身形”。"
           ],
           "alternatives": [],
           "blocks": [
             {
               "i": 171,
               "speaker": "",
-              "text": "Which- Which one were you doing?",
-              "stage": "Chuckles"
+              "text": "Seriously. Not to be the evil stepdad,"
             },
             {
               "i": 172,
               "speaker": "",
-              "text": "I'm hearing this for the first time."
+              "text": "but if you put on a puffy white shirt..."
             },
             {
               "i": 173,
               "speaker": "",
-              "text": "This doesn't worry you?"
+              "text": "and declare your love for a 16-year-old,"
             },
             {
               "i": 174,
               "speaker": "",
-              "text": "She barely slept on the plane and she's still wide awake."
+              "text": "you're gonna be swinging from the flagpole"
+            },
+            {
+              "i": 175,
+              "speaker": "",
+              "text": "in your puffy white underpants."
+            },
+            {
+              "i": 176,
+              "speaker": "",
+              "text": "- Stop the car. - Oh, where are you going?"
+            },
+            {
+              "i": 177,
+              "speaker": "",
+              "text": "See? You hurt his feelings."
             }
           ]
         }
@@ -5405,9 +5309,164 @@
       "title": "Lily 夜里哭与壁画冲突",
       "segments": [
         {
-          "start": 175,
-          "end": 175,
-          "translation": "——哦，别担心了。——我做不到。",
+          "start": 178,
+          "end": 180,
+          "translation": "如果能让他稍微坚强一点，那就……天哪，他在摘花！",
+          "translationSource": "curated",
+          "matchScore": 0.826,
+          "keyPhrase": "toughens him up",
+          "meaning": "让他变得坚强",
+          "phonetic": "/ˈtʌfənz hɪm ʌp/",
+          "sourceId": "entry-43",
+          "sourceText": "- Well, if it toughens him up a little bit, then oh, jeez, he's picking flowers! Manny is verry passionate, just like his father.",
+          "grammarNotes": [
+            "while we were expecting the baby 用过去进行时表示当时持续的状态；gain a few extra pounds 是“胖了几磅”。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 178,
+              "speaker": "",
+              "text": "Ah- Well, if it toughens him up a little bit then-"
+            },
+            {
+              "i": 179,
+              "speaker": "",
+              "text": "Oh, geez. He's picking flowers."
+            },
+            {
+              "i": 180,
+              "speaker": "",
+              "text": "Manny's very passionate, just like his father."
+            }
+          ]
+        },
+        {
+          "start": 181,
+          "end": 181,
+          "translation": "我的前夫 风度翩翩 但太疯狂了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "My first husband- he's very handsome, but too crazy.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 181,
+              "speaker": "",
+              "text": "My first husband- he's very handsome, but too crazy."
+            }
+          ]
+        },
+        {
+          "start": 182,
+          "end": 182,
+          "translation": "我们似乎不是吵架就是做爱。",
+          "translationSource": "curated",
+          "matchScore": 0.917,
+          "keyPhrase": "make love",
+          "meaning": "做爱",
+          "phonetic": "/meɪk lʌv/",
+          "sourceId": "entry-45",
+          "sourceText": "It seemed like all what we did was fight and make love.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 182,
+              "speaker": "",
+              "text": "It seemed like all we did was fight and make love,"
+            }
+          ]
+        },
+        {
+          "start": 183,
+          "end": 183,
+          "translation": "吵架 做爱 吵架 做爱",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "fight and make love, fight and make love.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 183,
+              "speaker": "",
+              "text": "fight and make love, fight and make love."
+            }
+          ]
+        },
+        {
+          "start": 184,
+          "end": 184,
+          "translation": "有一次，我没骗你，我们一起从窗户掉了下去。",
+          "translationSource": "curated",
+          "matchScore": 0.923,
+          "keyPhrase": "fell out of the window",
+          "meaning": "从窗户掉了下去",
+          "phonetic": "/fel aʊt əv ðə ˈwɪndoʊ/",
+          "sourceId": "entry-46",
+          "sourceText": "One time, I'm not kidding you, we fell out of the window together.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 184,
+              "speaker": "",
+              "text": "One time, I'm not kidding you, we fell out the window together."
+            }
+          ]
+        },
+        {
+          "start": 185,
+          "end": 188,
+          "translation": "她在飞机上几乎没睡，现在却还很清醒。",
+          "translationSource": "curated",
+          "matchScore": 0.926,
+          "keyPhrase": "barely slept",
+          "meaning": "几乎没睡",
+          "phonetic": "/ˈberli slept/",
+          "sourceId": "entry-47",
+          "sourceText": "Which one were you doing? I'm hearing this for the first time! This doesn't worry you? She barely slept in the plane, and she's stil wide awake.",
+          "grammarNotes": [
+            "You're saying everything. 是反讽，字面“你什么都说了”，实际指“你嘴上不说，但态度已经说明一切”。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 185,
+              "speaker": "",
+              "text": "Which- Which one were you doing?"
+            },
+            {
+              "i": 186,
+              "speaker": "",
+              "text": "I'm hearing this for the first time."
+            },
+            {
+              "i": 187,
+              "speaker": "",
+              "text": "This doesn't worry you?"
+            },
+            {
+              "i": 188,
+              "speaker": "",
+              "text": "She barely slept on the plane and she's still wide awake."
+            }
+          ]
+        },
+        {
+          "start": 189,
+          "end": 189,
+          "translation": "-别想多了 -不想才怪",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -5427,16 +5486,16 @@
           ],
           "blocks": [
             {
-              "i": 175,
+              "i": 189,
               "speaker": "",
               "text": "- Oh, stop worrying. - I can't."
             }
           ]
         },
         {
-          "start": 176,
-          "end": 176,
-          "translation": "那——那家孤儿院全是女人。",
+          "start": 190,
+          "end": 190,
+          "translation": "那个孤儿院里都是女人",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -5444,21 +5503,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "That- That orphanage was all women.",
-          "grammarNotes": [
-            "all women 用 all 直接修饰复数名词，表示“全都是女性”；注意不能写成 all woman。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 176,
+              "i": 190,
               "speaker": "",
               "text": "That- That orphanage was all women."
             }
           ]
         },
         {
-          "start": 177,
-          "end": 177,
+          "start": 191,
+          "end": 191,
           "translation": "也许她要感受到女人的身形才能入睡。",
           "translationSource": "curated",
           "matchScore": 0.909,
@@ -5468,7 +5525,7 @@
           "sourceId": "entry-49",
           "sourceText": "Maybe she can't fall asleep unless she feels a woman's shape.",
           "grammarNotes": [
-            "unless 表示“除非”，引导否定条件；feel a woman's shape 按字面是“感受到女性的身形”。"
+            "What the hell is that? 是强烈口语问句，表示震惊、反感或难以置信；正式写作中应避免 hell。"
           ],
           "alternatives": [
             {
@@ -5481,36 +5538,36 @@
           ],
           "blocks": [
             {
-              "i": 177,
+              "i": 191,
               "speaker": "",
               "text": "Maybe she just- she can't fall asleep unless she feels a woman's shape."
             }
           ]
         },
         {
-          "start": 178,
-          "end": 178,
-          "translation": "我想也不是没可能。那给你。",
+          "start": 192,
+          "end": 192,
+          "translation": "-有可能 -那你抱着她",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "I guess that's possible. So here.",
+          "sourceText": "- I guess that's possible. - So here.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 178,
+              "i": 192,
               "speaker": "",
-              "text": "I guess that's possible. So here."
+              "text": "- I guess that's possible. - So here."
             }
           ]
         },
         {
-          "start": 179,
-          "end": 180,
+          "start": 193,
+          "end": 195,
           "translation": "是的，怀着宝宝的时候我多了几磅。",
           "translationSource": "curated",
           "matchScore": 0.905,
@@ -5520,26 +5577,31 @@
           "sourceId": "entry-51",
           "sourceText": "- What the hell is that suppose to mean? Yes, I've gained a few extra pounds while we expecting the baby.",
           "grammarNotes": [
-            "while we were expecting the baby 用过去进行时表示当时持续的状态；gain a few extra pounds 是“胖了几磅”。"
+            "tear somebody away from something 表示“把某人从熟悉的地方强行带走”；things are normal here 是安慰式陈述。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 179,
+              "i": 193,
               "speaker": "",
               "text": "What the hell is that supposed to mean?"
             },
             {
-              "i": 180,
+              "i": 194,
               "speaker": "",
-              "text": "Yes, I've gained a few extra pounds while we were expecting the baby,"
+              "text": "Yes,"
+            },
+            {
+              "i": 195,
+              "speaker": "",
+              "text": "I've gained a few extra pounds while we were expecting the baby,"
             }
           ]
         },
         {
-          "start": 181,
-          "end": 181,
-          "translation": "这对我来说非常难接受。",
+          "start": 196,
+          "end": 196,
+          "translation": "过程相当艰辛",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -5551,15 +5613,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 181,
+              "i": 196,
               "speaker": "",
               "text": "which has been very difficult."
             }
           ]
         },
         {
-          "start": 182,
-          "end": 183,
+          "start": 197,
+          "end": 199,
           "translation": "你的身体似乎在做一个筑巢般的、非常母性的原始反应，会保留营养。",
           "translationSource": "curated",
           "matchScore": 0.933,
@@ -5568,24 +5630,53 @@
           "phonetic": "/məˈtɜːrnəl ˈpraɪməl θɪŋ/",
           "sourceId": "entry-52",
           "sourceText": "But, apparently your body does a nesting, very maternal primal thing, were it retains nutrients.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "less gay 中 less 修饰形容词，表示“没那么……”。这句是喜剧对白，翻译时要保留调侃语气，不能按字面生硬处理。",
+            "stop having friends with names like ... 是 stop doing 结构；with names like 作后置定语修饰 friends。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 182,
+              "i": 197,
               "speaker": "",
-              "text": "But apparently your body does a nesting, very maternal, primal thing..."
+              "text": "But apparently your body"
             },
             {
-              "i": 183,
+              "i": 198,
               "speaker": "",
-              "text": "where it retains nutrients- some sort of molecular physiology thing."
+              "text": "does a nesting, very maternal, primal thing..."
+            },
+            {
+              "i": 199,
+              "speaker": "",
+              "text": "where it retains nutrients-"
             }
           ]
         },
         {
-          "start": 184,
-          "end": 185,
+          "start": 200,
+          "end": 200,
+          "translation": "某种分子生理学上的现象。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "molecular physiology",
+          "meaning": "分子生理学",
+          "phonetic": "/məˈlekjələr ˌfɪziˈɑːlədʒi/",
+          "sourceId": "entry-53",
+          "sourceText": "Some sort of molecular physiology thing.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 200,
+              "speaker": "",
+              "text": "some sort of molecular physiology thing."
+            }
+          ]
+        },
+        {
+          "start": 201,
+          "end": 202,
           "translation": "但那是科学，你没法抗拒。",
           "translationSource": "curated",
           "matchScore": 0.778,
@@ -5598,353 +5689,14 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 184,
+              "i": 201,
               "speaker": "",
               "text": "But that's science."
             },
             {
-              "i": 185,
-              "speaker": "",
-              "text": "You can't- You can't fight it, so-"
-            }
-          ]
-        },
-        {
-          "start": 186,
-          "end": 186,
-          "translation": "你嘴上说没什么，其实什么都说明了。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "saying everything",
-          "meaning": "什么都说明了",
-          "phonetic": "/ˈseɪɪŋ ˈevriθɪŋ/",
-          "sourceId": "entry-55",
-          "sourceText": "You're saying everything.",
-          "grammarNotes": [
-            "You're saying everything. 是反讽，字面“你什么都说了”，实际指“你嘴上不说，但态度已经说明一切”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 186,
-              "speaker": "",
-              "text": "- I'm not saying anything. - You're saying everything."
-            }
-          ]
-        },
-        {
-          "start": 187,
-          "end": 187,
-          "translation": "数到三。一、二——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Count to three. One, two-",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 187,
-              "speaker": "",
-              "text": "Count to three. One, two-"
-            }
-          ]
-        },
-        {
-          "start": 188,
-          "end": 188,
-          "translation": "三。好了。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Three. Okay.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 188,
-              "speaker": "",
-              "text": "Three. Okay."
-            }
-          ]
-        },
-        {
-          "start": 189,
-          "end": 189,
-          "translation": "哦，卡姆，这太美了。天哪。你喜欢吗？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh, Cam. This is beautiful. Oh, my God. Do you love it?",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 189,
-              "speaker": "",
-              "text": "Oh, Cam. This is beautiful. Oh, my God. Do you love it?"
-            }
-          ]
-        },
-        {
-          "start": 190,
-          "end": 190,
-          "translation": "喜欢，我——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Yes, I-",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 190,
-              "speaker": "",
-              "text": "Yes, I-"
-            }
-          ]
-        },
-        {
-          "start": 191,
-          "end": 191,
-          "translation": "这到底是什么鬼东西？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "What the hell is that?",
-          "grammarNotes": [
-            "What the hell is that? 是强烈口语问句，表示震惊、反感或难以置信；正式写作中应避免 hell。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 191,
-              "speaker": "",
-              "text": "What the hell is that?"
-            }
-          ]
-        },
-        {
-          "start": 192,
-          "end": 193,
-          "translation": "我们漂浮在她上方，永远在那里保护她。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "floating above her",
-          "meaning": "漂浮在她上方",
-          "phonetic": "/ˈfloʊtɪŋ əˈbʌv hɜːr/",
-          "sourceId": "entry-58",
-          "sourceText": "Is that us? With wings? We're floating above her, always there to protect her.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 192,
-              "speaker": "",
-              "text": "I had Andre do it while we were gone. Is that us, with wings?"
-            },
-            {
-              "i": 193,
-              "speaker": "",
-              "text": "We're floating above her, always there to protect her."
-            }
-          ]
-        },
-        {
-          "start": 194,
-          "end": 195,
-          "translation": "我们把你从熟悉的一切中带走了，但别担心，这里一切正常。",
-          "translationSource": "curated",
-          "matchScore": 0.905,
-          "keyPhrase": "tore you away",
-          "meaning": "把你强行带走",
-          "phonetic": "/tɔːr juː əˈweɪ/",
-          "sourceId": "entry-59",
-          "sourceText": "Well, that's reassuring, right Lilly? Yeah, we tore you away from everyting you know, but don't worry, things are normal here.",
-          "grammarNotes": [
-            "tear somebody away from something 表示“把某人从熟悉的地方强行带走”；things are normal here 是安慰式陈述。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 194,
-              "speaker": "",
-              "text": "Okay. Well, that's reassuring, right, Lily?"
-            },
-            {
-              "i": 195,
-              "speaker": "",
-              "text": "Yes, we tore you away from everything you know, but don't worry, things are normal here."
-            }
-          ]
-        },
-        {
-          "start": 196,
-          "end": 196,
-          "translation": "你爸爸们是漂浮的仙子。不行，你能不能打电话给安德烈，",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Your fathers are floating fairies. No, can you call Andre,",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 196,
-              "speaker": "",
-              "text": "Your fathers are floating fairies. No, can you call Andre,"
-            }
-          ]
-        },
-        {
-          "start": 197,
-          "end": 197,
-          "translation": "让他画点没那么娘娘腔的东西？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "have him paint something a little less gay?",
-          "grammarNotes": [
-            "less gay 中 less 修饰形容词，表示“没那么……”。这句是喜剧对白，翻译时要保留调侃语气，不能按字面生硬处理。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 197,
-              "speaker": "",
-              "text": "have him paint something a little less gay?"
-            }
-          ]
-        },
-        {
-          "start": 198,
-          "end": 198,
-          "translation": "顺便说一句，咱们别再交叫安德烈的朋友了。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "By the way, we need to stop having friends with names like Andre.",
-          "grammarNotes": [
-            "stop having friends with names like ... 是 stop doing 结构；with names like 作后置定语修饰 friends。"
-          ],
-          "alternatives": [
-            {
-              "phrase": "by the way",
-              "alternatives": [
-                "incidentally",
-                "speaking of which"
-              ]
-            }
-          ],
-          "blocks": [
-            {
-              "i": 198,
-              "speaker": "",
-              "text": "By the way, we need to stop having friends with names like Andre."
-            }
-          ]
-        },
-        {
-          "start": 199,
-          "end": 199,
-          "translation": "红发爸爸是生气的爸爸。不，我没有。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Redheaded dad is angry daddy. No, I'm not.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 199,
-              "speaker": "",
-              "text": "Redheaded dad is angry daddy. No, I'm not."
-            }
-          ]
-        },
-        {
-          "start": 200,
-          "end": 200,
-          "translation": "连佩珀都在从机场回家的路上指出了这一点。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "pointed it out",
-          "meaning": "指出了这一点",
-          "phonetic": "/ˈpɔɪntɪd ɪt aʊt/",
-          "sourceId": "entry-60",
-          "sourceText": "Even Pepper pointed it out on the way home from the airport.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 200,
-              "speaker": "",
-              "text": "Yes, you are. Even Pepper pointed it out on the way home from the airport."
-            }
-          ]
-        },
-        {
-          "start": 201,
-          "end": 204,
-          "translation": "我从没告诉家人我们要领养一个孩子。",
-          "translationSource": "curated",
-          "matchScore": 0.826,
-          "keyPhrase": "never told my family",
-          "meaning": "从没告诉我的家人",
-          "phonetic": "/ˈnevər toʊld maɪ ˈfæməli/",
-          "sourceId": "entry-61",
-          "sourceText": "- Okay, that's another one, Pepper! Okay, what's up? I I never told my family we were adopting a baby.",
-          "grammarNotes": [
-            "never told 用过去时表示过去从未做过；we were adopting a baby 是过去进行时，表示当时正在推进的计划。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 201,
-              "speaker": "",
-              "text": "Okay, that's another one- Pepper."
-            },
-            {
               "i": 202,
               "speaker": "",
-              "text": "Okay, what's up?"
-            },
-            {
-              "i": 203,
-              "speaker": "",
-              "text": "All right, look. I-"
-            },
-            {
-              "i": 204,
-              "speaker": "",
-              "text": "I- I never told my family we were adopting a baby."
+              "text": "You can't- You can't fight it, so-"
             }
           ]
         }
@@ -5957,29 +5709,463 @@
       "title": "Mitchell 还没告诉家人",
       "segments": [
         {
-          "start": 205,
-          "end": 205,
-          "translation": "而且——我知道。",
+          "start": 203,
+          "end": 203,
+          "translation": "你嘴上说没什么，其实什么都说明了。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "saying everything",
+          "meaning": "什么都说明了",
+          "phonetic": "/ˈseɪɪŋ ˈevriθɪŋ/",
+          "sourceId": "entry-55",
+          "sourceText": "You're saying everything.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 203,
+              "speaker": "",
+              "text": "- I'm not saying anything. - You're saying everything."
+            }
+          ]
+        },
+        {
+          "start": 204,
+          "end": 204,
+          "translation": "-数到3 -1 2",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "And- I know.",
+          "sourceText": "- Count to three. - One, two-",
+          "grammarNotes": [
+            "never told 用过去时表示过去从未做过；we were adopting a baby 是过去进行时，表示当时正在推进的计划。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 204,
+              "speaker": "",
+              "text": "- Count to three. - One, two-"
+            }
+          ]
+        },
+        {
+          "start": 205,
+          "end": 205,
+          "translation": "-3 -好吧",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Three. - Okay.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
               "i": 205,
               "speaker": "",
-              "text": "And- I know."
+              "text": "- Three. - Okay."
             }
           ]
         },
         {
           "start": 206,
           "end": 206,
+          "translation": "-小卡 真美 -我的天 你喜欢吗",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Oh, Cam. This is beautiful. - Oh, my God. Do you love it?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 206,
+              "speaker": "",
+              "text": "- Oh, Cam. This is beautiful. - Oh, my God. Do you love it?"
+            }
+          ]
+        },
+        {
+          "start": 207,
+          "end": 207,
+          "translation": "当然 我",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Yes, I-",
+          "grammarNotes": [
+            "You'd tell 'em. They'd say ... 中 'd 都是 would 的缩写，表示对将来反应的推断。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 207,
+              "speaker": "",
+              "text": "Yes, I-"
+            }
+          ]
+        },
+        {
+          "start": 208,
+          "end": 208,
+          "translation": "这是什么玩意",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "What the hell is that?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 208,
+              "speaker": "",
+              "text": "What the hell is that?"
+            }
+          ]
+        },
+        {
+          "start": 209,
+          "end": 209,
+          "translation": "我让安珠尔趁我们不在时画的",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I had Andre do it while we were gone.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 209,
+              "speaker": "",
+              "text": "I had Andre do it while we were gone."
+            }
+          ]
+        },
+        {
+          "start": 210,
+          "end": 211,
+          "translation": "我们漂浮在她上方，永远在那里保护她。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "floating above her",
+          "meaning": "漂浮在她上方",
+          "phonetic": "/ˈfloʊtɪŋ əˈbʌv hɜːr/",
+          "sourceId": "entry-58",
+          "sourceText": "Is that us? With wings? We're floating above her, always there to protect her.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 210,
+              "speaker": "",
+              "text": "Is that us, with wings?"
+            },
+            {
+              "i": 211,
+              "speaker": "",
+              "text": "We're floating above her, always there to protect her."
+            }
+          ]
+        },
+        {
+          "start": 212,
+          "end": 214,
+          "translation": "我们把你从熟悉的一切中带走了，但别担心，这里一切正常。",
+          "translationSource": "curated",
+          "matchScore": 0.905,
+          "keyPhrase": "tore you away",
+          "meaning": "把你强行带走",
+          "phonetic": "/tɔːr juː əˈweɪ/",
+          "sourceId": "entry-59",
+          "sourceText": "Well, that's reassuring, right Lilly? Yeah, we tore you away from everyting you know, but don't worry, things are normal here.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 212,
+              "speaker": "",
+              "text": "Okay. Well, that's reassuring, right, Lily?"
+            },
+            {
+              "i": 213,
+              "speaker": "",
+              "text": "Yes, we tore you away from everything you know,"
+            },
+            {
+              "i": 214,
+              "speaker": "",
+              "text": "but don't worry, things are normal here."
+            }
+          ]
+        },
+        {
+          "start": 215,
+          "end": 215,
+          "translation": "你的大爸二爸可是飞天小精灵哦",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Your fathers are floating fairies.",
+          "grammarNotes": [
+            "would have gone on forever 是虚拟语气，表示“本来会没完没了”；avoider 指习惯逃避问题的人。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 215,
+              "speaker": "",
+              "text": "Your fathers are floating fairies."
+            }
+          ]
+        },
+        {
+          "start": 216,
+          "end": 216,
+          "translation": "不行 你能叫安珠尔",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "No, can you call Andre,",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 216,
+              "speaker": "",
+              "text": "No, can you call Andre,"
+            }
+          ]
+        },
+        {
+          "start": 217,
+          "end": 217,
+          "translation": "重新画点不那么基情的东西吗",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "have him paint something a little less gay?",
+          "grammarNotes": [
+            "tell somebody (that) ... 后接宾语从句；tonight 放在句末表示最后期限。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 217,
+              "speaker": "",
+              "text": "have him paint something a little less gay?"
+            }
+          ]
+        },
+        {
+          "start": 218,
+          "end": 218,
+          "translation": "另外 我们也该少和安珠尔往来",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "By the way, we need to stop having friends",
+          "grammarNotes": [],
+          "alternatives": [
+            {
+              "phrase": "by the way",
+              "alternatives": [
+                "incidentally",
+                "speaking of which"
+              ]
+            }
+          ],
+          "blocks": [
+            {
+              "i": 218,
+              "speaker": "",
+              "text": "By the way, we need to stop having friends"
+            }
+          ]
+        },
+        {
+          "start": 219,
+          "end": 219,
+          "translation": "他名字也太娘了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "with names like Andre.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 219,
+              "speaker": "",
+              "text": "with names like Andre."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scene-9",
+      "start": 220,
+      "end": 255,
+      "title": "Dylan 到访，Phil 滑倒",
+      "segments": [
+        {
+          "start": 220,
+          "end": 220,
+          "translation": "-红发老爹怒火旺盛 -我才不是",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Redheaded dad is angry daddy. - No, I'm not.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 220,
+              "speaker": "",
+              "text": "- Redheaded dad is angry daddy. - No, I'm not."
+            }
+          ]
+        },
+        {
+          "start": 221,
+          "end": 221,
+          "translation": "你就是",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Yes, you are.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 221,
+              "speaker": "",
+              "text": "Yes, you are."
+            }
+          ]
+        },
+        {
+          "start": 222,
+          "end": 222,
+          "translation": "连佩珀都在从机场回家的路上指出了这一点。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "pointed it out",
+          "meaning": "指出了这一点",
+          "phonetic": "/ˈpɔɪntɪd ɪt aʊt/",
+          "sourceId": "entry-60",
+          "sourceText": "Even Pepper pointed it out on the way home from the airport.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 222,
+              "speaker": "",
+              "text": "Even Pepper pointed it out on the way home from the airport."
+            }
+          ]
+        },
+        {
+          "start": 223,
+          "end": 226,
+          "translation": "我从没告诉家人我们要领养一个孩子。",
+          "translationSource": "curated",
+          "matchScore": 0.826,
+          "keyPhrase": "never told my family",
+          "meaning": "从没告诉我的家人",
+          "phonetic": "/ˈnevər toʊld maɪ ˈfæməli/",
+          "sourceId": "entry-61",
+          "sourceText": "- Okay, that's another one, Pepper! Okay, what's up? I I never told my family we were adopting a baby.",
+          "grammarNotes": [
+            "hang on one second 是电话和日常对话中的固定表达，表示“稍等一下”。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 223,
+              "speaker": "",
+              "text": "Okay, that's another one- Pepper."
+            },
+            {
+              "i": 224,
+              "speaker": "",
+              "text": "Okay, what's up?"
+            },
+            {
+              "i": 225,
+              "speaker": "",
+              "text": "All right, look. I-"
+            },
+            {
+              "i": 226,
+              "speaker": "",
+              "text": "I- I never told my family we were adopting a baby."
+            }
+          ]
+        },
+        {
+          "start": 227,
+          "end": 227,
+          "translation": "-而且 -我知道",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- And... - I know.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 227,
+              "speaker": "",
+              "text": "- And... - I know."
+            }
+          ]
+        },
+        {
+          "start": 228,
+          "end": 228,
           "translation": "我不怪你，我了解你的家人。",
           "translationSource": "curated",
           "matchScore": 0.917,
@@ -5992,16 +6178,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 206,
+              "i": 228,
               "speaker": "",
-              "text": "You do? Yeah, and I don't blame you. I know your family."
+              "text": "- You do? - Yeah, and I don't blame you. I know your family."
             }
           ]
         },
         {
-          "start": 207,
-          "end": 207,
-          "translation": "你一告诉他们，他们准会说些刻薄评判的话。",
+          "start": 229,
+          "end": 229,
+          "translation": "你一告诉他们 他们就开始说三道四",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6009,21 +6195,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "You'd tell 'em. They'd say something judgmental.",
-          "grammarNotes": [
-            "You'd tell 'em. They'd say ... 中 'd 都是 would 的缩写，表示对将来反应的推断。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 207,
+              "i": 229,
               "speaker": "",
               "text": "You'd tell 'em. They'd say something judgmental."
             }
           ]
         },
         {
-          "start": 208,
-          "end": 208,
+          "start": 230,
+          "end": 230,
           "translation": "你会生气。",
           "translationSource": "curated",
           "matchScore": 0.75,
@@ -6044,15 +6228,15 @@
           ],
           "blocks": [
             {
-              "i": 208,
+              "i": 230,
               "speaker": "",
-              "text": "Exactly. You'd get mad."
+              "text": "- Exactly. - You'd get mad."
             }
           ]
         },
         {
-          "start": 209,
-          "end": 210,
+          "start": 231,
+          "end": 232,
           "translation": "本来应该没什么，但喜悦突然变成了一场大吵。",
           "translationSource": "curated",
           "matchScore": 0.833,
@@ -6073,20 +6257,20 @@
           ],
           "blocks": [
             {
-              "i": 209,
+              "i": 231,
               "speaker": "",
-              "text": "I know. And then something that's supposed to be nothing but joyful..."
+              "text": "I know. And then something that's supposed to be nothing but joyful"
             },
             {
-              "i": 210,
+              "i": 232,
               "speaker": "",
               "text": "suddenly turns into this huge fight."
             }
           ]
         },
         {
-          "start": 211,
-          "end": 212,
+          "start": 233,
+          "end": 235,
           "translation": "谁会想要那样一场情绪激烈的大戏？",
           "translationSource": "curated",
           "matchScore": 0.789,
@@ -6095,24 +6279,32 @@
           "phonetic": "/bɪɡ ɪˈmoʊʃənəl siːn/",
           "sourceId": "entry-66",
           "sourceText": "Who wants a big emotional scene like that? Thank you, I'm so relieved you understand.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "let somebody do something 表示“让某人做某事”；let the eyes do the work 是拟人化表达，意思是“用眼神传达态度”。",
+            "might be saying 表示现在可能正在说；后面用 but 转折，强调言语和眼神不一致。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 211,
+              "i": 233,
               "speaker": "",
-              "text": "And who wants a big, emotional scene like that? Thank you. Thank you."
+              "text": "And who wants a big, emotional scene like that?"
             },
             {
-              "i": 212,
+              "i": 234,
+              "speaker": "",
+              "text": "Thank you. Thank you."
+            },
+            {
+              "i": 235,
               "speaker": "",
               "text": "I'm so- I'm so relieved you understand."
             }
           ]
         },
         {
-          "start": 213,
-          "end": 213,
+          "start": 236,
+          "end": 236,
           "translation": "我邀请他们今晚来吃晚饭了。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -6121,19 +6313,21 @@
           "phonetic": "/ɪnˈvaɪtɪd ðəm ˈoʊvər fɔːr ˈdɪnər/",
           "sourceId": "entry-67",
           "sourceText": "I invited them over for dinner tonight.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "Nice to meet you. 是初次见面的固定礼貌用语；No, it's not. 是省略回答，完整为 No, it's not nice to meet you。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 213,
+              "i": 236,
               "speaker": "",
               "text": "I invited them over for dinner tonight."
             }
           ]
         },
         {
-          "start": 214,
-          "end": 215,
+          "start": 237,
+          "end": 238,
           "translation": "我不得不这么做！否则这事会一直拖下去。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -6142,27 +6336,25 @@
           "phonetic": "/ɡɔːn ɑːn fɔːrˈevər/",
           "sourceId": "entry-68",
           "sourceText": "What? - I had to! This would have gone on forever.",
-          "grammarNotes": [
-            "would have gone on forever 是虚拟语气，表示“本来会没完没了”；avoider 指习惯逃避问题的人。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 214,
+              "i": 237,
               "speaker": "",
-              "text": "What? I had to."
+              "text": "- What? - I had to."
             },
             {
-              "i": 215,
+              "i": 238,
               "speaker": "",
               "text": "This would have gone on forever. You're an avoider."
             }
           ]
         },
         {
-          "start": 216,
-          "end": 216,
-          "translation": "不。不。不。卡姆，我现在就打电话取消。",
+          "start": 239,
+          "end": 239,
+          "translation": "不 小卡 我现在就打电话取消这件事",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6174,38 +6366,57 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 216,
+              "i": 239,
               "speaker": "",
               "text": "No. No. No. Cam, I'm calling them right now and canceling."
             }
           ]
         },
         {
-          "start": 217,
-          "end": 217,
-          "translation": "不，你不会。你今晚要告诉你家人你领养了一个孩子。",
+          "start": 240,
+          "end": 240,
+          "translation": "不准打",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "No, you're not. You're telling your family you adopted a baby, tonight.",
-          "grammarNotes": [
-            "tell somebody (that) ... 后接宾语从句；tonight 放在句末表示最后期限。"
-          ],
+          "sourceText": "No, you're not.",
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 217,
+              "i": 240,
               "speaker": "",
-              "text": "No, you're not. You're telling your family you adopted a baby, tonight."
+              "text": "No, you're not."
             }
           ]
         },
         {
-          "start": 218,
-          "end": 221,
+          "start": 241,
+          "end": 241,
+          "translation": "今晚你得把领养的事告诉全家人",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "You're telling your family you adopted a baby, tonight.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 241,
+              "speaker": "",
+              "text": "You're telling your family you adopted a baby, tonight."
+            }
+          ]
+        },
+        {
+          "start": 242,
+          "end": 245,
           "translation": "你确实有回避问题，连拉吉娜都这么说！",
           "translationSource": "curated",
           "matchScore": 0.9,
@@ -6218,126 +6429,93 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 218,
+              "i": 242,
               "speaker": "",
               "text": "And you do have avoidance issues. Even Longinus said so."
             },
             {
-              "i": 219,
+              "i": 243,
               "speaker": "",
-              "text": "Are- Are you really not hearing these names?",
-              "stage": "Doorbell Rings"
+              "text": "Are- Are you really not hearing these names?"
             },
             {
-              "i": 220,
-              "speaker": "Haley",
+              "i": 244,
+              "speaker": "",
               "text": "Don't answer it! I'll get it!"
             },
             {
-              "i": 221,
+              "i": 245,
               "speaker": "",
               "text": "Hi. Hey, you must be Dylan."
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "scene-9",
-      "start": 220,
-      "end": 255,
-      "title": "Dylan 到访，Phil 滑倒",
-      "segments": [
+        },
         {
-          "start": 222,
-          "end": 222,
-          "translation": "嘿。迪伦。对。我是海莉的妈妈。",
+          "start": 246,
+          "end": 246,
+          "translation": "-是的 迪兰 -我是海莉的妈妈",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Hey. Dylan. Yeah. I'm Haley's mother.",
+          "sourceText": "- Hey. Dylan. Yeah. - I'm Haley's mother.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 222,
+              "i": 246,
               "speaker": "",
-              "text": "Hey. Dylan. Yeah. I'm Haley's mother."
+              "text": "- Hey. Dylan. Yeah. - I'm Haley's mother."
             }
           ]
         },
         {
-          "start": 223,
-          "end": 223,
-          "translation": "嘿。嗯。",
+          "start": 247,
+          "end": 247,
+          "translation": "-我们走吧 -那个",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Hey. Mm-hmm.",
+          "sourceText": "- Come on. Let's go. - Okay. Um-",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 223,
+              "i": 247,
               "speaker": "",
-              "text": "Hey. Mm-hmm."
+              "text": "- Come on. Let's go. - Okay. Um-"
             }
           ]
         },
         {
-          "start": 224,
-          "end": 224,
-          "translation": "走吧，我们上楼。好。呃——",
+          "start": 248,
+          "end": 248,
+          "translation": "等一下",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Come on. Let's go. Okay. Um-",
+          "sourceText": "Hang on one second.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 224,
+              "i": 248,
               "speaker": "",
-              "text": "Come on. Let's go. Okay. Um-",
-              "stage": "Clears Throat"
+              "text": "Hang on one second."
             }
           ]
         },
         {
-          "start": 225,
-          "end": 225,
-          "translation": "等一下。呃——哇。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Hang on one second. Um- Whoa.",
-          "grammarNotes": [
-            "hang on one second 是电话和日常对话中的固定表达，表示“稍等一下”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 225,
-              "speaker": "",
-              "text": "Hang on one second. Um- Whoa."
-            }
-          ]
-        },
-        {
-          "start": 226,
-          "end": 227,
+          "start": 249,
+          "end": 250,
           "translation": "迪伦，你还在上高中？——是的，我是毕业班学生。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -6350,20 +6528,20 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 226,
+              "i": 249,
               "speaker": "",
               "text": "Dylan, you're still in high school?"
             },
             {
-              "i": 227,
+              "i": 250,
               "speaker": "",
-              "text": "Yeah, I'm a senior. A senior. Okay. Cool."
+              "text": "- Yeah, I'm a senior. -A senior. Okay. Cool."
             }
           ]
         },
         {
-          "start": 228,
-          "end": 229,
+          "start": 251,
+          "end": 252,
           "translation": "他就是迪伦，而且是毕业班学生，你需要吓唬吓唬他。",
           "translationSource": "curated",
           "matchScore": 0.846,
@@ -6384,21 +6562,20 @@
           ],
           "blocks": [
             {
-              "i": 228,
+              "i": 251,
               "speaker": "",
-              "text": "Hey, Phil. Sweetie. Honey. He is Dylan, and he is a senior.",
-              "stage": "Whispers"
+              "text": "Hey, Phil. Sweetie. Honey. He is Dylan, and he is a senior."
             },
             {
-              "i": 229,
+              "i": 252,
               "speaker": "",
               "text": "You have to scare him."
             }
           ]
         },
         {
-          "start": 230,
-          "end": 230,
+          "start": 253,
+          "end": 253,
           "translation": "让我见见这个情场高手。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -6407,19 +6584,21 @@
           "phonetic": "/ˈpleɪə/",
           "sourceId": "entry-73",
           "sourceText": "Let me meet this playa.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "flip somebody back 表示“把某人翻回去”；and we're good 是口语，表示“我们就没事了”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 230,
+              "i": 253,
               "speaker": "",
-              "text": "Let me meet this \"playa.\""
+              "text": "Let me meet this \"Playa.\""
             }
           ]
         },
         {
-          "start": 231,
-          "end": 233,
+          "start": 254,
+          "end": 256,
           "translation": "你要先给他一点脸色，然后让眼神来发挥作用。",
           "translationSource": "curated",
           "matchScore": 0.7,
@@ -6428,32 +6607,38 @@
           "phonetic": "/let ði aɪz duː ðə wɜːrk/",
           "sourceId": "entry-74",
           "sourceText": "Phil Dunphy, yo! It's like that, you just start down on him and let the eyes do the work.",
-          "grammarNotes": [
-            "let somebody do something 表示“让某人做某事”；let the eyes do the work 是拟人化表达，意思是“用眼神传达态度”。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 231,
+              "i": 254,
               "speaker": "",
               "text": "Phil Dunphy, yo."
             },
             {
-              "i": 232,
+              "i": 255,
               "speaker": "",
               "text": "It's like that. You just- You just stare down at 'em,"
             },
             {
-              "i": 233,
+              "i": 256,
               "speaker": "",
               "text": "let the eyes do the work."
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "scene-10",
+      "start": 256,
+      "end": 290,
+      "title": "Manny 的表白计划",
+      "segments": [
         {
-          "start": 234,
-          "end": 234,
-          "translation": "你嘴上也许说：“嘿，我们没矛盾。”",
+          "start": 257,
+          "end": 257,
+          "translation": "你嘴上说着 没问题",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6461,22 +6646,20 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Your mouth might be saying, \"Hey, we cool,\"",
-          "grammarNotes": [
-            "might be saying 表示现在可能正在说；后面用 but 转折，强调言语和眼神不一致。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 234,
+              "i": 257,
               "speaker": "",
               "text": "Your mouth might be saying, \"Hey, we cool,\""
             }
           ]
         },
         {
-          "start": 235,
-          "end": 235,
-          "translation": "但你的眼神却在说：“不，我们有。”",
+          "start": 258,
+          "end": 258,
+          "translation": "可你的眼神说 才怪",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6488,16 +6671,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 235,
+              "i": 258,
               "speaker": "",
               "text": "but your eyes are like, \"No, we not.\""
             }
           ]
         },
         {
-          "start": 236,
-          "end": 236,
-          "translation": "“很高兴认识你。”“不，才不是。”",
+          "start": 259,
+          "end": 259,
+          "translation": "很高兴见到你 才怪",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6505,22 +6688,20 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "\"Nice to meet you.\" \"No, it's not.\"",
-          "grammarNotes": [
-            "Nice to meet you. 是初次见面的固定礼貌用语；No, it's not. 是省略回答，完整为 No, it's not nice to meet you。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 236,
+              "i": 259,
               "speaker": "",
               "text": "\"Nice to meet you.\" \"No, it's not.\""
             }
           ]
         },
         {
-          "start": 237,
-          "end": 237,
-          "translation": "“一切都好。”",
+          "start": 260,
+          "end": 260,
+          "translation": "挺不错嘛",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6532,37 +6713,38 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 237,
+              "i": 260,
               "speaker": "",
-              "text": "\"It's all good.\"",
-              "stage": "Mutters"
+              "text": "\"It's all good.\""
             }
           ]
         },
         {
-          "start": 238,
-          "end": 238,
-          "translation": "哟。哟。",
+          "start": 261,
+          "end": 261,
+          "translation": "才怪",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Yo. Yo.",
-          "grammarNotes": [],
+          "sourceText": "\"No, it's not.\"",
+          "grammarNotes": [
+            "What are you gonna do with ...? 可以按字面问“你打算怎么处理”，但在恋爱语境里是质问“你追她又能怎样”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 238,
+              "i": 261,
               "speaker": "",
-              "text": "Yo. Yo."
+              "text": "\"No, it's not.\""
             }
           ]
         },
         {
-          "start": 239,
-          "end": 242,
+          "start": 262,
+          "end": 265,
           "translation": "你们两个保持真实？你知道那是什么意思吗，小子？",
           "translationSource": "curated",
           "matchScore": 0.609,
@@ -6583,30 +6765,30 @@
           ],
           "blocks": [
             {
-              "i": 239,
+              "i": 262,
               "speaker": "",
-              "text": "Okay, I see you two guys- Wait, wait, wait."
+              "text": "- Okay, I see you two guys- - Wait, wait, wait."
             },
             {
-              "i": 240,
+              "i": 263,
               "speaker": "",
               "text": "You two-"
             },
             {
-              "i": 241,
+              "i": 264,
               "speaker": "",
               "text": "You two keep it real, know what I mean, son?"
             },
             {
-              "i": 242,
+              "i": 265,
               "speaker": "",
               "text": "Not really."
             }
           ]
         },
         {
-          "start": 243,
-          "end": 245,
+          "start": 266,
+          "end": 268,
           "translation": "哦，天哪，我的背！我踩到婴儿油滑倒了。",
           "translationSource": "curated",
           "matchScore": 0.789,
@@ -6615,121 +6797,125 @@
           "phonetic": "/slipt ɪn ðə ˈbeɪbi ɔɪl/",
           "sourceId": "entry-76",
           "sourceText": "- That's cool! Oh, God, that's my back! Ow, oh, I slipped in the baby oil.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "When you say no like that, it's always yes. 用 when 引导习惯性条件；like that 指“用那种语气”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 243,
+              "i": 266,
               "speaker": "",
-              "text": "Please, stop. That's cool."
+              "text": "- Please, stop. - That's cool."
             },
             {
-              "i": 244,
+              "i": 267,
               "speaker": "",
-              "text": "Ow. Oh, God! That's my back. Oh, honey. Sweetheart."
+              "text": "- Ow. Oh, God! That's my back. - Oh, honey. Sweetheart."
             },
             {
-              "i": 245,
+              "i": 268,
               "speaker": "",
               "text": "Ow! Oh! I slipped in the baby oil."
             }
           ]
         },
         {
-          "start": 246,
-          "end": 249,
+          "start": 269,
+          "end": 272,
           "translation": "如果真的动手，我能打败你！",
           "translationSource": "curated",
-          "matchScore": 0.824,
+          "matchScore": 0.933,
           "keyPhrase": "physical confrontation",
           "meaning": "肢体冲突；动手",
           "phonetic": "/ˈfɪzɪkəl ˌkɑːnfrənˈteɪʃən/",
           "sourceId": "entry-77",
           "sourceText": "Ooh, where you from originally? I could defeat you if it came to a physical confrontation! I don't know about this, shall I call a doctor? - No, no, no, no.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "not care what ... thinks about me 是宾语从句结构；what 在从句中作 thinks 的宾语。",
+            "I don't care how old you are. 中 how old you are 是宾语从句，用陈述语序，不能写成 how old are you。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 246,
+              "i": 269,
               "speaker": "",
               "text": "\"Oh, where you from originally?\""
             },
             {
-              "i": 247,
+              "i": 270,
               "speaker": "",
               "text": "\"I could defeat you if it came to a physical confrontation.\""
             },
             {
-              "i": 248,
+              "i": 271,
               "speaker": "",
-              "text": "Ow! Ow! Ow! Ow! I don't know about this. Should I call a doctor?"
+              "text": "I don't know about this. Should I call a doctor?"
             },
             {
-              "i": 249,
+              "i": 272,
               "speaker": "",
               "text": "No, no, no, no, no. Okay."
             }
           ]
         },
         {
-          "start": 250,
-          "end": 250,
-          "translation": "你力气真大，兄弟。谢谢。",
+          "start": 273,
+          "end": 273,
+          "translation": "-小样儿挺强壮的啊 -谢谢夸奖",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "You're very strong, homes. Thanks.",
+          "sourceText": "- You're very strong, homes. - Thanks.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 250,
+              "i": 273,
               "speaker": "",
-              "text": "You're very strong, homes. Thanks."
+              "text": "- You're very strong, homes. - Thanks."
             }
           ]
         },
         {
-          "start": 251,
-          "end": 253,
+          "start": 274,
+          "end": 276,
           "translation": "我侧躺着，所以把我翻回去，我们就没事了。",
           "translationSource": "curated",
-          "matchScore": 0.655,
+          "matchScore": 0.679,
           "keyPhrase": "flip me right back",
           "meaning": "把我翻回去",
           "phonetic": "/flɪp miː raɪt bæk/",
           "sourceId": "entry-78",
           "sourceText": "Okay, nice, nice soft landing Okay, I am on my side, so flip me right back and we're good.",
           "grammarNotes": [
-            "flip somebody back 表示“把某人翻回去”；and we're good 是口语，表示“我们就没事了”。"
+            "make a fool of oneself 是固定搭配，表示“让自己出丑”；of himself 与主语 he 保持一致。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 251,
+              "i": 274,
               "speaker": "",
-              "text": "Okay. Nice- Nice soft landing. There you go."
+              "text": "- Okay. Nice- Nice soft landing. - There you go."
             },
             {
-              "i": 252,
+              "i": 275,
               "speaker": "",
-              "text": "Okay. I am on my side though. Okay, let's go. Come on."
+              "text": "- Okay, let's go. Come on. - I am on my side though."
             },
             {
-              "i": 253,
+              "i": 276,
               "speaker": "",
-              "text": "So just flip me right back, and we're good.",
-              "stage": "Sighs"
+              "text": "So just flip me right back, and we're good."
             }
           ]
         },
         {
-          "start": 254,
-          "end": 254,
-          "translation": "我们就会没事。",
+          "start": 277,
+          "end": 277,
+          "translation": "就没事了",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6737,19 +6923,21 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "We'll be good.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "what's gonna happen to him 是 what 引导的宾语从句；over there 指不在眼前的地方。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 254,
+              "i": 277,
               "speaker": "",
               "text": "We'll be good."
             }
           ]
         },
         {
-          "start": 255,
-          "end": 255,
+          "start": 278,
+          "end": 279,
           "translation": "我只需要被翻回仰面，我们应该就没事了。",
           "translationSource": "curated",
           "matchScore": 0.938,
@@ -6758,28 +6946,27 @@
           "phonetic": "/ɡet flɪpt raɪt ɑːn maɪ bæk/",
           "sourceId": "entry-79",
           "sourceText": "I just need to get flipped right on my back, we should be fine, so.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "that means only one thing 中 that 指代前一句；破折号后的内容是在解释“唯一一件事”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 255,
+              "i": 278,
               "speaker": "",
-              "text": "I just need to get flipped right on my back, and we should be fine. So-"
+              "text": "I just need to get flipped right on my back,"
+            },
+            {
+              "i": 279,
+              "speaker": "",
+              "text": "and we should be fine. So-"
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "scene-10",
-      "start": 256,
-      "end": 290,
-      "title": "Manny 的表白计划",
-      "segments": [
+        },
         {
-          "start": 256,
-          "end": 256,
-          "translation": "布伦达·费尔德曼。",
+          "start": 280,
+          "end": 280,
+          "translation": "布兰达·费尔曼",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6791,36 +6978,59 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 256,
+              "i": 280,
               "speaker": "",
               "text": "Brenda Feldman."
             }
           ]
         },
         {
-          "start": 257,
-          "end": 257,
-          "translation": "那是什么？我给布伦达·费尔德曼写的一首诗。",
+          "start": 281,
+          "end": 281,
+          "translation": "-你拿的什么 -我为布兰达·费尔曼写的诗",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "What is that? A poem I have written for Brenda Feldman.",
+          "sourceText": "- What is that? - A poem I have written for Brenda Feldman.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 257,
+              "i": 281,
               "speaker": "",
-              "text": "What is that? A poem I have written for Brenda Feldman."
+              "text": "- What is that? - A poem I have written for Brenda Feldman."
             }
           ]
         },
         {
-          "start": 258,
-          "end": 259,
+          "start": 282,
+          "end": 282,
+          "translation": "不用想也知道",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Of course it is.",
+          "grammarNotes": [
+            "mi niño 是西班牙语称呼，意为“我的孩子”；翻译时要保留亲昵语气，不能按英语名词硬译。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 282,
+              "speaker": "",
+              "text": "Of course it is."
+            }
+          ]
+        },
+        {
+          "start": 283,
+          "end": 284,
           "translation": "我把想法写成文字，现在我要把文字变成行动！",
           "translationSource": "curated",
           "matchScore": 0.909,
@@ -6833,21 +7043,21 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 258,
+              "i": 283,
               "speaker": "",
-              "text": "- Of course it is. - I put my thoughts into words and now my words into action."
+              "text": "I put my thoughts into words and now my words into action."
             },
             {
-              "i": 259,
+              "i": 284,
               "speaker": "",
               "text": "Hey, I'll give you 50 bucks not to do this."
             }
           ]
         },
         {
-          "start": 260,
-          "end": 260,
-          "translation": "我才十一岁。我要钱干什么？",
+          "start": 285,
+          "end": 285,
+          "translation": "我才11岁而已 要那么多钱干什么",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6859,16 +7069,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 260,
+              "i": 285,
               "speaker": "",
               "text": "I'm 11 years old. What am I gonna do with money?"
             }
           ]
         },
         {
-          "start": 261,
-          "end": 261,
-          "translation": "那你追一个十六岁女孩又想干什么？",
+          "start": 286,
+          "end": 286,
+          "translation": "你这年纪要16岁的花姑娘又能干什么",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6877,41 +7087,43 @@
           "sourceId": "",
           "sourceText": "What are you gonna do with a 16-year-old?",
           "grammarNotes": [
-            "What are you gonna do with ...? 可以按字面问“你打算怎么处理”，但在恋爱语境里是质问“你追她又能怎样”。"
+            "wasn't it? 是反义疑问句，用来寻求对方确认；mi amor 是西班牙语的“我的爱人”。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 261,
+              "i": 286,
               "speaker": "",
               "text": "What are you gonna do with a 16-year-old?"
             }
           ]
         },
         {
-          "start": 262,
-          "end": 262,
-          "translation": "他像个斗牛士。嗯。你看过斗牛吗？",
+          "start": 287,
+          "end": 287,
+          "translation": "-他就像个斗牛士 -你见过斗牛吗",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "He's like a bullfighter. Mmm. You ever see a bullfight?",
-          "grammarNotes": [],
+          "sourceText": "- He's like a bullfighter. - Mmm. You ever see a bullfight?",
+          "grammarNotes": [
+            "It was brave. 用一般过去时评价已经发生的行为；Right, Jay? 用简短疑问寻求附和。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 262,
+              "i": 287,
               "speaker": "",
-              "text": "He's like a bullfighter. Mmm. You ever see a bullfight?"
+              "text": "- He's like a bullfighter. - Mmm. You ever see a bullfight?"
             }
           ]
         },
         {
-          "start": 263,
-          "end": 263,
+          "start": 288,
+          "end": 288,
           "translation": "你心情这么差。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -6932,16 +7144,16 @@
           ],
           "blocks": [
             {
-              "i": 263,
+              "i": 288,
               "speaker": "",
-              "text": "- I can't watch this. - You're in such a bad mood."
+              "text": "I can't watch this. - You're in such a bad mood."
             }
           ]
         },
         {
-          "start": 264,
-          "end": 264,
-          "translation": "我知道为什么。因为那个人以为你是我爸爸。",
+          "start": 289,
+          "end": 289,
+          "translation": "我也知道原因 因为那人以为你是我爸爸",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -6953,518 +7165,23 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 264,
+              "i": 289,
               "speaker": "",
               "text": "And I know why. It's because that man thought you were my father."
             }
           ]
         },
         {
-          "start": 265,
-          "end": 265,
-          "translation": "不是。就是。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "No. Yes.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 265,
-              "speaker": "",
-              "text": "No. Yes."
-            }
-          ]
-        },
-        {
-          "start": 266,
-          "end": 266,
-          "translation": "你那样说不的时候，其实总是意思是是。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "when you say no like that, it's always yes",
-          "meaning": "你那样说不，其实就是是",
-          "phonetic": "/wen juː seɪ noʊ laɪk ðæt ɪts ˈɔːlweɪz jes/",
-          "sourceId": "entry-84",
-          "sourceText": "When you say no like that, it's always yes.",
-          "grammarNotes": [
-            "When you say no like that, it's always yes. 用 when 引导习惯性条件；like that 指“用那种语气”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 266,
-              "speaker": "",
-              "text": "No. When you say \"No\" like that, it's always \"Yes.\""
-            }
-          ]
-        },
-        {
-          "start": 267,
-          "end": 267,
-          "translation": "走吧。我们在商场里。给你买点年轻点的衣服。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Come on. We're in the mall. Let's get you, like, some younger clothes.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 267,
-              "speaker": "",
-              "text": "Come on. We're in the mall. Let's get you, like, some younger clothes."
-            }
-          ]
-        },
-        {
-          "start": 268,
-          "end": 268,
-          "translation": "那边就有家店。我不需要什么年轻点的衣服。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "There's a store there. I don't need any younger clothes.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 268,
-              "speaker": "",
-              "text": "There's a store there. I don't need any younger clothes."
-            }
-          ]
-        },
-        {
-          "start": 269,
-          "end": 269,
-          "translation": "我也不在乎某个穿破洞牛仔裤的混蛋怎么看我。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "And I don't care what some jackass in a pair of ripped jeans thinks about me.",
-          "grammarNotes": [
-            "not care what ... thinks about me 是宾语从句结构；what 在从句中作 thinks 的宾语。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 269,
-              "speaker": "",
-              "text": "And I don't care what some jackass in a pair of ripped jeans thinks about me."
-            }
-          ]
-        },
-        {
-          "start": 270,
-          "end": 270,
-          "translation": "很好。你本来就不该在乎。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Good. You shouldn't.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 270,
-              "speaker": "",
-              "text": "Good. You shouldn't."
-            }
-          ]
-        },
-        {
-          "start": 271,
-          "end": 271,
-          "translation": "你只需要在乎我怎么想。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "You should only care what I think.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 271,
-              "speaker": "",
-              "text": "You should only care what I think."
-            }
-          ]
-        },
-        {
-          "start": 272,
-          "end": 272,
-          "translation": "我爱你，我不在乎你多大年纪。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I love you, and I don't care how old you are.",
-          "grammarNotes": [
-            "I don't care how old you are. 中 how old you are 是宾语从句，用陈述语序，不能写成 how old are you。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 272,
-              "speaker": "",
-              "text": "I love you, and I don't care how old you are."
-            }
-          ]
-        },
-        {
-          "start": 273,
-          "end": 273,
-          "translation": "别做闷闷不乐的人，也别对曼尼那么严厉。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "gloomy goose",
-          "meaning": "闷闷不乐的人",
-          "phonetic": "/ˈɡluːmi ɡuːs/",
-          "sourceId": "entry-86",
-          "sourceText": "So stop being a gloomy goose, and stop being so hard on Manny.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 273,
-              "speaker": "",
-              "text": "So stop being a gloomy goose and stop being so hard on Manny."
-            }
-          ]
-        },
-        {
-          "start": 274,
-          "end": 275,
-          "translation": "我对曼尼严厉，只是不想看到他出丑。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "make a fool of himself",
-          "meaning": "让自己出丑",
-          "phonetic": "/meɪk ə fuːl əv hɪmˈself/",
-          "sourceId": "entry-87",
-          "sourceText": "- The only reason I'm hard on Manny is just because I don't wanna see him make a fool of himself.",
-          "grammarNotes": [
-            "make a fool of oneself 是固定搭配，表示“让自己出丑”；of himself 与主语 he 保持一致。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 274,
-              "speaker": "",
-              "text": "The only reason I'm hard on Manny..."
-            },
-            {
-              "i": 275,
-              "speaker": "",
-              "text": "is just because I don't wanna see him make a fool of himself."
-            }
-          ]
-        },
-        {
-          "start": 276,
-          "end": 276,
-          "translation": "而且我在这儿都能闻到他头发上发胶的味道。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "And I can smell that hair goo of his from here.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 276,
-              "speaker": "",
-              "text": "And I can smell that hair goo of his from here."
-            }
-          ]
-        },
-        {
-          "start": 277,
-          "end": 277,
-          "translation": "听着，我不知道他去了那边会怎么样。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Look, I don't know what's gonna happen to him over there.",
-          "grammarNotes": [
-            "what's gonna happen to him 是 what 引导的宾语从句；over there 指不在眼前的地方。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 277,
-              "speaker": "",
-              "text": "Look, I don't know what's gonna happen to him over there."
-            }
-          ]
-        },
-        {
-          "start": 278,
-          "end": 278,
-          "translation": "但你现在是他的家人了，而这就意味着一件事——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "But you're his family now, and that means only one thing-",
-          "grammarNotes": [
-            "that means only one thing 中 that 指代前一句；破折号后的内容是在解释“唯一一件事”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 278,
-              "speaker": "",
-              "text": "But you're his family now, and that means only one thing-"
-            }
-          ]
-        },
-        {
-          "start": 279,
-          "end": 281,
-          "translation": "你要成为推动他前进的风，而不是朝他脸上吐的口水！",
-          "translationSource": "curated",
-          "matchScore": 0.917,
-          "keyPhrase": "wind in his back",
-          "meaning": "在背后支持他",
-          "phonetic": "/wɪnd ɪn hɪz bæk/",
-          "sourceId": "entry-88",
-          "sourceText": "You be there wind in his back, not the spit in his face! What? Something my mom always says, it's gorgeous in Spanish.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 279,
-              "speaker": "",
-              "text": "You be the wind in his back, not the spit in his face."
-            },
-            {
-              "i": 280,
-              "speaker": "",
-              "text": "What? It's something my mom always says."
-            },
-            {
-              "i": 281,
-              "speaker": "",
-              "text": "It's gorgeous in Spanish. Look, he's there."
-            }
-          ]
-        },
-        {
-          "start": 282,
-          "end": 282,
-          "translation": "她有男朋友了。哦，对不起，我的孩子。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "She has a boyfriend. Oh, I'm sorry, mi niño.",
-          "grammarNotes": [
-            "mi niño 是西班牙语称呼，意为“我的孩子”；翻译时要保留亲昵语气，不能按英语名词硬译。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 282,
-              "speaker": "",
-              "text": "She has a boyfriend. Oh, I'm sorry, mi niño."
-            }
-          ]
-        },
-        {
-          "start": 283,
-          "end": 283,
-          "translation": "我把心交给了她。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "gave her my heart",
-          "meaning": "把心交给了她",
-          "phonetic": "/ɡeɪv hɜːr maɪ hɑːrt/",
-          "sourceId": "entry-89",
-          "sourceText": "I gave her my heart.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 283,
-              "speaker": "",
-              "text": "I gave her my heart,"
-            }
-          ]
-        },
-        {
-          "start": 284,
-          "end": 284,
-          "translation": "她给了我一张我扮成老式西部警长的照片。",
-          "translationSource": "card",
-          "matchScore": 1,
-          "keyPhrase": "",
-          "meaning": "老式西部警长",
-          "phonetic": "/oʊld taɪm ˈʃɛrɪf/",
-          "sourceId": "card-38",
-          "sourceText": "She gave me a picture of me as an old-time sheriff.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 284,
-              "speaker": "",
-              "text": "she gave me a picture of me as an old-time sheriff."
-            }
-          ]
-        },
-        {
-          "start": 285,
-          "end": 285,
-          "translation": "哦。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 285,
-              "speaker": "",
-              "text": "Oh."
-            }
-          ]
-        },
-        {
-          "start": 286,
-          "end": 286,
-          "translation": "我那样做挺傻的，是吧？不，我的爱人。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "That was pretty stupid of me, wasn't it? No, mi amor.",
-          "grammarNotes": [
-            "wasn't it? 是反义疑问句，用来寻求对方确认；mi amor 是西班牙语的“我的爱人”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 286,
-              "speaker": "",
-              "text": "That was pretty stupid of me, wasn't it? No, mi amor."
-            }
-          ]
-        },
-        {
-          "start": 287,
-          "end": 287,
-          "translation": "那很勇敢。对吧，杰伊？很勇敢。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "It was brave. Right, Jay? Brave.",
-          "grammarNotes": [
-            "It was brave. 用一般过去时评价已经发生的行为；Right, Jay? 用简短疑问寻求附和。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 287,
-              "speaker": "",
-              "text": "It was brave. Right, Jay? Brave."
-            }
-          ]
-        },
-        {
-          "start": 288,
-          "end": 288,
-          "translation": "嗯——好吧，下次你就明白了。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "W-Well, you'll know better next time.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 288,
-              "speaker": "",
-              "text": "W-Well, you'll know better next time."
-            }
-          ]
-        },
-        {
-          "start": 289,
-          "end": 289,
-          "translation": "走吧。咱们去买个椒盐卷饼。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Come on. Let's get a pretzel.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 289,
-              "speaker": "",
-              "text": "Come on. Let's get a pretzel."
-            }
-          ]
-        },
-        {
           "start": 290,
           "end": 290,
-          "translation": "骗你的。其实我喜欢她。",
+          "translation": "-不是的 -就是",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Mentira. A mí sí me gusta.",
+          "sourceText": "- No. - Yes.",
           "grammarNotes": [
             "Mentira 是西班牙语“骗你的、开玩笑”；A mí sí me gusta 意思是“我其实喜欢她”。"
           ],
@@ -7473,7 +7190,7 @@
             {
               "i": 290,
               "speaker": "",
-              "text": "Mentira. A mí sí me gusta."
+              "text": "- No. - Yes."
             }
           ]
         }
@@ -7488,6 +7205,560 @@
         {
           "start": 291,
           "end": 291,
+          "translation": "你那样说不的时候，其实总是意思是是。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "when you say no like that, it's always yes",
+          "meaning": "你那样说不，其实就是是",
+          "phonetic": "/wen juː seɪ noʊ laɪk ðæt ɪts ˈɔːlweɪz jes/",
+          "sourceId": "entry-84",
+          "sourceText": "When you say no like that, it's always yes.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 291,
+              "speaker": "",
+              "text": "- No. - When you say \"No\" like that, it's always \"Yes.\""
+            }
+          ]
+        },
+        {
+          "start": 292,
+          "end": 292,
+          "translation": "别这样 我们都到商场了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Come on. We're in the mall.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 292,
+              "speaker": "",
+              "text": "Come on. We're in the mall."
+            }
+          ]
+        },
+        {
+          "start": 293,
+          "end": 293,
+          "translation": "给你买点年轻的衣服吧",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Let's get you, like, some younger clothes.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 293,
+              "speaker": "",
+              "text": "Let's get you, like, some younger clothes."
+            }
+          ]
+        },
+        {
+          "start": 294,
+          "end": 294,
+          "translation": "-那边有家店 -我不需要年轻的衣服",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- There's a store there. - I don't need any younger clothes.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 294,
+              "speaker": "",
+              "text": "- There's a store there. - I don't need any younger clothes."
+            }
+          ]
+        },
+        {
+          "start": 295,
+          "end": 295,
+          "translation": "我也不在乎那些",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "And I don't care what some jackass",
+          "grammarNotes": [
+            "respect somebody's privacy 是“尊重某人的隐私”；need to do 表示客观上需要做。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 295,
+              "speaker": "",
+              "text": "And I don't care what some jackass"
+            }
+          ]
+        },
+        {
+          "start": 296,
+          "end": 296,
+          "translation": "穿着破牛仔裤的混蛋如何看我",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "in a pair of ripped jeans thinks about me.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 296,
+              "speaker": "",
+              "text": "in a pair of ripped jeans thinks about me."
+            }
+          ]
+        },
+        {
+          "start": 297,
+          "end": 297,
+          "translation": "没错 你不用在乎他们",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Good. You shouldn't.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 297,
+              "speaker": "",
+              "text": "Good. You shouldn't."
+            }
+          ]
+        },
+        {
+          "start": 298,
+          "end": 298,
+          "translation": "你只要在乎我的想法就行了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "You should only care what I think.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 298,
+              "speaker": "",
+              "text": "You should only care what I think."
+            }
+          ]
+        },
+        {
+          "start": 299,
+          "end": 299,
+          "translation": "我爱你 我不在意你的年纪",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I love you, and I don't care how old you are.",
+          "grammarNotes": [
+            "help somebody with something 是固定搭配，表示“帮某人做某事”；这里 with the frosting 指帮抹糖霜。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 299,
+              "speaker": "",
+              "text": "I love you, and I don't care how old you are."
+            }
+          ]
+        },
+        {
+          "start": 300,
+          "end": 300,
+          "translation": "别做闷闷不乐的人，也别对曼尼那么严厉。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "gloomy goose",
+          "meaning": "闷闷不乐的人",
+          "phonetic": "/ˈɡluːmi ɡuːs/",
+          "sourceId": "entry-86",
+          "sourceText": "So stop being a gloomy goose, and stop being so hard on Manny.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 300,
+              "speaker": "",
+              "text": "So stop being a gloomy goose and stop being so hard on Manny."
+            }
+          ]
+        },
+        {
+          "start": 301,
+          "end": 302,
+          "translation": "我对曼尼严厉，只是不想看到他出丑。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "make a fool of himself",
+          "meaning": "让自己出丑",
+          "phonetic": "/meɪk ə fuːl əv hɪmˈself/",
+          "sourceId": "entry-87",
+          "sourceText": "- The only reason I'm hard on Manny is just because I don't wanna see him make a fool of himself.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 301,
+              "speaker": "",
+              "text": "The only reason I'm hard on Manny..."
+            },
+            {
+              "i": 302,
+              "speaker": "",
+              "text": "Is just because I don't wanna see him make a fool of himself."
+            }
+          ]
+        },
+        {
+          "start": 303,
+          "end": 303,
+          "translation": "我从这儿都能闻到他的发胶味了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "And I can smell that hair goo of his from here.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 303,
+              "speaker": "",
+              "text": "And I can smell that hair goo of his from here."
+            }
+          ]
+        },
+        {
+          "start": 304,
+          "end": 304,
+          "translation": "我不知道他那里会发生什么",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Look, I don't know what's gonna happen to him over there.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 304,
+              "speaker": "",
+              "text": "Look, I don't know what's gonna happen to him over there."
+            }
+          ]
+        },
+        {
+          "start": 305,
+          "end": 305,
+          "translation": "可你是他的家人 这就意味着",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "But you're his family now, and that means only one thing-",
+          "grammarNotes": [
+            "swear (that) she saw ... 后接宾语从句；at a coin-op car wash 表示地点，coin-op 是投币式设备。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 305,
+              "speaker": "",
+              "text": "But you're his family now, and that means only one thing-"
+            }
+          ]
+        },
+        {
+          "start": 306,
+          "end": 308,
+          "translation": "你要成为推动他前进的风，而不是朝他脸上吐的口水！",
+          "translationSource": "curated",
+          "matchScore": 0.917,
+          "keyPhrase": "wind in his back",
+          "meaning": "在背后支持他",
+          "phonetic": "/wɪnd ɪn hɪz bæk/",
+          "sourceId": "entry-88",
+          "sourceText": "You be there wind in his back, not the spit in his face! What? Something my mom always says, it's gorgeous in Spanish.",
+          "grammarNotes": [
+            "No jacket. 是省略句，完整意思接近 You're not wearing a jacket；口语里常用名词短语表达否定判断。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 306,
+              "speaker": "",
+              "text": "You be the wind in his back, not the spit in his face."
+            },
+            {
+              "i": 307,
+              "speaker": "",
+              "text": "- What? -It's something my mom always says."
+            },
+            {
+              "i": 308,
+              "speaker": "",
+              "text": "It's gorgeous in Spanish."
+            }
+          ]
+        },
+        {
+          "start": 309,
+          "end": 309,
+          "translation": "瞧 他来了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Look, he's there.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 309,
+              "speaker": "",
+              "text": "Look, he's there."
+            }
+          ]
+        },
+        {
+          "start": 310,
+          "end": 310,
+          "translation": "-她名花有主了 -真遗憾 小宝贝",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- She has a boyfriend. - Oh, I'm sorry, mi nino.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 310,
+              "speaker": "",
+              "text": "- She has a boyfriend. - Oh, I'm sorry, mi nino."
+            }
+          ]
+        },
+        {
+          "start": 311,
+          "end": 311,
+          "translation": "我把心交给了她。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "gave her my heart",
+          "meaning": "把心交给了她",
+          "phonetic": "/ɡeɪv hɜːr maɪ hɑːrt/",
+          "sourceId": "entry-89",
+          "sourceText": "I gave her my heart.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 311,
+              "speaker": "",
+              "text": "I gave her my heart,"
+            }
+          ]
+        },
+        {
+          "start": 312,
+          "end": 312,
+          "translation": "她给了我一张我扮成老式西部警长的照片。",
+          "translationSource": "card",
+          "matchScore": 1,
+          "keyPhrase": "",
+          "meaning": "老式西部警长",
+          "phonetic": "/oʊld taɪm ˈʃɛrɪf/",
+          "sourceId": "card-38",
+          "sourceText": "She gave me a picture of me as an old-time sheriff.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 312,
+              "speaker": "",
+              "text": "she gave me a picture of me as an old-time sheriff."
+            }
+          ]
+        },
+        {
+          "start": 313,
+          "end": 313,
+          "translation": "-我真傻是吧 -才不是呢小宝贝",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- That was pretty stupid of me, wasn't it? - No, mi amor.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 313,
+              "speaker": "",
+              "text": "- That was pretty stupid of me, wasn't it? - No, mi amor."
+            }
+          ]
+        },
+        {
+          "start": 314,
+          "end": 314,
+          "translation": "你是勇气可嘉 对吧 杰 勇气可嘉",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "It was brave. Right, Jay? Brave.",
+          "grammarNotes": [
+            "make trouble for somebody 是“给某人惹麻烦”；it's not gonna work 表示“这招行不通”。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 314,
+              "speaker": "",
+              "text": "It was brave. Right, Jay? Brave."
+            }
+          ]
+        },
+        {
+          "start": 315,
+          "end": 315,
+          "translation": "下次你就会进步了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "W-Well, you'll know better next time.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 315,
+              "speaker": "",
+              "text": "W-Well, you'll know better next time."
+            }
+          ]
+        },
+        {
+          "start": 316,
+          "end": 316,
+          "translation": "来 我们买椒盐卷去",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Come on. Let's get a pretzel.",
+          "grammarNotes": [
+            "I was just like her when I was ... 用一般过去时描述过去的相似状态，when 从句省略了句末内容。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 316,
+              "speaker": "",
+              "text": "Come on. Let's get a pretzel."
+            }
+          ]
+        },
+        {
+          "start": 317,
+          "end": 317,
+          "translation": "没事 我挺喜欢这画的",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Mentira. A me se me gusta.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 317,
+              "speaker": "",
+              "text": "Mentira. A me se me gusta."
+            }
+          ]
+        },
+        {
+          "start": 318,
+          "end": 318,
+          "translation": "先生 不好意思",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Uh, excuse me, sir.",
+          "grammarNotes": [
+            "you're learning 用现在进行时，强调正在经历、正在学习的过程。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 318,
+              "speaker": "",
+              "text": "Uh, excuse me, sir."
+            }
+          ]
+        },
+        {
+          "start": 319,
+          "end": 319,
           "translation": "请所有在商场遛弯的人靠右侧行走。",
           "translationSource": "card",
           "matchScore": 1,
@@ -7496,19 +7767,21 @@
           "phonetic": "/mɔːl ˈwɔːkər/",
           "sourceId": "card-39",
           "sourceText": "We ask that all mall-walkers stay to the right.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "Soak it. Keep it. 是两个祈使句，表示“记住这种感觉，把它留着”；这里 soak 是比喻用法。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 291,
+              "i": 319,
               "speaker": "",
-              "text": "Uh, excuse me, sir. We ask that all mall-walkers stay to the right."
+              "text": "We ask that all mall-walkers stay to the right."
             }
           ]
         },
         {
-          "start": 292,
-          "end": 295,
+          "start": 320,
+          "end": 323,
           "translation": "我知道，宝贝，但你需要尊重他们的隐私。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -7517,9 +7790,7 @@
           "phonetic": "/rɪˈspekt ðer ˈpraɪvəsi/",
           "sourceId": "entry-91",
           "sourceText": "Alex, get out! MOM! Alex, leave your sister alone! I was just getting my book, gosh! - I know sweetie, but you need to respect their privacy.",
-          "grammarNotes": [
-            "respect somebody's privacy 是“尊重某人的隐私”；need to do 表示客观上需要做。"
-          ],
+          "grammarNotes": [],
           "alternatives": [
             {
               "phrase": "respect their privacy",
@@ -7531,52 +7802,54 @@
           ],
           "blocks": [
             {
-              "i": 292,
-              "speaker": "Haley",
+              "i": 320,
+              "speaker": "",
               "text": "Alex, get out! Mom!"
             },
             {
-              "i": 293,
+              "i": 321,
               "speaker": "",
               "text": "Alex, leave your sister alone."
             },
             {
-              "i": 294,
+              "i": 322,
               "speaker": "",
               "text": "I was just getting my book. Gosh."
             },
             {
-              "i": 295,
+              "i": 323,
               "speaker": "",
               "text": "I know, sweetie. But you need to respect their privacy."
             }
           ]
         },
         {
-          "start": 296,
-          "end": 296,
-          "translation": "他们在楼上干什么？没干什么。",
+          "start": 324,
+          "end": 324,
+          "translation": "-他们在楼上干嘛呢 -没干嘛",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "What are they doing up there? Nothing.",
-          "grammarNotes": [],
+          "sourceText": "- What are they doing up there? - Nothing.",
+          "grammarNotes": [
+            "learn one's lesson 是固定搭配，表示“吸取教训”；you're scared 说明当前状态，I think 后接宾语从句。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 296,
+              "i": 324,
               "speaker": "",
-              "text": "What are they doing up there? Nothing."
+              "text": "- What are they doing up there? - Nothing."
             }
           ]
         },
         {
-          "start": 297,
-          "end": 297,
-          "translation": "躺在她床上看电影。",
+          "start": 325,
+          "end": 325,
+          "translation": "躺在她床上并肩看电影",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -7588,16 +7861,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 297,
+              "i": 325,
               "speaker": "",
               "text": "Lying on her bed, watching a movie."
             }
           ]
         },
         {
-          "start": 298,
-          "end": 298,
-          "translation": "好。好吧。",
+          "start": 326,
+          "end": 326,
+          "translation": "很好 很好",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -7609,15 +7882,36 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 298,
+              "i": 326,
               "speaker": "",
               "text": "Okay. Okay."
             }
           ]
         },
         {
-          "start": 299,
-          "end": 299,
+          "start": 327,
+          "end": 327,
+          "translation": "我在为今晚的聚餐准备蛋糕",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Um, I'm making a cake for tonight.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 327,
+              "speaker": "",
+              "text": "Um, I'm making a cake for tonight."
+            }
+          ]
+        },
+        {
+          "start": 328,
+          "end": 328,
           "translation": "你想帮我弄蛋糕糖霜吗？",
           "translationSource": "card",
           "matchScore": 1,
@@ -7626,22 +7920,20 @@
           "phonetic": "/ˈfrɔːstɪŋ/",
           "sourceId": "card-40",
           "sourceText": "you wanna help me with the frosting?",
-          "grammarNotes": [
-            "help somebody with something 是固定搭配，表示“帮某人做某事”；这里 with the frosting 指帮抹糖霜。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 299,
+              "i": 328,
               "speaker": "",
-              "text": "Um, I'm making a cake for tonight. You wanna help me with the frosting?"
+              "text": "You wanna help me with the frosting?"
             }
           ]
         },
         {
-          "start": 300,
-          "end": 300,
-          "translation": "当然。",
+          "start": 329,
+          "end": 329,
+          "translation": "好啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -7653,15 +7945,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 300,
+              "i": 329,
               "speaker": "",
               "text": "Sure."
             }
           ]
         },
         {
-          "start": 301,
-          "end": 305,
+          "start": 330,
+          "end": 334,
           "translation": "你会不会假装她得了几个月的单核细胞增多症，然后告诉大家孩子是你的？",
           "translationSource": "curated",
           "matchScore": 0.761,
@@ -7671,42 +7963,63 @@
           "sourceId": "entry-92",
           "sourceText": "So, you know if Haley got pregnant, would you ever pretend she got mono for a few months and then tell everyone the baby's yours? What? A senior at school was out sick for four months, but she was out breastfeeding in an cleanup carwash.",
           "grammarNotes": [
-            "swear (that) she saw ... 后接宾语从句；at a coin-op car wash 表示地点，coin-op 是投币式设备。"
+            "we're just gonna go ahead and leave that open 用 be going to 表示已经作出的决定；go ahead and do 是口语里的“直接做”。",
+            "I have seen this little show before. 用现在完成时强调到目前为止的经历；this little show 是反讽说法。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 301,
+              "i": 330,
               "speaker": "",
               "text": "So, you know, if Haley got pregnant,"
             },
             {
-              "i": 302,
+              "i": 331,
               "speaker": "",
               "text": "would you ever pretend she has mono for a few months,"
             },
             {
-              "i": 303,
+              "i": 332,
               "speaker": "",
               "text": "and then, like, tell everyone the baby's yours?"
             },
             {
-              "i": 304,
+              "i": 333,
               "speaker": "",
-              "text": "What? This senior at school was \"out sick\" for four months,"
+              "text": "- What? - This senior at school was \"Out sick\" for four months,"
             },
             {
-              "i": 305,
+              "i": 334,
               "speaker": "",
-              "text": "but Jenna Resnick swears she saw her breast-feeding at a coin-op car wash.",
-              "stage": "Sighs"
+              "text": "but Jenna Resnick swears she saw her breast-feeding"
             }
           ]
         },
         {
-          "start": 306,
-          "end": 306,
-          "translation": "哥们，你穿的是什么？",
+          "start": 335,
+          "end": 335,
+          "translation": "在自助洗车站给孩子喂奶",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "at a coin-op car wash.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 335,
+              "speaker": "",
+              "text": "at a coin-op car wash."
+            }
+          ]
+        },
+        {
+          "start": 336,
+          "end": 336,
+          "translation": "老弟 你穿了多少衣服啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -7718,16 +8031,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 306,
+              "i": 336,
               "speaker": "",
               "text": "Buddy, what are you wearing?"
             }
           ]
         },
         {
-          "start": 307,
-          "end": 307,
-          "translation": "——没穿。——呃，不行，得穿外套。",
+          "start": 337,
+          "end": 337,
+          "translation": "-没穿多少 -把外套脱了",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -7735,21 +8048,40 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "- Nothing. - Uh-uh. No jacket.",
-          "grammarNotes": [
-            "No jacket. 是省略句，完整意思接近 You're not wearing a jacket；口语里常用名词短语表达否定判断。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 307,
+              "i": 337,
               "speaker": "",
               "text": "- Nothing. - Uh-uh. No jacket."
             }
           ]
         },
         {
-          "start": 308,
-          "end": 309,
+          "start": 338,
+          "end": 338,
+          "translation": "只能戴一顶帽子",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "One hat.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 338,
+              "speaker": "",
+              "text": "One hat."
+            }
+          ]
+        },
+        {
+          "start": 339,
+          "end": 341,
           "translation": "你穿了几条内裤？",
           "translationSource": "curated",
           "matchScore": 1,
@@ -7762,21 +8094,25 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 308,
+              "i": 339,
               "speaker": "",
-              "text": "One hat. How many pairs of underwear do you have on?"
+              "text": "How many pairs of underwear do you have on?"
             },
             {
-              "i": 309,
+              "i": 340,
               "speaker": "",
-              "text": "One. Six.",
-              "stage": "Sighs"
+              "text": "One."
+            },
+            {
+              "i": 341,
+              "speaker": "",
+              "text": "Six."
             }
           ]
         },
         {
-          "start": 310,
-          "end": 313,
+          "start": 342,
+          "end": 346,
           "translation": "有一个其实是我外甥的假弟弟，那该多棒？",
           "translationSource": "curated",
           "matchScore": 0.974,
@@ -7785,581 +8121,35 @@
           "phonetic": "/feɪk ˈlɪtəl ˈbrʌðər/",
           "sourceId": "entry-94",
           "sourceText": "First of all, it would be really cool to see Haley that fat, and how awesome would it be to have a fake little brother who's really my nephew? Haley is not getting pregnant! I'm just saying if.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "freak out 是“情绪失控、抓狂”；completely 加强程度，embarrass 表示“让某人难堪”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 310,
+              "i": 342,
               "speaker": "",
               "text": "First of all, it would be really cool to see Haley that fat."
             },
             {
-              "i": 311,
-              "speaker": "",
-              "text": "And how awesome would it be to have a fake little brother who's really my nephew."
-            },
-            {
-              "i": 312,
-              "speaker": "",
-              "text": "Haley is not getting pregnant.",
-              "stage": "Clears Throat"
-            },
-            {
-              "i": 313,
-              "speaker": "",
-              "text": "Just saying \"if.\" I know."
-            }
-          ]
-        },
-        {
-          "start": 314,
-          "end": 314,
-          "translation": "我也知道你喜欢给你姐姐找麻烦，但这次行不通。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "And I know you like to make trouble for your sister, but it's not gonna work this time.",
-          "grammarNotes": [
-            "make trouble for somebody 是“给某人惹麻烦”；it's not gonna work 表示“这招行不通”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 314,
-              "speaker": "",
-              "text": "And I know you like to make trouble for your sister, but it's not gonna work this time."
-            }
-          ]
-        },
-        {
-          "start": 315,
-          "end": 315,
-          "translation": "你知道为什么吗？因为你姐姐是个好女孩。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "You know why? 'Cause your sister's a good girl.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 315,
-              "speaker": "",
-              "text": "You know why? 'Cause your sister's a good girl."
-            }
-          ]
-        },
-        {
-          "start": 316,
-          "end": 316,
-          "translation": "我知道。我像她这么大的时候也——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I know. I was just like her when I was-",
-          "grammarNotes": [
-            "I was just like her when I was ... 用一般过去时描述过去的相似状态，when 从句省略了句末内容。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 316,
-              "speaker": "",
-              "text": "I know. I was just like her when I was-"
-            }
-          ]
-        },
-        {
-          "start": 317,
-          "end": 317,
-          "translation": "我想让你知道，我也不好受。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I want you to know, I'm not enjoying this.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 317,
-              "speaker": "",
-              "text": "I want you to know, I'm not enjoying this."
-            }
-          ]
-        },
-        {
-          "start": 318,
-          "end": 318,
-          "translation": "但这是你正在学的重要一课。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "But this is an important lesson that you're learning.",
-          "grammarNotes": [
-            "you're learning 用现在进行时，强调正在经历、正在学习的过程。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 318,
-              "speaker": "",
-              "text": "But this is an important lesson that you're learning."
-            }
-          ]
-        },
-        {
-          "start": 319,
-          "end": 319,
-          "translation": "所以，记住这种感觉，别忘。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "So, soak it. Keep it.",
-          "grammarNotes": [
-            "Soak it. Keep it. 是两个祈使句，表示“记住这种感觉，把它留着”；这里 soak 是比喻用法。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 319,
-              "speaker": "",
-              "text": "So, soak it. Keep it.",
-              "stage": "Clearing Throat"
-            }
-          ]
-        },
-        {
-          "start": 320,
-          "end": 320,
-          "translation": "你离得太近了。会疼的。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "You're too close. It's gonna hurt.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 320,
-              "speaker": "",
-              "text": "You're too close. It's gonna hurt."
-            }
-          ]
-        },
-        {
-          "start": 321,
-          "end": 323,
-          "translation": "本来就该疼！",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "supposed to hurt",
-          "meaning": "本来就该疼",
-          "phonetic": "/səˈpoʊzd tə hɜːrt/",
-          "sourceId": "entry-97",
-          "sourceText": "- It's supposed to hurt! And why are you smiling? I'm What? Oh, forget it.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 321,
-              "speaker": "",
-              "text": "It's supposed to hurt."
-            },
-            {
-              "i": 322,
-              "speaker": "",
-              "text": "- And why are you smiling? - I'm- What?"
-            },
-            {
-              "i": 323,
-              "speaker": "",
-              "text": "Oh, forget it. I can't do this."
-            }
-          ]
-        },
-        {
-          "start": 324,
-          "end": 324,
-          "translation": "我想你已经吸取教训了。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "learned your lesson",
-          "meaning": "吸取了教训",
-          "phonetic": "/lɜːrnd jɔːr ˈlesən/",
-          "sourceId": "entry-98",
-          "sourceText": "I think you've learned your lesson.",
-          "grammarNotes": [
-            "learn one's lesson 是固定搭配，表示“吸取教训”；you're scared 说明当前状态，I think 后接宾语从句。"
-          ],
-          "alternatives": [
-            {
-              "phrase": "learned your lesson",
-              "alternatives": [
-                "learned your lesson",
-                "learned the hard way"
-              ]
-            }
-          ],
-          "blocks": [
-            {
-              "i": 324,
-              "speaker": "",
-              "text": "The point is you're scared. I think you've learned your lesson.",
-              "stage": "Shoots"
-            }
-          ]
-        },
-        {
-          "start": 325,
-          "end": 325,
-          "translation": "哇。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Wow.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 325,
-              "speaker": "",
-              "text": "Wow."
-            }
-          ]
-        },
-        {
-          "start": 326,
-          "end": 326,
-          "translation": "啊！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Ow!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 326,
-              "speaker": "",
-              "text": "Ow!"
-            }
-          ]
-        },
-        {
-          "start": 327,
-          "end": 330,
-          "translation": "嘿，我只是来送些要洗的衣服，现在不方便吗？",
-          "translationSource": "curated",
-          "matchScore": 0.826,
-          "keyPhrase": "dropping off some laundry",
-          "meaning": "送洗好的衣服过来",
-          "phonetic": "/ˈdrɑːpɪŋ ɔːf səm ˈlɔːndri/",
-          "sourceId": "entry-99",
-          "sourceText": "Mom?! What are you doing? - Hey, I was just dropping off some laundry, this is a bad time? Yeah Oh, okay.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 327,
-              "speaker": "",
-              "text": "Mom! What are you doing?"
-            },
-            {
-              "i": 328,
-              "speaker": "",
-              "text": "Oh, hey! I was just, um, dropping off some laundry."
-            },
-            {
-              "i": 329,
-              "speaker": "",
-              "text": "- Is this a bad time? - Yeah."
-            },
-            {
-              "i": 330,
-              "speaker": "",
-              "text": "Oh. Okay."
-            }
-          ]
-        },
-        {
-          "start": 331,
-          "end": 331,
-          "translation": "呃，你能把门关上吗？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Uh, can you shut the door, please?",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 331,
-              "speaker": "",
-              "text": "Uh, can you shut the door, please?"
-            }
-          ]
-        },
-        {
-          "start": 332,
-          "end": 332,
-          "translation": "其实，我们就要让门开着。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Actually, we're just gonna go ahead and leave that open.",
-          "grammarNotes": [
-            "we're just gonna go ahead and leave that open 用 be going to 表示已经作出的决定；go ahead and do 是口语里的“直接做”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 332,
-              "speaker": "",
-              "text": "Actually, we're just gonna go ahead and leave that open."
-            }
-          ]
-        },
-        {
-          "start": 333,
-          "end": 333,
-          "translation": "为什么？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Why?",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 333,
-              "speaker": "",
-              "text": "Why?"
-            }
-          ]
-        },
-        {
-          "start": 334,
-          "end": 334,
-          "translation": "因为我以前看过这出小戏——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Because I have, uh, seen this little show before-",
-          "grammarNotes": [
-            "I have seen this little show before. 用现在完成时强调到目前为止的经历；this little show 是反讽说法。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 334,
-              "speaker": "",
-              "text": "Because I have, uh, seen this little show before-"
-            }
-          ]
-        },
-        {
-          "start": 335,
-          "end": 335,
-          "translation": "和一个高个毕业班男生躺在床上。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "lying on the bed with a tall senior.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 335,
-              "speaker": "",
-              "text": "lying on the bed with a tall senior."
-            }
-          ]
-        },
-        {
-          "start": 336,
-          "end": 342,
-          "translation": "她像完全抓狂了一样，还让我很难堪。",
-          "translationSource": "curated",
-          "matchScore": 0.873,
-          "keyPhrase": "freaking out",
-          "meaning": "抓狂；情绪失控",
-          "phonetic": "/ˈfriːkɪŋ aʊt/",
-          "sourceId": "entry-100",
-          "sourceText": "one minute you're just friends, watching Falcon Crest, and the next you're lying underneath the air-hockey table with your bra un-pocket! Mom! You hit my bone! - It was an accident! I thought we were friends! - I am your friend! Dad?! Dad, you have got to talk to mom, she is like completely freaking out and emberassing me.",
-          "grammarNotes": [
-            "freak out 是“情绪失控、抓狂”；completely 加强程度，embarrass 表示“让某人难堪”。"
-          ],
-          "alternatives": [
-            {
-              "phrase": "freaking out",
-              "alternatives": [
-                "losing it",
-                "completely panicking"
-              ]
-            }
-          ],
-          "blocks": [
-            {
-              "i": 336,
-              "speaker": "",
-              "text": "One minute you're just friends, watching Falcon Crest,"
-            },
-            {
-              "i": 337,
-              "speaker": "",
-              "text": "and the next you're lying underneath the air hockey table with your bra in your pocket."
-            },
-            {
-              "i": 338,
-              "speaker": "",
-              "text": "Whoa. Mom!"
-            },
-            {
-              "i": 339,
-              "speaker": "",
-              "text": "- [Whimpering] You hit my bone! - It was an accident!"
-            },
-            {
-              "i": 340,
-              "speaker": "",
-              "text": "- I thought you were my friend! - I am your friend."
-            },
-            {
-              "i": 341,
-              "speaker": "",
-              "text": "Dad! Dad, Dad. You have got to talk to Mom."
-            },
-            {
-              "i": 342,
-              "speaker": "",
-              "text": "She is, like, completely freaking out and embarrassing me!"
-            }
-          ]
-        },
-        {
-          "start": 343,
-          "end": 343,
-          "translation": "亲爱的，你妈妈对有些事并不总是那么开明——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Honey, your mom isn't always as cool about things as-",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
               "i": 343,
               "speaker": "",
-              "text": "Honey, your mom isn't always as cool about things as-"
-            }
-          ]
-        },
-        {
-          "start": 344,
-          "end": 344,
-          "translation": "——（开枪）——啊！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "- [Shoots] - Ow!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "And how awesome would it be"
+            },
             {
               "i": 344,
               "speaker": "",
-              "text": "- [Shoots] - Ow!"
-            }
-          ]
-        },
-        {
-          "start": 345,
-          "end": 345,
-          "translation": "这玩意儿怎么回事？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "What is with this thing?",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "to have a fake little brother who's really my nephew."
+            },
             {
               "i": 345,
               "speaker": "",
-              "text": "What is with this thing?",
-              "stage": "Shoots"
-            }
-          ]
-        },
-        {
-          "start": 346,
-          "end": 346,
-          "translation": "啊！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Ow!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
+              "text": "Haley is not getting pregnant."
+            },
             {
               "i": 346,
               "speaker": "",
-              "text": "Ow!"
+              "text": "- Just saying \"If.\" - I know."
             }
           ]
         }
@@ -8374,14 +8164,14 @@
         {
           "start": 347,
           "end": 347,
-          "translation": "我爸。呃，我爸到现在还是没法完全接受。",
+          "translation": "我知道你喜欢找你姐的茬儿",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "My dad. Uh, my dad still isn't completely comfortable with this.",
+          "sourceText": "And I know you like to make trouble for your sister,",
           "grammarNotes": [
             "be comfortable with something 表示“对某事感到自在、能接受”；still 强调到现在仍未改变。"
           ],
@@ -8390,42 +8180,42 @@
             {
               "i": 347,
               "speaker": "",
-              "text": "My dad. Uh, my dad still isn't completely comfortable with this."
+              "text": "And I know you like to make trouble for your sister,"
             }
           ]
         },
         {
           "start": 348,
           "end": 348,
-          "translation": "呃——他到现在还这样。都五年了。",
+          "translation": "不过这次不管用了",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Um- He-He still does this thing. It's been five years now.",
+          "sourceText": "but it's not gonna work this time.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
               "i": 348,
               "speaker": "",
-              "text": "Um- He-He still does this thing. It's been five years now."
+              "text": "but it's not gonna work this time."
             }
           ]
         },
         {
           "start": 349,
           "end": 349,
-          "translation": "他还是每次进我们所在的房间前，",
+          "translation": "知道为啥吗 因为你姐是个好女孩",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "And he still does this thing where he announces himself...",
+          "sourceText": "You know why? 'Cause your sister's a good girl.",
           "grammarNotes": [
             "the thing where ... 是口语中的定语结构，where 引导解释具体做法的从句，意思是“他一直是那样做的”。"
           ],
@@ -8434,14 +8224,520 @@
             {
               "i": 349,
               "speaker": "",
-              "text": "And he still does this thing where he announces himself..."
+              "text": "You know why? 'Cause your sister's a good girl."
             }
           ]
         },
         {
           "start": 350,
           "end": 350,
-          "translation": "都要先大声报一声自己要进来，",
+          "translation": "我明白 因为她和我当年一模一...",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I know. I was just like her when I was-",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 350,
+              "speaker": "",
+              "text": "I know. I was just like her when I was-"
+            }
+          ]
+        },
+        {
+          "start": 351,
+          "end": 351,
+          "translation": "要知道 我也不想这么做",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I want you to know, I'm not enjoying this.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 351,
+              "speaker": "",
+              "text": "I want you to know, I'm not enjoying this."
+            }
+          ]
+        },
+        {
+          "start": 352,
+          "end": 352,
+          "translation": "可你得吸取这个教训",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "But this is an important lesson that you're learning.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 352,
+              "speaker": "",
+              "text": "But this is an important lesson that you're learning."
+            }
+          ]
+        },
+        {
+          "start": 353,
+          "end": 353,
+          "translation": "所以 记好了 记住了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "So, soak it. Keep it.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 353,
+              "speaker": "",
+              "text": "So, soak it. Keep it."
+            }
+          ]
+        },
+        {
+          "start": 354,
+          "end": 354,
+          "translation": "你站太近了 这样会很疼的",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "You're too close. It's gonna hurt.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 354,
+              "speaker": "",
+              "text": "You're too close. It's gonna hurt."
+            }
+          ]
+        },
+        {
+          "start": 355,
+          "end": 357,
+          "translation": "本来就该疼！",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "supposed to hurt",
+          "meaning": "本来就该疼",
+          "phonetic": "/səˈpoʊzd tə hɜːrt/",
+          "sourceId": "entry-97",
+          "sourceText": "- It's supposed to hurt! And why are you smiling? I'm What? Oh, forget it.",
+          "grammarNotes": [
+            "get in the spirit of things 表示“融入气氛、配合场合”；It's a celebration 用一般现在时说明当前场合。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 355,
+              "speaker": "",
+              "text": "It's supposed to hurt."
+            },
+            {
+              "i": 356,
+              "speaker": "",
+              "text": "- And why are you smiling? - I'm- What?"
+            },
+            {
+              "i": 357,
+              "speaker": "",
+              "text": "Oh, forget it. I can't do this."
+            }
+          ]
+        },
+        {
+          "start": 358,
+          "end": 358,
+          "translation": "我想你已经吸取教训了。",
+          "translationSource": "curated",
+          "matchScore": 1,
+          "keyPhrase": "learned your lesson",
+          "meaning": "吸取了教训",
+          "phonetic": "/lɜːrnd jɔːr ˈlesən/",
+          "sourceId": "entry-98",
+          "sourceText": "I think you've learned your lesson.",
+          "grammarNotes": [],
+          "alternatives": [
+            {
+              "phrase": "learned your lesson",
+              "alternatives": [
+                "learned your lesson",
+                "learned the hard way"
+              ]
+            }
+          ],
+          "blocks": [
+            {
+              "i": 358,
+              "speaker": "",
+              "text": "The point is you're scared. I think you've learned your lesson."
+            }
+          ]
+        },
+        {
+          "start": 359,
+          "end": 362,
+          "translation": "嘿，我只是来送些要洗的衣服，现在不方便吗？",
+          "translationSource": "curated",
+          "matchScore": 0.826,
+          "keyPhrase": "dropping off some laundry",
+          "meaning": "送洗好的衣服过来",
+          "phonetic": "/ˈdrɑːpɪŋ ɔːf səm ˈlɔːndri/",
+          "sourceId": "entry-99",
+          "sourceText": "Mom?! What are you doing? - Hey, I was just dropping off some laundry, this is a bad time? Yeah Oh, okay.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 359,
+              "speaker": "",
+              "text": "Mom! What are you doing?"
+            },
+            {
+              "i": 360,
+              "speaker": "",
+              "text": "Oh, hey! I was just, um, dropping off some laundry."
+            },
+            {
+              "i": 361,
+              "speaker": "",
+              "text": "- Is this a bad time? - Yeah."
+            },
+            {
+              "i": 362,
+              "speaker": "",
+              "text": "Oh. Okay."
+            }
+          ]
+        },
+        {
+          "start": 363,
+          "end": 363,
+          "translation": "你能把门带上吗",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Uh, can you shut the door, please?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 363,
+              "speaker": "",
+              "text": "Uh, can you shut the door, please?"
+            }
+          ]
+        },
+        {
+          "start": 364,
+          "end": 364,
+          "translation": "我们还是让门开着吧",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Actually, we're just gonna go ahead and leave that open.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 364,
+              "speaker": "",
+              "text": "Actually, we're just gonna go ahead and leave that open."
+            }
+          ]
+        },
+        {
+          "start": 365,
+          "end": 365,
+          "translation": "为啥",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Why?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 365,
+              "speaker": "",
+              "text": "Why?"
+            }
+          ]
+        },
+        {
+          "start": 366,
+          "end": 366,
+          "translation": "因为这种场景我见多了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Because I have, uh, seen this little show before-",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 366,
+              "speaker": "",
+              "text": "Because I have, uh, seen this little show before-"
+            }
+          ]
+        },
+        {
+          "start": 367,
+          "end": 367,
+          "translation": "和高大的学长共卧一塌",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Lying on the bed with a tall senior.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 367,
+              "speaker": "",
+              "text": "Lying on the bed with a tall senior."
+            }
+          ]
+        },
+        {
+          "start": 368,
+          "end": 375,
+          "translation": "她像完全抓狂了一样，还让我很难堪。",
+          "translationSource": "curated",
+          "matchScore": 0.887,
+          "keyPhrase": "freaking out",
+          "meaning": "抓狂；情绪失控",
+          "phonetic": "/ˈfriːkɪŋ aʊt/",
+          "sourceId": "entry-100",
+          "sourceText": "one minute you're just friends, watching Falcon Crest, and the next you're lying underneath the air-hockey table with your bra un-pocket! Mom! You hit my bone! - It was an accident! I thought we were friends! - I am your friend! Dad?! Dad, you have got to talk to mom, she is like completely freaking out and emberassing me.",
+          "grammarNotes": [
+            "Nothing gay going on here. 可理解为 There is nothing gay going on here. 的省略；going on 是现在分词短语作后置定语。",
+            "May I ...? 是礼貌请求句式，比 Can I ...? 更正式；multicolored 和 bejeweled 都是复合形容词。",
+            "That's how she says ... 表示“她就是这么发……这个音的”；how 引导表语从句。"
+          ],
+          "alternatives": [
+            {
+              "phrase": "freaking out",
+              "alternatives": [
+                "losing it",
+                "completely panicking"
+              ]
+            }
+          ],
+          "blocks": [
+            {
+              "i": 368,
+              "speaker": "",
+              "text": "One minute you're just friends, watching Falcon Crest,"
+            },
+            {
+              "i": 369,
+              "speaker": "",
+              "text": "and the next you're lying underneath the air hockey table"
+            },
+            {
+              "i": 370,
+              "speaker": "",
+              "text": "with your bra in your pocket."
+            },
+            {
+              "i": 371,
+              "speaker": "",
+              "text": "Mom!"
+            },
+            {
+              "i": 372,
+              "speaker": "",
+              "text": "- You hit my bone! - It was an accident!"
+            },
+            {
+              "i": 373,
+              "speaker": "",
+              "text": "- I thought you were my friend! - I am your friend."
+            },
+            {
+              "i": 374,
+              "speaker": "",
+              "text": "Dad! Dad, Dad. You have got to talk to Mom."
+            },
+            {
+              "i": 375,
+              "speaker": "",
+              "text": "She is, like, completely freaking out and embarrassing me!"
+            }
+          ]
+        },
+        {
+          "start": 376,
+          "end": 376,
+          "translation": "宝贝 你妈是不像你爸那么通情达理",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Honey, your mom isn't always as cool about things as-",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 376,
+              "speaker": "",
+              "text": "Honey, your mom isn't always as cool about things as-"
+            }
+          ]
+        },
+        {
+          "start": 377,
+          "end": 377,
+          "translation": "这玩意怎么回事啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "What is with this thing?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 377,
+              "speaker": "",
+              "text": "What is with this thing?"
+            }
+          ]
+        },
+        {
+          "start": 378,
+          "end": 378,
+          "translation": "我爸",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "My dad.",
+          "grammarNotes": [
+            "We didn't just go ... for pleasure. 用 didn't 否定过去行为；not just 表示“不只是”，暗示还有别的原因。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 378,
+              "speaker": "",
+              "text": "My dad."
+            }
+          ]
+        },
+        {
+          "start": 379,
+          "end": 379,
+          "translation": "我爸对这事还是不太习惯",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Uh, my dad still isn't completely comfortable with this.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 379,
+              "speaker": "",
+              "text": "Uh, my dad still isn't completely comfortable with this."
+            }
+          ]
+        },
+        {
+          "start": 380,
+          "end": 380,
+          "translation": "已经过了5年了 他还是无法完全接受",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Um- He-He still does this thing. It's been five years now.",
+          "grammarNotes": [
+            "If Cam comes out here ... 是条件状语从句，主句用 I'm leaving 表示当下立刻作出的决定。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 380,
+              "speaker": "",
+              "text": "Um- He-He still does this thing. It's been five years now."
+            }
+          ]
+        },
+        {
+          "start": 381,
+          "end": 381,
+          "translation": "每次他要进入我和小卡在的房间时",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "And he still does this thing where he announces himself...",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 381,
+              "speaker": "",
+              "text": "And he still does this thing where he announces himself..."
+            }
+          ]
+        },
+        {
+          "start": 382,
+          "end": 382,
+          "translation": "他都会先喊一声",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -8453,16 +8749,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 350,
+              "i": 382,
               "speaker": "",
               "text": "before walking into any room we're in..."
             }
           ]
         },
         {
-          "start": 351,
-          "end": 351,
-          "translation": "就为了确保永远不会看到我们接吻。",
+          "start": 383,
+          "end": 383,
+          "translation": "以防撞见我和小卡亲嘴",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -8470,677 +8766,6 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "just to make sure he doesn't have to ever see us kiss.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 351,
-              "speaker": "",
-              "text": "just to make sure he doesn't have to ever see us kiss."
-            }
-          ]
-        },
-        {
-          "start": 352,
-          "end": 352,
-          "translation": "真希望我妈也有这套机制。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Wish my mother had that system.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 352,
-              "speaker": "",
-              "text": "Wish my mother had that system."
-            }
-          ]
-        },
-        {
-          "start": 353,
-          "end": 353,
-          "translation": "记得吗？现在别说这个。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Remember? Not now.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 353,
-              "speaker": "",
-              "text": "Remember? Not now."
-            }
-          ]
-        },
-        {
-          "start": 354,
-          "end": 354,
-          "translation": "我还是不敢相信你竟然这样对我。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I still can't believe you did this to me.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 354,
-              "speaker": "",
-              "text": "I still can't believe you did this to me."
-            }
-          ]
-        },
-        {
-          "start": 355,
-          "end": 355,
-          "translation": "你能不能配合一下气氛？今天是庆祝。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Would you get in the spirit of things? It's a celebration.",
-          "grammarNotes": [
-            "get in the spirit of things 表示“融入气氛、配合场合”；It's a celebration 用一般现在时说明当前场合。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 355,
-              "speaker": "",
-              "text": "Would you get in the spirit of things? It's a celebration.",
-              "stage": "Doorbell Rings"
-            }
-          ]
-        },
-        {
-          "start": 356,
-          "end": 356,
-          "translation": "——哦，天哪。——好了，我去把莉莉准备好。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "- Oh, God. - Okay, I'm gonna go get Lily ready.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 356,
-              "speaker": "",
-              "text": "- Oh, God. - Okay, I'm gonna go get Lily ready."
-            }
-          ]
-        },
-        {
-          "start": 357,
-          "end": 358,
-          "translation": "我要你直接坦白说出来，你能做到的！",
-          "translationSource": "card",
-          "matchScore": 0.824,
-          "keyPhrase": "",
-          "meaning": "直截了当说出来，坦白",
-          "phonetic": "/kʌm streɪt aʊt wɪð ɪt/",
-          "sourceId": "card-44",
-          "sourceText": "I want you to just come straight out with it, you can do this!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 357,
-              "speaker": "",
-              "text": "Okay. And I want you to just come straight out with it."
-            },
-            {
-              "i": 358,
-              "speaker": "",
-              "text": "All right. Okay. You can do this."
-            }
-          ]
-        },
-        {
-          "start": 359,
-          "end": 359,
-          "translation": "好。运动型哥们撞胸。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Yeah. Sports guy chest bump.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 359,
-              "speaker": "",
-              "text": "Yeah. Sports guy chest bump."
-            }
-          ]
-        },
-        {
-          "start": 360,
-          "end": 360,
-          "translation": "不对。运动型哥们撞胸是这样。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "No. Sports guy chest bump.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 360,
-              "speaker": "",
-              "text": "No. Sports guy chest bump."
-            }
-          ]
-        },
-        {
-          "start": 361,
-          "end": 361,
-          "translation": "卡姆。哦！行。来。撞啊。来。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Cam. Oh! All right. Go. Do it. Go.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 361,
-              "speaker": "",
-              "text": "Cam. Oh! All right. Go. Do it. Go."
-            }
-          ]
-        },
-        {
-          "start": 362,
-          "end": 362,
-          "translation": "抱歉。哦。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Sorry. Oh.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 362,
-              "speaker": "",
-              "text": "Sorry. Oh.",
-              "stage": "Exhales"
-            }
-          ]
-        },
-        {
-          "start": 363,
-          "end": 363,
-          "translation": "嘿。嗨。嘿。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Hey. Hi. Hey.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 363,
-              "speaker": "",
-              "text": "Hey. Hi. Hey."
-            }
-          ]
-        },
-        {
-          "start": 364,
-          "end": 364,
-          "translation": "你们好吗？嗨，大家。嘿。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "How are you? Hi, guys. Hey.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 364,
-              "speaker": "",
-              "text": "How are you? Hi, guys. Hey."
-            }
-          ]
-        },
-        {
-          "start": 365,
-          "end": 365,
-          "translation": "看起来不错。哦，谢谢。谢谢。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "That looks good. Oh, thank you. Thanks.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 365,
-              "speaker": "",
-              "text": "That looks good. Oh, thank you. Thanks."
-            }
-          ]
-        },
-        {
-          "start": 366,
-          "end": 366,
-          "translation": "别谢我们。打开看看。爸爸就在后面。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Don't thank us. Open it. Dad is coming right behind.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 366,
-              "speaker": "",
-              "text": "Don't thank us. Open it. Dad is coming right behind.",
-              "stage": "Doorbell Ringing；Knocking"
-            }
-          ]
-        },
-        {
-          "start": 367,
-          "end": 367,
-          "translation": "杰伊：咚咚！我们来了，进来啦！",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Knock, knock! We're here. Coming in!",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 367,
-              "speaker": "Jay",
-              "text": "Knock, knock! We're here. Coming in!"
-            }
-          ]
-        },
-        {
-          "start": 368,
-          "end": 368,
-          "translation": "别担心，爸。这里没有什么同性恋的事。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Don't worry, Dad. Nothing gay going on here.",
-          "grammarNotes": [
-            "Nothing gay going on here. 可理解为 There is nothing gay going on here. 的省略；going on 是现在分词短语作后置定语。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 368,
-              "speaker": "",
-              "text": "Don't worry, Dad. Nothing gay going on here."
-            }
-          ]
-        },
-        {
-          "start": 369,
-          "end": 369,
-          "translation": "我帮你拿这件花里胡哨的外套和镶珠宝的帽子好吗？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "May I take your multicolored coat and bejeweled cap?",
-          "grammarNotes": [
-            "May I ...? 是礼貌请求句式，比 Can I ...? 更正式；multicolored 和 bejeweled 都是复合形容词。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 369,
-              "speaker": "",
-              "text": "May I take your multicolored coat and bejeweled cap?"
-            }
-          ]
-        },
-        {
-          "start": 370,
-          "end": 370,
-          "translation": "是啊，是啊。嘿，杰伊。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Yeah. Yeah. Hey, Jay.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 370,
-              "speaker": "",
-              "text": "Yeah. Yeah. Hey, Jay."
-            }
-          ]
-        },
-        {
-          "start": 371,
-          "end": 371,
-          "translation": "格洛丽亚，嗨。嗨。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Gloria, hi. Hi.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 371,
-              "speaker": "",
-              "text": "Gloria, hi. Hi."
-            }
-          ]
-        },
-        {
-          "start": 372,
-          "end": 372,
-          "translation": "你好吗？嗨，爸爸。嗨，格洛丽亚，你好吗？",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "How are you? Hi, Dad. Hi, Gloria. How are you?",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 372,
-              "speaker": "",
-              "text": "How are you? Hi, Dad. Hi, Gloria. How are you?"
-            }
-          ]
-        },
-        {
-          "start": 373,
-          "end": 373,
-          "translation": "哦，这裙子真漂亮。啊，谢谢你，菲尔。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh, what a beautiful dress. Ay, thank you, Phil.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 373,
-              "speaker": "",
-              "text": "Oh, what a beautiful dress. Ay, thank you, Phil."
-            }
-          ]
-        },
-        {
-          "start": 374,
-          "end": 374,
-          "translation": "好了。哦，嘿——菲尔。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Okay. Oh, hey- Phil.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 374,
-              "speaker": "",
-              "text": "Okay. Oh, hey- Phil."
-            }
-          ]
-        },
-        {
-          "start": 375,
-          "end": 375,
-          "translation": "她就是这么念“Phil”的，不是“feel”。Phil。哦。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "That's how she says \"Phil.\" Not \"feel.\" Phil. Oh.",
-          "grammarNotes": [
-            "That's how she says ... 表示“她就是这么发……这个音的”；how 引导表语从句。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 375,
-              "speaker": "",
-              "text": "That's how she says \"Phil.\" Not \"feel.\" Phil. Oh."
-            }
-          ]
-        },
-        {
-          "start": 376,
-          "end": 376,
-          "translation": "——旅行怎么样？——很好，真的挺好的。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "- So how was your trip? - It was good. It was good actually.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 376,
-              "speaker": "",
-              "text": "- So how was your trip? - It was good. It was good actually."
-            }
-          ]
-        },
-        {
-          "start": 377,
-          "end": 377,
-          "translation": "不过，呃，关于这个，我——我有件事得告诉你们。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "But, um, about that, I- I have something that I need to tell you guys.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 377,
-              "speaker": "",
-              "text": "But, um, about that, I- I have something that I need to tell you guys."
-            }
-          ]
-        },
-        {
-          "start": 378,
-          "end": 378,
-          "translation": "呃——我们不只是去越南玩的。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Um- Uh, we didn't just go to Vietnam for pleasure.",
-          "grammarNotes": [
-            "We didn't just go ... for pleasure. 用 didn't 否定过去行为；not just 表示“不只是”，暗示还有别的原因。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 378,
-              "speaker": "",
-              "text": "Um- Uh, we didn't just go to Vietnam for pleasure."
-            }
-          ]
-        },
-        {
-          "start": 379,
-          "end": 379,
-          "translation": "我们，呃，算是有点大消息。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "We, uh, kind of have some big news.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 379,
-              "speaker": "",
-              "text": "We, uh, kind of have some big news."
-            }
-          ]
-        },
-        {
-          "start": 380,
-          "end": 380,
-          "translation": "哦，天哪。要是卡姆顶着两个大胸出来，我马上走。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh, God. If Cam comes out here with boobs, I'm leaving.",
-          "grammarNotes": [
-            "If Cam comes out here ... 是条件状语从句，主句用 I'm leaving 表示当下立刻作出的决定。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 380,
-              "speaker": "",
-              "text": "Oh, God. If Cam comes out here with boobs, I'm leaving."
-            }
-          ]
-        },
-        {
-          "start": 381,
-          "end": 381,
-          "translation": "——克莱尔：爸。——我希望他没让你难堪，妈。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "- [Claire] Dad. - I hope he didn't embarrass you, Mom.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 381,
-              "speaker": "",
-              "text": "- [Claire] Dad. - I hope he didn't embarrass you, Mom."
-            }
-          ]
-        },
-        {
-          "start": 382,
-          "end": 382,
-          "translation": "哦，别听她的。海莉今天第一次请男孩来家里——",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Oh, don't mind her. Haley had her first boy over today...",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 382,
-              "speaker": "",
-              "text": "Oh, don't mind her. Haley had her first boy over today..."
-            }
-          ]
-        },
-        {
-          "start": 383,
-          "end": 383,
-          "translation": "结果菲尔开枪打了他。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "and Phil shot him.",
           "grammarNotes": [
             "shot him 用一般过去时叙述刚刚发生的事件；Phil shot him 是被动语义的主动表达，实际指“菲尔开枪打了他”。"
           ],
@@ -9149,7 +8774,7 @@
             {
               "i": 383,
               "speaker": "",
-              "text": "and Phil shot him."
+              "text": "just to make sure he doesn't have to ever see us kiss."
             }
           ]
         }
@@ -9164,7 +8789,731 @@
         {
           "start": 384,
           "end": 384,
-          "translation": "总之，嗯，事情是——大约一年前，",
+          "translation": "要是我妈也有这个习惯就好了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Wish my mother had that system.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 384,
+              "speaker": "",
+              "text": "Wish my mother had that system."
+            }
+          ]
+        },
+        {
+          "start": 385,
+          "end": 385,
+          "translation": "-还记得吗 -以后再说",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Remember? - Not now.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 385,
+              "speaker": "",
+              "text": "- Remember? - Not now."
+            }
+          ]
+        },
+        {
+          "start": 386,
+          "end": 386,
+          "translation": "我真不敢相信你这么对我",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I still can't believe you did this to me.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 386,
+              "speaker": "",
+              "text": "I still can't believe you did this to me."
+            }
+          ]
+        },
+        {
+          "start": 387,
+          "end": 387,
+          "translation": "你能高兴点吗 这是个庆祝会啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Would you get in the spirit of things? It's a celebration.",
+          "grammarNotes": [
+            "What do you mean, 'bad idea'? 用引号回击对方用词；mean 后可直接接名词或引语。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 387,
+              "speaker": "",
+              "text": "Would you get in the spirit of things? It's a celebration."
+            }
+          ]
+        },
+        {
+          "start": 388,
+          "end": 388,
+          "translation": "天啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Oh, God.",
+          "grammarNotes": [
+            "If you two guys are bored, get a dog. 是“条件从句 + 祈使句”结构，表示建议或命令。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 388,
+              "speaker": "",
+              "text": "Oh, God."
+            }
+          ]
+        },
+        {
+          "start": 389,
+          "end": 389,
+          "translation": "-我去给莉莉打扮一下 -好",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Okay, I'm gonna go get Lily ready. - Okay.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 389,
+              "speaker": "",
+              "text": "- Okay, I'm gonna go get Lily ready. - Okay."
+            }
+          ]
+        },
+        {
+          "start": 390,
+          "end": 391,
+          "translation": "我要你直接坦白说出来，你能做到的！",
+          "translationSource": "card",
+          "matchScore": 0.824,
+          "keyPhrase": "",
+          "meaning": "直截了当说出来，坦白",
+          "phonetic": "/kʌm streɪt aʊt wɪð ɪt/",
+          "sourceId": "card-44",
+          "sourceText": "I want you to just come straight out with it, you can do this!",
+          "grammarNotes": [
+            "even though you're not my son 是让步状语从句，表示“尽管……”；语气带有冒犯性讽刺。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 390,
+              "speaker": "",
+              "text": "- And I want you to just come straight out with it. - All right."
+            },
+            {
+              "i": 391,
+              "speaker": "",
+              "text": "Okay. You can do this."
+            }
+          ]
+        },
+        {
+          "start": 392,
+          "end": 392,
+          "translation": "来个运动员式的撞胸",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Yeah. Sports guy chest bump.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 392,
+              "speaker": "",
+              "text": "Yeah. Sports guy chest bump."
+            }
+          ]
+        },
+        {
+          "start": 393,
+          "end": 393,
+          "translation": "-不要 -来撞一个",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- No. - Sports guy chest bump.",
+          "grammarNotes": [
+            "bring chaos 表示“带来混乱”；handle it well 中 it 指孩子带来的混乱局面。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 393,
+              "speaker": "",
+              "text": "- No. - Sports guy chest bump."
+            }
+          ]
+        },
+        {
+          "start": 394,
+          "end": 394,
+          "translation": "-小卡 好了 -上吧",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Cam. Oh! All right. Go - Do it.",
+          "grammarNotes": [
+            "in a whole different way 表示“以完全不同的方式”；whole 用来加强 different。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 394,
+              "speaker": "",
+              "text": "- Cam. Oh! All right. Go - Do it."
+            }
+          ]
+        },
+        {
+          "start": 395,
+          "end": 395,
+          "translation": "抱歉",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Sorry.",
+          "grammarNotes": [
+            "Let's all ... 是 Let us all ... 的缩写，后接动词原形，表示共同做某事。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 395,
+              "speaker": "",
+              "text": "Sorry."
+            }
+          ]
+        },
+        {
+          "start": 396,
+          "end": 396,
+          "translation": "-你好啊 -大家好啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- How are you? - Hi, guys. Hey.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 396,
+              "speaker": "",
+              "text": "- How are you? - Hi, guys. Hey."
+            }
+          ]
+        },
+        {
+          "start": 397,
+          "end": 397,
+          "translation": "看起来很美味啊 谢谢",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "That looks good. Oh, thank you. Thanks.",
+          "grammarNotes": [
+            "Someone who's not insulting me notices he's not here. 中 who 引导定语从句修饰 someone；notices 是主句谓语。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 397,
+              "speaker": "",
+              "text": "That looks good. Oh, thank you. Thanks."
+            }
+          ]
+        },
+        {
+          "start": 398,
+          "end": 398,
+          "translation": "不用谢 打开吧 爸爸后脚马上就到",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Don't thank us. Open it. Dad is coming right behind.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 398,
+              "speaker": "",
+              "text": "Don't thank us. Open it. Dad is coming right behind."
+            }
+          ]
+        },
+        {
+          "start": 399,
+          "end": 399,
+          "translation": "有人吗 我们要进来了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Knock, knock! We're here. Coming in!",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 399,
+              "speaker": "",
+              "text": "Knock, knock! We're here. Coming in!"
+            }
+          ]
+        },
+        {
+          "start": 400,
+          "end": 400,
+          "translation": "别担心爸爸 我们没在里面搞基",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Don't worry, Dad. Nothing gay going on here.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 400,
+              "speaker": "",
+              "text": "Don't worry, Dad. Nothing gay going on here."
+            }
+          ]
+        },
+        {
+          "start": 401,
+          "end": 401,
+          "translation": "能帮你脱下这缤纷外套和闪亮小帽吗",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "May I take your multicolored coat and bejeweled cap?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 401,
+              "speaker": "",
+              "text": "May I take your multicolored coat and bejeweled cap?"
+            }
+          ]
+        },
+        {
+          "start": 402,
+          "end": 402,
+          "translation": "-拿去吧 -杰你好啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Yeah. Yeah. - Hey, Jay.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 402,
+              "speaker": "",
+              "text": "- Yeah. Yeah. - Hey, Jay."
+            }
+          ]
+        },
+        {
+          "start": 403,
+          "end": 403,
+          "translation": "-你好 歌洛莉亚 -你好",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Gloria, hi. - Hi.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 403,
+              "speaker": "",
+              "text": "- Gloria, hi. - Hi."
+            }
+          ]
+        },
+        {
+          "start": 404,
+          "end": 404,
+          "translation": "-老爸你还好吗 -歌洛莉亚 你好",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- How are you? Hi, Dad. - Hi, Gloria. How are you?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 404,
+              "speaker": "",
+              "text": "- How are you? Hi, Dad. - Hi, Gloria. How are you?"
+            }
+          ]
+        },
+        {
+          "start": 405,
+          "end": 405,
+          "translation": "-裙子真漂亮 -谢谢你 菲尔[摸摸]",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Oh, what a beautiful dress. - Ay, thank you, Phil.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 405,
+              "speaker": "",
+              "text": "- Oh, what a beautiful dress. - Ay, thank you, Phil."
+            }
+          ]
+        },
+        {
+          "start": 406,
+          "end": 406,
+          "translation": "好吧",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Okay.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 406,
+              "speaker": "",
+              "text": "Okay."
+            }
+          ]
+        },
+        {
+          "start": 407,
+          "end": 407,
+          "translation": "菲尔",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Oh, hey, Phil.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 407,
+              "speaker": "",
+              "text": "Oh, hey, Phil."
+            }
+          ]
+        },
+        {
+          "start": 408,
+          "end": 408,
+          "translation": "她是叫你名字 不是要你去摸",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "That's how she says \"Phil.\" Not \"Feel.\" Phil.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 408,
+              "speaker": "",
+              "text": "That's how she says \"Phil.\" Not \"Feel.\" Phil."
+            }
+          ]
+        },
+        {
+          "start": 409,
+          "end": 409,
+          "translation": "-旅行怎么样 -挺好的 真的",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- So how was your trip? - It was good. It was good actually.",
+          "grammarNotes": [
+            "Exciting! 是单词成句的口语表达，表示“太刺激了、太让人兴奋了”；具体情绪由语境决定。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 409,
+              "speaker": "",
+              "text": "- So how was your trip? - It was good. It was good actually."
+            }
+          ]
+        },
+        {
+          "start": 410,
+          "end": 410,
+          "translation": "关于这事",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "But, um, about that, I- I",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 410,
+              "speaker": "",
+              "text": "But, um, about that, I- I"
+            }
+          ]
+        },
+        {
+          "start": 411,
+          "end": 411,
+          "translation": "我有些事要告诉你们",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "have something that I need to tell you guys.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 411,
+              "speaker": "",
+              "text": "have something that I need to tell you guys."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scene-14",
+      "start": 412,
+      "end": 442,
+      "title": "Lily 登场与家庭合照",
+      "segments": [
+        {
+          "start": 412,
+          "end": 412,
+          "translation": "我们去越南不光是为了旅游",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Um- Uh, we didn't just go to Vietnam for pleasure.",
+          "grammarNotes": [
+            "come say hi 是 come and say hi 的口语省略，表示“过来打个招呼”。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 412,
+              "speaker": "",
+              "text": "Um- Uh, we didn't just go to Vietnam for pleasure."
+            }
+          ]
+        },
+        {
+          "start": 413,
+          "end": 413,
+          "translation": "我们有重要消息宣布",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "We, uh, kind of have some big news.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 413,
+              "speaker": "",
+              "text": "We, uh, kind of have some big news."
+            }
+          ]
+        },
+        {
+          "start": 414,
+          "end": 414,
+          "translation": "天啊 要是小卡隆了胸 我立马走人",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Oh, God. If Cam comes out here with boobs, I'm leaving.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 414,
+              "speaker": "",
+              "text": "Oh, God. If Cam comes out here with boobs, I'm leaving."
+            }
+          ]
+        },
+        {
+          "start": 415,
+          "end": 415,
+          "translation": "-爸爸 -我希望你的家长没让你觉得丢人 妈",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- Dad. - I hope he didn't embarrass you, Mom.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 415,
+              "speaker": "",
+              "text": "- Dad. - I hope he didn't embarrass you, Mom."
+            }
+          ]
+        },
+        {
+          "start": 416,
+          "end": 416,
+          "translation": "别管她 海莉今天首次带男生回家",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Oh, don't mind her. Haley had her first boy over today...",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 416,
+              "speaker": "",
+              "text": "Oh, don't mind her. Haley had her first boy over today..."
+            }
+          ]
+        },
+        {
+          "start": 417,
+          "end": 417,
+          "translation": "菲尔就给了他一枪",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "And Phil shot him.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 417,
+              "speaker": "",
+              "text": "And Phil shot him."
+            }
+          ]
+        },
+        {
+          "start": 418,
+          "end": 418,
+          "translation": "总之 一年前",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9172,20 +9521,22 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Anyway, um, so, about- about a year ago,",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "Isn't that gonna be hard for her to say? 是反义疑问式问句，实际在质疑名字是否拗口；be hard for somebody to do 是固定结构。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 384,
+              "i": 418,
               "speaker": "",
               "text": "Anyway, um, so, about- about a year ago,"
             }
           ]
         },
         {
-          "start": 385,
-          "end": 385,
-          "translation": "卡姆和我开始特别渴望，你知道，",
+          "start": 419,
+          "end": 419,
+          "translation": "小卡和我开始渴望有一个",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9197,16 +9548,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 385,
+              "i": 419,
               "speaker": "",
               "text": "Cam and I started feeling this longing, you know,"
             }
           ]
         },
         {
-          "start": 386,
-          "end": 386,
-          "translation": "想要更多，比如，呃，也许要个孩子？",
+          "start": 420,
+          "end": 420,
+          "translation": "有一个 孩子",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9218,62 +9569,79 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 386,
+              "i": 420,
               "speaker": "",
               "text": "for something more, like, uh, maybe a baby?"
             }
           ]
         },
         {
-          "start": 387,
-          "end": 387,
-          "translation": "——哦，这主意可不怎么样。——你什么意思，“主意不怎么样”？",
+          "start": 421,
+          "end": 421,
+          "translation": "-这主意很糟糕 -你说糟糕是什么意思",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "- Ooh, that's a bad idea. - What do you mean, \"bad idea\"?",
-          "grammarNotes": [
-            "What do you mean, 'bad idea'? 用引号回击对方用词；mean 后可直接接名词或引语。"
-          ],
+          "sourceText": "- Ooh, that's a bad idea. - What do you mean, \"Bad idea\"?",
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 387,
+              "i": 421,
               "speaker": "",
-              "text": "- Ooh, that's a bad idea. - What do you mean, \"bad idea\"?"
+              "text": "- Ooh, that's a bad idea. - What do you mean, \"Bad idea\"?"
             }
           ]
         },
         {
-          "start": 388,
-          "end": 388,
-          "translation": "孩子需要妈妈。我是说，你们俩要是无聊，就养条狗。",
+          "start": 422,
+          "end": 422,
+          "translation": "孩子需要有妈妈",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Well, kids need a mother. I mean if you two guys are bored, get a dog.",
-          "grammarNotes": [
-            "If you two guys are bored, get a dog. 是“条件从句 + 祈使句”结构，表示建议或命令。"
-          ],
+          "sourceText": "Well, kids need a mother.",
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 388,
+              "i": 422,
               "speaker": "",
-              "text": "Well, kids need a mother. I mean if you two guys are bored, get a dog."
+              "text": "Well, kids need a mother."
             }
           ]
         },
         {
-          "start": 389,
-          "end": 389,
-          "translation": "好吧，我们不无聊，爸。",
+          "start": 423,
+          "end": 423,
+          "translation": "如果你们俩无聊了 可以养条狗",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "I mean if you two guys are bored, get a dog.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 423,
+              "speaker": "",
+              "text": "I mean if you two guys are bored, get a dog."
+            }
+          ]
+        },
+        {
+          "start": 424,
+          "end": 424,
+          "translation": "我们不是闲得无聊 爸",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9281,20 +9649,22 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Okay, we're not bored, Dad.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "have been trying 用现在完成进行时，强调从过去持续到现在并仍在继续；still 表示尽管努力仍然如此。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 389,
+              "i": 424,
               "speaker": "",
               "text": "Okay, we're not bored, Dad."
             }
           ]
         },
         {
-          "start": 390,
-          "end": 390,
-          "translation": "我支持你，米切尔，虽然你不是我儿子。",
+          "start": 425,
+          "end": 425,
+          "translation": "我支持米奇尔 尽管你不是我亲生的",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9302,22 +9672,20 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "I support you, Mitchell, even though you're not my son.",
-          "grammarNotes": [
-            "even though you're not my son 是让步状语从句，表示“尽管……”；语气带有冒犯性讽刺。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 390,
+              "i": 425,
               "speaker": "",
               "text": "I support you, Mitchell, even though you're not my son."
             }
           ]
         },
         {
-          "start": 391,
-          "end": 391,
-          "translation": "我——我——我想爸爸想说的是——",
+          "start": 426,
+          "end": 426,
+          "translation": "我觉得爸爸的意思是",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9329,15 +9697,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 391,
+              "i": 426,
               "speaker": "",
               "text": "I-I-I-I think what Dad is trying to say..."
             }
           ]
         },
         {
-          "start": 392,
-          "end": 393,
+          "start": 427,
+          "end": 428,
           "translation": "Mitchell，你有点太拘谨了，孩子会带来混乱，而你处理不好。",
           "translationSource": "card",
           "matchScore": 0.867,
@@ -9346,49 +9714,91 @@
           "phonetic": "/ˈʌptaɪt/",
           "sourceId": "card-45",
           "sourceText": "Mitchell, you're a little uptight, kids bring chaos and you don't handle well.",
-          "grammarNotes": [
-            "bring chaos 表示“带来混乱”；handle it well 中 it 指孩子带来的混乱局面。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 392,
+              "i": 427,
               "speaker": "",
               "text": "is that, Mitchell, you're a little uptight."
             },
             {
-              "i": 393,
+              "i": 428,
               "speaker": "",
-              "text": "- Kids bring chaos, and- and you don't handle it well. - That's not what Dad's saying."
+              "text": "Kids bring chaos, and- and you don't handle it well."
             }
           ]
         },
         {
-          "start": 394,
-          "end": 394,
-          "translation": "这就是你的意思。而且这侮辱人的方式还完全不一样。",
+          "start": 429,
+          "end": 429,
+          "translation": "爸爸可不是这个意思",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "That's what you're saying. And it's insulting in a whole different way.",
+          "sourceText": "That's not what Dad's saying.",
           "grammarNotes": [
-            "in a whole different way 表示“以完全不同的方式”；whole 用来加强 different。"
+            "blow at your back 是按字面直译的说法，实际想表达 wind at your back（背后有风、得到支持）。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 394,
+              "i": 429,
               "speaker": "",
-              "text": "That's what you're saying. And it's insulting in a whole different way."
+              "text": "That's not what Dad's saying."
             }
           ]
         },
         {
-          "start": 395,
-          "end": 395,
+          "start": 430,
+          "end": 430,
+          "translation": "这是你的意思",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "That's what you're saying.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 430,
+              "speaker": "",
+              "text": "That's what you're saying."
+            }
+          ]
+        },
+        {
+          "start": 431,
+          "end": 431,
+          "translation": "而且是从另一个角度羞辱了我",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "And it's insulting in a whole different way.",
+          "grammarNotes": [
+            "be supposed to 表示“按理说、本应该”；这里用西班牙语版本听起来更美来打圆场。"
+          ],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 431,
+              "speaker": "",
+              "text": "And it's insulting in a whole different way."
+            }
+          ]
+        },
+        {
+          "start": 432,
+          "end": 432,
           "translation": "好了各位，大家都冷静放松一下！",
           "translationSource": "card",
           "matchScore": 1,
@@ -9397,43 +9807,41 @@
           "phonetic": "/tʃɪˈlæks/",
           "sourceId": "card-46",
           "sourceText": "Okay, people, let's all chillax!",
-          "grammarNotes": [
-            "Let's all ... 是 Let us all ... 的缩写，后接动词原形，表示共同做某事。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 395,
+              "i": 432,
               "speaker": "",
-              "text": "Okay, people. Let's all \"chillax.\""
+              "text": "Okay, people. Let's all \"Chillax.\""
             }
           ]
         },
         {
-          "start": 396,
-          "end": 396,
-          "translation": "嘿，卡梅隆叔叔呢？谢谢。谢谢。",
+          "start": 433,
+          "end": 433,
+          "translation": "-卡梅隆舅夫呢 -多谢多谢",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Hey, where's Uncle Cameron? Thank you. Thank you.",
+          "sourceText": "- Hey, where's Uncle Cameron? - Thank you. Thank you.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 396,
+              "i": 433,
               "speaker": "",
-              "text": "Hey, where's Uncle Cameron? Thank you. Thank you."
+              "text": "- Hey, where's Uncle Cameron? - Thank you. Thank you."
             }
           ]
         },
         {
-          "start": 397,
-          "end": 397,
-          "translation": "总算有人没在侮辱我，还注意到他不在这儿。",
+          "start": 434,
+          "end": 434,
+          "translation": "总算有人发现他不在了 而不是光羞辱我",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9441,21 +9849,40 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Someone who's not insulting me notices he's not here.",
-          "grammarNotes": [
-            "Someone who's not insulting me notices he's not here. 中 who 引导定语从句修饰 someone；notices 是主句谓语。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 397,
+              "i": 434,
               "speaker": "",
               "text": "Someone who's not insulting me notices he's not here."
             }
           ]
         },
         {
-          "start": 398,
-          "end": 398,
+          "start": 435,
+          "end": 435,
+          "translation": "原来你的重要消息就是这个啊",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Oh, so that's the big announcement, huh?",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 435,
+              "speaker": "",
+              "text": "Oh, so that's the big announcement, huh?"
+            }
+          ]
+        },
+        {
+          "start": 436,
+          "end": 436,
           "translation": "所以，这就是那个重大消息。你们俩分手了。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -9464,7 +9891,9 @@
           "phonetic": "/broʊk ʌp/",
           "sourceId": "entry-9",
           "sourceText": "You two broke up.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "I got her. 是口语中的“我来抱她、我接住她”；got 在这里不是“得到”，而是“接住、负责”。"
+          ],
           "alternatives": [
             {
               "phrase": "broke up",
@@ -9476,15 +9905,15 @@
           ],
           "blocks": [
             {
-              "i": 398,
+              "i": 436,
               "speaker": "",
-              "text": "Oh, so that's the big announcement, huh? You two broke up."
+              "text": "You two broke up."
             }
           ]
         },
         {
-          "start": 399,
-          "end": 400,
+          "start": 437,
+          "end": 439,
           "translation": "我跟你说，分开对你反而更好，因为他有点太爱演了。",
           "translationSource": "curated",
           "matchScore": 0.88,
@@ -9493,7 +9922,9 @@
           "phonetic": "/ˈbetər ɔːf/",
           "sourceId": "entry-10",
           "sourceText": "Well a baby wasn't gonna help that, anyway! Let me tell you, you'll be better off, because he was a bit of a drama queen.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "She wants ... 用一般现在时表达婴儿当前的需求；两个感叹句形成节奏感，翻译时保留重复。"
+          ],
           "alternatives": [
             {
               "phrase": "better off",
@@ -9505,23 +9936,28 @@
           ],
           "blocks": [
             {
-              "i": 399,
+              "i": 437,
               "speaker": "",
               "text": "Well- Well, a baby wasn't gonna help that anyway."
             },
             {
-              "i": 400,
+              "i": 438,
               "speaker": "",
-              "text": "And let me tell you. You're better off, because he was a bit of a drama queen."
+              "text": "And let me tell you. You're better off,"
+            },
+            {
+              "i": 439,
+              "speaker": "",
+              "text": "because he was a bit of a drama queen."
             }
           ]
         },
         {
-          "start": 401,
-          "end": 406,
+          "start": 440,
+          "end": 443,
           "translation": "你跑到我家来侮辱我和我男朋友，顺便说一句，他根本没那么多戏！我们领养了一个孩子。",
           "translationSource": "curated",
-          "matchScore": 0.741,
+          "matchScore": 0.852,
           "keyPhrase": "by the way",
           "meaning": "顺便说一下",
           "phonetic": "/baɪ ðə weɪ/",
@@ -9539,72 +9975,47 @@
           ],
           "blocks": [
             {
-              "i": 401,
+              "i": 440,
               "speaker": "",
               "text": "No, no, no. Stop. Stop. No."
             },
             {
-              "i": 402,
+              "i": 441,
               "speaker": "",
               "text": "You come into my house and you insult me and my boyfriend,"
             },
             {
-              "i": 403,
+              "i": 442,
               "speaker": "",
               "text": "who, by the way, is not that dramatic-"
             },
             {
-              "i": 404,
+              "i": 443,
               "speaker": "",
-              "text": "♪♪ [Stereo: Man Singing In Zulu] Oh, God."
-            },
-            {
-              "i": 405,
-              "speaker": "",
-              "text": "♪♪ [Chorus Singing In Zulu]"
-            },
-            {
-              "i": 406,
-              "speaker": "Man",
-              "text": "♪ It's the circle of life ♪"
+              "text": "We adopted a baby."
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "scene-15",
+      "start": 443,
+      "end": 496,
+      "title": "结尾：我们来自不同的世界",
+      "segments": [
         {
-          "start": 407,
-          "end": 407,
-          "translation": "我们领养了一个孩子。♪ 它推动着我们所有人 ♪",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "We adopted a baby. ♪ And it moves us all ♪",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 407,
-              "speaker": "",
-              "text": "We adopted a baby. ♪ And it moves us all ♪"
-            }
-          ]
-        },
-        {
-          "start": 408,
-          "end": 409,
+          "start": 444,
+          "end": 445,
           "translation": "太棒了！把它关掉。",
           "translationSource": "curated",
-          "matchScore": 0.8,
+          "matchScore": 0.889,
           "keyPhrase": "turn it off",
           "meaning": "关掉它",
           "phonetic": "/tɜːrn ɪt ɔːf/",
           "sourceId": "entry-18",
           "sourceText": "Her name is Lilly Exciting! Just turn it off.",
-          "grammarNotes": [
-            "Exciting! 是单词成句的口语表达，表示“太刺激了、太让人兴奋了”；具体情绪由语境决定。"
-          ],
+          "grammarNotes": [],
           "alternatives": [
             {
               "phrase": "turn it off",
@@ -9616,21 +10027,21 @@
           ],
           "blocks": [
             {
-              "i": 408,
+              "i": 444,
               "speaker": "",
-              "text": "Her name is Lily. Oh."
+              "text": "Her name is Lily."
             },
             {
-              "i": 409,
+              "i": 445,
               "speaker": "",
-              "text": "Exciting! Just turn it off."
+              "text": "- Exciting! - Just turn it off."
             }
           ]
         },
         {
-          "start": 410,
-          "end": 410,
-          "translation": "我关不掉。这就是我的本性。",
+          "start": 446,
+          "end": 446,
+          "translation": "我停不下来 这就是我的个性",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9650,153 +10061,146 @@
           ],
           "blocks": [
             {
-              "i": 410,
+              "i": 446,
               "speaker": "",
               "text": "I can't turn it off. It's who I am."
             }
           ]
         },
         {
-          "start": 411,
-          "end": 411,
-          "translation": "音乐。哦，对，音乐。",
+          "start": 447,
+          "end": 447,
+          "translation": "-我是说音乐 -关音乐啊",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "The music. Oh, yes, the music.",
+          "sourceText": "- The music. - Oh, yes, the music.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 411,
+              "i": 447,
               "speaker": "",
-              "text": "The music. Oh, yes, the music.",
-              "stage": "Chuckles"
+              "text": "- The music. - Oh, yes, the music."
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "scene-14",
-      "start": 412,
-      "end": 442,
-      "title": "Lily 登场与家庭合照",
-      "segments": [
+        },
         {
-          "start": 412,
-          "end": 412,
-          "translation": "♪♪（停下）来跟莉莉打个招呼。",
+          "start": 448,
+          "end": 448,
+          "translation": "来和莉莉打招呼吧",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "♪♪ [Stops] Come say hi to Lily.",
+          "sourceText": "Come say hi to Lily.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 448,
+              "speaker": "",
+              "text": "Come say hi to Lily."
+            }
+          ]
+        },
+        {
+          "start": 449,
+          "end": 449,
+          "translation": "看看这个小公主",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "Ay, miren a la princesita.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 449,
+              "speaker": "",
+              "text": "Ay, miren a la princesita."
+            }
+          ]
+        },
+        {
+          "start": 450,
+          "end": 450,
+          "translation": "真是个小公主",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "The little princess.",
           "grammarNotes": [
-            "come say hi 是 come and say hi 的口语省略，表示“过来打个招呼”。"
+            "so far 与现在完成时 hasn't beaten 搭配，表示“到目前为止还没有”。"
           ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 412,
+              "i": 450,
               "speaker": "",
-              "text": "♪♪ [Stops] Come say hi to Lily."
+              "text": "The little princess."
             }
           ]
         },
         {
-          "start": 413,
-          "end": 413,
-          "translation": "快看小公主。小公主。",
+          "start": 451,
+          "end": 451,
+          "translation": "-她好可爱 -多谢夸奖",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Ay, miren a la princesita. The little princess.",
-          "grammarNotes": [],
+          "sourceText": "- She's so cute! - Thank you.",
+          "grammarNotes": [
+            "It's 2-0. 读作 two to zero；比分作主语时用 it，口语里省略了 the score。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 413,
+              "i": 451,
               "speaker": "",
-              "text": "Ay, miren a la princesita. The little princess."
+              "text": "- She's so cute! - Thank you."
             }
           ]
         },
         {
-          "start": 414,
-          "end": 414,
-          "translation": "海莉：她太可爱了！",
+          "start": 452,
+          "end": 452,
+          "translation": "让我看看 让我看看",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "She's so cute!",
+          "sourceText": "Let me see her. Let me see her.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 414,
-              "speaker": "Haley",
-              "text": "She's so cute!"
-            }
-          ]
-        },
-        {
-          "start": 415,
-          "end": 415,
-          "translation": "太可爱了。谢谢。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "So cute. Thank you.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 415,
+              "i": 452,
               "speaker": "",
-              "text": "So cute. Thank you."
+              "text": "Let me see her. Let me see her."
             }
           ]
         },
         {
-          "start": 416,
-          "end": 416,
-          "translation": "克莱尔：让我看看她。让我看看她。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Let me see her. Let me see her. Let me see her.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 416,
-              "speaker": "Claire",
-              "text": "Let me see her. Let me see her. Let me see her."
-            }
-          ]
-        },
-        {
-          "start": 417,
-          "end": 417,
-          "translation": "嗨，莉莉。",
+          "start": 453,
+          "end": 453,
+          "translation": "你好啊 莉莉",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9808,16 +10212,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 417,
+              "i": 453,
               "speaker": "",
               "text": "Hi there, Lily."
             }
           ]
         },
         {
-          "start": 418,
-          "end": 418,
-          "translation": "“莉莉”？这名字对她来说会不会很难念？",
+          "start": 454,
+          "end": 454,
+          "translation": "莉莉 对她来说不是很难发音吗",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9825,64 +10229,41 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "\"Lily.\" Isn't that gonna be hard for her to say?",
-          "grammarNotes": [
-            "Isn't that gonna be hard for her to say? 是反义疑问式问句，实际在质疑名字是否拗口；be hard for somebody to do 是固定结构。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 418,
+              "i": 454,
               "speaker": "",
               "text": "\"Lily.\" Isn't that gonna be hard for her to say?"
             }
           ]
         },
         {
-          "start": 419,
-          "end": 419,
-          "translation": "海莉：太可爱了。",
+          "start": 455,
+          "end": 455,
+          "translation": "-菲尔打住 -我说",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "So cute.",
+          "sourceText": "- Phil. - Excuse me.",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 419,
-              "speaker": "Haley",
-              "text": "So cute."
-            }
-          ]
-        },
-        {
-          "start": 420,
-          "end": 420,
-          "translation": "菲尔。失陪一下。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Phil. Excuse me.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 420,
+              "i": 455,
               "speaker": "",
-              "text": "Phil. Excuse me."
+              "text": "- Phil. - Excuse me."
             }
           ]
         },
         {
-          "start": 421,
-          "end": 421,
-          "translation": "好吧，我——我知道我说过我觉得这主意不好。",
+          "start": 456,
+          "end": 456,
+          "translation": "我知道我说了领养这个主意很糟糕",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9894,15 +10275,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 421,
+              "i": 456,
               "speaker": "",
               "text": "Okay, I-I-I know that I said I thought this was a bad idea."
             }
           ]
         },
         {
-          "start": 422,
-          "end": 423,
+          "start": 457,
+          "end": 458,
           "translation": "又不是我写了一本关于如何当父亲的书。",
           "translationSource": "curated",
           "matchScore": 0.941,
@@ -9911,24 +10292,27 @@
           "phonetic": "/roʊt ðə bʊk ɑːn ˈfɑːðərhʊd/",
           "sourceId": "entry-34",
           "sourceText": "But What do I know? I mean, It's not like I wrote the book on fatherhood.",
-          "grammarNotes": [],
+          "grammarNotes": [
+            "if he beats me, I'm gonna be like ... 是条件从句加将来打算，be like 是口语中的“我会说、我会是这种反应”。",
+            "Well done. 是固定称赞语，表示“干得好”；重复使用表示真心或略带自嘲的鼓励。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 422,
+              "i": 457,
               "speaker": "",
               "text": "But, uh, what do I know?"
             },
             {
-              "i": 423,
+              "i": 458,
               "speaker": "",
               "text": "I mean, it's not like I wrote the book on fatherhood."
             }
           ]
         },
         {
-          "start": 424,
-          "end": 424,
+          "start": 459,
+          "end": 459,
           "translation": "我一辈子都在努力把这件事做好，我仍然会搞砸。",
           "translationSource": "curated",
           "matchScore": 0.846,
@@ -9937,9 +10321,7 @@
           "phonetic": "/ˈskruːɪŋ ʌp/",
           "sourceId": "entry-41",
           "sourceText": "I'm trying whole my life to get it right, I'm still screwing up.",
-          "grammarNotes": [
-            "have been trying 用现在完成进行时，强调从过去持续到现在并仍在继续；still 表示尽管努力仍然如此。"
-          ],
+          "grammarNotes": [],
           "alternatives": [
             {
               "phrase": "screwing up",
@@ -9951,16 +10333,16 @@
           ],
           "blocks": [
             {
-              "i": 424,
+              "i": 459,
               "speaker": "",
               "text": "Been trying all my life to get it right. I'm still screwing up."
             }
           ]
         },
         {
-          "start": 425,
-          "end": 425,
-          "translation": "——对吧，曼尼？——我在车里为此写了首歌。",
+          "start": 460,
+          "end": 460,
+          "translation": "-对吧曼尼 -我在车上为此写了首歌",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -9972,47 +10354,47 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 425,
+              "i": 460,
               "speaker": "",
               "text": "- Right, Manny? - I wrote a song about it in the car."
             }
           ]
         },
         {
-          "start": 426,
-          "end": 426,
-          "translation": "你当然会。呃——",
+          "start": 461,
+          "end": 461,
+          "translation": "意料之中",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "Of course you did. Uh-",
-          "grammarNotes": [],
+          "sourceText": "Of course you did.",
+          "grammarNotes": [
+            "two out of three 表示“三局两胜”；out of 用于比例结构，意思是“从三局中取两局”。"
+          ],
           "alternatives": [],
           "blocks": [
             {
-              "i": 426,
+              "i": 461,
               "speaker": "",
-              "text": "Of course you did. Uh-"
+              "text": "Of course you did."
             }
           ]
         },
         {
-          "start": 427,
-          "end": 429,
-          "translation": "我不是来朝你脸上吐口水的，我是来在你背后鼓风的。",
+          "start": 462,
+          "end": 462,
+          "translation": "总之，我为你高兴。",
           "translationSource": "curated",
-          "matchScore": 0.909,
-          "keyPhrase": "blow at your back",
-          "meaning": "在背后支持你",
-          "phonetic": "/bloʊ æt jɔːr bæk/",
-          "sourceId": "entry-50",
-          "sourceText": "And you should know that I'm not here to spit in your face, I'm here to blow at your back.",
-          "grammarNotes": [
-            "blow at your back 是按字面直译的说法，实际想表达 wind at your back（背后有风、得到支持）。"
-          ],
+          "matchScore": 1,
+          "keyPhrase": "happy for you",
+          "meaning": "为你高兴",
+          "phonetic": "/ˈhæpi fɔːr juː/",
+          "sourceId": "entry-44",
+          "sourceText": "Anyway, I'm happy for you.",
+          "grammarNotes": [],
           "alternatives": [
             {
               "phrase": "happy for you",
@@ -10024,47 +10406,68 @@
           ],
           "blocks": [
             {
-              "i": 427,
+              "i": 462,
               "speaker": "",
-              "text": "Anyway, I'm happy for you. And, uh, you should know that, uh,"
+              "text": "Anyway, I'm happy for you."
+            }
+          ]
+        },
+        {
+          "start": 463,
+          "end": 465,
+          "translation": "我不是来朝你脸上吐口水的，我是来在你背后鼓风的。",
+          "translationSource": "curated",
+          "matchScore": 0.909,
+          "keyPhrase": "blow at your back",
+          "meaning": "在背后支持你",
+          "phonetic": "/bloʊ æt jɔːr bæk/",
+          "sourceId": "entry-50",
+          "sourceText": "And you should know that I'm not here to spit in your face, I'm here to blow at your back.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 463,
+              "speaker": "",
+              "text": "And, uh, you should know that, uh,"
             },
             {
-              "i": 428,
+              "i": 464,
               "speaker": "",
               "text": "I'm not here to spit in your face,"
             },
             {
-              "i": 429,
+              "i": 465,
               "speaker": "",
               "text": "I'm here to... blow at your back."
             }
           ]
         },
         {
-          "start": 430,
-          "end": 430,
-          "translation": "我不明白那是什么意思。我不——",
+          "start": 466,
+          "end": 466,
+          "translation": "-我不懂你的意思 -我也不懂",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "I don't understand what that means. I don't-",
+          "sourceText": "- I don't understand what that means. - I don't-",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 430,
+              "i": 466,
               "speaker": "",
-              "text": "I don't understand what that means. I don't-"
+              "text": "- I don't understand what that means. - I don't-"
             }
           ]
         },
         {
-          "start": 431,
-          "end": 431,
-          "translation": "好吧，这句话用西班牙语说本来更好听。",
+          "start": 467,
+          "end": 467,
+          "translation": "这话用西班牙语说比较好听",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10072,43 +10475,20 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "Well, it's- it's supposed to sound better in Spanish.",
-          "grammarNotes": [
-            "be supposed to 表示“按理说、本应该”；这里用西班牙语版本听起来更美来打圆场。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 431,
+              "i": 467,
               "speaker": "",
               "text": "Well, it's- it's supposed to sound better in Spanish."
             }
           ]
         },
         {
-          "start": 432,
-          "end": 432,
-          "translation": "我要做你背后的微风，而不是朝你脸上吐口水的人。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "Voy a ser la brisa en tu espalda, no quien te escupa en la frente.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 432,
-              "speaker": "",
-              "text": "Voy a ser la brisa en tu espalda, no quien te escupa en la frente."
-            }
-          ]
-        },
-        {
-          "start": 433,
-          "end": 433,
-          "translation": "哦，太美了。说得真好。",
+          "start": 468,
+          "end": 468,
+          "translation": "真好听 真美",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10120,16 +10500,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 433,
+              "i": 468,
               "speaker": "",
               "text": "Oh, that's beautiful. That's really nice."
             }
           ]
         },
         {
-          "start": 434,
-          "end": 434,
-          "translation": "也谢谢你们。",
+          "start": 469,
+          "end": 469,
+          "translation": "也谢谢你",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10141,16 +10521,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 434,
+              "i": 469,
               "speaker": "",
               "text": "And thank you too."
             }
           ]
         },
         {
-          "start": 435,
-          "end": 435,
-          "translation": "总之，米奇，呃——",
+          "start": 470,
+          "end": 470,
+          "translation": "总之 米奇",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10162,60 +10542,58 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 435,
+              "i": 470,
               "speaker": "",
               "text": "Anyhow, Mitch, uh-"
             }
           ]
         },
         {
-          "start": 436,
-          "end": 436,
-          "translation": "——不，爸，这——这——（莉莉哭）",
+          "start": 471,
+          "end": 471,
+          "translation": "不用了 爸爸",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "- No, Dad, it's- it's- - [Lily Crying]",
-          "grammarNotes": [
-            "I got her. 是口语中的“我来抱她、我接住她”；got 在这里不是“得到”，而是“接住、负责”。"
-          ],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 436,
-              "speaker": "",
-              "text": "- No, Dad, it's- it's- - [Lily Crying]"
-            }
-          ]
-        },
-        {
-          "start": 437,
-          "end": 437,
-          "translation": "我来抱她。我来抱。哦，她哭了。",
-          "translationSource": "reviewed",
-          "matchScore": null,
-          "keyPhrase": "",
-          "meaning": "",
-          "phonetic": "",
-          "sourceId": "",
-          "sourceText": "I got her. I got her. Oh, she's crying.",
+          "sourceText": "No, Dad, it's- it's- -",
           "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 437,
+              "i": 471,
               "speaker": "",
-              "text": "I got her. I got her. Oh, she's crying."
+              "text": "No, Dad, it's- it's- -"
             }
           ]
         },
         {
-          "start": 438,
-          "end": 438,
-          "translation": "她要爷爷！她要爸爸！",
+          "start": 472,
+          "end": 472,
+          "translation": "-我来抱她 -她哭了",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "- I got her. I got her. - Oh, she's crying.",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 472,
+              "speaker": "",
+              "text": "- I got her. I got her. - Oh, she's crying."
+            }
+          ]
+        },
+        {
+          "start": 473,
+          "end": 473,
+          "translation": "她要爷爷抱 她要爸爸抱",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10223,21 +10601,19 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "She wants her grandpa! She wants her daddy!",
-          "grammarNotes": [
-            "She wants ... 用一般现在时表达婴儿当前的需求；两个感叹句形成节奏感，翻译时保留重复。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 438,
+              "i": 473,
               "speaker": "",
               "text": "She wants her grandpa! She wants her daddy!"
             }
           ]
         },
         {
-          "start": 439,
-          "end": 443,
+          "start": 474,
+          "end": 478,
           "translation": "你开玩笑吗？她现在是我们的一员了！",
           "translationSource": "curated",
           "matchScore": 0.743,
@@ -10250,45 +10626,35 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 439,
+              "i": 474,
               "speaker": "",
-              "text": "Do you wanna meet Grandpa? What? Are you kidding?"
+              "text": "- Do you wanna meet Grandpa? - What? Are you kidding?"
             },
             {
-              "i": 440,
+              "i": 475,
               "speaker": "",
-              "text": "She's one of us now. Let me see the little pot sticker.",
-              "stage": "Chuckling"
+              "text": "She's one of us now. Let me see the little pot sticker."
             },
             {
-              "i": 441,
+              "i": 476,
               "speaker": "",
               "text": "Hey, you're a cutie, aren't you?"
             },
             {
-              "i": 442,
+              "i": 477,
               "speaker": "",
-              "text": "Ah. Look at this.",
-              "stage": "All Fussing"
+              "text": "Ah. Look at this."
             },
             {
-              "i": 443,
-              "speaker": "Jay",
+              "i": 478,
+              "speaker": "",
               "text": "We're from different worlds, yet we somehow fit together."
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "scene-15",
-      "start": 443,
-      "end": 461,
-      "title": "结尾：我们来自不同的世界",
-      "segments": [
+        },
         {
-          "start": 444,
-          "end": 444,
+          "start": 479,
+          "end": 479,
           "translation": "爱把我们的心连在一起。",
           "translationSource": "curated",
           "matchScore": 1,
@@ -10301,36 +10667,15 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 444,
+              "i": 479,
               "speaker": "",
-              "text": "Love is what binds us,"
+              "text": "Love is what binds us, through fair or stormy weather."
             }
           ]
         },
         {
-          "start": 445,
-          "end": 445,
-          "translation": "无论风和日丽还是风雨交加。",
-          "translationSource": "curated",
-          "matchScore": 1,
-          "keyPhrase": "fair or stormy weather",
-          "meaning": "无论顺境还是逆境",
-          "phonetic": "/fer ɔːr ˈstɔːrmi ˈweðər/",
-          "sourceId": "entry-83",
-          "sourceText": "Through fair or stormy weather.",
-          "grammarNotes": [],
-          "alternatives": [],
-          "blocks": [
-            {
-              "i": 445,
-              "speaker": "",
-              "text": "through fair or stormy weather."
-            }
-          ]
-        },
-        {
-          "start": 446,
-          "end": 450,
+          "start": 480,
+          "end": 484,
           "translation": "我现在站在你面前，只有一个目的。",
           "translationSource": "curated",
           "matchScore": 0.903,
@@ -10339,42 +10684,40 @@
           "phonetic": "/stænd bɪˈfɔːr juː/",
           "sourceId": "entry-85",
           "sourceText": "I stand before you now with only one agenda To let you know my heart is yours, Feldman, Brenda I mean seriously! Luke, so far, he hasn't beaten me at basketball.",
-          "grammarNotes": [
-            "so far 与现在完成时 hasn't beaten 搭配，表示“到目前为止还没有”。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 446,
+              "i": 480,
               "speaker": "",
               "text": "I stand before you now with only one agenda-"
             },
             {
-              "i": 447,
+              "i": 481,
               "speaker": "",
               "text": "\"To let you know my heart is yours,"
             },
             {
-              "i": 448,
+              "i": 482,
               "speaker": "",
               "text": "Feldman comma Brenda.\""
             },
             {
-              "i": 449,
+              "i": 483,
               "speaker": "",
               "text": "I mean, seriously."
             },
             {
-              "i": 450,
+              "i": 484,
               "speaker": "",
               "text": "Luke, so far, hasn't beaten me in basketball."
             }
           ]
         },
         {
-          "start": 451,
-          "end": 451,
-          "translation": "现在是二比零。二比零。好吧。好吧。",
+          "start": 485,
+          "end": 485,
+          "translation": "2比0 2比0 来吧",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10382,71 +10725,66 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "It's 2-0. 2-0. Okay. Okay.",
-          "grammarNotes": [
-            "It's 2-0. 读作 two to zero；比分作主语时用 it，口语里省略了 the score。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 451,
+              "i": 485,
               "speaker": "",
-              "text": "It's 2-0. 2-0. Okay. Okay.",
-              "stage": "Grunting"
+              "text": "It's 2-0. 2-0. Okay. Okay."
             }
           ]
         },
         {
-          "start": 452,
-          "end": 457,
+          "start": 486,
+          "end": 491,
           "translation": "你能不能离开我的厨房！",
           "translationSource": "curated",
-          "matchScore": 0.738,
+          "matchScore": 0.756,
           "keyPhrase": "step out of my kitchen",
           "meaning": "离开我的厨房",
           "phonetic": "/step aʊt əv maɪ ˈkɪtʃən/",
           "sourceId": "entry-90",
           "sourceText": "Get that! Will you step out of my kitchen! Could you just do me a favour and just grab How's the weather down there? But, when the day comes that he does win, if, you know, if when he beats me.",
-          "grammarNotes": [
-            "if he beats me, I'm gonna be like ... 是条件从句加将来打算，be like 是口语中的“我会说、我会是这种反应”。"
-          ],
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 452,
+              "i": 486,
               "speaker": "",
-              "text": "Get that weak stuff out of my kitchen! Dad, stop it!"
+              "text": "- Get that weak stuff out of my kitchen! - Dad, stop it!"
             },
             {
-              "i": 453,
+              "i": 487,
               "speaker": "",
               "text": "Can you do me a favor? Just grab-"
             },
             {
-              "i": 454,
+              "i": 488,
               "speaker": "",
-              "text": "Ooh! How's the weather down there?"
+              "text": "How's the weather down there?"
             },
             {
-              "i": 455,
+              "i": 489,
               "speaker": "",
               "text": "But when the day comes that he does win-"
             },
             {
-              "i": 456,
+              "i": 490,
               "speaker": "",
               "text": "if- you know- if/when-"
             },
             {
-              "i": 457,
+              "i": 491,
               "speaker": "",
               "text": "he beats me, I'm just gonna be like,"
             }
           ]
         },
         {
-          "start": 458,
-          "end": 458,
-          "translation": "“干得好。干得好。”",
+          "start": 492,
+          "end": 492,
+          "translation": "干得好 干得好",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10454,9 +10792,7 @@
           "phonetic": "",
           "sourceId": "",
           "sourceText": "\"Well done. Well done.\"",
-          "grammarNotes": [
-            "Well done. 是固定称赞语，表示“干得好”；重复使用表示真心或略带自嘲的鼓励。"
-          ],
+          "grammarNotes": [],
           "alternatives": [
             {
               "phrase": "well done",
@@ -10468,16 +10804,16 @@
           ],
           "blocks": [
             {
-              "i": 458,
+              "i": 492,
               "speaker": "",
               "text": "\"Well done. Well done.\""
             }
           ]
         },
         {
-          "start": 459,
-          "end": 459,
-          "translation": "就，呃，让他——就支持他……",
+          "start": 493,
+          "end": 493,
+          "translation": "就这样支持他",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10489,16 +10825,16 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 459,
+              "i": 493,
               "speaker": "",
               "text": "Just, like, let him- Just support him..."
             }
           ]
         },
         {
-          "start": 460,
-          "end": 460,
-          "translation": "在——在那种事情上。",
+          "start": 494,
+          "end": 494,
+          "translation": "就是这样",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
@@ -10510,32 +10846,51 @@
           "alternatives": [],
           "blocks": [
             {
-              "i": 460,
+              "i": 494,
               "speaker": "",
               "text": "in- in- in that kind of stuff."
             }
           ]
         },
         {
-          "start": 461,
-          "end": 461,
-          "translation": "我是说，我可能还会想打三局两胜，看看结果怎么样，不过——",
+          "start": 495,
+          "end": 495,
+          "translation": "我可能会说",
           "translationSource": "reviewed",
           "matchScore": null,
           "keyPhrase": "",
           "meaning": "",
           "phonetic": "",
           "sourceId": "",
-          "sourceText": "I mean, I'd probably want to go, like, two out of three and just see what happens there, but-",
-          "grammarNotes": [
-            "two out of three 表示“三局两胜”；out of 用于比例结构，意思是“从三局中取两局”。"
-          ],
+          "sourceText": "I mean, I'd probably want to go, like,",
+          "grammarNotes": [],
           "alternatives": [],
           "blocks": [
             {
-              "i": 461,
+              "i": 495,
               "speaker": "",
-              "text": "I mean, I'd probably want to go, like, two out of three and just see what happens there, but-"
+              "text": "I mean, I'd probably want to go, like,"
+            }
+          ]
+        },
+        {
+          "start": 496,
+          "end": 496,
+          "translation": "三局两胜才算赢 再来一局什么的",
+          "translationSource": "reviewed",
+          "matchScore": null,
+          "keyPhrase": "",
+          "meaning": "",
+          "phonetic": "",
+          "sourceId": "",
+          "sourceText": "two out of three and just see what happens there, but-",
+          "grammarNotes": [],
+          "alternatives": [],
+          "blocks": [
+            {
+              "i": 496,
+              "speaker": "",
+              "text": "two out of three and just see what happens there, but-"
             }
           ]
         }

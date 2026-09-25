@@ -43,6 +43,8 @@
   const DISPLAY_STORAGE_KEY = "iball-movie-display-mode";
   const LEVELS_STORAGE_KEY = "iball-movie-level-marks";
   const ALTERNATIVES_STORAGE_KEY = "iball-movie-alternatives";
+  const SENTENCE_VOCAB_STORAGE_KEY = "iball-movie-sentence-vocab";
+  const AUDIO_MANIFEST_DIR = "./movie-data/audio/";
   const LEVEL_NAMES = ["四级", "六级", "考研"];
   const LEVEL_SHORT = { 四级: "四", 六级: "六", 考研: "研" };
   const LEVEL_CLASS = {
@@ -97,6 +99,15 @@
     showAlternatives: readStoredValue(ALTERNATIVES_STORAGE_KEY) !== "hidden",
     speechRun: 0,
     allSpeaking: false,
+    sentenceVocab: new Map(),
+    sentenceVocabReady: false,
+    showSentenceVocab: readStoredValue(SENTENCE_VOCAB_STORAGE_KEY) !== "hidden",
+    audioManifest: null,
+    audioManifestId: "",
+    audioRun: 0,
+    audioButton: null,
+    audioCue: null,
+    audioCleanup: null,
     activeSceneId: "",
     toastTimer: 0,
     scrollFrame: 0,
@@ -111,6 +122,9 @@
     sceneNavigation: document.querySelector("#sceneNavigation"),
     content: document.querySelector("#movieContent"),
     levelToggleButton: document.querySelector("#levelToggleButton"),
+    sentenceVocabToggleButton: document.querySelector(
+      "#sentenceVocabToggleButton",
+    ),
     alternativeToggleButton: document.querySelector("#alternativeToggleButton"),
     readAllButton: document.querySelector("#readAllButton"),
     toast: document.querySelector("#toast"),
@@ -301,6 +315,7 @@
   }
 
   function stopSpeech() {
+    stopAudioPlayback();
     state.speechRun += 1;
     state.allSpeaking = false;
     if (activeSpeechButton) {
@@ -482,6 +497,275 @@
     playNext();
   }
 
+  /* ------------------------------------------------------------- 原声播放 */
+
+  let audioElement = null;
+
+  function getAudioElement() {
+    if (!audioElement) {
+      audioElement = new Audio();
+      audioElement.preload = "none";
+    }
+    return audioElement;
+  }
+
+  function stopAudioPlayback(message) {
+    state.audioRun += 1;
+    state.audioCue = null;
+    if (state.audioButton) {
+      setSpeechButtonState(state.audioButton, false);
+      state.audioButton = null;
+    }
+    if (state.audioCleanup) {
+      state.audioCleanup();
+    }
+    if (audioElement) {
+      audioElement.pause();
+    }
+    if (message) {
+      showToast(message);
+    }
+  }
+
+  function isCurrentAudioRun(run) {
+    return run === state.audioRun;
+  }
+
+  function playAudioCues(cues, button) {
+    const usable = (Array.isArray(cues) ? cues : []).filter(
+      (cue) =>
+        cue &&
+        Number.isFinite(Number(cue.start)) &&
+        Number.isFinite(Number(cue.end)) &&
+        Number(cue.end) > Number(cue.start),
+    );
+    if (!usable.length || !state.audioManifest?.spriteUrl) {
+      return false;
+    }
+
+    if (state.audioButton === button && state.audioCue) {
+      stopAudioPlayback("已停止原声");
+      return true;
+    }
+
+    stopSpeech();
+    const run = state.audioRun;
+    const audio = getAudioElement();
+    let index = 0;
+
+    const cleanup = () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
+      state.audioCleanup = null;
+    };
+
+    const finish = (message) => {
+      if (!isCurrentAudioRun(run)) {
+        return;
+      }
+      cleanup();
+      state.audioCue = null;
+      if (state.audioButton) {
+        setSpeechButtonState(state.audioButton, false);
+        state.audioButton = null;
+      }
+      if (message) {
+        showToast(message);
+      }
+    };
+
+    const playNext = () => {
+      if (!isCurrentAudioRun(run)) {
+        return;
+      }
+      if (index >= usable.length) {
+        finish("原声播放完成");
+        return;
+      }
+      const cue = usable[index];
+      state.audioCue = cue;
+      try {
+        audio.currentTime = Math.max(0, Number(cue.start) || 0);
+      } catch {
+        // 元数据未就绪时浏览器会在 canplay 后接受跳转，继续播放即可。
+      }
+      const started = audio.play();
+      if (started && typeof started.catch === "function") {
+        started.catch(() => {
+          if (!isCurrentAudioRun(run)) {
+            return;
+          }
+          cleanup();
+          state.audioCue = null;
+          if (state.audioButton) {
+            setSpeechButtonState(state.audioButton, false);
+            state.audioButton = null;
+          }
+          showToast("原声加载失败，可点击“朗读”使用浏览器语音");
+        });
+      }
+    };
+
+    function handleTimeUpdate() {
+      if (!isCurrentAudioRun(run)) {
+        return;
+      }
+      const cue = state.audioCue;
+      if (!cue) {
+        return;
+      }
+      if (audio.currentTime >= Number(cue.end) - 0.03) {
+        index += 1;
+        playNext();
+      }
+    }
+
+    function handleEnded() {
+      if (!isCurrentAudioRun(run)) {
+        return;
+      }
+      index += 1;
+      playNext();
+    }
+
+    function handleError() {
+      if (!isCurrentAudioRun(run)) {
+        return;
+      }
+      cleanup();
+      state.audioCue = null;
+      if (state.audioButton) {
+        setSpeechButtonState(state.audioButton, false);
+        state.audioButton = null;
+      }
+      showToast("原声文件不可用，可点击“朗读”使用浏览器语音");
+    }
+
+    cleanup();
+    audio.pause();
+    audio.src = state.audioManifest.spriteUrl;
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
+    state.audioCleanup = cleanup;
+    state.audioButton = button;
+    setSpeechButtonState(button, true);
+    playNext();
+    return true;
+  }
+
+  function findAudioCue(view) {
+    const map = state.audioManifest?.cueMap;
+    if (!map || !view) {
+      return null;
+    }
+    return (
+      map.get(view.id) ||
+      map.get(`segment-${view.number}`) ||
+      map.get(String(view.number)) ||
+      null
+    );
+  }
+
+  function findAudioCues(view) {
+    const map = state.audioManifest?.lineCueMap;
+    const blocks = Array.isArray(view?.blocks) ? view.blocks : [];
+    if (!map || !blocks.length) {
+      return [];
+    }
+    const cues = blocks
+      .map((block) => map.get(`b${Number(block.i)}`))
+      .filter(Boolean);
+    return cues.length === blocks.length ? cues : [];
+  }
+
+  function playSegmentEnglish(view, button) {
+    const lineCues = findAudioCues(view);
+    if (lineCues.length && playAudioCues(lineCues, button)) {
+      return;
+    }
+    const cue = findAudioCue(view);
+    if (cue && playAudioCues([cue], button)) {
+      return;
+    }
+    playTexts(
+      view.blocks.map((block) => block.text),
+      button,
+    );
+  }
+
+  function playSceneEnglish(views, button) {
+    const lineCues = views.flatMap(findAudioCues);
+    const lineCount = views.reduce(
+      (total, view) =>
+        total + (Array.isArray(view.blocks) ? view.blocks.length : 0),
+      0,
+    );
+    if (
+      lineCues.length &&
+      lineCues.length === lineCount &&
+      playAudioCues(lineCues, button)
+    ) {
+      return;
+    }
+    const cues = views.map(findAudioCue).filter(Boolean);
+    if (
+      cues.length &&
+      cues.length === views.length &&
+      playAudioCues(cues, button)
+    ) {
+      return;
+    }
+    playTexts(
+      views.flatMap((view) => view.blocks.map((block) => block.text)),
+      button,
+    );
+  }
+
+  async function loadAudioManifest(id) {
+    if (state.audioManifestId === id) {
+      return state.audioManifest;
+    }
+    state.audioManifestId = id;
+    state.audioManifest = null;
+    try {
+      const response = await fetch(
+        `${AUDIO_MANIFEST_DIR}${encodeURIComponent(id)}.json`,
+        { cache: "no-store" },
+      );
+      if (!response.ok) {
+        return null;
+      }
+      const data = await response.json().catch(() => null);
+      if (!data?.sprite || !Array.isArray(data.cues)) {
+        return null;
+      }
+      const cueMap = new Map();
+      data.cues.forEach((cue) => {
+        if (cue?.id) {
+          cueMap.set(String(cue.id), cue);
+        }
+      });
+      const lineCueMap = new Map();
+      (Array.isArray(data.lineCues) ? data.lineCues : []).forEach((cue) => {
+        if (cue?.id) {
+          lineCueMap.set(String(cue.id), cue);
+        }
+      });
+      data.cueMap = cueMap;
+      data.lineCueMap = lineCueMap;
+      data.spriteUrl = new URL(
+        data.sprite,
+        new URL(AUDIO_MANIFEST_DIR, document.baseURI),
+      ).href;
+      state.audioManifest = data;
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
   /* ------------------------------------------------------------- 显示设置 */
 
   function setDisplayMode(mode) {
@@ -502,6 +786,7 @@
   function setLevelVisibility(visible) {
     state.showLevels = visible;
     document.body.classList.toggle("hides-levels", !visible);
+    document.body.classList.toggle("marks-levels", visible);
     if (elements.levelToggleButton) {
       elements.levelToggleButton.textContent = visible
         ? "隐藏考试词标记"
@@ -509,6 +794,24 @@
       elements.levelToggleButton.setAttribute("aria-pressed", String(visible));
     }
     writeStoredValue(LEVELS_STORAGE_KEY, visible ? "visible" : "hidden");
+  }
+
+  function setSentenceVocabVisibility(visible) {
+    state.showSentenceVocab = visible;
+    document.body.classList.toggle("hides-sentence-vocab", !visible);
+    if (elements.sentenceVocabToggleButton) {
+      elements.sentenceVocabToggleButton.textContent = visible
+        ? "隐藏本句词汇"
+        : "显示本句词汇";
+      elements.sentenceVocabToggleButton.setAttribute(
+        "aria-pressed",
+        String(visible),
+      );
+    }
+    writeStoredValue(
+      SENTENCE_VOCAB_STORAGE_KEY,
+      visible ? "visible" : "hidden",
+    );
   }
 
   function setAlternativeVisibility(visible) {
@@ -607,6 +910,8 @@
     state.segments = new Map();
     state.segmentOrder = [];
     state.phraseCache = new Map();
+    state.sentenceVocab = new Map();
+    state.sentenceVocabReady = false;
 
     const scenes = Array.isArray(data?.scenes) ? data.scenes : [];
     scenes.forEach((scene) => {
@@ -674,7 +979,7 @@
     const chips = [
       { value: data?.blockCount || 0, label: "句台词" },
       { value: data?.sceneCount || 0, label: "个场景" },
-      { value: data?.wordCount || 0, label: "个英文词" },
+      { value: data?.vocabCount || 0, label: "个不重复单词" },
       { value: human, label: "句逐句精翻" },
     ];
     if (Number(stats.machine) > 0) {
@@ -683,6 +988,14 @@
         label: "句机翻补全",
       });
     }
+    const audioCueCount = Array.isArray(state.audioManifest?.lineCues)
+      ? state.audioManifest.lineCues.length
+      : 0;
+    chips.push(
+      audioCueCount
+        ? { value: audioCueCount, label: "句原声切片" }
+        : { value: "TTS", label: "原声缺失时浏览器朗读" },
+    );
     elements.heroStats.replaceChildren(
       ...chips.map((chip) => createStat(chip.value, chip.label)),
     );
@@ -754,7 +1067,10 @@
     showLoading(meta);
 
     try {
-      const data = await loadEpisodeScript(id);
+      const [data] = await Promise.all([
+        loadEpisodeScript(id),
+        loadAudioManifest(id),
+      ]);
       if (state.episodeId !== id) {
         return;
       }
@@ -822,9 +1138,88 @@
     }
   }
 
+  function getVocabLevelWeight(levels) {
+    if (levels.includes("考研")) {
+      return 3;
+    }
+    if (levels.includes("六级")) {
+      return 2;
+    }
+    if (levels.includes("四级")) {
+      return 1;
+    }
+    return 0;
+  }
+
+  async function buildSentenceVocabulary() {
+    const index = window.VocabIndex;
+    if (!index || typeof index.lookup !== "function" || !state.wordLevels.size) {
+      state.sentenceVocab = new Map();
+      state.sentenceVocabReady = false;
+      return;
+    }
+
+    const vocabulary = new Map();
+    const pending = [];
+
+    state.segmentOrder.forEach((view) => {
+      const seen = new Set();
+      const records = [];
+      tokenizeWords(view.english).forEach((token) => {
+        const key = normalizeWord(token);
+        if (!key || seen.has(key)) {
+          return;
+        }
+        seen.add(key);
+        const levels = state.wordLevels.get(key) || [];
+        if (!levels.length) {
+          return;
+        }
+        const record = {
+          word: token,
+          key,
+          phonetic: "",
+          meaning: "",
+          levels,
+          wordId: makeWordId(token, view.english),
+        };
+        records.push(record);
+        pending.push(
+          Promise.resolve(index.lookup(token))
+            .catch(() => null)
+            .then((entry) => {
+              if (!entry) {
+                return;
+              }
+              record.phonetic = cleanPhonetic(entry.phonetic);
+              record.meaning = String(entry.meaning || "").trim();
+            }),
+        );
+      });
+
+      records.sort(
+        (left, right) =>
+          getVocabLevelWeight(right.levels) -
+            getVocabLevelWeight(left.levels) ||
+          left.word.localeCompare(right.word),
+      );
+      vocabulary.set(view.id, records.slice(0, 10));
+    });
+
+    if (pending.length) {
+      await Promise.all(pending);
+    }
+    state.sentenceVocab = vocabulary;
+    state.sentenceVocabReady = true;
+  }
+
   async function refreshIndices() {
     const run = ++state.indexRun;
     await Promise.all([loadCollocations(), loadWordLevels()]);
+    if (run !== state.indexRun) {
+      return;
+    }
+    await buildSentenceVocabulary();
     if (run !== state.indexRun) {
       return;
     }
@@ -1068,10 +1463,7 @@
       `播放 ${scene.title || `场景 ${index + 1}`} 的英文台词`,
     );
     playButton.addEventListener("click", () => {
-      playTexts(
-        views.flatMap((view) => view.blocks.map((block) => block.text)),
-        playButton,
-      );
+      playSceneEnglish(views, playButton);
     });
 
     head.append(copy, playButton);
@@ -1137,6 +1529,11 @@
       body.append(grammarNotes);
     }
 
+    const sentenceVocab = createSentenceVocabBlock(view);
+    if (sentenceVocab) {
+      body.append(sentenceVocab);
+    }
+
     const foot = document.createElement("div");
     foot.className = "movie-line-foot";
 
@@ -1162,10 +1559,7 @@
     playButton.textContent = "播放";
     playButton.setAttribute("aria-label", `播放第 ${view.number} 句英文`);
     playButton.addEventListener("click", () => {
-      playTexts(
-        view.blocks.map((block) => block.text),
-        playButton,
-      );
+      playSegmentEnglish(view, playButton);
     });
     foot.append(playButton);
 
@@ -1293,6 +1687,74 @@
     });
 
     return row;
+  }
+
+  function createSentenceVocabBlock(view) {
+    if (!state.sentenceVocabReady) {
+      return null;
+    }
+    const entries = state.sentenceVocab.get(view.id) || [];
+    if (!entries.length) {
+      return null;
+    }
+
+    const block = document.createElement("div");
+    block.className = "movie-sentence-vocab";
+
+    const label = document.createElement("span");
+    label.className = "movie-sentence-vocab-label";
+    label.textContent = `本句词汇 ${entries.length}`;
+    block.append(label);
+
+    const list = document.createElement("div");
+    list.className = "movie-sentence-vocab-list";
+
+    entries.forEach((entry) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "sentence-vocab-chip";
+      button.dataset.word = entry.word;
+      button.dataset.segmentId = view.id;
+      button.dataset.wordId = entry.wordId;
+
+      const head = document.createElement("span");
+      head.className = "sentence-vocab-head";
+
+      const word = document.createElement("strong");
+      word.lang = "en";
+      word.textContent = entry.word;
+      head.append(word);
+
+      const levels = createPhraseLevelBadges(entry.levels);
+      if (levels) {
+        head.append(levels);
+      }
+
+      if (entry.phonetic) {
+        const phonetic = document.createElement("small");
+        phonetic.className = "sentence-vocab-phonetic";
+        phonetic.lang = "en";
+        phonetic.textContent = entry.phonetic;
+        head.append(phonetic);
+      }
+      button.append(head);
+
+      if (entry.meaning) {
+        const meaning = document.createElement("span");
+        meaning.className = "sentence-vocab-meaning";
+        meaning.textContent = entry.meaning.slice(0, 90);
+        button.append(meaning);
+      }
+
+      button.setAttribute(
+        "aria-label",
+        `查看 ${entry.word} 的释义与固定搭配`,
+      );
+      list.append(button);
+    });
+
+    block.append(list);
+    return block;
   }
 
   function createGrammarNotes(view) {
@@ -1428,11 +1890,13 @@
 
   function updateTokenMarks() {
     const documentId = getMovieDocumentId();
-    elements.content?.querySelectorAll(".word-token").forEach((token) => {
-      const key = getItemKey(documentId, { id: token.dataset.wordId });
-      token.classList.toggle("is-unknown-token", state.unknown.has(key));
-      token.classList.toggle("is-known-token", state.known.has(key));
-    });
+    elements.content
+      ?.querySelectorAll(".word-token, .sentence-vocab-chip")
+      .forEach((token) => {
+        const key = getItemKey(documentId, { id: token.dataset.wordId });
+        token.classList.toggle("is-unknown-token", state.unknown.has(key));
+        token.classList.toggle("is-known-token", state.known.has(key));
+      });
     updateNavigationCounts();
   }
 
@@ -2038,11 +2502,36 @@
       renderPagePreservingScroll();
     });
 
+    elements.sentenceVocabToggleButton?.addEventListener("click", () => {
+      setSentenceVocabVisibility(!state.showSentenceVocab);
+    });
+
     elements.alternativeToggleButton?.addEventListener("click", () => {
       setAlternativeVisibility(!state.showAlternatives);
     });
 
     elements.readAllButton?.addEventListener("click", () => {
+      const lineCues = state.segmentOrder.flatMap(findAudioCues);
+      const lineCount = state.segmentOrder.reduce(
+        (total, view) =>
+          total + (Array.isArray(view.blocks) ? view.blocks.length : 0),
+        0,
+      );
+      if (
+        lineCues.length &&
+        lineCues.length === lineCount &&
+        playAudioCues(lineCues, elements.readAllButton)
+      ) {
+        return;
+      }
+      const cues = state.segmentOrder.map(findAudioCue).filter(Boolean);
+      if (
+        cues.length &&
+        cues.length === state.segmentOrder.length &&
+        playAudioCues(cues, elements.readAllButton)
+      ) {
+        return;
+      }
       playSequence(
         state.segmentOrder.flatMap((view) =>
           view.blocks.map((block) => block.text),
@@ -2079,6 +2568,7 @@
 
     setDisplayMode(readStoredValue(DISPLAY_STORAGE_KEY) || "bilingual");
     setLevelVisibility(state.showLevels);
+    setSentenceVocabVisibility(state.showSentenceVocab);
     setAlternativeVisibility(state.showAlternatives);
     updateReadAllButton();
     updateReadingProgress();

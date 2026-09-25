@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b2925" />
+    <meta
+      name="description"
+      content="六级备考总览：阅读全文精读、听力全文精读、翻译写作精读三大板块，逐句对照翻译、点词查义、按套懒加载。"
+    />
+    <title>六级备考总览 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./cet6.css" />
+    <script src="./deck-data.js" defer></script>
+  </head>
+  <body class="cet6-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./kaoyan.html">考研英语</a>
+        <a class="topbar-link topbar-link-extra" href="./periodical.html">
+          外刊精读
+        </a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>六级备考</strong>
+          <small>CET-6 CABIN</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./reading-intensive.html">
+        四级精读
+      </a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">CET-6 · READING / LISTENING / WRITING</p>
+            <h1 id="pageTitle">六级备考总览</h1>
+            <p class="hero-description">
+              阅读、听力、翻译与写作四大题型各自成页，全部按套懒加载：进入页面只取当前这一套，点任意单词即可查释义、看固定搭配、标记生词，
+              再回素材库用卡片复习。
+            </p>
+            <div class="hero-stats" aria-label="六级内容统计">
+              <span class="stat-chip"><strong>70</strong><span>套阅读</span></span>
+              <span class="stat-chip"><strong>49</strong><span>套听力</span></span>
+              <span class="stat-chip"><strong>76</strong><span>套翻译写作</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cet6-hub" aria-labelledby="cet6HubTitle">
+        <h2 id="cet6HubTitle">选一个板块开始</h2>
+        <p>
+          三个板块共用同一套生词卡组与「不会 / 掌握」标记，手机端可以直接滑动复习。
+        </p>
+        <div class="cet6-hub-grid">
+          <a class="cet6-hub-card" href="./cet6-reading.html">
+            <span class="cet6-hub-card-badge" aria-hidden="true">阅</span>
+            <strong>六级阅读全文精读</strong>
+            <span>2015-2026 共 70 套：仔细阅读、段落匹配、选词填空，逐段对照译文与答案位置。</span>
+          </a>
+          <a class="cet6-hub-card is-accent" href="./cet6-listening.html">
+            <span class="cet6-hub-card-badge" aria-hidden="true">听</span>
+            <strong>六级听力全文精读</strong>
+            <span>49 套听力原文逐段翻译，标注出题点与答案位置，可整篇朗读跟听。</span>
+          </a>
+          <a class="cet6-hub-card is-warm" href="./cet6-extra.html">
+            <span class="cet6-hub-card-badge" aria-hidden="true">译</span>
+            <strong>六级翻译写作精读</strong>
+            <span>76 套段落翻译与作文：逐句拆解、参考译文、提纲、范文、评分要点与草稿本。</span>
+          </a>
+          <a class="cet6-hub-card" href="./index.html">
+            <span class="cet6-hub-card-badge" aria-hidden="true">卡</span>
+            <strong>回素材库复习生词</strong>
+            <span>精读时标记的六级生词会自动进入卡组，按不会 / 掌握分组滚动复习。</span>
+          </a>
+        </div>
+        <div class="cet6-hub-stats">
+          <span class="cet6-hub-stat"><strong>279</strong> 篇阅读文章</span>
+          <span class="cet6-hub-stat"><strong>2090</strong> 道阅读题</span>
+          <span class="cet6-hub-stat"><strong>343</strong> 篇听力原文</span>
+          <span class="cet6-hub-stat"><strong>1225</strong> 道听力题</span>
+          <span class="cet6-hub-stat"><strong>逐句</strong> 点词查义</span>
+        </div>
+      </section>
+
+      <section class="cet6-os" aria-labelledby="cet6CreditsTitle">
+        <h2 id="cet6CreditsTitle">数据来源与开源思路借鉴</h2>
+        <p>
+          六级真题原文、答案与译文来自本机 <code>kaoyan-english</code> 与
+          <code>gbro-series-vocab</code> 技能使用的公开真题语料；站点结构、按套懒加载、
+          按句学词与生词卡组设计参考了下列开源项目的公开做法，只借鉴思路与数据结构，
+          未复制其受版权保护的正文内容。
+        </p>
+        <ul class="cet6-os-list">
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/3056810551/cet-listening" target="_blank" rel="noopener noreferrer">3056810551/cet-listening</a>
+            </strong>
+            <em>MIT</em>
+            <span>四六级听力原文的整理方式与段落切分粒度，用于本站听力板块的逐段对照结构。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/hezkvectory/hermes-edu-skills" target="_blank" rel="noopener noreferrer">hezkvectory/hermes-edu-skills</a>
+            </strong>
+            <em>MIT</em>
+            <span>把考试题型拆成可复用 skill 的组织方式，用于本模块「阅读 / 听力 / 翻译写作」的板块划分。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/alei37/dsh-cet6-tutor" target="_blank" rel="noopener noreferrer">alei37/dsh-cet6-tutor</a>
+            </strong>
+            <em>AGPL-3.0 · 仅借鉴思路，未引入其代码</em>
+            <span>六级辅导问答的提示词组织与错题复盘流程。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>Drhm1224/cet6-all-in-one</strong>
+            <em>无 License · 仅借鉴架构思路</em>
+            <span>一体化六级备考工具的信息架构：题库、生词、复盘集中在一处。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>gaoge1314/cet6-reading-companion</strong>
+            <em>无 License · 仅借鉴架构思路</em>
+            <span>阅读陪练页面的交互分层：原文、题目、解析分开呈现。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/Liuxiangjian-ai/cet-skill" target="_blank" rel="noopener noreferrer">Liuxiangjian-ai/cet-skill</a>
+            </strong>
+            <em>MIT</em>
+            <span>把四六级真题按年份逐条拆成 skill 的知识组织方式，与考研页共用同一套复盘清单。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/shadcn-ui/ui" target="_blank" rel="noopener noreferrer">shadcn-ui/ui</a>
+            </strong>
+            <em>MIT · 仅借鉴设计规范</em>
+            <span>组件默认值与键盘可访问性的做法：可见焦点环、足够对比度、克制的圆角，用于本站筛选器、选项按钮与卡片状态样式。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/VoltAgent/awesome-design-md" target="_blank" rel="noopener noreferrer">VoltAgent/awesome-design-md</a>
+            </strong>
+            <em>MIT · 仅借鉴设计规范</em>
+            <span>把一套设计体系写成规范文档再落地到页面的做法，用于统一本站的颜色、间距与信息层级。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill" target="_blank" rel="noopener noreferrer">nextlevelbuilder/ui-ux-pro-max-skill</a>
+            </strong>
+            <em>MIT · 仅借鉴检查清单</em>
+            <span>把 UI/UX 检查清单封装成可复用 skill 的组织方式，用于本站改版前逐页做视觉自查。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/2ndLA/english-phrases" target="_blank" rel="noopener noreferrer">2ndLA/english-phrases</a>
+            </strong>
+            <em>CC-BY-SA-4.0</em>
+            <span>固定搭配与短语表，站点词库脚本 <code>scripts/build-vocabulary-library.mjs</code> 已在用。</span>
+          </li>
+          <li class="cet6-os-item">
+            <strong>
+              <a href="https://github.com/Benature/WordReview" target="_blank" rel="noopener noreferrer">Benature/WordReview</a>
+            </strong>
+            <em>LGPL-3.0</em>
+            <span>网页背单词的「不会 / 掌握」标记与卡组联动设计。</span>
+          </li>
+        </ul>
+        <p class="cet6-os-warn">
+          作文素材说明：此前提供的三个百度网盘分享（
+          <code>1xPlY6BPtsjusXa4bFWqxfQ</code>、<code>1dfhHIFjB9KYLTbb_dOUuxA</code>、
+          <code>1I-H3GWCG-cXQ_WCimPgybQ</code>，提取码均为 <code>iq7m</code>）里的 5 份考研英语一作文模板
+          （使用方法、万能模板1 大小作文、大小作文资料）已下载并接入站点素材库，在「素材库 → 考研 → 作文模板」
+          可以直接下载原件；站内只做保存与索引，不改写其中的模板内容。
+          翻译写作板块目前使用公开真题题干与配套范文，思路组织参考了上面列出的开源项目与本地
+          <code>kaoyan-english</code> 作文批改 skill。
+        </p>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

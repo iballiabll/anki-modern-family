@@ -1,7 +1,9 @@
-// Builds the 四级阅读精读 library from the public CET-4 reading pages.
-// Sources: /cet4/sections/{paperId}/{part3-section-a|b|c}/
+// Builds the 四级/六级阅读精读 library from the public reading study pages.
+// Sources: /{cet4|cet6}/sections/{paperId}/{part3-section-a|b|c}/
 // Usage: node scripts/build-reading-library.mjs [paperId ...]
 //        node scripts/build-reading-library.mjs --probe 2022-06-1
+//        node scripts/build-reading-library.mjs --level cet6
+//        node scripts/build-reading-library.mjs --level cet6 --probe 2024-06-1
 
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
@@ -9,20 +11,68 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const outputDir = path.join(root, "reading-data");
-const manifestPath = path.join(root, "reading-papers.js");
 const cacheDir = path.join(root, ".cache", "reading-source");
 const ORIGIN = "https://english-exam.lazynote.cn";
 const USER_AGENT = "Mozilla/5.0 (compatible; iball-cabin reading builder)";
 const builtPapers = new Map();
-const MIN_YEAR = 2022;
-const MAX_YEAR = 2026;
 
-const INDEX_PAGES = {
-  careful: "/cet4/sections/reading/",
-  matching: "/cet4/sections/long-reading/",
-  cloze: "/cet4/sections/banked-cloze/",
+// 四级/六级共用同一套解析器，只有路径、年份范围与输出文件不同。
+const LEVELS = {
+  cet4: {
+    key: "cet4",
+    label: "四级",
+    root: "/cet4",
+    outputDir: path.join(root, "reading-data"),
+    fileDir: "./reading-data/",
+    manifestPath: path.join(root, "reading-papers.js"),
+    papersVar: "IBALL_READING_PAPERS",
+    libraryVar: "IBALL_READING_LIBRARY",
+    minYear: 2022,
+    maxYear: 2026,
+    indexPages: {
+      careful: "/cet4/sections/reading/",
+      matching: "/cet4/sections/long-reading/",
+      cloze: "/cet4/sections/banked-cloze/",
+    },
+  },
+  cet6: {
+    key: "cet6",
+    label: "六级",
+    root: "/cet6",
+    outputDir: path.join(root, "cet6-data"),
+    fileDir: "./cet6-data/",
+    manifestPath: path.join(root, "cet6-papers.js"),
+    papersVar: "IBALL_CET6_READING_PAPERS",
+    libraryVar: "IBALL_CET6_READING_LIBRARY",
+    minYear: 2015,
+    maxYear: 2026,
+    indexPages: {
+      careful: "/cet6/sections/reading/",
+      matching: "/cet6/sections/long-reading/",
+      cloze: "/cet6/sections/banked-cloze/",
+    },
+  },
 };
+
+let LEVEL = LEVELS.cet4;
+let MIN_YEAR = LEVEL.minYear;
+let MAX_YEAR = LEVEL.maxYear;
+let outputDir = LEVEL.outputDir;
+let manifestPath = LEVEL.manifestPath;
+let INDEX_PAGES = LEVEL.indexPages;
+
+function useLevel(key) {
+  const config = LEVELS[key];
+  if (!config) {
+    throw new Error(`Unknown level: ${key} (expected cet4 or cet6)`);
+  }
+  LEVEL = config;
+  MIN_YEAR = config.minYear;
+  MAX_YEAR = config.maxYear;
+  outputDir = config.outputDir;
+  manifestPath = config.manifestPath;
+  INDEX_PAGES = config.indexPages;
+}
 
 // Fallback map used when the index pages cannot be fetched.
 const FALLBACK_PAPERS = {
@@ -419,7 +469,9 @@ function parseQuestionUnit(html) {
 
   const pairs = [];
   const pairsList = /<ul class="rp-pairs[^"]*"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] || "";
-  for (const item of splitBlocks(pairsList, /<li class="rp-pair"/)) {
+  // 源站有两套写法：新版外层是 <li class="rp-pair-group">（内嵌 div.rp-pair），
+  // 旧版直接是 <li class="rp-pair">。只匹配其中一种会漏掉另一批题的改写对。
+  for (const item of splitBlocks(pairsList, /<li class="rp-pair(-group)?"/)) {
     const origin = pickText(
       item.html,
       /<span class="rp-pair-orig"[^>]*>([\s\S]*?)<\/span>/,
@@ -457,7 +509,7 @@ function parseQuestionUnit(html) {
     const itemPairs = [];
     const pairList =
       /<ul class="rp-pairs[^"]*"[^>]*>([\s\S]*?)<\/ul>/.exec(item.html)?.[1] || "";
-    for (const pair of splitBlocks(pairList, /<li class="rp-pair"/)) {
+    for (const pair of splitBlocks(pairList, /<li class="rp-pair(-group)?"/)) {
       const origin = pickText(
         pair.html,
         /<span class="rp-pair-orig"[^>]*>([\s\S]*?)<\/span>/,
@@ -494,6 +546,10 @@ function parseQuestionUnit(html) {
       distractors.push({ letter, reason, source: sourceText });
     }
   }
+
+  // 有些题源站只给定位/改写，整题没有任何 rp-disc 区块。这种情况如实标记为
+  // “源站未提供辨邻项”，避免和解析遗漏混为一谈。
+  const distractorGap = distractors.length === 0 && !/rp-disc/.test(html);
 
   for (const row of splitBlocks(html, /<div class="rp-row"/)) {
     const label = pickText(
@@ -561,6 +617,7 @@ function parseQuestionUnit(html) {
     pairs,
     verdicts,
     distractors,
+    distractorGap,
     notes,
     rivals,
   };
@@ -637,6 +694,7 @@ function parseMatchingPage(source, { paperId, slug }) {
       locate: unit.parsed.locate,
       pairs: unit.parsed.pairs,
       distractors: unit.parsed.distractors,
+      distractorGap: unit.parsed.distractorGap === true,
       notes: unit.parsed.notes,
     }))
     .filter((question) => question.stem);
@@ -728,8 +786,11 @@ function parseClozePage(source, { paperId, slug }) {
   });
 
   const wordBank = [];
+  // 词库条目的字母有的页写成「A)」有的写成「A」（2024-12-1 起出现无括号形态），
+  // 所以括号可省；第二个 span 允许带样式属性，但显式排除卷面选项用的
+  // data-pdh-letter 标，否则会把 A–D 的选项正文误当词库。
   const bankPattern =
-    /<span class="select-none"[^>]*>([A-O])\)<\/span>\s*<span>([^<]*)<\/span>/g;
+    /<span class="select-none"[^>]*>([A-O])\)?<\/span>\s*<span(?:\s(?!data-pdh-letter)[^>]*)?>([^<]*)<\/span>/g;
   for (const match of clean.matchAll(bankPattern)) {
     const word = cleanHtml(match[2]);
     if (word && !wordBank.some((item) => item.letter === match[1])) {
@@ -785,6 +846,9 @@ function parseClozePage(source, { paperId, slug }) {
 
 async function discoverPapers() {
   const map = new Map();
+  const fallbackPapers = LEVEL.key === "cet4" ? FALLBACK_PAPERS : {};
+  // 只有索引页读成功时，才能断定“这一套没有这个题型”。
+  const indexOk = { careful: false, matching: false, cloze: false };
   const ensure = (paperId) => {
     if (!map.has(paperId)) {
       map.set(paperId, { careful: [], matching: [], cloze: [] });
@@ -796,11 +860,15 @@ async function discoverPapers() {
     let html = "";
     try {
       html = await fetchPage(`${ORIGIN}${page}`);
+      indexOk[kind] = true;
     } catch (error) {
       console.warn(`Index ${page} unavailable: ${error.message}`);
       continue;
     }
-    const pattern = /\/cet4\/sections\/(\d{4}-\d{2}-\d+)\/([a-z0-9-]+)\//g;
+    const pattern = new RegExp(
+      `\\${LEVEL.root}\\/sections\\/(\\d{4}-\\d{2}-\\d+)\\/([a-z0-9-]+)\\/`,
+      "g",
+    );
     for (const match of html.matchAll(pattern)) {
       const paperId = match[1];
       const slug = match[2];
@@ -825,25 +893,38 @@ async function discoverPapers() {
   }
 
   const papers = [];
-  const ids = new Set([...map.keys(), ...Object.keys(FALLBACK_PAPERS)]);
+  const ids = new Set([...map.keys(), ...Object.keys(fallbackPapers)]);
   for (const paperId of ids) {
     const { year, month, set } = parsePaperId(paperId);
     if (year < MIN_YEAR || year > MAX_YEAR) {
       continue;
     }
     const discovered = map.get(paperId) || {};
-    const fallback = FALLBACK_PAPERS[paperId] || {};
+    const fallback = fallbackPapers[paperId] || {};
     const careful = (discovered.careful?.length
       ? discovered.careful
       : fallback.careful || []
     ).sort();
-    const matching = discovered.matching?.length
-      ? discovered.matching
-      : fallback.matching || ["part3-section-b"];
-    const cloze = discovered.cloze?.length
-      ? discovered.cloze
-      : fallback.cloze || ["part3-section-a"];
-    papers.push({ id: paperId, year, month, set, careful, matching, cloze });
+    const missing = [];
+    const resolveKind = (kind, conventionalSlug) => {
+      const found = discovered[kind]?.length ? discovered[kind] : fallback[kind] || [];
+      if (found.length) {
+        return found;
+      }
+      if (indexOk[kind]) {
+        // 索引页明确列过这一套的其它文章，却没有这一题型：如实记录源站缺口。
+        missing.push(PIECE_TYPE[kind].type);
+        return [];
+      }
+      // 索引页本身没取到，保留传统链接兜底，避免网络波动时整块丢失。
+      return conventionalSlug ? [conventionalSlug] : [];
+    };
+    const matching = resolveKind("matching", "part3-section-b");
+    const cloze = resolveKind("cloze", "part3-section-a");
+    if (!careful.length && indexOk.careful) {
+      missing.push(PIECE_TYPE.careful.type);
+    }
+    papers.push({ id: paperId, year, month, set, careful, matching, cloze, missing });
   }
   papers.sort((left, right) => right.id.localeCompare(left.id));
   return papers;
@@ -881,7 +962,7 @@ function countStats(pieces) {
 }
 
 async function buildPiece(paperId, kind, slug, index) {
-  const url = `${ORIGIN}/cet4/sections/${paperId}/${slug}/`;
+  const url = `${ORIGIN}${LEVEL.root}/sections/${paperId}/${slug}/`;
   const source = await fetchPage(url);
   const parsed =
     kind === "careful"
@@ -941,21 +1022,22 @@ async function buildPaper(paper, { useCache }) {
     meta: {
       id: paper.id,
       label: `${paper.year} 年 ${paper.month} 月 · 第 ${paper.set} 套`,
-      title: `${paper.year} 年 ${paper.month} 月四级阅读第 ${paper.set} 套`,
+      title: `${paper.year} 年 ${paper.month} 月${LEVEL.label}阅读第 ${paper.set} 套`,
       subtitle:
         "选词填空、段落匹配、仔细阅读全题型：逐段中英对照、考点位置提醒、逐题解析与同义替换。",
       year: paper.year,
       month: paper.month,
       set: paper.set,
-      sourceUrl: `${ORIGIN}/cet4/sections/reading/`,
+      sourceUrl: `${ORIGIN}${LEVEL.indexPages.careful}`,
       generatedAt: new Date().toISOString().slice(0, 10),
       pieceCount: pieces.length,
+      missing: paper.missing || [],
       ...stats,
     },
     pieces,
   };
 
-  const output = `// Generated by scripts/build-reading-library.mjs from public CET-4 reading study pages.\n(window.IBALL_READING_LIBRARY = window.IBALL_READING_LIBRARY || {})[${JSON.stringify(
+  const output = `// Generated by scripts/build-reading-library.mjs from public ${LEVEL.label} reading study pages.\n(window.${LEVEL.libraryVar} = window.${LEVEL.libraryVar} || {})[${JSON.stringify(
     paper.id,
   )}] = ${JSON.stringify(data, null, 2)};\n`;
   await fs.writeFile(path.join(outputDir, `${paper.id}.js`), output, "utf8");
@@ -967,8 +1049,9 @@ async function buildPaper(paper, { useCache }) {
     year: paper.year,
     month: paper.month,
     set: paper.set,
-    file: `./reading-data/${paper.id}.js`,
+    file: `${LEVEL.fileDir}${paper.id}.js`,
     pieceCount: pieces.length,
+    missing: paper.missing || [],
     types: pieces.map((piece) => ({
       kind: piece.kind,
       index: piece.index,
@@ -982,7 +1065,7 @@ async function buildPaper(paper, { useCache }) {
 
 async function buildPieceWithCache(paperId, kind, slug, index, useCache) {
   if (!useCache) {
-    const url = `${ORIGIN}/cet4/sections/${paperId}/${slug}/`;
+    const url = `${ORIGIN}${LEVEL.root}/sections/${paperId}/${slug}/`;
     await fs.rm(cachePathFor(url), { force: true });
   }
   return buildPiece(paperId, kind, slug, index);
@@ -1007,6 +1090,11 @@ async function mapLimit(items, limit, worker) {
 const args = process.argv.slice(2);
 const probe = args.includes("--probe");
 const noCache = args.includes("--refresh");
+const levelIndex = args.indexOf("--level");
+if (levelIndex !== -1) {
+  useLevel(args[levelIndex + 1]);
+  args.splice(levelIndex, 2);
+}
 const requested = args.filter((arg) => !arg.startsWith("--"));
 
 await fs.mkdir(outputDir, { recursive: true });
@@ -1023,7 +1111,7 @@ if (!papers.length) {
 }
 
 console.log(
-  `Building ${papers.length} reading paper(s) across ${MIN_YEAR}-${MAX_YEAR}...`,
+  `Building ${papers.length} ${LEVEL.label} reading paper(s) across ${MIN_YEAR}-${MAX_YEAR}...`,
 );
 
 const summary = [];
@@ -1079,7 +1167,7 @@ if (probe) {
 }
 
 summary.sort((left, right) => right.id.localeCompare(left.id));
-const manifest = `// Generated by scripts/build-reading-library.mjs\nwindow.IBALL_READING_PAPERS = ${JSON.stringify(
+const manifest = `// Generated by scripts/build-reading-library.mjs\nwindow.${LEVEL.papersVar} = ${JSON.stringify(
   summary,
   null,
   2,
@@ -1088,7 +1176,7 @@ const manifest = `// Generated by scripts/build-reading-library.mjs\nwindow.IBAL
 if (!requested.length) {
   await fs.writeFile(manifestPath, manifest, "utf8");
   console.log(
-    `\nWrote ${summary.length} papers to ${path.relative(root, outputDir)} and updated reading-papers.js.`,
+    `\nWrote ${summary.length} papers to ${path.relative(root, outputDir)} and updated ${path.relative(root, manifestPath)}.`,
   );
 } else {
   console.log(

@@ -37,7 +37,16 @@ const PRACTICE_SETTINGS_STORAGE_KEY =
 const WELCOME_OVERLAY_STORAGE_KEY = "iball-listening-cabin-welcome-seen";
 const COLLAPSED_CATEGORIES_STORAGE_KEY =
   "iball-listening-cabin-collapsed-categories";
-const CATEGORY_ORDER = ["0基础", "四级", "六级", "考研", "电影", "其他"];
+const CATEGORY_ORDER = [
+  "0基础",
+  "四级",
+  "六级",
+  "考研",
+  "外刊",
+  "电影",
+  "其他",
+];
+const VIRTUAL_CATEGORY_NAMES = ["外刊"];
 const LARGE_DECK_UNIT_THRESHOLD = 300;
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
 const INTENSIVE_ENTRY_SEARCH_TEXT =
@@ -45,9 +54,21 @@ const INTENSIVE_ENTRY_SEARCH_TEXT =
 const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
 const READING_ENTRY_SEARCH_TEXT =
   "上传四六级考研题目翻译阅读背单词真题精读";
-const READING_INTENSIVE_ENTRY_CATEGORIES = ["四级"];
+const READING_INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级"];
 const READING_INTENSIVE_ENTRY_SEARCH_TEXT =
-  "四级阅读全文精读仔细阅读段落匹配选词填空完形翻译解析技巧替换词固定搭配2022至2026真题";
+  "四六级阅读全文精读仔细阅读段落匹配选词填空完形翻译解析技巧替换词固定搭配2022至2026真题";
+const CET6_ENTRY_CATEGORIES = ["六级"];
+const CET6_ENTRY_SEARCH_TEXT =
+  "六级备考总览阅读听力翻译写作作文范文逐句精读真题点词生词按套懒加载";
+const CET6_EXTRA_ENTRY_CATEGORIES = ["六级"];
+const CET6_EXTRA_ENTRY_SEARCH_TEXT =
+  "六级翻译写作作文范文提纲评分要点逐句拆解参考译文段落翻译2015至2026";
+const KAOYAN_ENTRY_CATEGORIES = ["考研"];
+const KAOYAN_ENTRY_SEARCH_TEXT =
+  "考研英语一二真题精读阅读完形新题型翻译写作作文模板解析2010至2026";
+const PERIODICAL_ENTRY_CATEGORIES = ["外刊"];
+const PERIODICAL_ENTRY_SEARCH_TEXT =
+  "外刊经济学人卫报巴伦周刊精读原文检验题完形新题型答疑杂志排版生词时间轴主题导引50期";
 const AMERICAN_VOICE_NAMES = {
   female: [
     "aria",
@@ -6169,6 +6190,8 @@ function getCategoryDefinitions() {
     ]);
   });
 
+  VIRTUAL_CATEGORY_NAMES.forEach((name) => registerCategory(name));
+
   return [...categories.entries()]
     .sort(([left], [right]) => compareCategoryNames(left, right))
     .map(([name, sections]) => ({
@@ -7095,6 +7118,39 @@ function matchesReadingIntensiveEntryQuery(query) {
   return Boolean(compactQuery) && searchable.includes(compactQuery);
 }
 
+function matchesKaoyanEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(KAOYAN_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesCet6EntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(CET6_ENTRY_SEARCH_TEXT).replace(/\s+/g, "");
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesCet6ExtraEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(CET6_EXTRA_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
+function matchesPeriodicalEntryQuery(query) {
+  const compactQuery = normalizeText(query).replace(/\s+/g, "");
+  const searchable = normalizeText(PERIODICAL_ENTRY_SEARCH_TEXT).replace(
+    /\s+/g,
+    "",
+  );
+  return Boolean(compactQuery) && searchable.includes(compactQuery);
+}
+
 function createReadingEntry(categoryName) {
   const link = document.createElement("a");
   link.className = "resource-button is-reading-entry";
@@ -7132,9 +7188,22 @@ function createReadingEntry(categoryName) {
 
 function createIntensiveEntry(categoryName) {
   const isMovie = categoryName === "电影";
+  const isCet6 = categoryName === "六级";
+  const intensivePaperCount =
+    window.IBALL_INTENSIVE_PAPERS?.length > 0
+      ? window.IBALL_INTENSIVE_PAPERS.length
+      : 19;
+  const cet6ListeningCount =
+    window.IBALL_CET6_LISTENING_PAPERS?.length > 0
+      ? window.IBALL_CET6_LISTENING_PAPERS.length
+      : 49;
   const link = document.createElement("a");
   link.className = "resource-button is-intensive-entry";
-  link.href = isMovie ? "./movie.html" : "./intensive.html";
+  link.href = isMovie
+    ? "./movie.html"
+    : isCet6
+      ? "./cet6-listening.html"
+      : "./intensive.html";
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.dataset.intensiveEntry = categoryName;
@@ -7142,13 +7211,15 @@ function createIntensiveEntry(categoryName) {
     "aria-label",
     isMovie
       ? `打开美剧台词精读、逐句精翻与固定搭配，位于${categoryName}分类`
-      : `打开四级听力全文翻译、出题点与语法精读，位于${categoryName}分类`,
+      : isCet6
+        ? `打开六级听力全文翻译、出题点与逐段精读，位于${categoryName}分类`
+        : `打开四级听力全文翻译、出题点与语法精读，位于${categoryName}分类`,
   );
 
   const badge = document.createElement("span");
   badge.className = "resource-index";
   badge.setAttribute("aria-hidden", "true");
-  badge.textContent = isMovie ? "剧" : "精";
+  badge.textContent = isMovie ? "剧" : isCet6 ? "听" : "精";
 
   const copy = document.createElement("span");
   copy.className = "resource-copy";
@@ -7156,12 +7227,16 @@ function createIntensiveEntry(categoryName) {
   const title = document.createElement("strong");
   title.textContent = isMovie
     ? "美剧台词逐句精读"
-    : "四级听力全文翻译 + 出题点精读";
+    : isCet6
+      ? "六级听力全文精读"
+      : "四级听力全文翻译 + 出题点精读";
 
   const meta = document.createElement("span");
   meta.textContent = isMovie
     ? "摩登家庭 S01E01 · 逐句精翻 · 考试词与固定搭配"
-    : "2022-2026 年共 14 套 · 逐句翻译 · 答案位置提示";
+    : isCet6
+      ? `2015-2026 年已收录 ${cet6ListeningCount} 套 · 逐段翻译 · 出题点提示`
+      : `2022-2026 年已收录 ${intensivePaperCount} 套 · 逐句翻译 · 答案位置提示`;
 
   const count = document.createElement("span");
   count.className = "resource-count";
@@ -7173,15 +7248,24 @@ function createIntensiveEntry(categoryName) {
 }
 
 function createReadingIntensiveEntry(categoryName) {
+  const isCet6 = categoryName === "六级";
+  const readingPaperCount =
+    window.IBALL_READING_PAPERS?.length > 0
+      ? window.IBALL_READING_PAPERS.length
+      : 28;
+  const cet6ReadingCount =
+    window.IBALL_CET6_READING_PAPERS?.length > 0
+      ? window.IBALL_CET6_READING_PAPERS.length
+      : 70;
   const link = document.createElement("a");
   link.className = "resource-button is-reading-intensive-entry";
-  link.href = "./reading-intensive.html";
+  link.href = isCet6 ? "./cet6-reading.html" : "./reading-intensive.html";
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.dataset.readingIntensiveEntry = categoryName;
   link.setAttribute(
     "aria-label",
-    `打开四级阅读全文精读、逐段翻译与答案位置提示，位于${categoryName}分类`,
+    `打开${isCet6 ? "六级" : "四级"}阅读全文精读、逐段翻译与答案位置提示，位于${categoryName}分类`,
   );
 
   const badge = document.createElement("span");
@@ -7193,10 +7277,159 @@ function createReadingIntensiveEntry(categoryName) {
   copy.className = "resource-copy";
 
   const title = document.createElement("strong");
-  title.textContent = "四级阅读全文精读";
+  title.textContent = isCet6 ? "六级阅读全文精读" : "四级阅读全文精读";
 
   const meta = document.createElement("span");
-  meta.textContent = "2022-2026 年共 28 套 · 仔细阅读 / 段落匹配 / 选词填空";
+  meta.textContent = isCet6
+    ? `2015-2026 年已收录 ${cet6ReadingCount} 套 · 仔细阅读 / 段落匹配 / 选词填空`
+    : `2022-2026 年已收录 ${readingPaperCount} 套 · 仔细阅读 / 段落匹配 / 选词填空`;
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createKaoyanEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-kaoyan-entry";
+  link.href = "./kaoyan.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.kaoyanEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开考研英语一/二真题精读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "研";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "考研英语一/二真题精读";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "2010-2026 · 阅读 / 完形 / 新题型 / 翻译 / 写作 · 按套懒加载";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createPeriodicalEntry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-periodical-entry";
+  link.href = "./periodical.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.periodicalEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开外刊精读，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "刊";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "外刊精读";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "50 期 · 时间轴 / 主题导引 · 精读 / 原文 / 检验题 / 答疑 / 原件 · 单期懒加载";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createCet6Entry(categoryName) {
+  const link = document.createElement("a");
+  link.className = "resource-button is-cet6-entry";
+  link.href = "./cet6.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.cet6Entry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开六级备考总览，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "六";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "六级备考总览";
+
+  const meta = document.createElement("span");
+  meta.textContent =
+    "阅读 / 听力 / 翻译写作 · 三个板块 · 按套懒加载 · 点词查义";
+
+  const count = document.createElement("span");
+  count.className = "resource-count";
+  count.textContent = "打开";
+
+  copy.append(title, meta);
+  link.append(badge, copy, count);
+  return link;
+}
+
+function createCet6ExtraEntry(categoryName) {
+  const cet6ExtraCount =
+    window.IBALL_CET6_EXTRA_PAPERS?.length > 0
+      ? window.IBALL_CET6_EXTRA_PAPERS.length
+      : 76;
+  const link = document.createElement("a");
+  link.className = "resource-button is-cet6-extra-entry";
+  link.href = "./cet6-extra.html";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.dataset.cet6ExtraEntry = categoryName;
+  link.setAttribute(
+    "aria-label",
+    `打开六级翻译与写作精读、逐句拆解与范文，位于${categoryName}分类`,
+  );
+
+  const badge = document.createElement("span");
+  badge.className = "resource-index";
+  badge.setAttribute("aria-hidden", "true");
+  badge.textContent = "译";
+
+  const copy = document.createElement("span");
+  copy.className = "resource-copy";
+
+  const title = document.createElement("strong");
+  title.textContent = "六级翻译写作精读";
+
+  const meta = document.createElement("span");
+  meta.textContent = `2015-2026 年已收录 ${cet6ExtraCount} 套 · 逐句拆解 · 提纲范文与评分要点`;
 
   const count = document.createElement("span");
   count.className = "resource-count";
@@ -7540,6 +7773,18 @@ function renderResourceList() {
       (!query ||
         categoryNameMatches ||
         matchesReadingIntensiveEntryQuery(query));
+    const showKaoyanEntry =
+      KAOYAN_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesKaoyanEntryQuery(query));
+    const showCet6Entry =
+      CET6_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesCet6EntryQuery(query));
+    const showCet6ExtraEntry =
+      CET6_EXTRA_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesCet6ExtraEntryQuery(query));
+    const showPeriodicalEntry =
+      PERIODICAL_ENTRY_CATEGORIES.includes(category.name) &&
+      (!query || categoryNameMatches || matchesPeriodicalEntryQuery(query));
     const visibleResources = categoryResources.filter(
       (resource) =>
         !query || categoryNameMatches || matchesMaterialQuery(resource, query),
@@ -7576,7 +7821,11 @@ function renderResourceList() {
       visibleSections.length === 0 &&
       !showIntensiveEntry &&
       !showReadingEntry &&
-      !showReadingIntensiveEntry
+      !showReadingIntensiveEntry &&
+      !showKaoyanEntry &&
+      !showCet6Entry &&
+      !showCet6ExtraEntry &&
+      !showPeriodicalEntry
     ) {
       return;
     }
@@ -7589,7 +7838,11 @@ function renderResourceList() {
       visibleResources.length +
       (showIntensiveEntry ? 1 : 0) +
       (showReadingEntry ? 1 : 0) +
-      (showReadingIntensiveEntry ? 1 : 0);
+      (showReadingIntensiveEntry ? 1 : 0) +
+      (showKaoyanEntry ? 1 : 0) +
+      (showCet6Entry ? 1 : 0) +
+      (showCet6ExtraEntry ? 1 : 0) +
+      (showPeriodicalEntry ? 1 : 0);
 
     const group = document.createElement("section");
     group.className = "resource-group";
@@ -7647,6 +7900,22 @@ function renderResourceList() {
       group.append(createIntensiveEntry(category.name));
     }
 
+    if (showKaoyanEntry) {
+      group.append(createKaoyanEntry(category.name));
+    }
+
+    if (showCet6Entry) {
+      group.append(createCet6Entry(category.name));
+    }
+
+    if (showCet6ExtraEntry) {
+      group.append(createCet6ExtraEntry(category.name));
+    }
+
+    if (showPeriodicalEntry) {
+      group.append(createPeriodicalEntry(category.name));
+    }
+
     const directResources = visibleResources.filter(
       (resource) => !resource.section,
     );
@@ -7683,6 +7952,11 @@ function renderResourceList() {
     if (
       !showIntensiveEntry &&
       !showReadingEntry &&
+      !showReadingIntensiveEntry &&
+      !showKaoyanEntry &&
+      !showCet6Entry &&
+      !showCet6ExtraEntry &&
+      !showPeriodicalEntry &&
       !directResources.length &&
       !visibleSections.length
     ) {

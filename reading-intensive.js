@@ -21,24 +21,56 @@
     saveReadingDocument,
   } = Deck;
 
-  const papers = Array.isArray(window.IBALL_READING_PAPERS)
-    ? window.IBALL_READING_PAPERS.slice()
-    : [];
-  const library = (window.IBALL_READING_LIBRARY =
-    window.IBALL_READING_LIBRARY || {});
+  const READING_LEVEL =
+    window.IBALL_READING_LEVEL === "cet6" ? "cet6" : "cet4";
+  const LEVEL_CONFIG =
+    READING_LEVEL === "cet6"
+      ? {
+          label: "六级",
+          category: "六级",
+          section: "六级阅读精读",
+          eyebrow: "CET-6 READING",
+          title: "六级阅读全文精读",
+          description:
+            "仔细阅读、段落匹配、选词填空三类题型，逐段对照翻译，标注答案位置，点词看释义、固定搭配与四六级考研替换。",
+          storagePrefix: "iball-cet6-reading",
+          papers: Array.isArray(window.IBALL_CET6_READING_PAPERS)
+            ? window.IBALL_CET6_READING_PAPERS.slice()
+            : [],
+          library: (window.IBALL_CET6_READING_LIBRARY =
+            window.IBALL_CET6_READING_LIBRARY || {}),
+        }
+      : {
+          label: "四级",
+          category: "四级",
+          section: "四级阅读精读",
+          eyebrow: "CET-4 READING",
+          title: "四级阅读全文精读",
+          description:
+            "仔细阅读、段落匹配、选词填空三类题型，逐段对照翻译，标注答案位置，点词看释义、固定搭配与四六级考研替换。",
+          storagePrefix: "iball-reading",
+          papers: Array.isArray(window.IBALL_READING_PAPERS)
+            ? window.IBALL_READING_PAPERS.slice()
+            : [],
+          library: (window.IBALL_READING_LIBRARY =
+            window.IBALL_READING_LIBRARY || {}),
+        };
+  const papers = LEVEL_CONFIG.papers;
+  const library = LEVEL_CONFIG.library;
 
   const WORD_PATTERN = /[A-Za-z]+(?:['’\-][A-Za-z]+)*/g;
   const PHONETIC_PLACEHOLDERS = new Set(["暂无音标", "音标查询中"]);
-  const READING_CATEGORY = "四级";
-  const READING_SECTION = "四级阅读精读";
-  const PAPER_STORAGE_KEY = "iball-reading-paper";
-  const PIECE_STORAGE_KEY = "iball-reading-piece";
-  const KIND_STORAGE_KEY = "iball-reading-kind";
-  const CUE_STORAGE_KEY = "iball-reading-cues";
-  const DISPLAY_STORAGE_KEY = "iball-reading-display-mode";
-  const ANSWER_STORAGE_KEY = "iball-reading-answers";
-  const REVEAL_STORAGE_KEY = "iball-reading-revealed";
-  const CLOZE_TRANSLATION_STORAGE_KEY = "iball-reading-cloze-translation";
+  const READING_CATEGORY = LEVEL_CONFIG.category;
+  const READING_SECTION = LEVEL_CONFIG.section;
+  const PAPER_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-paper`;
+  const PIECE_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-piece`;
+  const KIND_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-kind`;
+  const CUE_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-cues`;
+  const DISPLAY_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-display-mode`;
+  const ANSWER_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-answers`;
+  const REVEAL_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-revealed`;
+  const CLOZE_TRANSLATION_STORAGE_KEY =
+    `${LEVEL_CONFIG.storagePrefix}-cloze-translation`;
 
   const KIND_LABELS = {
     cloze: "选词填空",
@@ -498,7 +530,7 @@
       script.async = true;
       script.dataset.paperSource = meta.id;
       script.addEventListener("load", () => {
-        const data = window.IBALL_READING_LIBRARY?.[meta.id];
+        const data = library[meta.id];
         if (data) {
           resolve(data);
         } else {
@@ -798,7 +830,12 @@
     const headingTitle = document.createElement("strong");
     headingTitle.textContent = "阅读分块总览";
     const headingMeta = document.createElement("span");
-    headingMeta.textContent = `${papers.length} 套 · 2022-2026`;
+    const years = uniqueValues(
+      papers.map((paper) => parsePaperId(paper.id)?.year),
+    ).sort();
+    headingMeta.textContent = years.length
+      ? `${papers.length} 套 · ${years[0]}-${years[years.length - 1]}`
+      : `${papers.length} 套`;
     heading.append(headingTitle, headingMeta);
     fragment.append(heading);
 
@@ -924,7 +961,9 @@
   /* ----------------------------------------------------------- marking */
 
   function getReadingDocumentId() {
-    return `reading-intensive-${state.paperId}`;
+    const prefix =
+      READING_LEVEL === "cet6" ? "cet6-reading-intensive" : "reading-intensive";
+    return `${prefix}-${state.paperId}`;
   }
 
   function getReadingDocument() {
@@ -1047,7 +1086,7 @@
     updateWordPanelMarkState();
     showToast(
       mark === "unknown"
-        ? `${item.phrase} 已加入四级阅读不会`
+        ? `${item.phrase} 已加入${READING_CATEGORY}阅读不会`
         : `${item.phrase} 已标记为掌握`,
     );
   }
@@ -3810,6 +3849,19 @@
   }
 
   async function initialize() {
+    document.title = `${LEVEL_CONFIG.title} · iball的小屋`;
+    const pageTitle = document.querySelector("#pageTitle");
+    if (pageTitle) {
+      pageTitle.textContent = LEVEL_CONFIG.title;
+    }
+    const eyebrow = document.querySelector(".hero-eyebrow");
+    if (eyebrow) {
+      eyebrow.textContent = LEVEL_CONFIG.eyebrow;
+    }
+    const description = document.querySelector(".hero-description");
+    if (description) {
+      description.textContent = LEVEL_CONFIG.description;
+    }
     renderHeroStats();
     buildNavigation();
     bindEvents();
