@@ -1693,6 +1693,22 @@
 
   /* --------------------------------------------------------------- 朗读 */
 
+  let speechToken = 0;
+
+  /**
+   * 部分 Windows 语音只调 cancel() 停不干净，上一段会继续说，两次朗读就叠在一起。
+   * 先 pause 再 cancel、随后 resume 复位，才是硬停止。
+   */
+  function haltSpeech() {
+    const synth = window.speechSynthesis;
+    if (!synth) {
+      return;
+    }
+    synth.pause();
+    synth.cancel();
+    synth.resume();
+  }
+
   function speakText(text, holder, button, runId) {
     if (!("speechSynthesis" in window)) {
       return;
@@ -1701,7 +1717,10 @@
     if (!value) {
       return;
     }
-    window.speechSynthesis.cancel();
+    // 每次朗读都认领一个新令牌，过期的结束回调不再改动按钮，免得旧的一段收尾时
+    // 把新的一段标成已停止。
+    const token = (speechToken += 1);
+    haltSpeech();
     const utterance = new SpeechSynthesisUtterance(value.slice(0, 2400));
     utterance.lang = "en-US";
     utterance.rate = 0.95;
@@ -1711,13 +1730,19 @@
     if (voice) {
       utterance.voice = voice;
     }
-    button?.classList.add("is-playing");
-    utterance.addEventListener("end", () => {
-      button?.classList.remove("is-playing");
-    });
-    utterance.addEventListener("error", () => {
-      button?.classList.remove("is-playing");
-    });
+    const releaseButton = () => {
+      if (!button || button.dataset.speechToken !== String(token)) {
+        return;
+      }
+      delete button.dataset.speechToken;
+      button.classList.remove("is-playing");
+    };
+    if (button) {
+      button.dataset.speechToken = String(token);
+      button.classList.add("is-playing");
+    }
+    utterance.addEventListener("end", releaseButton);
+    utterance.addEventListener("error", releaseButton);
     window.speechSynthesis.speak(utterance);
   }
 

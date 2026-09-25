@@ -327,7 +327,11 @@
     }
     updateReadAllButton();
     if ("speechSynthesis" in window) {
+      // 只调 cancel() 时部分 Windows 语音会继续说下去，朗读就会和上一句叠在一起。
+      // 先 pause 再 cancel、最后 resume 复位，才算真正停下来。
+      window.speechSynthesis.pause();
       window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
     }
   }
 
