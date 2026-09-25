@@ -1,0 +1,46 @@
+name: Backup static mirror
+
+# 搬瓦工机器被封 / 欠费 / 挂掉时，用这个镜像兜底：
+#   https://iballiabll.github.io/anki-modern-family/
+# 镜像里没有 /api/，前端会自动切到「本地模式」，进度存在浏览器里。
+#
+# 首次使用需要在仓库 Settings → Pages 里把 Source 选成
+# "Deploy from a branch"，分支 gh-pages、目录 / (root)。
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backup-pages
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build static site
+        run: npm run build
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          # 每次只留一个提交，避免 236 MB 的静态资源把分支历史撑爆
+          force_orphan: true
+          # 镜像走 GitHub Pages 子路径，不能带 CNAME，否则会被 301 回主域名
+          cname: false

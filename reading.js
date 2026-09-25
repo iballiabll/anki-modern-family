@@ -1358,20 +1358,19 @@
   }
 
   async function checkSession() {
-    try {
-      const response = await fetch("./api/auth", {
-        credentials: "same-origin",
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.authenticated) {
-        window.location.replace("./index.html");
-        return false;
-      }
-      return true;
-    } catch {
+    if (!window.iballSession) {
       showToast("登录状态检查失败，请刷新页面重试");
       return false;
     }
+
+    const session = await window.iballSession.probe();
+    // 静态镜像（GitHub 备份）没有账号接口，仍然放行。
+    if (session.mode === "local" || session.authenticated) {
+      return true;
+    }
+
+    window.location.replace("./index.html");
+    return false;
   }
 
   async function initialize() {

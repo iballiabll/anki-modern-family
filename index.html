@@ -19,6 +19,7 @@
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
+    <script src="./session-guard.js" defer></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
@@ -59,10 +60,35 @@
 
         <div class="login-panel">
           <div>
-            <p class="panel-kicker">欢迎回来</p>
-            <h2>进入小屋</h2>
-            <p class="panel-copy">使用账号密码继续你的听力词汇复习。</p>
+            <p id="authKicker" class="panel-kicker">欢迎回来</p>
+            <h2 id="authTitle">进入小屋</h2>
+            <p id="authCopy" class="panel-copy">
+              使用账号密码继续你的听力词汇复习。
+            </p>
           </div>
+
+          <div class="auth-mode-switch" role="tablist" aria-label="登录或注册">
+            <button
+              id="authModeLogin"
+              class="auth-mode-button is-active"
+              type="button"
+              role="tab"
+              aria-selected="true"
+            >
+              登录
+            </button>
+            <button
+              id="authModeRegister"
+              class="auth-mode-button"
+              type="button"
+              role="tab"
+              aria-selected="false"
+            >
+              注册
+            </button>
+          </div>
+
+          <p id="authNotice" class="auth-notice" hidden></p>
 
           <form id="loginForm" class="login-form">
             <label for="username">账号</label>
@@ -74,6 +100,17 @@
               placeholder="请输入账号"
               required
             />
+
+            <div id="emailField" class="auth-extra-field" hidden>
+              <label for="email">邮箱（可选）</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="用于记账号，可留空"
+              />
+            </div>
 
             <label for="password">密码</label>
             <div class="password-field">
@@ -94,6 +131,21 @@
               >
                 显示
               </button>
+            </div>
+
+            <p id="passwordHint" class="field-hint" hidden>
+              密码至少 8 位，不要和账号相同。
+            </p>
+
+            <div id="inviteField" class="auth-extra-field" hidden>
+              <label for="inviteCode">邀请码</label>
+              <input
+                id="inviteCode"
+                name="inviteCode"
+                type="text"
+                autocomplete="off"
+                placeholder="请输入站长提供的邀请码"
+              />
             </div>
 
             <button id="loginButton" class="primary-button" type="submit">

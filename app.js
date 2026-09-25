@@ -1602,6 +1602,9 @@ const state = {
   meaningReveals: new Set(),
   meaningHides: new Set(),
   user: "",
+  authMode: "login",
+  sessionMode: "server",
+  registration: null,
   practiceActive: false,
   practiceSection: "shadow",
   practiceIndex: 0,
@@ -1668,6 +1671,17 @@ const elements = {
   loginForm: document.querySelector("#loginForm"),
   loginButton: document.querySelector("#loginButton"),
   loginError: document.querySelector("#loginError"),
+  authKicker: document.querySelector("#authKicker"),
+  authTitle: document.querySelector("#authTitle"),
+  authCopy: document.querySelector("#authCopy"),
+  authModeLogin: document.querySelector("#authModeLogin"),
+  authModeRegister: document.querySelector("#authModeRegister"),
+  authNotice: document.querySelector("#authNotice"),
+  emailField: document.querySelector("#emailField"),
+  email: document.querySelector("#email"),
+  passwordHint: document.querySelector("#passwordHint"),
+  inviteField: document.querySelector("#inviteField"),
+  inviteCode: document.querySelector("#inviteCode"),
   username: document.querySelector("#username"),
   password: document.querySelector("#password"),
   passwordVisibilityButton: document.querySelector(
@@ -8695,12 +8709,80 @@ function render() {
   renderCollectionFilters();
 }
 
+const AUTH_MODE_COPY = {
+  login: {
+    kicker: "欢迎回来",
+    title: "进入小屋",
+    copy: "使用账号密码继续你的听力词汇复习。",
+    button: "登录",
+    pending: "登录中...",
+  },
+  register: {
+    kicker: "第一次来",
+    title: "创建账号",
+    copy: "注册后即可登录；学习进度仍保存在当前浏览器里。",
+    button: "注册并进入",
+    pending: "注册中...",
+  },
+};
+
+function renderAuthNotice(text = "", tone = "info") {
+  if (!elements.authNotice) {
+    return;
+  }
+  elements.authNotice.textContent = text;
+  elements.authNotice.dataset.tone = tone;
+  elements.authNotice.hidden = !text;
+}
+
+function setAuthMode(mode, message = "") {
+  const next = mode === "register" ? "register" : "login";
+  const copy = AUTH_MODE_COPY[next];
+  state.authMode = next;
+
+  if (elements.authKicker) {
+    elements.authKicker.textContent = copy.kicker;
+  }
+  if (elements.authTitle) {
+    elements.authTitle.textContent = copy.title;
+  }
+  if (elements.authCopy) {
+    elements.authCopy.textContent = copy.copy;
+  }
+
+  const registering = next === "register";
+  elements.authModeLogin?.classList.toggle("is-active", !registering);
+  elements.authModeRegister?.classList.toggle("is-active", registering);
+  elements.authModeLogin?.setAttribute("aria-selected", String(!registering));
+  elements.authModeRegister?.setAttribute("aria-selected", String(registering));
+
+  if (elements.emailField) {
+    elements.emailField.hidden = !registering;
+  }
+  if (elements.passwordHint) {
+    elements.passwordHint.hidden = !registering;
+  }
+  if (elements.inviteField) {
+    elements.inviteField.hidden = !(
+      registering && state.registration?.inviteRequired
+    );
+  }
+  if (elements.password) {
+    elements.password.autocomplete = registering
+      ? "new-password"
+      : "current-password";
+  }
+
+  elements.loginButton.textContent = copy.button;
+  elements.loginError.textContent = message;
+  elements.loginError.hidden = !message;
+}
+
 function showLogin(message = "") {
   setPasswordVisibility(false);
   elements.loginView.hidden = false;
   elements.appView.hidden = true;
-  elements.loginError.textContent = message;
-  elements.loginError.hidden = !message;
+  setAuthMode(state.authMode, message);
   elements.username.focus();
 }
 
@@ -8748,17 +8830,34 @@ async function requestAuth(payload = {}, method = "POST") {
 }
 
 async function checkSession() {
-  try {
-    const { response, data } = await requestAuth({}, "GET");
-    if (response.ok && data.authenticated) {
-      removeWelcomeOverlay();
-      await showApp(data.user || "用户");
-      return;
-    }
-  } catch {
-    // The login form will report connection problems after submission.
+  const session = window.iballSession
+    ? await window.iballSession.probe()
+    : null;
+
+  // 静态镜像（GitHub 备份）或账号服务临时不可用时，仍然放行浏览，
+  // 学习进度继续写 localStorage，等服务器恢复后再登录即可。
+  if (!session || session.mode === "local") {
+    state.sessionMode = "local";
+    state.registration = null;
+    await showApp("本地模式");
+    return;
   }
+
+  state.sessionMode = "server";
+  state.registration = session.registration || null;
+
+  if (session.authenticated) {
+    removeWelcomeOverlay();
+    await showApp(session.user || "用户");
+    return;
+  }
+
   showLogin();
+  renderAuthNotice(
+    state.registration && !state.registration.enabled
+      ? "本站当前未开放注册，请使用已有账号登录。"
+      : "",
+  );
   showWelcomeOverlay();
 }
 
@@ -8827,30 +8926,47 @@ async function loadLibrary() {
   }
 }
 
-async function handleLogin(event) {
+async function handleAuthSubmit(event) {
   event.preventDefault();
+  const mode = state.authMode === "register" ? "register" : "login";
+  const copy = AUTH_MODE_COPY[mode];
+  const username = elements.username.value.trim();
+  const password = elements.password.value;
+
   elements.loginButton.disabled = true;
-  elements.loginButton.textContent = "登录中...";
+  elements.loginButton.textContent = copy.pending;
   elements.loginError.hidden = true;
 
   try {
-    const { response, data } = await requestAuth({
-      action: "login",
-      username: elements.username.value.trim(),
-      password: elements.password.value,
-    });
+    const payload =
+      mode === "register"
+        ? {
+            action: "register",
+            username,
+            password,
+            email: elements.email?.value.trim() || "",
+            inviteCode: elements.inviteCode?.value.trim() || "",
+          }
+        : { action: "login", username, password };
+
+    const { response, data } = await requestAuth(payload);
 
     if (!response.ok || !data.ok) {
       throw new Error(data.message || "账号或密码不正确");
     }
 
     elements.password.value = "";
-    await showApp(data.user || elements.username.value.trim());
+    if (elements.inviteCode) {
+      elements.inviteCode.value = "";
+    }
+    state.authMode = "login";
+    // 注册成功后服务端已经下发会话，直接进入小屋。
+    await showApp(data.user || username);
   } catch (error) {
     showLogin(error.message || "登录服务暂时不可用");
   } finally {
     elements.loginButton.disabled = false;
-    elements.loginButton.textContent = "登录";
+    elements.loginButton.textContent = AUTH_MODE_COPY[state.authMode].button;
   }
 }
 
@@ -8863,10 +8979,31 @@ async function handleLogout() {
   }
   elements.logoutButton.disabled = false;
   state.user = "";
+  state.authMode = "login";
+  window.iballSession?.reset();
+  if (elements.email) {
+    elements.email.value = "";
+  }
+  renderAuthNotice("");
   showLogin();
 }
 
-elements.loginForm.addEventListener("submit", handleLogin);
+elements.loginForm.addEventListener("submit", handleAuthSubmit);
+elements.authModeLogin?.addEventListener("click", () => {
+  renderAuthNotice("");
+  setAuthMode("login");
+  elements.username.focus();
+});
+elements.authModeRegister?.addEventListener("click", () => {
+  setAuthMode("register");
+  renderAuthNotice(
+    state.registration && !state.registration.enabled
+      ? "本站当前未开放注册，请使用已有账号登录。"
+      : "",
+    state.registration && !state.registration.enabled ? "warn" : "info",
+  );
+  elements.username.focus();
+});
 elements.logoutButton.addEventListener("click", handleLogout);
 elements.practiceButton.addEventListener("click", () => {
   openPractice();

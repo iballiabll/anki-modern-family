@@ -343,6 +343,74 @@ p {
   line-height: 1.45;
 }
 
+.auth-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 4px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.auth-mode-button {
+  height: 40px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 800;
+  transition:
+    color 150ms ease,
+    background 150ms ease;
+}
+
+.auth-mode-button:hover {
+  color: var(--forest);
+  background: #eef4f1;
+}
+
+.auth-mode-button.is-active {
+  color: #ffffff;
+  background: var(--forest);
+}
+
+.auth-mode-button:focus-visible {
+  outline: 3px solid rgba(90, 150, 132, 0.24);
+  outline-offset: 2px;
+}
+
+.auth-notice {
+  margin: -8px 0 18px;
+  padding: 10px 12px;
+  color: #6b5316;
+  background: #fdf4dc;
+  border: 1px solid #ecd7a3;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.auth-notice[data-tone="warn"] {
+  color: #8a2c28;
+  background: #fdecea;
+  border-color: #f2c6c1;
+}
+
+.auth-extra-field {
+  display: grid;
+  gap: 10px;
+}
+
+.field-hint {
+  margin: -2px 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .app-view {
   min-height: 100vh;
   display: grid;

@@ -62,6 +62,7 @@ const staticEntries = [
   "review.css",
   "review.html",
   "review.js",
+  "session-guard.js",
   "shadow.css",
   "shadow.html",
   "shadow.js",

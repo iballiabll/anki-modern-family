@@ -67,7 +67,7 @@ Anki CSV 的 `#columns` 需要包含 `Front,Back`。
 
 ## 网站功能
 
-- 单账号登录，不提供公开注册。
+- 账号注册与登录（自建服务器上真正落盘；静态镜像自动切本地模式，仍可浏览）。
 - 按 GitHub 文件夹展示一级分类和二级目录。
 - 素材搜索，以及短语、释义、句子、音标搜索。
 - 全部收藏集和按一级分类自动生成的分类收藏集，例如 `四级收藏集`、
@@ -185,15 +185,47 @@ Chat API 的模型名称支持直接输入，也可从 `v4flash`、`v4pro`、`gp
 
 ## 登录配置
 
-Vercel 项目需要设置以下 Production 环境变量：
+支持**真实的多账号注册 + 登录**，账号存在服务器磁盘上的
+`DATA_DIR/users.json`，口令只保存 scrypt 散列，会话是 HMAC 签名的
+HttpOnly Cookie，不需要数据库。
+
+### 自建服务器（推荐，注册真正可用）
+
+```bash
+npm run build
+npm start          # 需要先设好 SESSION_SECRET
+```
+
+完整步骤（搬瓦工 VPS、Nginx、HTTPS、GitHub 兜底）见
+[`deploy/README.md`](deploy/README.md)。
+
+环境变量：
+
+- `SESSION_SECRET` 必填，签名 Cookie 用，缺省时服务拒绝启动
+- `DATA_DIR` 账号文件目录，默认 `work/data`
+- `APP_USERNAME` 站长账号，默认 `iball`
+- `APP_PASSWORD_SHA256` 站长口令散列，不设则用仓库内置值
+- `REGISTRATION_ENABLED` 是否开放注册，默认 `true`
+- `REGISTRATION_CODE` 可选邀请码，设置后注册必须填对
+- `MAX_USERS` 账号上限，默认 `20`
+
+### Vercel
 
 - `APP_USERNAME=iball`
 - `SESSION_SECRET`（至少 32 字节随机字符串）
 
-登录密码在 `api/auth.js` 中以 SHA-256 哈希保存。历史环境变量 `wzh`
-会自动迁移为 `iball`，避免旧部署继续使用错误账号。登录接口使用签名
-HttpOnly Cookie 保存会话，不需要额外数据库。同一账号可以在两个浏览器中
-同时登录，单个浏览器退出不会让另一个浏览器掉线。
+Vercel 的部署目录是只读的，写不进 `users.json`，所以那里的注册会自动
+标记为不可用，只保留站长账号登录（口令散列在 `api/auth.js` 中）。历史
+环境变量 `wzh` 会自动迁移为 `iball`。
+
+### 静态镜像（GitHub Pages）
+
+仓库里的 `.github/workflows/backup-pages.yml` 会把 `public/` 发到
+`gh-pages` 分支作为兜底。镜像里没有 `/api/`，前端探测到接口不存在会切到
+「本地模式」，页面照常浏览，进度存在浏览器 `localStorage` 里。
+
+同一账号可以在两个浏览器中同时登录，单个浏览器退出不会让另一个浏览器
+掉线。
 
 口语练习的交互思路参考了 MIT 许可的
 [SpeakHub](https://github.com/yin-yizhen/SpeakHub)。

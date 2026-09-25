@@ -963,11 +963,11 @@
     setScopeControlVisibility(window.innerWidth >= 760);
 
     try {
-      const authResponse = await fetch("./api/auth", {
-        credentials: "same-origin",
-      });
-      const auth = await authResponse.json().catch(() => ({}));
-      if (!authResponse.ok || !auth.authenticated) {
+      const session = window.iballSession
+        ? await window.iballSession.probe()
+        : { mode: "server", authenticated: false };
+      // 静态镜像（GitHub 备份）没有账号接口，仍然放行。
+      if (session.mode !== "local" && !session.authenticated) {
         window.location.replace("./index.html");
         return;
       }

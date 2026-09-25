@@ -1,0 +1,25 @@
+[Unit]
+Description=iball cabin (Node static site + accounts)
+After=network.target
+
+[Service]
+Type=simple
+User=iball
+Group=iball
+WorkingDirectory=/srv/iball-cabin/app
+EnvironmentFile=/etc/iball-cabin.env
+ExecStart=/usr/bin/node server.mjs
+Restart=always
+RestartSec=3
+# 账号文件只让这个用户读得到
+UMask=0027
+
+# 基本加固：站点只写账号目录
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/lib/iball-cabin
+
+[Install]
+WantedBy=multi-user.target
