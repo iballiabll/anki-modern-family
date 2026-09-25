@@ -28,6 +28,75 @@
     cet6: 15,
   };
 
+  // 考研英语写作按 Part A / Part B 分别计分；MAX_SCORES 保留为整卷参考值，
+  // 兼容没有 part 信息的旧调用。
+  const TASK_MAX_SCORES = {
+    "english-i": { "Part A": 10, "Part B": 20 },
+    "english-ii": { "Part A": 10, "Part B": 15 },
+  };
+
+  // 阅卷档位表按题目满分区分。每档给出分值与核心表现，供讲解和前端展示。
+  const KAOYAN_BAND_TABLE = {
+    10: [
+      { key: "band5", label: "第五档", range: "9-10 分", min: 9, max: 10, descriptor: "很好地完成任务；要点齐全，语法和词汇准确，衔接自然，格式和语体恰当。" },
+      { key: "band4", label: "第四档", range: "7-8 分", min: 7, max: 8, descriptor: "较好地完成任务；包含所有要点但少数阐述不足，语言基本准确，格式语体基本恰当。" },
+      { key: "band3", label: "第三档", range: "5-6 分", min: 5, max: 6, descriptor: "基本完成任务；遗漏部分内容，存在一些语言错误但基本不影响理解。" },
+      { key: "band2", label: "第二档", range: "3-4 分", min: 3, max: 4, descriptor: "未能按要求完成任务；遗漏或无效表达较多，语言错误影响理解，格式或语体不当。" },
+      { key: "band1", label: "第一档", range: "1-2 分", min: 1, max: 2, descriptor: "内容严重不足或偏题；语言错误频繁，结构混乱，基本没有完成交际目的。" },
+      { key: "zero", label: "零分", range: "0 分", min: 0, max: 0, descriptor: "空白、完全跑题、照抄无关内容，或几乎无法判断为有效英文作文。" },
+    ],
+    20: [
+      { key: "band5", label: "第五档", range: "17-20 分", min: 17, max: 20, descriptor: "很好地完成任务；包含并有效阐述所有内容要点，语言准确，衔接自然，格式语体恰当。" },
+      { key: "band4", label: "第四档", range: "13-16 分", min: 13, max: 16, descriptor: "较好地完成任务；包含所有要点但少数阐述不足，复杂结构偶有错误，衔接较自然。" },
+      { key: "band3", label: "第三档", range: "9-12 分", min: 9, max: 12, descriptor: "基本完成任务；遗漏部分内容，存在一些语言错误但基本不影响理解。" },
+      { key: "band2", label: "第二档", range: "5-8 分", min: 5, max: 8, descriptor: "未能按要求完成任务；内容遗漏较多，语言结构单调，错误影响理解。" },
+      { key: "band1", label: "第一档", range: "1-4 分", min: 1, max: 4, descriptor: "内容严重不足或偏题；语言错误频繁，结构混乱，基本没有完成交际目的。" },
+      { key: "zero", label: "零分", range: "0 分", min: 0, max: 0, descriptor: "空白、完全跑题、照抄无关内容，或几乎无法判断为有效英文作文。" },
+    ],
+    15: [
+      { key: "band5", label: "第五档", range: "13-15 分", min: 13, max: 15, descriptor: "很好地完成任务；内容要点齐全并有效阐述，语言准确，衔接自然，格式语体恰当。" },
+      { key: "band4", label: "第四档", range: "10-12 分", min: 10, max: 12, descriptor: "较好地完成任务；包含所有要点但少数阐述不足，语言基本准确，衔接较自然。" },
+      { key: "band3", label: "第三档", range: "7-9 分", min: 7, max: 9, descriptor: "基本完成任务；遗漏部分内容，存在一些语言错误但基本不影响理解。" },
+      { key: "band2", label: "第二档", range: "4-6 分", min: 4, max: 6, descriptor: "未能按要求完成任务；遗漏或无效表达较多，错误影响理解，衔接不足。" },
+      { key: "band1", label: "第一档", range: "1-3 分", min: 1, max: 3, descriptor: "内容严重不足或偏题；语言错误频繁，结构混乱，基本没有完成交际目的。" },
+      { key: "zero", label: "零分", range: "0 分", min: 0, max: 0, descriptor: "空白、完全跑题、照抄无关内容，或几乎无法判断为有效英文作文。" },
+    ],
+  };
+
+  // 维度分值来自考研英语 Skill 的评分细则，各 Part 分值合计等于题目满分。
+  const PART_DIMENSIONS = {
+    "english-i:Part A": [
+      { key: "task", label: "任务完成与格式", points: 3 },
+      { key: "structure", label: "组织与衔接", points: 2 },
+      { key: "language", label: "语法与句式", points: 2 },
+      { key: "lexis", label: "词汇与语域", points: 2 },
+      { key: "mechanics", label: "拼写与格式", points: 1 },
+    ],
+    "english-ii:Part A": [
+      { key: "task", label: "任务完成与格式", points: 3 },
+      { key: "structure", label: "组织与衔接", points: 2 },
+      { key: "language", label: "语法与句式", points: 2 },
+      { key: "lexis", label: "词汇与语域", points: 2 },
+      { key: "mechanics", label: "拼写与格式", points: 1 },
+    ],
+    "english-i:Part B": [
+      { key: "task", label: "任务完成与扣题", points: 6 },
+      { key: "content", label: "内容展开与论证", points: 4 },
+      { key: "structure", label: "组织与段落逻辑", points: 3 },
+      { key: "language", label: "语法与句式", points: 3 },
+      { key: "lexis", label: "词汇与语域", points: 3 },
+      { key: "mechanics", label: "拼写与格式", points: 1 },
+    ],
+    "english-ii:Part B": [
+      { key: "task", label: "任务完成与扣题", points: 5 },
+      { key: "content", label: "内容展开与论证", points: 3 },
+      { key: "structure", label: "组织与段落逻辑", points: 2 },
+      { key: "language", label: "语法与句式", points: 2 },
+      { key: "lexis", label: "词汇与语域", points: 2 },
+      { key: "mechanics", label: "拼写与格式", points: 1 },
+    ],
+  };
+
   const EXAM_LABELS = {
     "english-i": "考研英语一",
     "english-ii": "考研英语二",
@@ -816,7 +885,26 @@
       notes.push("与题目关键词重合较少，注意回扣题干，别写成通用模板文。");
     }
 
-    return { score: score / 3, keywords: promptKeys, hits: hit, notes };
+    const tooShort = Boolean(min) && words < min * 0.6;
+    const tooLong = Boolean(max) && words > max * 1.5;
+    const offTopic = promptKeys.length >= 3 && coverage < 0.2;
+    if (tooShort) {
+      notes.push("篇幅明显不足，任务完成和内容展开都会受到限制。");
+    }
+    if (tooLong) {
+      notes.push("篇幅明显超出要求，容易带来重复和偏题，组织分会受影响。");
+    }
+
+    return {
+      score: score / 3,
+      keywords: promptKeys,
+      hits: hit,
+      coverage,
+      tooShort,
+      tooLong,
+      offTopic,
+      notes,
+    };
   }
 
   function scoreStructure(text, sentences) {
@@ -895,6 +983,215 @@
       return { key: "pass", label: "合格" };
     }
     return { key: "weak", label: "待提升" };
+  }
+
+  function isKaoyan(exam) {
+    return exam === "english-i" || exam === "english-ii";
+  }
+
+  function resolvePart(prompt) {
+    const raw = String(prompt?.part || "").trim();
+    if (/part\s*a\b/i.test(raw) || /^a$/i.test(raw)) {
+      return "Part A";
+    }
+    if (/part\s*b\b/i.test(raw) || /^b$/i.test(raw)) {
+      return "Part B";
+    }
+    const labelMatch = String(prompt?.label || "").match(/part\s*([ab])\b/i);
+    if (labelMatch) {
+      return `Part ${labelMatch[1].toUpperCase()}`;
+    }
+    const id = String(prompt?.id || "");
+    if (/\d{2}$/.test(id)) {
+      const lastTwo = id.slice(-2);
+      if (lastTwo === "51" || lastTwo === "47") {
+        return "Part A";
+      }
+      if (lastTwo === "52" || lastTwo === "48") {
+        return "Part B";
+      }
+    }
+    if (prompt?.exam === "english-ii" && /-p[12]$/i.test(id)) {
+      return id.endsWith("1") ? "Part A" : "Part B";
+    }
+    return null;
+  }
+
+  function bandForScore(score, maxScore, exam, part) {
+    const value = Math.round(Number(score) || 0);
+    if (isKaoyan(exam) && part && KAOYAN_BAND_TABLE[maxScore]) {
+      const table = KAOYAN_BAND_TABLE[maxScore];
+      const band =
+        table.find((item) => value >= item.min) || table[table.length - 1];
+      return { ...band, fiveBand: true };
+    }
+    return {
+      ...bandOf(value / (Number(maxScore) || 1)),
+      fiveBand: false,
+    };
+  }
+
+  function resolveScoringPlan(exam, prompt) {
+    const part = resolvePart(prompt);
+    const track = TASK_MAX_SCORES[exam];
+    if (isKaoyan(exam) && part && track?.[part]) {
+      return {
+        part,
+        maxScore: track[part],
+        fiveBand: true,
+        dimensions: (PART_DIMENSIONS[`${exam}:${part}`] || []).map((item) => ({
+          ...item,
+        })),
+      };
+    }
+    const maxScore = MAX_SCORES[exam] || MAX_SCORES.cet6;
+    return {
+      part,
+      maxScore,
+      fiveBand: false,
+      dimensions: DIMENSIONS.map((item) => ({
+        key: item.key,
+        label: item.label,
+        points: Math.round(item.weight * maxScore * 10) / 10,
+      })),
+    };
+  }
+
+  function taskMaxScore(exam, prompt) {
+    return resolveScoringPlan(exam, prompt).maxScore;
+  }
+
+  function scoreContent(text, prompt, task) {
+    const notes = [];
+    const words = countWords(text);
+    const sentenceCount = splitSentences(text).length;
+    let score = task.score * 0.55 + Math.min(100, 42 + sentenceCount * 7) * 0.45;
+    if (words < 70 && Number(prompt?.wordLimitMin) >= 100) {
+      score -= 12;
+      notes.push("展开明显不足，至少用两个理由或细节把主体段写满。");
+    }
+    if (task.keywords.length && task.coverage < 0.5) {
+      score -= 8;
+      notes.push("内容与题干关键词结合不够，论证容易显得空泛。");
+    }
+    return {
+      score: Math.max(25, Math.min(100, score)),
+      notes,
+      sentenceCount,
+    };
+  }
+
+  function wantsSmallWritingFormat(prompt, part) {
+    if (part !== "Part A") {
+      return false;
+    }
+    const source = [
+      prompt?.label,
+      prompt?.prompt,
+      (prompt?.directions || []).join(" "),
+    ]
+      .filter(Boolean)
+      .join(" ");
+    return /(letter|email|notice|reply|write\s+to|应用文|小作文|书信|通知)/i.test(
+      source,
+    );
+  }
+
+  function scoreMechanics(text, issues, prompt, part) {
+    const notes = [];
+    const mechanicIssues = (issues || []).filter((issue) =>
+      /拼写|标点|大写/.test(issue.label || ""),
+    );
+    const errors = mechanicIssues.filter(
+      (issue) => issue.severity === "error",
+    ).length;
+    const warnings = mechanicIssues.length - errors;
+    let score = 100 - errors * 16 - warnings * 8;
+    if (mechanicIssues.length) {
+      notes.push(
+        `拼写、标点或大小写共检出 ${mechanicIssues.length} 处，机械分先从这里补。`,
+      );
+    }
+
+    let formatIssue = false;
+    if (wantsSmallWritingFormat(prompt, part)) {
+      const source = [prompt?.prompt, (prompt?.directions || []).join(" ")]
+        .filter(Boolean)
+        .join(" ");
+      const noticeTask = /notice|通知/i.test(source) && !/letter|email|书信/i.test(source);
+      if (noticeTask) {
+        const hasHeading = /(^|\n)\s*notice\b/i.test(text);
+        if (!hasHeading) {
+          score -= 20;
+          formatIssue = true;
+          notes.push("通知类应用文建议有 Notice 标题，格式分会被压低。");
+        }
+      } else {
+        const hasGreeting =
+          /(^|\n)\s*(dear\b[^\n]{0,60}[,:]|hello\b[^\n]{0,50}[,:]|hi\b[^\n]{0,50}[,:])/i.test(
+            text,
+          );
+        const hasSignoff =
+          /(yours\s+(sincerely|faithfully|truly)|best\s+(regards|wishes)|sincerely|kind regards|li ming\b)/i.test(
+            text,
+          );
+        if (!hasGreeting) {
+          score -= 20;
+          formatIssue = true;
+          notes.push("书信或邮件缺少称呼，任务格式不完整。");
+        }
+        if (!hasSignoff) {
+          score -= 15;
+          formatIssue = true;
+          notes.push("书信或邮件缺少落款或署名，任务格式不完整。");
+        }
+      }
+    }
+
+    return {
+      score: Math.max(0, Math.min(100, score)),
+      notes,
+      issues: mechanicIssues.length,
+      formatIssue,
+    };
+  }
+
+  function resolveDeductionCaps({
+    exam,
+    part,
+    maxScore,
+    task,
+    language,
+    mechanics,
+    words,
+  }) {
+    if (!isKaoyan(exam) || !part || !KAOYAN_BAND_TABLE[maxScore]) {
+      return [];
+    }
+    const capFor = (bandKey) =>
+      KAOYAN_BAND_TABLE[maxScore].find((item) => item.key === bandKey)?.max ??
+      maxScore;
+    const caps = [];
+    if (task.offTopic) {
+      caps.push({
+        cap: capFor("band2"),
+        reason: "内容与题干基本无关，按第二档封顶。",
+      });
+    } else if (mechanics.formatIssue) {
+      caps.push({
+        cap: capFor("band3"),
+        reason: "应用文格式或体裁不完整，即使句子流畅也按第三档封顶。",
+      });
+    }
+    const blockingErrors =
+      (language.errors || 0) >= Math.max(4, Math.ceil(words / 35));
+    if (blockingErrors) {
+      caps.push({
+        cap: capFor("band3"),
+        reason: "多处错误反复影响理解，按第三档封顶。",
+      });
+    }
+    return caps;
   }
 
   function buildModelEssay(prompt) {
@@ -1706,6 +2003,7 @@
       language,
       replacements,
       prompt,
+      partLabel,
     } = context;
     const sortedDimensions = [...dimensions].sort(
       (left, right) => left.score - right.score,
@@ -1725,7 +2023,7 @@
         : `先把“${weakest.label}”从 ${weakest.score} 分往上拉`;
 
     return {
-      overview: `这道题属于${EXAM_LABELS[exam] || exam}。你这篇作文共 ${words} 词、${paragraphs} 段、${sentences.length} 句，当前 ${score} / ${maxScore} 分（${band.label}）。${strongest.label}是相对优势，${weakest.label}是最需要补的短板。讲解按“审题 - 段落 - 逐句 - 升格 - 复写”展开，所有原句都取自你这篇作文。`,
+      overview: `这道题属于${EXAM_LABELS[exam] || exam}${partLabel ? ` ${partLabel}` : ""}。你这篇作文共 ${words} 词、${paragraphs} 段、${sentences.length} 句，当前 ${score} / ${maxScore} 分（${band.label}${band.range ? ` · ${band.range}` : ""}）。${strongest.label}是相对优势，${weakest.label}是最需要补的短板。讲解按“审题 - 段落 - 逐句 - 升格 - 复写”展开，所有原句都取自你这篇作文。`,
       focus: priorityAction + "；改完后再处理段落展开和词汇升级。",
       taskBreakdown: buildTaskBreakdown(context),
       paragraphMap: buildParagraphMap(context),
@@ -1740,7 +2038,8 @@
     const text = String(input?.text || "").trim();
     const prompt = input?.prompt || {};
     const exam = prompt.exam || input?.exam || "cet6";
-    const maxScore = MAX_SCORES[exam] || MAX_SCORES.cet6;
+    const plan = resolveScoringPlan(exam, prompt);
+    const maxScore = plan.maxScore;
 
     const sentences = splitSentences(text);
     const paragraphDetails = splitParagraphDetails(text);
@@ -1756,25 +2055,64 @@
     const structure = scoreStructure(text, sentences);
     const language = scoreLanguage(text, grammarIssues);
     const lexis = scoreLexis(text, replacements);
-    const parts = { task, structure, language, lexis };
+    const mechanics = scoreMechanics(text, grammarIssues, prompt, plan.part);
+    const content = scoreContent(text, prompt, task);
+    const parts = { task, structure, language, lexis, content, mechanics };
 
-    const raw = DIMENSIONS.reduce(
-      (sum, dimension) => sum + (parts[dimension.key]?.score || 0) * dimension.weight,
+    const weighted = plan.dimensions.map((dimension) => ({
+      ...dimension,
+      rawScore: Math.max(0, Math.min(100, parts[dimension.key]?.score || 0)),
+    }));
+    const uncapped = weighted.reduce(
+      (sum, dimension) => sum + (dimension.rawScore / 100) * dimension.points,
       0,
     );
-    const ratio = Math.max(0, Math.min(1, raw / 100));
-    const score = Math.round(ratio * maxScore * 10) / 10;
-    const band = bandOf(ratio);
+    const words = countWords(text);
+    const caps = resolveDeductionCaps({
+      exam,
+      part: plan.part,
+      maxScore,
+      task,
+      language,
+      mechanics,
+      words,
+    });
+    const scoreCap = caps.reduce(
+      (lowest, item) => Math.min(lowest, item.cap),
+      maxScore,
+    );
+    const score = Math.round(Math.min(uncapped, scoreCap) * 10) / 10;
+    const band = bandForScore(score, maxScore, exam, plan.part);
 
-    const dimensions = DIMENSIONS.map((dimension) => ({
+    const dimensions = weighted.map((dimension) => ({
       key: dimension.key,
       label: dimension.label,
-      weight: dimension.weight,
-      score: Math.round(parts[dimension.key].score),
+      weight: maxScore ? dimension.points / maxScore : 0,
+      score: Math.round(dimension.rawScore),
       max: 100,
-      scaled: Math.round(ratio * maxScore * 10) / 10,
-      note: (parts[dimension.key].notes || []).join(" "),
+      points: Math.round(dimension.points * 10) / 10,
+      scaled:
+        Math.round((dimension.rawScore / 100) * dimension.points * 10) / 10,
+      note: (parts[dimension.key]?.notes || []).join(" "),
     }));
+
+    const partLabel =
+      plan.part === "Part A"
+        ? "Part A · 小作文"
+        : plan.part === "Part B"
+          ? "Part B · 大作文"
+          : "";
+    const hasPromptDetail =
+      Boolean(String(prompt?.prompt || "").trim()) ||
+      (prompt?.directions || []).length > 0;
+    const taskProvisional = !hasPromptDetail;
+    const scoreNotice = isKaoyan(exam)
+      ? `非官方模拟评分：按考研英语${exam === "english-i" ? "一" : "二"}${partLabel ? ` ${partLabel}` : ""}的评分标准给出，仅供练习定位。${
+          taskProvisional
+            ? "题干或图片不完整，任务完成分仅供参考。"
+            : ""
+        }`
+      : "本地练习估算分，非官方成绩。";
 
     const lesson = buildLesson({
       text,
@@ -1783,7 +2121,7 @@
       maxScore,
       score,
       band,
-      words: countWords(text),
+      words,
       paragraphs: paragraphs.length,
       paragraphDetails,
       sentences,
@@ -1795,13 +2133,23 @@
       structure,
       language,
       lexis,
+      mechanics,
+      content,
+      partLabel,
     });
 
     const feedback = [];
     feedback.push(
-      `总评：${countWords(text)} 词、${paragraphs.length} 段、${sentences.length} 句，得分 ${score} / ${maxScore}（${band.label}）。`,
+      `总评：${words} 词、${paragraphs.length} 段、${sentences.length} 句，得分 ${score} / ${maxScore}（${band.label}${band.range ? ` · ${band.range}` : ""}）。`,
     );
-    feedback.push(...task.notes, ...structure.notes, ...language.notes, ...lexis.notes);
+    feedback.push(
+      ...task.notes,
+      ...structure.notes,
+      ...language.notes,
+      ...lexis.notes,
+      ...mechanics.notes,
+    );
+    caps.forEach((item) => feedback.push(`封顶提示：${item.reason}`));
     if (!feedback.length) {
       feedback.push("整体完成度不错，继续保持并把重点放在语言多样性上。");
     }
@@ -1809,6 +2157,9 @@
     const nextSteps = [];
     if (task.notes.length) {
       nextSteps.push("先补齐字数与分段，保证结构分不丢。");
+    }
+    if (mechanics.formatIssue) {
+      nextSteps.push("先补全称呼、落款或标题等格式要素，再润色句子。");
     }
     if (language.errors > 0) {
       nextSteps.push(`优先改掉标红的 ${language.errors} 处语法错误，再谈润色。`);
@@ -1829,7 +2180,14 @@
       maxScore,
       score,
       band,
-      words: countWords(text),
+      part: plan.part,
+      partLabel,
+      taskType: `${EXAM_LABELS[exam] || exam}${partLabel ? ` · ${partLabel}` : ""}`,
+      official: false,
+      scoreNotice,
+      taskProvisional,
+      caps,
+      words,
       sentences: sentences.length,
       paragraphs: paragraphs.length,
       dimensions,
@@ -1856,5 +2214,9 @@
     splitParagraphs,
     keywords,
     MAX_SCORES,
+    TASK_MAX_SCORES,
+    resolvePart,
+    taskMaxScore,
+    bandForScore,
   };
 });

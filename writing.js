@@ -121,7 +121,16 @@
 
   function storageKeys() {
     try {
-      return Object.keys(window.localStorage);
+      // 注意：Storage 上 Object.keys() 只给方法名，得按下标取键。
+      const storage = window.localStorage;
+      const keys = [];
+      for (let index = 0; index < storage.length; index += 1) {
+        const key = storage.key(index);
+        if (key !== null) {
+          keys.push(key);
+        }
+      }
+      return keys;
     } catch {
       return [];
     }
@@ -1176,14 +1185,18 @@
     limit.textContent = prompt.wordLimit ? `字数：${prompt.wordLimit}` : "字数：按题目要求";
     const level = document.createElement("span");
     level.className = "writing-tag";
-    level.textContent = `满分参考：${maxScoreOf(prompt.exam)} 分`;
+    level.textContent = `满分参考：${maxScoreOf(prompt.exam, prompt)} 分`;
     foot.append(limit, level);
     els.taskBody.append(foot);
     updateWordMeter();
   }
 
-  function maxScoreOf(exam) {
-    return window.IBALL_WRITING_GRADE?.MAX_SCORES?.[exam] || 15;
+  function maxScoreOf(exam, prompt) {
+    const engine = window.IBALL_WRITING_GRADE;
+    if (engine?.taskMaxScore) {
+      return engine.taskMaxScore(exam, prompt);
+    }
+    return engine?.MAX_SCORES?.[exam] || 15;
   }
 
   function loadDraftIntoEditor(prompt, options = {}) {
@@ -1299,6 +1312,7 @@
           id: prompt.id,
           exam: prompt.exam,
           label: prompt.label,
+          part: prompt.part,
           prompt: prompt.prompt,
           directions: prompt.directions,
           outline: prompt.outline,
@@ -1715,18 +1729,33 @@
     const copy = document.createElement("div");
     copy.className = "writing-score-copy";
     const band = document.createElement("strong");
-    band.textContent = `评级：${result.band?.label || "已完成"}`;
+    band.textContent = `${result.taskType ? `${result.taskType} · ` : ""}评级：${
+      result.band?.label || "已完成"
+    }${result.band?.range ? ` · ${result.band.range}` : ""}`;
     const meta = document.createElement("span");
     meta.textContent = `${result.words} 词 · ${result.paragraphs} 段 · ${result.sentences} 句 · ${
-      (result.dimensions || []).map((item) => `${item.label} ${item.score}`).join(" / ")
+      (result.dimensions || [])
+        .map(
+          (item) =>
+            `${item.label} ${item.scaled ?? item.score}${item.points ? `/${item.points}` : ""}`,
+        )
+        .join(" / ")
     }`;
     const engine = document.createElement("span");
     engine.className = "writing-engine";
     engine.textContent =
-      result.engine === "ai" ? "AI 批改" : "本地规则引擎 · 断网可用";
+      (result.engine === "ai" ? "AI 批改" : "本地规则引擎 · 断网可用") +
+      (result.official === false ? " · 非官方模拟分" : "");
     copy.append(band, meta, engine);
     head.append(score, copy);
     fragment.append(head);
+
+    if (result.scoreNotice) {
+      const notice = document.createElement("p");
+      notice.className = "writing-panel-hint";
+      notice.textContent = result.scoreNotice;
+      fragment.append(notice);
+    }
 
     if (options.cached) {
       const hint = document.createElement("p");
@@ -1744,7 +1773,10 @@
     }
 
     if ((result.dimensions || []).length) {
-      fragment.append(sectionTitle("分项得分", "满分按考试类型折算"));
+      const dimensionHint = result.taskType
+        ? `${result.taskType} · 满分 ${result.maxScore} 分`
+        : `满分 ${result.maxScore} 分`;
+      fragment.append(sectionTitle("分项得分", dimensionHint));
       const dimensions = document.createElement("div");
       dimensions.className = "writing-dimensions";
       result.dimensions.forEach((item) => {
@@ -1755,7 +1787,7 @@
         const label = document.createElement("span");
         label.textContent = item.label;
         const value = document.createElement("span");
-        value.textContent = `${item.score} / ${item.max}`;
+        value.textContent = `${item.scaled ?? item.score} / ${item.points ?? item.max}`;
         headRow.append(label, value);
         const bar = document.createElement("div");
         bar.className = "writing-dimension-bar";

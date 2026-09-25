@@ -63,10 +63,18 @@ function buildAiPrompt({ text, exam, prompt, local }) {
   const maxScore = local.maxScore;
   const taskTitle = cleanText(prompt?.label || prompt?.prompt).slice(0, 300);
   const taskBody = cleanText(prompt?.prompt).slice(0, 800);
+  const taskType = cleanText(local?.taskType || exam);
+  const partLabel = cleanText(local?.partLabel || "");
+  const bandGuide = local?.band?.fiveBand
+    ? "本题按考研英语五档标准评分，最终分数必须落在与题目满分匹配的档位区间内；模板化但不回应题干的作文要扣任务完成分。"
+    : "";
 
   return [
     "你是中国研究生入学考试/大学英语四六级的资深阅卷老师。",
-    `考试类型：${exam}，满分 ${maxScore} 分。`,
+    `考试类型：${taskType}，满分 ${maxScore} 分。`,
+    partLabel ? `题型：${partLabel}。` : "",
+    bandGuide,
+    "评分定位必须标为“非官方模拟评分”，不得声称是官方阅卷分数。",
     taskTitle ? `作文题目：${taskTitle}` : "",
     taskBody ? `题目要求：${taskBody}` : "",
     "请批改下面这篇学生作文，只输出一个 JSON 对象，不要输出任何解释性文字。",
@@ -339,11 +347,16 @@ async function enhanceWithAi({ text, exam, prompt, local }) {
     const score = Number.isFinite(rawScore)
       ? Math.max(0, Math.min(local.maxScore, Math.round(rawScore)))
       : local.score;
+    const band =
+      typeof localEngine.bandForScore === "function"
+        ? localEngine.bandForScore(score, local.maxScore, exam, local.part)
+        : local.band;
 
     return {
       ...local,
       engine: "ai",
       score,
+      band,
       issues: [...local.issues, ...aiIssues].slice(0, 40),
       issueCount: local.issueCount + aiIssues.length,
       replacements: aiReplacements.length ? aiReplacements : local.replacements,

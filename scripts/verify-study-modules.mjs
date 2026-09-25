@@ -4,6 +4,9 @@
  * 用法：
  *   node scripts/verify-study-modules.mjs --base http://127.0.0.1:4175 --out ../verify-shots
  *
+ * 脚本会自己注册一个临时账号拿登录 Cookie，所以本地库被清空过也能跑；
+ * 想跑在别的环境时记得那是个会写账号数据的实例。
+ *
  * 断言口径：
  *   · 首屏渲染 < 3s、分片懒加载、localStorage 留痕；
  *   · 词汇收藏 / 生词本、听句答题与错题本、跟读语速与控制条；
@@ -14,7 +17,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import crypto from "node:crypto";
 import { createRequire } from "node:module";
 
 const RUNTIME_MODULES =
@@ -63,30 +65,52 @@ function note(text) {
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
 
+let sessionValue = "";
+
 /**
- * 站内页面登录后才渲染素材入口。验收脚本按 dev server 同样的会话密钥
- * 自己签一张 cookie，免得把密码写进脚本；线上跑不到这段代码。
+ * 站内页面登录后才渲染素材入口。这里用真接口注册一个临时账号，
+ * 比手工签 cookie 稳：证书密钥换了、账号库重置了都不影响。
  */
-function sessionToken() {
-  const secret = process.env.SESSION_SECRET || "local-preview-secret";
-  const payload = Buffer.from(
-    JSON.stringify({ username: "iball", expiresAt: Date.now() + 7 * 86400000 }),
-  ).toString("base64url");
-  const signature = crypto
-    .createHmac("sha256", secret)
-    .update(`username-iball-password-2026-09-17:${payload}`)
-    .digest("base64url");
-  return `${payload}.${signature}`;
+async function prepareSession(base) {
+  const username = `study${Date.now().toString(36)}`;
+  const response = await fetch(`${base}/api/auth`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      // 注册限流按 IP 计数，这里借用保留测试网段，别吃掉真实访客的额度。
+      "x-forwarded-for": "198.51.100.31",
+    },
+    body: JSON.stringify({
+      action: "register",
+      username,
+      password: "Study-Passw0rd-2026",
+      email: `${username}@example.com`,
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.ok) {
+    throw new Error(`准备验收账号失败：${data.message || response.status}`);
+  }
+  const list =
+    typeof response.headers.getSetCookie === "function"
+      ? response.headers.getSetCookie()
+      : [];
+  const pair = list.join("; ").match(/([^=\s]+)=([^;]*)/);
+  if (!pair) {
+    throw new Error("注册接口没有返回登录 Cookie");
+  }
+  sessionValue = decodeURIComponent(pair[2]);
 }
 
 function sessionCookie(base) {
   return {
     name: "iball_cabin_session",
-    value: sessionToken(),
+    value: sessionValue,
     domain: new URL(base).hostname,
     path: "/",
     httpOnly: true,
     sameSite: "Lax",
+    secure: new URL(base).protocol === "https:",
   };
 }
 
@@ -382,10 +406,12 @@ async function verifyWriting(browser, base, out) {
     .count();
   const templateNotes = await page.locator(".writing-template-note").count();
   const templateSlots = await page.locator(".writing-template-slot").count();
-  const templateCache = await page.evaluate(() =>
-    Object.keys(window.localStorage).filter((key) =>
-      key.startsWith("iball-writing-template:"),
-    ),
+  const templateCache = await page.evaluate(
+    () =>
+      // Storage 上 Object.keys() 只返回方法名，必须按下标枚举。
+      Array.from({ length: window.localStorage.length }, (_, index) =>
+        window.localStorage.key(index),
+      ).filter((key) => key && key.startsWith("iball-writing-template:")),
   );
   check(
     "模板库按索引和分片懒加载",
@@ -432,9 +458,25 @@ async function verifyWriting(browser, base, out) {
   check("字数统计跟着输入更新", /\d/.test(wordCount), wordCount.trim());
 
   const draft = await page.evaluate(() =>
-    Object.keys(window.localStorage).filter((key) => key.includes("writing")),
+    Array.from({ length: window.localStorage.length }, (_, index) =>
+      window.localStorage.key(index),
+    ).filter((key) => key && key.includes("writing")),
   );
   check("草稿写进 localStorage", draft.length > 0, draft.join(", ") || "(没有草稿键)");
+
+  const draftBadge = await page
+    .waitForFunction(
+      () => Number(document.getElementById("draftCount")?.textContent || "0") >= 1,
+      null,
+      { timeout: 2500 },
+    )
+    .then(() => page.locator("#draftCount").innerText())
+    .catch(() => "");
+  check(
+    "草稿计数跟着更新",
+    Boolean(draftBadge),
+    `草稿计数 ${draftBadge || "(没更新)"}`,
+  );
 
   let gradedApi = false;
   page.on("request", (request) => {
@@ -693,6 +735,7 @@ async function main() {
   const base = arg("base", "http://127.0.0.1:4175").replace(/\/$/, "");
   const out = path.resolve(arg("out", "../verify-shots"));
   await fs.mkdir(out, { recursive: true });
+  await prepareSession(base);
   const browser = await chromium.launch({ executablePath: await findBrowser(), headless: true });
   try {
     await verifyIndexEntries(browser, base, out);
