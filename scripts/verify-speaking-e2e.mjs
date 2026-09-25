@@ -6,7 +6,8 @@
  *   2. 练习台：真实生活场景筛选、雅思口语 Part 1 → 2 → 3 全流程、报告维度；
  *   3. 自由对话：本地免费陪练的话题轮换、自定义 API 失败后自动回退；
  *   4. 日常听力：按套懒加载、句子列表可播放；
- *   5. 桌面端与移动端的横向溢出、控制台错误、首屏耗时、口语素材懒加载。
+ *   5. 开源方案索引：模块筛选、关键词过滤、跳转 GitHub 搜索、Esc 关闭；
+ *   6. 桌面端与移动端的横向溢出、控制台错误、首屏耗时、口语素材懒加载。
  *
  * 用法：
  *   node scripts/verify-speaking-e2e.mjs --base http://127.0.0.1:4175
@@ -603,6 +604,25 @@ async function verifyPracticeStudio(page, { mobile = false, mockApi } = {}) {
     restoredUrl === mockUrl && restoredMode === "api",
     `mode=${restoredMode} url=${restoredUrl}`,
   );
+  const storedConversation = await page.evaluate(() =>
+    window.localStorage.getItem("iball-listening-cabin-free-conversation"),
+  );
+  let parsedConversation = [];
+  try {
+    parsedConversation = JSON.parse(storedConversation || "[]");
+  } catch {
+    parsedConversation = [];
+  }
+  const restoredMessages = await page
+    .locator(".free-message:not(.is-loading)")
+    .count();
+  check(
+    `${tag}：自由对话记录刷新后仍保留`,
+    Array.isArray(parsedConversation) &&
+      parsedConversation.length >= 6 &&
+      restoredMessages === parsedConversation.length,
+    `存储 ${parsedConversation.length} 条 / 页面 ${restoredMessages} 条`,
+  );
 
   const callsBefore = mockApi.calls.length;
   await answerTextarea(
@@ -690,6 +710,84 @@ async function verifyPracticeStudio(page, { mobile = false, mockApi } = {}) {
   console.log(`   截图: ${shot}`);
 }
 
+async function verifyOpenSourcePanel(page, { mobile = false } = {}) {
+  const tag = mobile ? "移动端" : "桌面端";
+  console.log(`\n== ${tag}：开源方案索引`);
+  const { errors } = attachDiagnostics(page);
+  await page.goto(`${base}/index.html`, { waitUntil: "load", timeout: 30000 });
+  await enterCabin(page, `osindex${Math.random().toString(36).slice(2, 10)}`);
+
+  await page.click("#openSourceButton");
+  await page.waitForSelector("#openSourcePanel:not([hidden])", {
+    timeout: 10000,
+  });
+  check(
+    `${tag}：开源方案索引可以打开`,
+    await page.locator("#openSourceList .open-source-item").count() >= 10,
+    `${await page.locator("#openSourceList .open-source-item").count()} 条`,
+  );
+  check(
+    `${tag}：索引条目都带仓库链接`,
+    (await page.locator("#openSourceList .open-source-link").count()) ===
+      (await page.locator("#openSourceList .open-source-item").count()),
+    `链接 ${await page.locator("#openSourceList .open-source-link").count()} 个`,
+  );
+
+  const filters = page.locator(".open-source-filter");
+  const filterCount = await filters.count();
+  check(`${tag}：按模块筛选可用`, filterCount >= 5, `${filterCount} 个筛选`);
+  await page.click('[data-open-source-filter="ielts"]');
+  const ieltsCount = await page.locator("#openSourceList .open-source-item").count();
+  check(
+    `${tag}：筛选后只剩对应模块条目`,
+    ieltsCount > 0 && ieltsCount < 5,
+    `${ieltsCount} 条`,
+  );
+  await page.click('[data-open-source-filter="all"]');
+
+  await page.fill("#openSourceQuery", "ecdict");
+  const filtered = await page.locator("#openSourceList .open-source-item").count();
+  check(`${tag}：关键词在索引内过滤`, filtered === 1, `${filtered} 条`);
+  await page.fill("#openSourceQuery", "");
+
+  if (!mobile) {
+    const popupPromise = page.waitForEvent("popup", { timeout: 10000 });
+    await page.click("#openSourceSubmit");
+    const popup = await popupPromise;
+    const popupUrl = popup.url();
+    check(
+      "桌面端：可以跳转 GitHub 搜索",
+      popupUrl.startsWith("https://github.com/search") &&
+        popupUrl.includes("q="),
+      popupUrl,
+    );
+    await popup.close();
+  }
+
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(160);
+  check(
+    `${tag}：Esc 可以关闭索引`,
+    await page.locator("#openSourcePanel").isHidden(),
+    `hidden=${await page.locator("#openSourcePanel").isHidden()}`,
+  );
+
+  const metrics = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  check(
+    `${tag}：索引没有横向溢出`,
+    metrics.scrollWidth <= metrics.clientWidth + 1,
+    `scrollWidth=${metrics.scrollWidth} clientWidth=${metrics.clientWidth}`,
+  );
+  check(
+    `${tag}：索引没有控制台报错`,
+    errors.length === 0,
+    errors.slice(0, 3).join(" | ") || "无",
+  );
+}
+
 async function verifyDailyListening(page) {
   console.log("\n== 桌面端：日常听力模块");
   const { errors, requests } = attachDiagnostics(page);
@@ -762,6 +860,7 @@ async function main() {
       deviceScaleFactor: 1,
     });
     await verifyPracticeStudio(await desktop.newPage(), { mockApi });
+    await verifyOpenSourcePanel(await desktop.newPage());
     await desktop.close();
 
     const mobile = await browser.newContext({
@@ -774,6 +873,7 @@ async function main() {
       mobile: true,
       mockApi,
     });
+    await verifyOpenSourcePanel(await mobile.newPage(), { mobile: true });
     await mobile.close();
 
     const listen = await browser.newContext({

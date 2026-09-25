@@ -14,14 +14,14 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260925-perf1" />
+    <link rel="stylesheet" href="./styles.css?v=20260925-convo1" />
     <link rel="stylesheet" href="./speech-transport.css?v=20260925-perf1" />
     <script src="./account-store.js?v=20260925-perf1" defer></script>
     <script src="./speech-transport.js?v=20260925-perf1" defer></script>
     <script src="./deck-data.js?v=20260925-perf1" defer></script>
     <script src="./vocab-index.js?v=20260925-perf1" defer></script>
     <script src="./session-guard.js?v=20260925-perf1" defer></script>
-    <script src="./app.js?v=20260925-perf1" defer></script>
+    <script src="./app.js?v=20260925-convo1" defer></script>
   </head>
   <body>
     <div
@@ -452,6 +452,15 @@
                 type="button"
               >
                 口语练习
+              </button>
+              <button
+                id="openSourceButton"
+                class="open-source-launch-button"
+                type="button"
+                aria-expanded="false"
+                aria-controls="openSourcePanel"
+              >
+                开源方案索引
               </button>
             </div>
           </div>
@@ -1763,6 +1772,79 @@
         </button>
       </div>
       <div id="wordPopoverContent" class="word-popover-content"></div>
+    </div>
+
+    <div
+      id="openSourcePanel"
+      class="open-source-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="openSourceTitle"
+      hidden
+    >
+      <div class="open-source-scrim" data-open-source-dismiss></div>
+      <article
+        id="openSourceCard"
+        class="open-source-card"
+        tabindex="-1"
+      >
+        <header class="open-source-head">
+          <div>
+            <span class="section-label">OPEN SOURCE RESEARCH</span>
+            <h2 id="openSourceTitle">开源方案索引</h2>
+          </div>
+          <button
+            id="openSourceClose"
+            class="open-source-close-button"
+            type="button"
+            aria-label="关闭开源方案索引"
+          >
+            关闭
+          </button>
+        </header>
+
+        <p class="open-source-intro">
+          按训练模块整理调研过的公开仓库，只借鉴思路、数据结构与版式，
+          未复制其代码与受版权保护的正文。需要更多方案时可直接去 GitHub 检索。
+        </p>
+
+        <form
+          id="openSourceForm"
+          class="open-source-search"
+          role="search"
+        >
+          <input
+            id="openSourceQuery"
+            class="open-source-input"
+            type="search"
+            autocomplete="off"
+            placeholder="关键词，例如 雅思口语 评分"
+            aria-label="开源项目关键词"
+          />
+          <button
+            id="openSourceSubmit"
+            class="open-source-search-button"
+            type="submit"
+          >
+            在 GitHub 搜索
+          </button>
+        </form>
+
+        <div
+          id="openSourceFilters"
+          class="open-source-filters"
+          role="group"
+          aria-label="按训练模块筛选"
+        ></div>
+
+        <p
+          id="openSourceStatus"
+          class="open-source-status"
+          aria-live="polite"
+        ></p>
+
+        <ul id="openSourceList" class="open-source-list"></ul>
+      </article>
     </div>
   </body>
 </html>

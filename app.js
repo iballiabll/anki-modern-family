@@ -34,9 +34,168 @@ const PRACTICE_HISTORY_STORAGE_KEY =
   "iball-listening-cabin-speaking-history";
 const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
+const FREE_CONVERSATION_STORAGE_KEY =
+  "iball-listening-cabin-free-conversation";
 const WELCOME_OVERLAY_STORAGE_KEY = "iball-listening-cabin-welcome-seen";
 const COLLAPSED_CATEGORIES_STORAGE_KEY =
   "iball-listening-cabin-collapsed-categories";
+const GITHUB_SEARCH_URL = "https://github.com/search";
+const OPEN_SOURCE_FILTERS = [
+  { id: "all", label: "全部", keyword: "english learning web app" },
+  { id: "speaking", label: "口语跟读", keyword: "english speaking practice" },
+  { id: "ielts", label: "雅思口语", keyword: "ielts speaking practice" },
+  { id: "listening", label: "听力听写", keyword: "english listening dictation" },
+  { id: "vocab", label: "词汇记忆", keyword: "english vocabulary spaced repetition" },
+  { id: "exam", label: "考研四六级", keyword: "kaoyan english cet6 exam" },
+  { id: "design", label: "界面设计", keyword: "education app ui design system" },
+];
+// 每次改版前逐页调研过的公开仓库，只借鉴思路、数据结构与版式。
+const OPEN_SOURCE_REFERENCES = [
+  {
+    group: "speaking",
+    module: "素材跟读",
+    name: "yin-yizhen/SpeakHub",
+    url: "https://github.com/yin-yizhen/SpeakHub",
+    license: "许可以仓库为准",
+    takeaway: "跟读练习里「播放原文 → 录音 → 查看结果」的三段式状态组织。",
+  },
+  {
+    group: "speaking",
+    module: "情景对话",
+    name: "EthanLyu30/spoken",
+    url: "https://github.com/EthanLyu30/spoken",
+    license: "MIT",
+    takeaway: "成人日常场景的轮次编排与追问方式，用于餐厅、医院、租房等场景。",
+  },
+  {
+    group: "speaking",
+    module: "口语反馈",
+    name: "luyou666/english-speaking-coach",
+    url: "https://github.com/luyou666/english-speaking-coach",
+    license: "MIT",
+    takeaway: "把发音、用词、语法拆成独立字段分别给建议的反馈结构。",
+  },
+  {
+    group: "ielts",
+    module: "雅思口语",
+    name: "Luxshan2000/ielts-prep",
+    url: "https://github.com/Luxshan2000/ielts-prep",
+    license: "MIT",
+    takeaway: "Part 1 问答、Part 2 题卡、Part 3 追问的结构与练习流程。",
+  },
+  {
+    group: "speaking",
+    module: "纠错表达",
+    name: "anticipate218/EchoMentor",
+    url: "https://github.com/anticipate218/EchoMentor",
+    license: "MIT",
+    takeaway: "把纠错写成「原句 → 地道改写 → 原因」的表达方式。",
+  },
+  {
+    group: "speaking",
+    module: "语音管线调研",
+    name: "xiaochong/hi-kid-fun",
+    url: "https://github.com/xiaochong/hi-kid-fun",
+    license: "ISC",
+    takeaway: "语音识别与朗读链路、话题驱动对话循环的调研，本站只用于成人场景的管线结论。",
+  },
+  {
+    group: "listening",
+    module: "听句版式",
+    name: "Pi3-l22/TingJu",
+    url: "https://github.com/Pi3-l22/TingJu",
+    license: "MIT",
+    takeaway: "固定顶部播放器 + 可滚动句子列表 + 下方答题区的版式。",
+  },
+  {
+    group: "listening",
+    module: "影视原声",
+    name: "tangshimin/MuJing",
+    url: "https://github.com/tangshimin/MuJing",
+    license: "MIT",
+    takeaway: "影视原声按句切分、逐句重听与字幕联动、点词查义的交互。",
+  },
+  {
+    group: "speaking",
+    module: "跟读评分",
+    name: "isboyjc/le-agent",
+    url: "https://github.com/isboyjc/le-agent",
+    license: "MIT",
+    takeaway: "「原音 → 跟读 → 评分 → 改写建议」的练习顺序与反馈结构。",
+  },
+  {
+    group: "vocab",
+    module: "词汇数据",
+    name: "lilinji/English",
+    url: "https://github.com/lilinji/English",
+    license: "MIT",
+    takeaway: "按考试类型分类的词表结构与列表式展示思路。",
+  },
+  {
+    group: "vocab",
+    module: "词典数据",
+    name: "skywind3000/ECDict",
+    url: "https://github.com/skywind3000/ECDict",
+    license: "MIT",
+    takeaway: "音标、释义、词形变化、词根与形近词数据。",
+  },
+  {
+    group: "vocab",
+    module: "短语搭配",
+    name: "2ndLA/english-phrases",
+    url: "https://github.com/2ndLA/english-phrases",
+    license: "CC-BY-SA-4.0",
+    takeaway: "固定搭配与短语表，站内词库脚本已在用。",
+  },
+  {
+    group: "vocab",
+    module: "复习调度",
+    name: "open-spaced-repetition/fsrs4anki",
+    url: "https://github.com/open-spaced-repetition/fsrs4anki",
+    license: "MIT",
+    takeaway: "间隔重复的到期队列与评分口径，复习卡组按这个思路排期。",
+  },
+  {
+    group: "exam",
+    module: "考研资料",
+    name: "Echo1LZJY/echo-kaoyan-english-skill",
+    url: "https://github.com/Echo1LZJY/echo-kaoyan-english-skill",
+    license: "仅借鉴公开结构",
+    takeaway: "真题按题型拆分，解析与复盘清单一起组织的知识结构。",
+  },
+  {
+    group: "exam",
+    module: "四六级资料",
+    name: "Liuxiangjian-ai/cet-skill",
+    url: "https://github.com/Liuxiangjian-ai/cet-skill",
+    license: "MIT",
+    takeaway: "真题按年份逐条拆成条目、配合复盘清单的组织方式。",
+  },
+  {
+    group: "design",
+    module: "界面规范",
+    name: "shadcn-ui/ui",
+    url: "https://github.com/shadcn-ui/ui",
+    license: "MIT",
+    takeaway: "组件默认值与键盘可访问性：可见焦点环、足够对比度、克制的圆角。",
+  },
+  {
+    group: "design",
+    module: "设计文档",
+    name: "VoltAgent/awesome-design-md",
+    url: "https://github.com/VoltAgent/awesome-design-md",
+    license: "MIT",
+    takeaway: "先把设计体系写成规范文档，再逐页落地的做法。",
+  },
+  {
+    group: "design",
+    module: "改版自查",
+    name: "nextlevelbuilder/ui-ux-pro-max-skill",
+    url: "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+    license: "MIT",
+    takeaway: "把 UI/UX 检查清单拆成可逐条复查的 skill 条目。",
+  },
+];
 const CATEGORY_ORDER = [
   "0基础",
   "四级",
@@ -1598,6 +1757,8 @@ const state = {
   ankiExportSection: "all",
   ankiExportStatus: "",
   ankiExportStatusType: "",
+  openSourceFilter: "all",
+  openSourceQuery: "",
   showAllMeanings: false,
   meaningReveals: new Set(),
   meaningHides: new Set(),
@@ -1786,6 +1947,15 @@ const elements = {
   hideAllMeaningsButton: document.querySelector("#hideAllMeaningsButton"),
   ankiExportButton: document.querySelector("#ankiExportButton"),
   ankiExportPanel: document.querySelector("#ankiExportPanel"),
+  openSourceButton: document.querySelector("#openSourceButton"),
+  openSourcePanel: document.querySelector("#openSourcePanel"),
+  openSourceCard: document.querySelector("#openSourceCard"),
+  openSourceClose: document.querySelector("#openSourceClose"),
+  openSourceForm: document.querySelector("#openSourceForm"),
+  openSourceQuery: document.querySelector("#openSourceQuery"),
+  openSourceFilters: document.querySelector("#openSourceFilters"),
+  openSourceStatus: document.querySelector("#openSourceStatus"),
+  openSourceList: document.querySelector("#openSourceList"),
   ankiExportCloseButton: document.querySelector(
     "#ankiExportCloseButton",
   ),
@@ -2090,6 +2260,59 @@ function persistPracticeHistory() {
     );
   } catch {
     // Practice still works for the current visit when storage is unavailable.
+  }
+}
+
+function restoreFreeConversation() {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(FREE_CONVERSATION_STORAGE_KEY) || "[]",
+    );
+    if (!Array.isArray(stored)) {
+      state.freeMessages = [];
+      return;
+    }
+
+    state.freeMessages = stored
+      .filter(
+        (message) =>
+          message &&
+          (message.role === "user" || message.role === "assistant") &&
+          typeof message.english === "string" &&
+          message.english.trim(),
+      )
+      .slice(-40)
+      .map((message) => ({
+        role: message.role,
+        english: message.english.trim(),
+        chinese:
+          typeof message.chinese === "string" ? message.chinese.trim() : "",
+        feedback:
+          message.feedback && typeof message.feedback === "object"
+            ? message.feedback
+            : null,
+        source:
+          typeof message.source === "string" ? message.source : "local",
+        createdAt:
+          typeof message.createdAt === "string" ? message.createdAt : "",
+      }));
+    state.freeTurnCount = state.freeMessages.filter(
+      (message) => message.role === "user",
+    ).length;
+  } catch {
+    state.freeMessages = [];
+    state.freeTurnCount = 0;
+  }
+}
+
+function persistFreeConversation() {
+  try {
+    localStorage.setItem(
+      FREE_CONVERSATION_STORAGE_KEY,
+      JSON.stringify(state.freeMessages.slice(-40)),
+    );
+  } catch {
+    // The current conversation stays available in memory if storage is full.
   }
 }
 
@@ -5056,6 +5279,7 @@ function resetFreeConversation() {
   state.freeUsedLines = new Set();
   state.freeUsedTopics = new Set([state.freeTopic]);
   state.freeTopicHistory = [];
+  persistFreeConversation();
   if (state.practiceSection === "free") {
     renderPracticeView();
   }
@@ -5606,6 +5830,7 @@ async function sendFreeMessage(providedText = "") {
     createdAt: new Date().toISOString(),
   };
   state.freeMessages.push(userMessage);
+  persistFreeConversation();
   state.freeTurnCount += 1;
   state.freeInput = "";
   state.freeHintVisible = false;
@@ -5661,6 +5886,7 @@ async function sendFreeMessage(providedText = "") {
     createdAt: new Date().toISOString(),
   };
   state.freeMessages.push(assistantMessage);
+  persistFreeConversation();
   state.freeChatLoading = false;
   renderPracticeView();
 
@@ -7463,6 +7689,114 @@ async function downloadAnkiExport() {
 
   setAnkiExportStatus(`已生成 ${entries.length} 条词卡：${fileName}`);
   renderAnkiExport();
+}
+
+function openSourceSearchUrl(query) {
+  const text = String(query || "").trim();
+  const keyword =
+    text ||
+    OPEN_SOURCE_FILTERS.find((filter) => filter.id === state.openSourceFilter)
+      ?.keyword ||
+    OPEN_SOURCE_FILTERS[0].keyword;
+  const url = new URL(GITHUB_SEARCH_URL);
+  url.searchParams.set("q", keyword);
+  url.searchParams.set("type", "repositories");
+  return url.toString();
+}
+
+function visibleOpenSourceReferences() {
+  const query = state.openSourceQuery.trim().toLowerCase();
+  return OPEN_SOURCE_REFERENCES.filter((item) => {
+    if (state.openSourceFilter !== "all" && item.group !== state.openSourceFilter) {
+      return false;
+    }
+    if (!query) {
+      return true;
+    }
+    return [item.name, item.module, item.license, item.takeaway].some((value) =>
+      value.toLowerCase().includes(query),
+    );
+  });
+}
+
+function renderOpenSourcePanel() {
+  const list = elements.openSourceList;
+  if (!list) {
+    return;
+  }
+
+  elements.openSourceFilters.replaceChildren(
+    ...OPEN_SOURCE_FILTERS.map((filter) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "open-source-filter";
+      button.dataset.openSourceFilter = filter.id;
+      button.textContent = filter.label;
+      const isActive = state.openSourceFilter === filter.id;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      return button;
+    }),
+  );
+
+  const visible = visibleOpenSourceReferences();
+  elements.openSourceStatus.textContent = `显示 ${visible.length} / ${OPEN_SOURCE_REFERENCES.length} 项，点标题可打开仓库。`;
+
+  if (visible.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "open-source-empty";
+    empty.textContent =
+      "本站索引里没有匹配项，可以点上面的按钮去 GitHub 上继续找。";
+    list.replaceChildren(empty);
+    return;
+  }
+
+  list.replaceChildren(
+    ...visible.map((item) => {
+      const row = document.createElement("li");
+      row.className = "open-source-item";
+
+      const head = document.createElement("div");
+      head.className = "open-source-item-head";
+      const link = document.createElement("a");
+      link.className = "open-source-link";
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = item.name;
+      const license = document.createElement("em");
+      license.className = "open-source-license";
+      license.textContent = item.license;
+      head.append(link, license);
+
+      const module = document.createElement("span");
+      module.className = "open-source-item-module";
+      module.textContent = item.module;
+
+      const takeaway = document.createElement("p");
+      takeaway.textContent = item.takeaway;
+
+      row.append(head, module, takeaway);
+      return row;
+    }),
+  );
+}
+
+function openOpenSourcePanel() {
+  elements.openSourcePanel.hidden = false;
+  elements.openSourceButton.setAttribute("aria-expanded", "true");
+  state.openSourceQuery = "";
+  elements.openSourceQuery.value = "";
+  renderOpenSourcePanel();
+  elements.openSourceCard.focus();
+}
+
+function closeOpenSourcePanel({ restoreFocus = false } = {}) {
+  elements.openSourcePanel.hidden = true;
+  elements.openSourceButton.setAttribute("aria-expanded", "false");
+  if (restoreFocus) {
+    elements.openSourceButton.focus();
+  }
 }
 
 
@@ -10152,6 +10486,8 @@ async function handleLogout() {
 
 function resetStateForAccount() {
   state.practiceHistory = [];
+  state.freeMessages = [];
+  state.freeTurnCount = 0;
   state.reviewProgress = {};
   state.reviewDaily = { date: "", reviewedKeys: [], newKeys: [] };
   state.reviewQueue = [];
@@ -10167,6 +10503,7 @@ function resetStateForAccount() {
   restoreMarks();
   restoreLibraryCollapse();
   restorePracticeHistory();
+  restoreFreeConversation();
   restorePracticeSettings();
   restoreReviewData();
 }
@@ -10649,6 +10986,49 @@ elements.viewSwitcher.addEventListener("click", (event) => {
   render();
 });
 elements.wordPopoverClose.addEventListener("click", closeWordPopover);
+elements.openSourceButton.addEventListener("click", () => {
+  if (elements.openSourcePanel.hidden) {
+    openOpenSourcePanel();
+    return;
+  }
+  closeOpenSourcePanel();
+});
+elements.openSourceClose.addEventListener("click", () =>
+  closeOpenSourcePanel({ restoreFocus: true }),
+);
+elements.openSourcePanel.addEventListener("click", (event) => {
+  const target = event.target;
+  if (
+    target instanceof HTMLElement &&
+    target.dataset.openSourceDismiss !== undefined
+  ) {
+    closeOpenSourcePanel({ restoreFocus: true });
+  }
+});
+elements.openSourceFilters.addEventListener("click", (event) => {
+  const target = event.target;
+  const button =
+    target instanceof HTMLElement
+      ? target.closest("[data-open-source-filter]")
+      : null;
+  if (!button) {
+    return;
+  }
+  state.openSourceFilter = button.dataset.openSourceFilter;
+  renderOpenSourcePanel();
+});
+elements.openSourceQuery.addEventListener("input", (event) => {
+  state.openSourceQuery = event.target.value;
+  renderOpenSourcePanel();
+});
+elements.openSourceForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  window.open(
+    openSourceSearchUrl(elements.openSourceQuery.value),
+    "_blank",
+    "noopener,noreferrer",
+  );
+});
 document.addEventListener("click", (event) => {
   if (
     elements.wordPopover.hidden ||
@@ -10660,6 +11040,10 @@ document.addEventListener("click", (event) => {
   closeWordPopover();
 });
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !elements.openSourcePanel.hidden) {
+    closeOpenSourcePanel({ restoreFocus: true });
+    return;
+  }
   if (event.key === "Escape" && !elements.ankiExportPanel.hidden) {
     closeAnkiExport({ restoreFocus: true });
     return;
@@ -10790,6 +11174,7 @@ if ("speechSynthesis" in window) {
 restoreMarks();
 restoreLibraryCollapse();
 restorePracticeHistory();
+restoreFreeConversation();
 restorePracticeSettings();
 restoreReviewData();
 syncLibraryDisclosure();

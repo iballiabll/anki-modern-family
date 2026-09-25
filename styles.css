@@ -1842,6 +1842,258 @@ p {
   border-color: var(--coral-dark);
 }
 
+.open-source-launch-button {
+  min-height: 38px;
+  flex: 0 0 auto;
+  padding: 0 13px;
+  color: #2f4f6d;
+  background: #eef3f8;
+  border: 1px solid #c6d6e4;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.open-source-launch-button:hover {
+  background: #e2ebf4;
+  border-color: #9db8ce;
+}
+
+.open-source-launch-button:focus-visible,
+.open-source-close-button:focus-visible,
+.open-source-filter:focus-visible,
+.open-source-search-button:focus-visible,
+.open-source-input:focus-visible,
+.open-source-link:focus-visible {
+  outline: 3px solid rgba(90, 150, 132, 0.3);
+  outline-offset: 2px;
+}
+
+.open-source-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.open-source-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 41, 37, 0.46);
+}
+
+.open-source-card {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  width: min(760px, 100%);
+  max-height: min(720px, calc(100vh - 36px));
+  overflow: auto;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #c9dcd2;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(8, 34, 30, 0.28);
+}
+
+.open-source-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.open-source-head > div {
+  display: grid;
+  gap: 3px;
+}
+
+.open-source-head .section-label {
+  margin: 0;
+  color: #6d8178;
+}
+
+.open-source-head h2 {
+  margin: 0;
+  color: var(--forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+}
+
+.open-source-close-button {
+  min-height: 30px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  color: #5c7067;
+  background: #f3f7f4;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.open-source-close-button:hover {
+  border-color: #9dbdaf;
+}
+
+.open-source-intro {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.open-source-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.open-source-input {
+  flex: 1 1 220px;
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #f7faf8;
+  border: 1px solid #d5e3da;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.open-source-search-button {
+  min-height: 38px;
+  flex: 0 0 auto;
+  padding: 0 14px;
+  color: #ffffff;
+  background: var(--forest);
+  border: 1px solid var(--forest);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.open-source-search-button:hover {
+  background: var(--forest-deep);
+  border-color: var(--forest-deep);
+}
+
+.open-source-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.open-source-filter {
+  min-height: 30px;
+  padding: 0 11px;
+  color: #466156;
+  background: #f2f7f4;
+  border: 1px solid #d5e3da;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.open-source-filter:hover {
+  border-color: #9dbdaf;
+}
+
+.open-source-filter.is-active {
+  color: #ffffff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.open-source-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.open-source-list {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.open-source-item {
+  display: grid;
+  gap: 4px;
+  padding: 11px 12px;
+  background: #f8fbf9;
+  border: 1px solid #dde9e2;
+  border-radius: 9px;
+}
+
+.open-source-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.open-source-link {
+  color: var(--forest);
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
+.open-source-license {
+  color: #7a8b83;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.open-source-item-module {
+  justify-self: start;
+  padding: 2px 7px;
+  color: #1f7a6c;
+  background: rgba(31, 122, 108, 0.1);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.open-source-item p {
+  margin: 0;
+  color: #40564e;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.open-source-empty {
+  padding: 14px;
+  color: var(--muted);
+  background: #f8fbf9;
+  border: 1px dashed #d5e3da;
+  border-radius: 9px;
+  font-size: 12.5px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .open-source-panel {
+    align-items: end;
+    padding: 0;
+  }
+
+  .open-source-card {
+    width: 100%;
+    max-height: calc(100vh - 44px);
+    padding: 16px;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .open-source-search-button {
+    flex: 1 1 100%;
+  }
+}
+
 .anki-export-panel {
   padding: 14px;
   display: grid;
