@@ -3,3 +3,10 @@
 public/
 preview-*.log
 tmp-*
+__pycache__/
+*.pyc
+work/
+
+# 摩登家庭每集的 mp3 / srt / cue 清单只是 movie-data 的生成源，
+# 页面运行时读取 movie-data/audio，因此不再重复入库（约 104 MB）。
+materials/电影/摩登家庭/S01E*/

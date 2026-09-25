@@ -10,6 +10,18 @@ const publicRoot = path.join(root, "public");
 const checkOnly = process.argv.includes("--check");
 const staticEntries = [
   "app.js",
+  "cet6-data",
+  "cet6.css",
+  "cet6-extra-data",
+  "cet6-extra-papers.js",
+  "cet6-extra.html",
+  "cet6-extra.js",
+  "cet6-listening-data",
+  "cet6-listening-papers.js",
+  "cet6-listening.html",
+  "cet6-papers.js",
+  "cet6-reading.html",
+  "cet6.html",
   "collocation-index.js",
   "collocation-index.json",
   "deck-data.js",
@@ -19,10 +31,21 @@ const staticEntries = [
   "intensive.html",
   "intensive-papers.js",
   "intensive.js",
+  "kaoyan-data",
+  "kaoyan.css",
+  "kaoyan.html",
+  "kaoyan.js",
   "movie-data",
   "movie.css",
   "movie.html",
   "movie.js",
+  "periodical-data",
+  "periodical-files",
+  "periodical-index.js",
+  "periodical-papers.js",
+  "periodical.css",
+  "periodical.html",
+  "periodical.js",
   "reading.css",
   "reading-data",
   "reading.html",
@@ -40,14 +63,27 @@ const staticEntries = [
   "vocab-index.json",
   "materials",
 ];
-const categoryOrder = ["0基础", "四级", "六级", "考研", "电影", "其他"];
+// 摩登家庭的逐句原声、字幕与 cue 清单只是 movie-data 的生成源，页面运行时
+// 读取 movie-data/，因此这份副本不再重复拷进 public（省下约 100 MB 部署体积）。
+const regeneratedMovieMediaPattern =
+  /^materials\/电影\/摩登家庭\/.+\/([^/]+)\.(mp3|m4a|aac|wav|ogg|opus|flac|srt|ass|vtt|json)$/i;
+const categoryOrder = [
+  "0基础",
+  "四级",
+  "六级",
+  "考研",
+  "外刊",
+  "电影",
+  "其他",
+];
 const supportedExtensions = new Map([
   [".csv", "anki-csv"],
   [".md", "markdown-table"],
   [".html", "html-page"],
   [".docx", "download-only"],
+  [".pdf", "download-only"],
 ]);
-const attachmentExtensions = new Set([".html", ".docx"]);
+const attachmentExtensions = new Set([".html", ".docx", ".pdf"]);
 
 function toPosixPath(value) {
   return value.split(path.sep).join("/");
@@ -233,11 +269,26 @@ async function buildPublicDirectory() {
   await fs.rm(publicRoot, { recursive: true, force: true });
   await fs.mkdir(publicRoot, { recursive: true });
 
+  let skippedMedia = 0;
+  const copyFilter = (source) => {
+    const relative = path.relative(root, source).split(path.sep).join("/");
+    if (regeneratedMovieMediaPattern.test(relative)) {
+      skippedMedia += 1;
+      return false;
+    }
+    return true;
+  };
+
   for (const entry of staticEntries) {
     const source = path.join(root, entry);
     const destination = path.join(publicRoot, entry);
-    await fs.cp(source, destination, { recursive: true, force: true });
+    await fs.cp(source, destination, {
+      recursive: true,
+      force: true,
+      filter: copyFilter,
+    });
   }
+  return skippedMedia;
 }
 
 await fs.mkdir(materialsRoot, { recursive: true });
@@ -257,7 +308,12 @@ if (checkOnly) {
   console.log(`Manifest is current with ${resources.length} material(s).`);
 } else {
   await fs.writeFile(manifestPath, nextManifest, "utf8");
-  await buildPublicDirectory();
+  const skippedMedia = await buildPublicDirectory();
   console.log(`Generated resources.json with ${resources.length} material(s).`);
   console.log("Prepared public directory for deployment.");
+  if (skippedMedia) {
+    console.log(
+      `Skipped ${skippedMedia} regenerated movie media file(s) already served from movie-data.`,
+    );
+  }
 }
