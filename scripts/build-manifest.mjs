@@ -9,6 +9,10 @@ const manifestPath = path.join(root, "resources.json");
 const publicRoot = path.join(root, "public");
 const checkOnly = process.argv.includes("--check");
 const staticEntries = [
+  "account-store.js",
+  "admin.css",
+  "admin.html",
+  "admin.js",
   "app.js",
   "cet4-writing-papers.js",
   "cet6-data",
@@ -50,6 +54,9 @@ const staticEntries = [
   "periodical.css",
   "periodical.html",
   "periodical.js",
+  "quiz.css",
+  "quiz.html",
+  "quiz.js",
   "reading.css",
   "reading-data",
   "reading.html",

@@ -7,6 +7,8 @@
  *  - AI 超时或返回异常时：静默回退到规则结果，前端不会因此失败。
  */
 const localEngine = require("../writing-grade.js");
+const { clientIp, resolveSessionUser } = require("./_session.js");
+const telemetry = require("./_telemetry.js");
 
 const MAX_TEXT_LENGTH = 6000;
 const MIN_TEXT_LENGTH = 10;
@@ -357,9 +359,16 @@ async function enhanceWithAi({ text, exam, prompt, local }) {
   }
 }
 
-module.exports = async function handler(request, response) {
+async function handler(request, response) {
   response.setHeader("Content-Type", "application/json; charset=utf-8");
   response.setHeader("Cache-Control", "no-store");
+
+  const user = await resolveSessionUser(request).catch(() => null);
+  telemetry.annotate(response, {
+    user: user?.username || "",
+    userId: user?.id || "",
+    ip: clientIp(request),
+  });
 
   if (request.method !== "POST") {
     response.status(405).json({ ok: false, message: "不支持的请求方式" });
@@ -387,6 +396,7 @@ module.exports = async function handler(request, response) {
   }
 
   const prompt = { ...(body.prompt || {}), exam };
+  telemetry.setMeta(response, { exam, chars: text.length });
   const local = localEngine.grade({ text, prompt, exam });
   if (!local) {
     response.status(500).json({ ok: false, message: "批改引擎不可用" });
@@ -394,5 +404,8 @@ module.exports = async function handler(request, response) {
   }
 
   const enhanced = await enhanceWithAi({ text, exam, prompt, local });
+  telemetry.setMeta(response, { ai: Boolean(enhanced) });
   response.status(200).json({ ok: true, result: enhanced || local });
-};
+}
+
+module.exports = telemetry.wrap("grade", handler);

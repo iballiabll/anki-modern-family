@@ -12,9 +12,10 @@
  *   SESSION_SECRET         必填，签名登录 Cookie；缺省直接启动失败
  *   DATA_DIR               账号文件目录，默认 work/data
  *   APP_USERNAME           站长账号，默认 iball
+ *   ADMIN_USERNAME         管理台账号名，默认取 APP_USERNAME，再退到 iball
  *   APP_PASSWORD_SHA256    站长口令的 SHA-256（不设则用仓库内置值）
  *   REGISTRATION_ENABLED   是否开放注册，默认 true
- *   REGISTRATION_CODE      可选邀请码
+ *   REGISTRATION_CODE      可选邀请码（也可在 /admin.html 里直接改，无需重启）
  *   MAX_USERS              账号上限，默认 20
  */
 

@@ -40,6 +40,9 @@
         mode: "server",
         authenticated: Boolean(data.authenticated),
         user: data.user || "",
+        account: data.account || null,
+        admin: Boolean(data.admin),
+        serviceConfigured: Boolean(data.serviceConfigured),
         registration: data.registration || {
           enabled: false,
           inviteRequired: false,

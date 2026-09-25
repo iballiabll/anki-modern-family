@@ -16,6 +16,7 @@
     />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
+    <script src="./account-store.js" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
@@ -148,10 +149,81 @@
               />
             </div>
 
+            <button
+              id="forgotPasswordButton"
+              class="link-button"
+              type="button"
+            >
+              忘记密码？
+            </button>
+
             <button id="loginButton" class="primary-button" type="submit">
               登录
             </button>
             <p id="loginError" class="form-message" role="alert" hidden></p>
+          </form>
+
+          <form id="resetForm" class="login-form" hidden>
+            <p class="panel-copy">
+              输入账号或注册邮箱生成一次性重置码，再凭重置码设置新密码。
+            </p>
+
+            <label for="resetAccount">账号或邮箱</label>
+            <input
+              id="resetAccount"
+              name="resetAccount"
+              type="text"
+              autocomplete="username"
+              placeholder="请输入账号或注册邮箱"
+            />
+
+            <button
+              id="resetRequestButton"
+              class="secondary-button"
+              type="button"
+            >
+              生成重置码
+            </button>
+
+            <p id="resetRequestMessage" class="form-message" role="status" hidden></p>
+
+            <div id="resetTokenFields" class="reset-token-fields" hidden>
+              <label for="resetToken">重置码</label>
+              <input
+                id="resetToken"
+                name="resetToken"
+                type="text"
+                autocomplete="one-time-code"
+                placeholder="粘贴站长发给你的重置码"
+              />
+
+              <label for="resetNewPassword">新密码</label>
+              <input
+                id="resetNewPassword"
+                name="resetNewPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="至少 8 位，不要和账号相同"
+              />
+
+              <button
+                id="resetSubmitButton"
+                class="primary-button"
+                type="button"
+              >
+                重设密码
+              </button>
+            </div>
+
+            <p id="resetError" class="form-message" role="alert" hidden></p>
+
+            <button
+              id="resetBackButton"
+              class="link-button"
+              type="button"
+            >
+              返回登录
+            </button>
           </form>
         </div>
       </div>
@@ -170,11 +242,34 @@
 
           <div class="account-row">
             <span id="userLabel" class="user-label"></span>
+            <a
+              id="adminLink"
+              class="account-link"
+              href="./admin.html"
+              hidden
+            >
+              控制台
+            </a>
             <button id="logoutButton" class="logout-button" type="button">
               退出
             </button>
           </div>
         </div>
+
+        <nav class="library-shortcuts" aria-label="学习工具">
+          <a class="library-shortcut" href="./quiz.html">
+            <strong>单词测试</strong>
+            <span>分级出题 · 排行榜</span>
+          </a>
+          <a class="library-shortcut" href="./vocab.html">
+            <strong>词汇库</strong>
+            <span>考研 · 四六级</span>
+          </a>
+          <a class="library-shortcut" href="./review.html">
+            <strong>错词复习</strong>
+            <span>收藏与生词本</span>
+          </a>
+        </nav>
 
         <div class="library-heading">
           <span class="library-heading-label">

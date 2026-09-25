@@ -1,3 +1,6 @@
+const { clientIp, resolveSessionUser } = require("./_session.js");
+const telemetry = require("./_telemetry.js");
+
 const YOUDAO_ENDPOINT = "https://dict.youdao.com/jsonapi";
 const FREE_DICTIONARY_PRIMARY_ENDPOINT =
   "https://freedictionaryapi.com/api/v1/entries/en/";
@@ -341,8 +344,15 @@ function formatDictionary(data, fallbackWord) {
   };
 }
 
-module.exports = async function handler(request, response) {
+async function handler(request, response) {
   response.setHeader("Content-Type", "application/json; charset=utf-8");
+
+  const user = await resolveSessionUser(request).catch(() => null);
+  telemetry.annotate(response, {
+    user: user?.username || "",
+    userId: user?.id || "",
+    ip: clientIp(request),
+  });
 
   if (request.method !== "GET") {
     response.setHeader("Cache-Control", "no-store");
@@ -354,6 +364,7 @@ module.exports = async function handler(request, response) {
     ? request.query.word[0]
     : request.query?.word;
   const word = cleanText(rawWord).toLocaleLowerCase("en-US");
+  telemetry.setMeta(response, { word: word.slice(0, 40) });
 
   if (
     !word ||
@@ -441,4 +452,6 @@ module.exports = async function handler(request, response) {
     "public, s-maxage=604800, stale-while-revalidate=86400",
   );
   response.status(200).json({ ok: true, ...result, sources });
-};
+}
+
+module.exports = telemetry.wrap("word", handler);

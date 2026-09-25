@@ -1,3 +1,6 @@
+const { clientIp, resolveSessionUser } = require("./_session.js");
+const telemetry = require("./_telemetry.js");
+
 const GOOGLE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const MYMEMORY_ENDPOINT = "https://api.mymemory.translated.net/get";
 const MAX_TEXTS = 24;
@@ -171,9 +174,16 @@ async function translateText(text) {
   return translation;
 }
 
-module.exports = async function handler(request, response) {
+async function handler(request, response) {
   response.setHeader("Content-Type", "application/json; charset=utf-8");
   response.setHeader("Cache-Control", "no-store");
+
+  const user = await resolveSessionUser(request).catch(() => null);
+  telemetry.annotate(response, {
+    user: user?.username || "",
+    userId: user?.id || "",
+    ip: clientIp(request),
+  });
 
   if (request.method !== "POST") {
     response.status(405).json({ ok: false, message: "不支持的请求方式" });
@@ -183,6 +193,7 @@ module.exports = async function handler(request, response) {
   const body = await readBody(request.body);
   const texts = (Array.isArray(body.texts) ? body.texts : []).map(cleanText);
   const totalLength = texts.reduce((sum, text) => sum + text.length, 0);
+  telemetry.setMeta(response, { texts: texts.length, chars: totalLength });
 
   if (
     texts.length === 0 ||
@@ -220,4 +231,6 @@ module.exports = async function handler(request, response) {
   }
 
   response.status(200).json({ ok: true, translations, failed });
-};
+}
+
+module.exports = telemetry.wrap("translate", handler);

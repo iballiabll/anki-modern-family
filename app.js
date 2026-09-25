@@ -1602,6 +1602,7 @@ const state = {
   meaningReveals: new Set(),
   meaningHides: new Set(),
   user: "",
+  isAdmin: false,
   authMode: "login",
   sessionMode: "server",
   registration: null,
@@ -1679,16 +1680,28 @@ const elements = {
   authNotice: document.querySelector("#authNotice"),
   emailField: document.querySelector("#emailField"),
   email: document.querySelector("#email"),
+  forgotPasswordButton: document.querySelector("#forgotPasswordButton"),
   passwordHint: document.querySelector("#passwordHint"),
   inviteField: document.querySelector("#inviteField"),
   inviteCode: document.querySelector("#inviteCode"),
   username: document.querySelector("#username"),
   password: document.querySelector("#password"),
+  resetForm: document.querySelector("#resetForm"),
+  resetAccount: document.querySelector("#resetAccount"),
+  resetRequestButton: document.querySelector("#resetRequestButton"),
+  resetRequestMessage: document.querySelector("#resetRequestMessage"),
+  resetTokenFields: document.querySelector("#resetTokenFields"),
+  resetToken: document.querySelector("#resetToken"),
+  resetNewPassword: document.querySelector("#resetNewPassword"),
+  resetSubmitButton: document.querySelector("#resetSubmitButton"),
+  resetError: document.querySelector("#resetError"),
+  resetBackButton: document.querySelector("#resetBackButton"),
   passwordVisibilityButton: document.querySelector(
     "#passwordVisibilityButton",
   ),
   appView: document.querySelector("#appView"),
   userLabel: document.querySelector("#userLabel"),
+  adminLink: document.querySelector("#adminLink"),
   logoutButton: document.querySelector("#logoutButton"),
   libraryPanel: document.querySelector(".library-panel"),
   libraryToggleButton: document.querySelector("#libraryToggleButton"),
@@ -8805,6 +8818,9 @@ function setPasswordVisibility(visible) {
 async function showApp(user) {
   state.user = user;
   elements.userLabel.textContent = user;
+  if (elements.adminLink) {
+    elements.adminLink.hidden = !state.isAdmin;
+  }
   removeWelcomeOverlay();
   elements.loginView.hidden = true;
   elements.appView.hidden = false;
@@ -8829,6 +8845,51 @@ async function requestAuth(payload = {}, method = "POST") {
   return { response, data };
 }
 
+const NAMESPACE_RELOAD_FLAG = "iball:namespace-reload";
+const PRE_ACTIVATION_NAMESPACE = window.iballAccounts?.namespace() || "";
+
+/**
+ * 切换本地命名空间并接入云端同步。
+ *
+ * 页面在加载时就已经按「上一个账号」读过本地数据了，如果这里换人，就必须
+ * 刷新一次让收藏、错词、复习记录重新按新账号读取。用 sessionStorage 打标记
+ * 保证最多只刷一次，不会来回跳。
+ */
+async function activateAccount(account) {
+  if (!window.iballAccounts || !window.iballProgress) {
+    return false;
+  }
+
+  window.iballAccounts.activate(account?.id || "");
+
+  if (window.iballAccounts.namespace() !== PRE_ACTIVATION_NAMESPACE) {
+    let alreadyReloaded = false;
+    try {
+      alreadyReloaded =
+        sessionStorage.getItem(NAMESPACE_RELOAD_FLAG) === "1";
+      if (!alreadyReloaded) {
+        sessionStorage.setItem(NAMESPACE_RELOAD_FLAG, "1");
+      }
+    } catch {
+      alreadyReloaded = true;
+    }
+    if (!alreadyReloaded) {
+      window.location.reload();
+      return true;
+    }
+  }
+
+  try {
+    sessionStorage.removeItem(NAMESPACE_RELOAD_FLAG);
+  } catch {
+    // 隐私模式下没有 sessionStorage，忽略即可。
+  }
+
+  await window.iballProgress.enableSync();
+  window.iballProgress.startHeartbeat();
+  return false;
+}
+
 async function checkSession() {
   const session = window.iballSession
     ? await window.iballSession.probe()
@@ -8839,19 +8900,28 @@ async function checkSession() {
   if (!session || session.mode === "local") {
     state.sessionMode = "local";
     state.registration = null;
+    state.isAdmin = false;
+    await activateAccount(null);
     await showApp("本地模式");
     return;
   }
 
   state.sessionMode = "server";
   state.registration = session.registration || null;
+  state.isAdmin = Boolean(session.admin);
 
   if (session.authenticated) {
+    const reloading = await activateAccount(session.account);
+    if (reloading) {
+      return;
+    }
     removeWelcomeOverlay();
     await showApp(session.user || "用户");
     return;
   }
 
+  await activateAccount(null);
+  state.isAdmin = false;
   showLogin();
   renderAuthNotice(
     state.registration && !state.registration.enabled
@@ -8960,6 +9030,11 @@ async function handleAuthSubmit(event) {
       elements.inviteCode.value = "";
     }
     state.authMode = "login";
+    state.isAdmin = Boolean(data.admin);
+    const reloading = await activateAccount(data.account);
+    if (reloading) {
+      return;
+    }
     // 注册成功后服务端已经下发会话，直接进入小屋。
     await showApp(data.user || username);
   } catch (error) {
@@ -8973,22 +9048,170 @@ async function handleAuthSubmit(event) {
 async function handleLogout() {
   elements.logoutButton.disabled = true;
   try {
+    await window.iballProgress?.flushSync();
     await requestAuth({ action: "logout" });
   } catch {
     // Clear the local view even if the network request fails.
   }
+  window.iballProgress?.stopHeartbeat();
+  window.iballProgress?.disableSync("已退出登录。");
   elements.logoutButton.disabled = false;
   state.user = "";
+  state.isAdmin = false;
   state.authMode = "login";
+  elements.loginError.hidden = true;
+  elements.password.value = "";
+  window.iballAccounts?.activate("");
   window.iballSession?.reset();
   if (elements.email) {
     elements.email.value = "";
   }
+  if (elements.adminLink) {
+    elements.adminLink.hidden = true;
+  }
+  resetStateForAccount();
   renderAuthNotice("");
   showLogin();
 }
 
+function resetStateForAccount() {
+  state.practiceHistory = [];
+  state.reviewProgress = {};
+  state.reviewDaily = { date: "", reviewedKeys: [], newKeys: [] };
+  state.reviewQueue = [];
+  state.reviewQueueIndex = 0;
+  state.reviewRevealed = false;
+  state.reviewSessionDone = 0;
+  state.resources = [];
+  state.categories = [];
+  state.decks = new Map();
+  state.deckPromises = new Map();
+  state.deckErrors = new Map();
+  state.activeResourceId = "";
+  restoreMarks();
+  restoreLibraryCollapse();
+  restorePracticeHistory();
+  restorePracticeSettings();
+  restoreReviewData();
+}
+
+function showResetForm(message = "") {
+  elements.loginForm.hidden = true;
+  elements.resetForm.hidden = false;
+  elements.authModeLogin.disabled = true;
+  elements.authModeRegister.disabled = true;
+  elements.loginError.hidden = true;
+  elements.resetError.textContent = message;
+  elements.resetError.hidden = !message;
+  elements.resetRequestMessage.hidden = true;
+  elements.resetTokenFields.hidden = true;
+  elements.resetToken.value = "";
+  elements.resetNewPassword.value = "";
+  elements.resetAccount.focus();
+}
+
+function showLoginForm() {
+  elements.resetForm.hidden = true;
+  elements.loginForm.hidden = false;
+  elements.authModeLogin.disabled = false;
+  elements.authModeRegister.disabled = false;
+  elements.resetError.hidden = true;
+  elements.resetRequestMessage.hidden = true;
+  elements.resetTokenFields.hidden = true;
+}
+
+async function handleResetRequest() {
+  const identifier = elements.resetAccount.value.trim();
+  if (!identifier) {
+    elements.resetError.textContent = "请先填写账号或注册邮箱。";
+    elements.resetError.hidden = false;
+    elements.resetAccount.focus();
+    return;
+  }
+
+  elements.resetRequestButton.disabled = true;
+  elements.resetRequestButton.textContent = "正在生成…";
+  elements.resetError.hidden = true;
+
+  try {
+    const { response, data } = await requestAuth({
+      action: "reset-request",
+      identifier,
+    });
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "暂时无法生成重置码。");
+    }
+    elements.resetRequestMessage.textContent =
+      data.message ||
+      "如果该账号存在，重置码已生成。请联系站长领取后填入下方。";
+    elements.resetRequestMessage.hidden = false;
+    elements.resetTokenFields.hidden = false;
+    elements.resetToken.focus();
+  } catch (error) {
+    elements.resetError.textContent =
+      error?.message || "暂时无法生成重置码。";
+    elements.resetError.hidden = false;
+  } finally {
+    elements.resetRequestButton.disabled = false;
+    elements.resetRequestButton.textContent = "生成重置码";
+  }
+}
+
+async function handleResetSubmit() {
+  const token = elements.resetToken.value.trim();
+  const newPassword = elements.resetNewPassword.value;
+
+  if (!token) {
+    elements.resetError.textContent = "请填写站长给你的重置码。";
+    elements.resetError.hidden = false;
+    elements.resetToken.focus();
+    return;
+  }
+  if (newPassword.length < 8) {
+    elements.resetError.textContent = "新密码至少 8 位。";
+    elements.resetError.hidden = false;
+    elements.resetNewPassword.focus();
+    return;
+  }
+
+  elements.resetSubmitButton.disabled = true;
+  elements.resetSubmitButton.textContent = "正在重设…";
+  elements.resetError.hidden = true;
+
+  try {
+    const { response, data } = await requestAuth({
+      action: "reset-password",
+      token,
+      newPassword,
+      password: newPassword,
+    });
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "重置码无效或已经过期。");
+    }
+    showLoginForm();
+    elements.password.value = "";
+    renderAuthNotice("密码已重设，请用新密码登录。", "info");
+    elements.username.focus();
+  } catch (error) {
+    elements.resetError.textContent =
+      error?.message || "重置码无效或已经过期。";
+    elements.resetError.hidden = false;
+  } finally {
+    elements.resetSubmitButton.disabled = false;
+    elements.resetSubmitButton.textContent = "重设密码";
+  }
+}
+
 elements.loginForm.addEventListener("submit", handleAuthSubmit);
+elements.forgotPasswordButton?.addEventListener("click", () => {
+  showResetForm();
+});
+elements.resetRequestButton?.addEventListener("click", handleResetRequest);
+elements.resetSubmitButton?.addEventListener("click", handleResetSubmit);
+elements.resetBackButton?.addEventListener("click", () => {
+  showLoginForm();
+  renderAuthNotice("");
+});
 elements.authModeLogin?.addEventListener("click", () => {
   renderAuthNotice("");
   setAuthMode("login");
