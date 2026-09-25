@@ -17,6 +17,9 @@
     },
   };
 
+  /** 只读镜像（Vercel 那份部署）上登录、注册都写不进去，账号只存在主站。 */
+  const MAIN_SITE_URL = "https://app.iball.top/";
+
   const state = {
     username: "",
     admin: false,
@@ -46,6 +49,9 @@
     [
       "accountChip",
       "gate",
+      "gateTitle",
+      "gateCopy",
+      "gateAction",
       "quizBody",
       "poolStats",
       "startPanel",
@@ -119,6 +125,32 @@
     }
     if (elements.quizBody) {
       elements.quizBody.hidden = true;
+    }
+  }
+
+  /**
+   * 镜像站没有可写账号目录：与其让用户在这里反复试密码，
+   * 不如把登录入口直接换成主站，并说明原因。
+   */
+  function applyMirrorGate(session) {
+    const mirror = Boolean(
+      session &&
+        session.mode === "server" &&
+        session.registration &&
+        session.registration.storageReady === false,
+    );
+    if (!mirror) {
+      return;
+    }
+    if (elements.gateTitle) {
+      elements.gateTitle.textContent = "这里是只读镜像，登录和注册都写不进去";
+    }
+    if (elements.gateCopy) {
+      elements.gateCopy.textContent = `账号和榜单都在主站 ${MAIN_SITE_URL}，去那边登录后就能参加测试。`;
+    }
+    if (elements.gateAction) {
+      elements.gateAction.href = MAIN_SITE_URL;
+      elements.gateAction.textContent = "去主站登录";
     }
   }
 
@@ -590,6 +622,7 @@
 
     if (!session || session.mode !== "server" || !session.authenticated) {
       showGate();
+      applyMirrorGate(session);
       return;
     }
 
