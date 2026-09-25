@@ -243,6 +243,14 @@ Lyu）。
 自由对话的“英文回复 + 中文翻译 + 每轮纠错”交互参考了 MIT 许可的
 [EchoMentor](https://github.com/anticipate218/EchoMentor)。
 
+考研写作的题型拆分、反馈口径和资料组织方式调研了
+[echo-kaoyan-english-skill](https://github.com/Echo1LZJY/echo-kaoyan-english-skill)；
+本站只借鉴公开的结构与评分思路，并明确标注所有分数都是练习估算。
+
+成人口语场景的状态机、语音管线和 API 降级思路调研了 ISC 许可的
+[hi-kid-fun](https://github.com/xiaochong/hi-kid-fun)；本站没有复用其儿童向
+界面或游戏内容，只将其作为技术结构参考。
+
 界面的细分割线、不对称卡片和编号视觉语言参考了 Apache-2.0 许可的
 [webtemplate](https://github.com/huangshiyu13/webtemplate)。
 
