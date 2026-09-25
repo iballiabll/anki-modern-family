@@ -34,6 +34,12 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      # 注意：这里不能写 cname: false。GitHub Actions 会把布尔值转成字符串
+      # "false"，peaceiris 动作只要拿到非空输入就会写一个内容为 false 的
+      # CNAME 文件，反而让镜像被 301 走。所以要显式删掉，并且不传 cname。
+      - name: Ensure mirror output has no CNAME
+        run: rm -f public/CNAME
+
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -42,5 +48,3 @@ jobs:
           publish_branch: gh-pages
           # 每次只留一个提交，避免 236 MB 的静态资源把分支历史撑爆
           force_orphan: true
-          # 镜像走 GitHub Pages 子路径，不能带 CNAME，否则会被 301 回主域名
-          cname: false
