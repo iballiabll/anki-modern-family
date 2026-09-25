@@ -8952,6 +8952,13 @@ async function checkSession() {
 
   await activateAccount(null);
   state.isAdmin = false;
+  // 从「还没有账号？注册」这类链接进来时，直接把面板切到注册页签。
+  if (
+    window.location.hash === "#register" &&
+    !(state.registration && state.registration.enabled === false)
+  ) {
+    state.authMode = "register";
+  }
   showLogin();
   renderAuthNotice(
     state.registration && !state.registration.enabled

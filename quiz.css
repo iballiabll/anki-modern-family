@@ -46,6 +46,14 @@
   line-height: 1.7;
 }
 
+.quiz-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 .quiz-hero {
   display: flex;
   flex-wrap: wrap;
