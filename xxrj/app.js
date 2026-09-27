@@ -4573,6 +4573,9 @@ function syncEntryOptions() {
   const english = entrySubject.value.startsWith("英语");
   if (entryKindField) entryKindField.hidden = !english;
   if (!english && entryKind) entryKind.value = "";
+  refreshChoiceFields(entryModal);
+  renderWrongGrid([]);
+  syncWrongFieldVisibility();
 }
 
 /** 数学一的来源里带上全部资料名，录成绩时能直接对上封神之路里的书。 */
@@ -4614,6 +4617,110 @@ const entryNote = document.getElementById("entry-note");
 const entryModalNote = document.getElementById("entry-modal-note");
 const ENTRY_NOTE_DEFAULT = "失分自动计算；保存后写进当前 iball 账号的数据档案。";
 
+/* ------------------------------------------- 套卷错题题号热力图 */
+
+const entryWrongField = document.getElementById("entry-wrong-field");
+const entryWrongLabel = document.getElementById("entry-wrong-label");
+const entryWrongGrid = document.getElementById("entry-wrong-grid");
+const entryWrongCount = document.getElementById("entry-wrong-count");
+
+/** 题号范围按科目给一套够用的默认值，点一下就是「这题错了」。 */
+const WRONG_QUESTION_RANGES = [
+  { key: "math", match: (subject) => subject.startsWith("数学"), max: 23, label: "数学真题" },
+  { key: "english", match: (subject) => subject.startsWith("英语"), max: 48, label: "英语真题" },
+  { key: "cs408", match: (subject) => subject === "408" || subject.includes("408"), max: 47, label: "408 真题" },
+];
+
+function wrongRangeFor(subject) {
+  const key = String(subject || "");
+  return WRONG_QUESTION_RANGES.find((item) => item.match(key)) || WRONG_QUESTION_RANGES[0];
+}
+
+function selectedWrongNumbers() {
+  if (!entryWrongGrid) return [];
+  return [...entryWrongGrid.querySelectorAll(".question-cell.active")]
+    .map((cell) => Number(cell.dataset.question))
+    .filter((number) => Number.isFinite(number) && number > 0);
+}
+
+function syncWrongFieldVisibility() {
+  if (!entryWrongField) return;
+  const status = entryStatus ? entryStatus.value : "";
+  entryWrongField.hidden = status === "学习进度";
+}
+
+function syncWrongGridState() {
+  const numbers = selectedWrongNumbers();
+  if (entryWrongCount) {
+    entryWrongCount.textContent = numbers.length ? `已选 ${numbers.length} 题` : "未选择";
+  }
+  if (entryWrongLabel) {
+    const range = wrongRangeFor(entrySubject.value);
+    entryWrongLabel.textContent = `${range.label} · 第 1-${range.max} 题，点哪个算哪个`;
+  }
+}
+
+/** 重画题号格；不传参数时保留当前已选中的题号。 */
+function renderWrongGrid(numbers = selectedWrongNumbers()) {
+  if (!entryWrongGrid) return;
+  const range = wrongRangeFor(entrySubject.value);
+  const selected = new Set((numbers || []).map((number) => Number(number)));
+  entryWrongGrid.dataset.range = String(range.max);
+  entryWrongGrid.innerHTML = Array.from({ length: range.max }, (_, index) => index + 1)
+    .map((number) => {
+      const active = selected.has(number);
+      return `<button class="question-cell${active ? " active" : ""}" type="button" data-question="${number}" aria-pressed="${active ? "true" : "false"}">${number}</button>`;
+    })
+    .join("");
+  syncWrongGridState();
+}
+
+/** 主记录下每题挂一条详情；id 固定成「主记录-q题号」，编辑时不会重复生成。 */
+function entryDetailId(summaryId, number) {
+  return `${summaryId}-q${number}`;
+}
+
+function entryDetailRecordsOf(summaryId) {
+  if (!STORE || !summaryId) return [];
+  return STORE.records().filter((record) => record.id.startsWith(`${summaryId}-q`));
+}
+
+function entryDetailNumbersOf(summaryId) {
+  return entryDetailRecordsOf(summaryId)
+    .map((record) => Number(String(record.question || "").replace(/[^\d]/g, "")))
+    .filter((number) => Number.isFinite(number) && number > 0);
+}
+
+/** 保存主记录时同步逐题错题：选了就生成，取消勾选就把对应详情删掉。 */
+function syncEntryDetails(summary, numbers) {
+  if (!STORE || !summary || !summary.id) return 0;
+  const existing = entryDetailRecordsOf(summary.id);
+  if (!numbers.length && !existing.length) return 0;
+  const keep = new Set(numbers.map((number) => entryDetailId(summary.id, number)));
+  existing.forEach((record) => {
+    if (!keep.has(record.id)) STORE.removeRecord(record.id);
+  });
+  numbers.forEach((number) => {
+    STORE.upsertRecord({
+      id: entryDetailId(summary.id, number),
+      date: summary.date,
+      subject: summary.subject,
+      source: summary.source,
+      year: summary.year,
+      paper: summary.paper,
+      module: summary.module,
+      kind: summary.kind,
+      round: summary.round,
+      status: "错题复盘",
+      question: `第 ${number} 题`,
+      errorType: summary.errorType,
+      reviewDate: summary.reviewDate,
+      note: summary.note,
+    });
+  });
+  return numbers.length;
+}
+
 const taskModal = document.getElementById("task-modal");
 const taskModalTitle = document.getElementById("task-modal-title");
 const taskModalNote = document.getElementById("task-modal-note");
@@ -4623,7 +4730,7 @@ const taskSubjectInput = document.getElementById("task-subject");
 const taskMinutesInput = document.getElementById("task-minutes");
 const taskPriorityInput = document.getElementById("task-priority");
 const taskNoteInput = document.getElementById("task-note");
-const TASK_NOTE_DEFAULT = "保存后立刻出现在对应日期的计划里。";
+const TASK_NOTE_DEFAULT = "一行保存一项；保存后每条都能单独修改。";
 
 const progressModal = document.getElementById("progress-modal");
 const progressTitle = document.getElementById("progress-title");
@@ -4671,6 +4778,74 @@ function setSelectValue(select, value) {
     select.add(new Option(target, target));
   }
   select.value = target;
+  refreshChoiceField(select);
+}
+
+/** 多选字段存的是「、」分隔的字符串，回填时逐个点选；下拉框里没有的值补进去。 */
+function setMultiSelectValue(select, value) {
+  if (!select) return;
+  const wanted = String(value || "")
+    .split(/[、,，/|]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const matched = new Set();
+  [...select.options].forEach((option) => {
+    const label = String(option.textContent || "").trim();
+    const hit = wanted.includes(label) || wanted.includes(option.value);
+    option.selected = hit;
+    if (hit) matched.add(label);
+  });
+  wanted
+    .filter((item) => !matched.has(item))
+    .forEach((item) => select.add(new Option(item, item, true, true)));
+  refreshChoiceField(select);
+}
+
+/** 多选字段往外写的时候统一用「、」连接，保持旧数据的字符串口径。 */
+function selectedChoiceValues(select) {
+  if (!select) return [];
+  return [...select.options]
+    .filter((option) => option.selected)
+    .map((option) => String(option.textContent || "").trim())
+    .filter(Boolean);
+}
+
+/* ------------------------------------------- 高密度点击格（热力图式点选） */
+
+/** 原生 select 仍是唯一数据源，点击格只是它的可视化外壳。 */
+function choiceGridFor(select, create = true) {
+  if (!select) return null;
+  const field = select.closest(".field");
+  if (!field) return null;
+  let grid = field.querySelector(".choice-grid");
+  if (!grid && create) {
+    grid = document.createElement("div");
+    grid.className = "choice-grid";
+    select.insertAdjacentElement("afterend", grid);
+    select.classList.add("choice-native");
+  }
+  return grid;
+}
+
+function refreshChoiceField(select) {
+  if (!select || !select.hasAttribute("data-choice-control")) return;
+  const grid = choiceGridFor(select);
+  if (!grid) return;
+  const multiple = Boolean(select.multiple);
+  grid.dataset.choiceFor = select.id;
+  grid.setAttribute("role", multiple ? "group" : "radiogroup");
+  grid.innerHTML = [...select.options]
+    .map((option, index) => {
+      const active = option.selected;
+      const label = String(option.textContent || option.value || "").trim() || "未填";
+      return `<button class="choice-tile${active ? " active" : ""}" type="button" data-choice-for="${escapeAttr(select.id)}" data-choice-index="${index}" aria-pressed="${active ? "true" : "false"}">${escapeHtml(label)}</button>`;
+    })
+    .join("");
+}
+
+function refreshChoiceFields(root = document) {
+  if (!root || !root.querySelectorAll) return;
+  root.querySelectorAll("[data-choice-control]").forEach(refreshChoiceField);
 }
 
 function resetEntryForm() {
@@ -4692,6 +4867,9 @@ function resetEntryForm() {
   if (entryRound) entryRound.value = "1";
   if (entryKind) entryKind.value = "";
   modalNote(entryModalNote, ENTRY_NOTE_DEFAULT);
+  refreshChoiceFields(entryModal);
+  renderWrongGrid([]);
+  syncWrongFieldVisibility();
 }
 
 function fillEntryForm(record) {
@@ -4714,8 +4892,9 @@ function fillEntryForm(record) {
   setSelectValue(entryPaperType, record.paper);
   setSelectValue(entryModule, record.module);
   setSelectValue(entryStatus, record.status);
-  setSelectValue(entryErrorType, record.errorType);
+  setMultiSelectValue(entryErrorType, record.errorType);
   setSelectValue(entryKind, record.kind || "");
+  refreshChoiceFields(entryModal);
 }
 
 function entryRecordFromForm(existing) {
@@ -4734,7 +4913,7 @@ function entryRecordFromForm(existing) {
     count: Number(entryCount.value) || 0,
     correct: Number(entryCorrect.value) || 0,
     minutes: Number(entryTime.value) || 0,
-    errorType: entryErrorType.value,
+    errorType: selectedChoiceValues(entryErrorType).join("、"),
     reviewDate: entryReview.value,
     kind: entrySubject.value.startsWith("英语") && entryKind ? entryKind.value : "",
     round: cleanMathRound(entryRound ? entryRound.value : existing?.round),
@@ -4753,6 +4932,8 @@ function openEntry(mode = "create", description = "", record = null) {
     resetEntryForm();
   }
   syncEntryOptions();
+  renderWrongGrid(record ? entryDetailNumbersOf(record.id) : []);
+  syncWrongFieldVisibility();
   updateLostScore();
   document.body.classList.add("entry-open");
   if (entryDate) entryDate.focus();
@@ -4780,7 +4961,9 @@ function saveEntry() {
     modalNote(entryModalNote, "得分不能大于满分。", true);
     return false;
   }
-  STORE.upsertRecord(record);
+  const wrongNumbers = selectedWrongNumbers();
+  const saved = STORE.upsertRecord(record);
+  syncEntryDetails(saved, wrongNumbers);
   closeEntry();
   setEntryMode("create");
   render();
@@ -4789,18 +4972,32 @@ function saveEntry() {
 
 /* ------------------------------------------- 计划与章节进度弹窗 */
 
+/** 一行一项；兼容从聊天或清单里粘进来的项目符号和编号。 */
+function taskTitlesFromInput(value) {
+  return String(value || "")
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.、)])\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 50)
+    .map((line) => line.slice(0, 200));
+}
+
 function openTaskModal(date = TODAY_KEY, id = "") {
   if (!STORE) return;
   const task = id ? STORE.getTask(id) : null;
   state.taskEditId = task ? task.id : "";
-  taskModalTitle.textContent = task ? "修改计划" : "新建计划";
+  taskModalTitle.textContent = task ? "修改任务" : "新建任务";
   taskTitleInput.value = task ? task.title : "";
   taskDateInput.value = task && task.date ? task.date : date || TODAY_KEY;
-  setSelectValue(taskSubjectInput, task && task.subject ? task.subject : "数学一");
+  setMultiSelectValue(taskSubjectInput, task && task.subject ? task.subject : "数学一");
   taskMinutesInput.value = task && task.minutes ? String(task.minutes) : "";
   taskPriorityInput.value = task && task.priority ? task.priority : "中";
   taskNoteInput.value = task ? task.note : "";
-  modalNote(taskModalNote, task ? "改完立刻生效，计划页马上刷新。" : TASK_NOTE_DEFAULT);
+  refreshChoiceFields(taskModal);
+  modalNote(
+    taskModalNote,
+    task ? "改完立刻生效；粘贴多行会新增其余任务。" : TASK_NOTE_DEFAULT,
+  );
   document.body.classList.add("task-open");
   taskTitleInput.focus();
 }
@@ -4813,25 +5010,24 @@ function closeTaskModal() {
 
 function saveTask() {
   if (!STORE) return;
-  const title = taskTitleInput.value.trim();
-  if (!title) {
+  const titles = taskTitlesFromInput(taskTitleInput.value);
+  if (!titles.length) {
     modalNote(taskModalNote, "任务内容不能为空。", true);
     taskTitleInput.focus();
     return;
   }
-  const payload = {
-    id: state.taskEditId || undefined,
+  const basePayload = {
     date: taskDateInput.value || TODAY_KEY,
-    title,
-    subject: taskSubjectInput.value,
+    subject: selectedChoiceValues(taskSubjectInput).join("、"),
     minutes: Number(taskMinutesInput.value) || 0,
     priority: taskPriorityInput.value,
     note: taskNoteInput.value.trim(),
   };
   if (state.taskEditId) {
-    STORE.updateTask(state.taskEditId, payload);
+    STORE.updateTask(state.taskEditId, { ...basePayload, title: titles[0] });
+    titles.slice(1).forEach((title) => STORE.addTask({ ...basePayload, title }));
   } else {
-    STORE.addTask(payload);
+    titles.forEach((title) => STORE.addTask({ ...basePayload, title }));
   }
   closeTaskModal();
   render();
@@ -4930,6 +5126,7 @@ function openKnowledgeModal(id = "") {
   knowledgeReview.value = item ? item.reviewDate || "" : "";
   knowledgeDetail.value = item ? item.detail : "";
   modalNote(knowledgeModalNote, item ? "改完保存，状态和下次复盘时间立刻更新。" : KNOWLEDGE_NOTE_DEFAULT);
+  refreshChoiceFields(knowledgeModal);
   document.body.classList.add("knowledge-open");
   knowledgeTopic.focus();
 }
@@ -5129,6 +5326,33 @@ function setPanelOption(button, attribute) {
 }
 
 document.addEventListener("click", (event) => {
+  const choiceTile = event.target.closest("[data-choice-for][data-choice-index]");
+  if (choiceTile) {
+    const select = document.getElementById(choiceTile.dataset.choiceFor);
+    const option = select ? select.options[Number(choiceTile.dataset.choiceIndex)] : null;
+    if (select && option) {
+      if (select.multiple) option.selected = !option.selected;
+      else select.selectedIndex = option.index;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      refreshChoiceFields(select.closest(".form-grid") || document);
+    }
+    return;
+  }
+
+  const questionCell = event.target.closest("#entry-wrong-grid .question-cell");
+  if (questionCell) {
+    const active = questionCell.classList.toggle("active");
+    questionCell.setAttribute("aria-pressed", active ? "true" : "false");
+    syncWrongGridState();
+    return;
+  }
+
+  const clearWrongButton = event.target.closest("#clear-entry-wrong");
+  if (clearWrongButton) {
+    renderWrongGrid([]);
+    return;
+  }
+
   const screenButton = event.target.closest("[data-screen]");
   if (screenButton) {
     state.screen = screenButton.dataset.screen;
@@ -5557,6 +5781,7 @@ document.getElementById("cancel-edit").addEventListener("click", () => {
 });
 document.getElementById("save-entry").addEventListener("click", saveEntry);
 entrySubject.addEventListener("change", syncEntryOptions);
+entryStatus.addEventListener("change", syncWrongFieldVisibility);
 entryFull.addEventListener("input", updateLostScore);
 entryScore.addEventListener("input", updateLostScore);
 entryModal.addEventListener("click", (event) => {
@@ -5648,6 +5873,7 @@ document.addEventListener("keydown", (event) => {
 setEntryMode(state.entryMode);
 syncEntryOptions();
 updateLostScore();
+refreshChoiceFields();
 
 /* ------------------------------------------- 账号：只绑定 iball 账号 */
 

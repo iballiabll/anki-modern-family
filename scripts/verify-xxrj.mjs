@@ -138,20 +138,239 @@ async function openDailyReview(page) {
   await page.waitForSelector("h1:text-is('待复盘')", { timeout: 10000 });
 }
 
+/** 点表单里的高密度格子，并回读它同步到的原生 select 值。 */
+async function clickChoice(page, scope, id, label) {
+  await page
+    .locator(`${scope} .choice-grid[data-choice-for='${id}'] .choice-tile`, {
+      hasText: new RegExp(`^${label}$`),
+    })
+    .first()
+    .click();
+  return page.locator(`#${id}`).evaluate((select) =>
+    select.multiple
+      ? [...select.selectedOptions].map((option) => option.textContent.trim()).join("、")
+      : select.value,
+  );
+}
+
 async function addKnowledge(page, { topic, detail }) {
   await page.locator("[data-knowledge-new]").first().click();
   await page.waitForSelector("#knowledge-modal:not([hidden])", { timeout: 10000 });
   await page.fill("#knowledge-topic", topic);
-  await page.selectOption("#knowledge-subject", "数学一");
+  await clickChoice(page, "#knowledge-modal", "knowledge-subject", "数学一");
   await page.fill("#knowledge-review", localDateKey());
   await page.fill("#knowledge-detail", detail);
   await page.click("#save-knowledge");
   await page.waitForSelector("#knowledge-modal", { state: "hidden", timeout: 10000 });
 }
 
+async function planTaskFlow(page, out) {
+  await page.locator(".sidebar .nav-item[data-screen='plan']").click();
+  await page.waitForSelector("h1:text-is('今日计划 · 随时可改')", { timeout: 10000 });
+
+  const taskLines = [
+    "数学 1000题：第一章全部到第二章前20题",
+    "复盘 1000题：第一章",
+    "英语一：真题阅读 2 篇",
+    "408：王道数据结构 第一章",
+  ];
+  await page.locator("[data-task-new]").first().click();
+  await page.waitForSelector("#task-modal:not([hidden])", { timeout: 10000 });
+  check(
+    "每日任务支持多行自定义输入",
+    (await page.locator("#task-title").evaluate((element) => element.tagName)) === "TEXTAREA",
+  );
+  await page.fill("#task-title", taskLines.join("\n"));
+  await page.fill("#task-minutes", "120");
+  check(
+    "任务科目默认点选一个",
+    (await page.locator("#task-modal .choice-grid[data-choice-for='task-subject'] .choice-tile.active").count()) === 1,
+  );
+  await clickChoice(page, "#task-modal", "task-subject", "408");
+  const taskSubjects = await clickChoice(page, "#task-modal", "task-subject", "英语一");
+  check("任务科目支持多选", taskSubjects === "数学一、英语一、408", taskSubjects);
+  await page.click("#save-task");
+  await page.waitForSelector("#task-modal", { state: "hidden", timeout: 10000 });
+
+  const tasks = await page.evaluate(() =>
+    window.YANTU_STORE.tasks().map((task) => ({
+      id: task.id,
+      title: task.title,
+      date: task.date,
+      minutes: task.minutes,
+      subject: task.subject,
+    })),
+  );
+  check("一行任务保存为一条计划", tasks.length === taskLines.length, `${tasks.length} 条`);
+  check(
+    "章节范围和整科任务原文保留",
+    taskLines.every((line) => tasks.some((task) => task.title === line)),
+    tasks.map((task) => task.title).join(" | "),
+  );
+  check("批量任务共用日期和用时", tasks.every((task) => task.date && task.minutes === 120));
+  check(
+    "多选科目按顿号写进任务",
+    tasks.every((task) => task.subject === "数学一、英语一、408"),
+    tasks[0] ? tasks[0].subject : "无任务",
+  );
+
+  const firstTask = tasks.find((task) => task.title === taskLines[0]);
+  await page.click(`[data-task-edit="${firstTask.id}"]`);
+  await page.waitForSelector("#task-modal:not([hidden])", { timeout: 10000 });
+  const editedTitle = `${taskLines[0]}（补齐）`;
+  await page.fill("#task-title", editedTitle);
+  await page.click("#save-task");
+  await page.waitForSelector("#task-modal", { state: "hidden", timeout: 10000 });
+  const afterEdit = await page.evaluate(() =>
+    window.YANTU_STORE.tasks().map((task) => ({ id: task.id, title: task.title, subject: task.subject })),
+  );
+  check("批量添加后仍可逐条修改", afterEdit.some((task) => task.title === editedTitle));
+  check("修改一条不会复制其它任务", afterEdit.length === taskLines.length, `${afterEdit.length} 条`);
+  check(
+    "其它批量任务保持不变",
+    taskLines.slice(1).every((line) => afterEdit.some((task) => task.title === line)),
+  );
+  check(
+    "逐条修改时多选科目原样保留",
+    afterEdit.every((task) => task.subject === "数学一、英语一、408"),
+    afterEdit[0] ? afterEdit[0].subject : "无任务",
+  );
+
+  await page.screenshot({ path: path.join(out, "xxrj-desktop-plan.png"), fullPage: false });
+}
+
+/** 成绩弹窗：科目点选、错因多选、套卷错题题号热力图与逐题详情。 */
+async function entryHeatmapFlow(page, out) {
+  await page.locator("#open-entry").click();
+  await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
+
+  const subjectGrid = page.locator("#entry-modal .choice-grid[data-choice-for='entry-subject']");
+  check("科目换成可点选格子", (await subjectGrid.locator(".choice-tile").count()) === 4);
+  check(
+    "默认只有一个科目被选中",
+    (await subjectGrid.locator(".choice-tile.active").innerText()) === "数学一",
+  );
+
+  check("点科目格子同步原生下拉框", (await clickChoice(page, "#entry-modal", "entry-subject", "英语一")) === "英语一");
+  check("单选格子不允许多选", (await subjectGrid.locator(".choice-tile.active").count()) === 1);
+  check(
+    "英语题号范围切到 48",
+    (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "48",
+  );
+
+  await clickChoice(page, "#entry-modal", "entry-subject", "数学一");
+  check(
+    "数学题号范围回到 23",
+    (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "23",
+  );
+
+  await page.fill("#entry-full", "150");
+  await page.fill("#entry-score", "118");
+  for (const number of [3, 7, 12]) {
+    await page.click(`#entry-wrong-grid .question-cell[data-question="${number}"]`);
+  }
+  check("题号格可以连续多选", (await page.locator("#entry-wrong-count").innerText()) === "已选 3 题");
+  check("选中的题号高亮", (await page.locator("#entry-wrong-grid .question-cell.active").count()) === 3);
+
+  const errorGrid = page.locator("#entry-modal .choice-grid[data-choice-for='entry-error-type']");
+  await clickChoice(page, "#entry-modal", "entry-error-type", "概念不清");
+  check("错因默认勾选一项", (await errorGrid.locator(".choice-tile.active").count()) === 2);
+
+  await page.screenshot({ path: path.join(out, "xxrj-desktop-entry-heatmap.png"), fullPage: false });
+
+  await page.click("#save-entry");
+  await page.waitForSelector("#entry-modal", { state: "hidden", timeout: 10000 });
+
+  const saved = await page.evaluate(() => {
+    const records = window.YANTU_STORE.records();
+    const summary = records.find((record) => Number(record.full) === 150 && Number(record.score) === 118);
+    const details = summary
+      ? records.filter((record) => record.id.startsWith(`${summary.id}-q`))
+      : [];
+    return {
+      summary: summary
+        ? { id: summary.id, errorType: summary.errorType, subject: summary.subject }
+        : null,
+      details: details.map((record) => ({
+        id: record.id,
+        question: record.question,
+        status: record.status,
+        full: record.full,
+        score: record.score,
+        errorType: record.errorType,
+      })),
+      total: records.length,
+    };
+  });
+
+  check("主记录保存为套卷成绩", Boolean(saved.summary) && saved.summary.subject === "数学一");
+  check(
+    "错因多选按顿号保存",
+    saved.summary && saved.summary.errorType === "计算错误、概念不清",
+    saved.summary ? saved.summary.errorType : "没有主记录",
+  );
+  check("选中题号逐题生成错题", saved.details.length === 3, `${saved.details.length} 条`);
+  check(
+    "逐题错题题号正确",
+    saved.details.map((item) => item.question).join(" ") === "第 3 题 第 7 题 第 12 题",
+    saved.details.map((item) => item.question).join(" | "),
+  );
+  check(
+    "逐题错题不重复计分",
+    saved.details.every((item) => item.status === "错题复盘" && item.full === 0 && item.score === 0),
+  );
+  check(
+    "逐题错题继承错因",
+    saved.details.every((item) => item.errorType === "计算错误、概念不清"),
+  );
+
+  if (!saved.summary) return;
+
+  // 回到错题本用真实 id 编辑主记录：题号要回填，取消勾选要删掉对应详情。
+  await page.locator(".sidebar .nav-item[data-screen='mistakes']").click();
+  await page.waitForSelector(`[data-record-edit="${saved.summary.id}"]`, { timeout: 10000 });
+  await page.click(`[data-record-edit="${saved.summary.id}"]`);
+  await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
+  check(
+    "编辑时回填已选错题",
+    (await page.locator("#entry-wrong-grid .question-cell.active").count()) === 3,
+  );
+  await page.click("#entry-wrong-grid .question-cell[data-question='7']");
+  check("取消勾选后计数跟着减", (await page.locator("#entry-wrong-count").innerText()) === "已选 2 题");
+  await page.click("#save-entry");
+  await page.waitForSelector("#entry-modal", { state: "hidden", timeout: 10000 });
+
+  const afterEdit = await page.evaluate((id) => {
+    const records = window.YANTU_STORE.records();
+    return {
+      details: records
+        .filter((record) => record.id.startsWith(`${id}-q`))
+        .map((record) => record.question),
+      total: records.length,
+      summaryCount: records.filter((record) => Number(record.full) === 150).length,
+    };
+  }, saved.summary.id);
+  check(
+    "取消勾选会删掉对应错题详情",
+    afterEdit.details.join(" ") === "第 3 题 第 12 题",
+    afterEdit.details.join(" | "),
+  );
+  check("重新保存不会重复生成主记录", afterEdit.summaryCount === 1, `${afterEdit.summaryCount} 条`);
+  check("重新保存不会留下多余记录", afterEdit.total === 3, `${afterEdit.total} 条`);
+
+  // 刷新后详情仍在，说明写进了 localStorage 而不是内存临时态。
+  await page.reload({ waitUntil: "load" });
+  const afterReload = await page.evaluate(() => window.YANTU_STORE.records().length);
+  check("刷新后逐题错题记录仍在", afterReload === 3, `${afterReload} 条`);
+}
+
 async function desktopFlow(browser, base, out) {
   const { context, page, errors } = await prepareContext(browser, DESKTOP, base, out, "xxrj-desktop");
   try {
+    await planTaskFlow(page, out);
+    await page.locator(".sidebar .nav-item[data-screen='dashboard']").click();
+    await page.waitForSelector(".review-summary-card", { timeout: 10000 });
+
     const freshSummary = await page.locator(".review-summary-card").innerText();
     check("总览出现待复盘汇总卡", /待复盘/.test(freshSummary), freshSummary.split("\n")[0]);
     check("空白数据时提示没有到期复盘", /今天没有到期的复盘/.test(freshSummary), freshSummary.replace(/\s+/g, " ").slice(0, 80));
@@ -257,6 +476,8 @@ async function desktopFlow(browser, base, out) {
     await page.waitForTimeout(500);
     check("删除后卡片消失", (await page.locator(".knowledge-card").count()) === 0);
 
+    await entryHeatmapFlow(page, out);
+
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -270,6 +491,71 @@ async function desktopFlow(browser, base, out) {
 async function mobileFlow(browser, base, out) {
   const { context, page, errors } = await prepareContext(browser, MOBILE, base, out, "xxrj-mobile");
   try {
+    await page.locator(".mobile-nav button[data-screen='plan']").click();
+    await page.waitForSelector("h1:text-is('今日计划 · 随时可改')", { timeout: 10000 });
+    await page.locator("[data-task-new]").first().click();
+    await page.waitForSelector("#task-modal:not([hidden])", { timeout: 10000 });
+    const taskModalBox = await page.evaluate(() => {
+      const modal = document.querySelector("#task-modal .modal");
+      const rect = modal.getBoundingClientRect();
+      return { width: rect.width, left: rect.left, right: rect.right, viewport: window.innerWidth };
+    });
+    check(
+      "手机端任务弹窗不超出视口",
+      taskModalBox.right <= taskModalBox.viewport + 1 &&
+        taskModalBox.left >= -1 &&
+        taskModalBox.width > 0,
+      `modal=${Math.round(taskModalBox.width)}px viewport=${taskModalBox.viewport}px`,
+    );
+    const taskChoiceBox = await page.evaluate(() => {
+      const grid = document.querySelector("#task-modal .choice-grid");
+      const modal = document.querySelector("#task-modal .modal");
+      return {
+        gridRight: grid.getBoundingClientRect().right,
+        modalRight: modal.getBoundingClientRect().right,
+        width: grid.getBoundingClientRect().width,
+      };
+    });
+    check(
+      "手机端点击格不超出弹窗",
+      taskChoiceBox.width > 0 && taskChoiceBox.gridRight <= taskChoiceBox.modalRight + 1,
+      `grid=${Math.round(taskChoiceBox.width)}px`,
+    );
+    await page.fill(
+      "#task-title",
+      "数学 1000题：第一章全部\n408：王道操作系统 第二章\n复盘：英语一阅读",
+    );
+    await page.click("#save-task");
+    await page.waitForSelector("#task-modal", { state: "hidden", timeout: 10000 });
+    check(
+      "手机端也能批量加任务",
+      (await page.evaluate(() => window.YANTU_STORE.tasks().length)) === 3,
+    );
+    await page.screenshot({ path: path.join(out, "xxrj-mobile-plan.png"), fullPage: false });
+
+    // 手机端也要能直接点题号标记套卷错题。
+    await page.locator("#open-entry").click();
+    await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
+    await page.click("#entry-wrong-grid .question-cell[data-question='5']");
+    await page.click("#entry-wrong-grid .question-cell[data-question='9']");
+    check("手机端题号格可多选", (await page.locator("#entry-wrong-count").innerText()) === "已选 2 题");
+    const heatmapBox = await page.evaluate(() => {
+      const grid = document.querySelector("#entry-wrong-grid");
+      const modal = document.querySelector("#entry-modal .modal");
+      return {
+        overflow: grid.scrollWidth - grid.clientWidth,
+        gridRight: grid.getBoundingClientRect().right,
+        modalRight: modal.getBoundingClientRect().right,
+      };
+    });
+    check(
+      "手机端热力图不溢出弹窗",
+      heatmapBox.overflow <= 1 && heatmapBox.gridRight <= heatmapBox.modalRight + 1,
+      `overflow=${heatmapBox.overflow}px`,
+    );
+    await page.click("#cancel-entry");
+    await page.waitForSelector("#entry-modal", { state: "hidden", timeout: 10000 });
+
     await page.locator(".mobile-nav button[data-screen='daily-review']").click();
     await page.waitForSelector("h1:text-is('待复盘')", { timeout: 10000 });
     check("手机端底部导航能进待复盘", (await page.locator("#crumb-current").innerText()) === "待复盘");
@@ -289,7 +575,7 @@ async function mobileFlow(browser, base, out) {
     );
 
     await page.fill("#knowledge-topic", "手机验收：矩阵相似对角化条件");
-    await page.selectOption("#knowledge-subject", "数学一");
+    await clickChoice(page, "#knowledge-modal", "knowledge-subject", "数学一");
     await page.fill("#knowledge-review", localDateKey());
     await page.fill("#knowledge-detail", "忘记检查特征向量个数");
     await page.click("#save-knowledge");

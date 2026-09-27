@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#17204f" />
     <title>XXRJ · 考研 11408 学习档案</title>
-    <link rel="stylesheet" href="./styles.css?v=20260927-cache1" />
+    <link rel="stylesheet" href="./styles.css?v=20260927-heatselect1" />
   </head>
   <body>
     <div class="app">
@@ -181,7 +181,7 @@
             </div>
             <div class="field">
               <label for="entry-subject">科目</label>
-              <select id="entry-subject">
+              <select id="entry-subject" data-choice-control>
                 <option>数学一</option>
                 <option>英语一</option>
                 <option>英语二</option>
@@ -190,7 +190,7 @@
             </div>
             <div class="field">
               <label for="entry-round">刷题轮次</label>
-              <select id="entry-round">
+              <select id="entry-round" data-choice-control>
                 <option value="1">一刷 · 基础覆盖</option>
                 <option value="2">二刷 · 强化巩固</option>
                 <option value="3">三刷 · 错题回炉</option>
@@ -200,7 +200,7 @@
             </div>
             <div class="field">
               <label for="entry-source">来源 / 试卷</label>
-              <select id="entry-source">
+              <select id="entry-source" data-choice-control>
                 <option>数学一真题</option>
                 <option>数学二真题</option>
                 <option>数学三真题</option>
@@ -216,7 +216,7 @@
             </div>
             <div class="field">
               <label for="entry-year">年份</label>
-              <select id="entry-year">
+              <select id="entry-year" data-choice-control>
                 <option>2026</option>
                 <option>2025</option>
                 <option>2024</option>
@@ -228,7 +228,7 @@
             </div>
             <div class="field">
               <label for="entry-paper-type">卷种 / 类别</label>
-              <select id="entry-paper-type">
+              <select id="entry-paper-type" data-choice-control>
                 <option>数学一</option>
                 <option>数学二</option>
                 <option>数学三</option>
@@ -239,7 +239,7 @@
             </div>
             <div class="field" id="entry-kind-field" hidden>
               <label for="entry-kind">英语类型</label>
-              <select id="entry-kind">
+              <select id="entry-kind" data-choice-control>
                 <option value="">自动判断</option>
                 <option value="paper">整套卷</option>
                 <option value="reading">单纯阅读</option>
@@ -248,7 +248,7 @@
             </div>
             <div class="field">
               <label for="entry-module">模块 / 章节</label>
-              <select id="entry-module">
+              <select id="entry-module" data-choice-control>
                 <option>高等数学 · 多元函数微分学</option>
                 <option>高等数学 · 无穷级数</option>
                 <option>线性代数 · 特征值与特征向量</option>
@@ -261,11 +261,20 @@
             </div>
             <div class="field">
               <label for="entry-question">题号（可选）</label>
-              <input id="entry-question" type="text" placeholder="例如 第 12 题 / Text 3 第 4 题" />
+              <input id="entry-question" type="text" placeholder="也可直接点下面的题号格" />
+            </div>
+            <div class="field span-12" id="entry-wrong-field">
+              <div class="field-head">
+                <label id="entry-wrong-label">套卷错题 · 可多选</label>
+                <span class="field-counter" id="entry-wrong-count">未选择</span>
+                <button class="text-btn" id="clear-entry-wrong" type="button">清空</button>
+              </div>
+              <div class="question-heatmap" id="entry-wrong-grid" role="group" aria-labelledby="entry-wrong-label"></div>
+              <p class="field-hint">点题号即选中，可连续点多个；保存后每个题号自动生成一条逐题错题记录。</p>
             </div>
             <div class="field">
               <label for="entry-status">记录类型</label>
-              <select id="entry-status">
+              <select id="entry-status" data-choice-control>
                 <option>套卷成绩</option>
                 <option>章节练习</option>
                 <option>错题复盘</option>
@@ -307,9 +316,9 @@
               </div>
             </div>
             <div class="field">
-              <label for="entry-error-type">错误类型</label>
-              <select id="entry-error-type">
-                <option>计算错误</option>
+              <label for="entry-error-type">错误类型 · 可多选</label>
+              <select id="entry-error-type" data-choice-control multiple>
+                <option selected>计算错误</option>
                 <option>概念不清</option>
                 <option>审题错误</option>
                 <option>时间不足</option>
@@ -353,17 +362,20 @@
         <div class="modal-body">
           <div class="form-grid">
             <div class="field span-12">
-              <label for="task-title">任务内容</label>
-              <input id="task-title" type="text" placeholder="例如 数学 1000题 · 第 8 章 · 20 题" />
+              <label for="task-title">任务内容（一行一项）</label>
+              <textarea id="task-title" rows="4" placeholder="数学 1000题：第一章全部到第二章前20题
+复盘 1000题：第一章
+英语一：真题阅读 2 篇
+408：王道数据结构 第一章"></textarea>
             </div>
             <div class="field">
               <label for="task-date">日期</label>
               <input id="task-date" type="date" />
             </div>
             <div class="field">
-              <label for="task-subject">科目</label>
-              <select id="task-subject">
-                <option>数学一</option>
+              <label for="task-subject">科目 · 可多选</label>
+              <select id="task-subject" data-choice-control multiple>
+                <option selected>数学一</option>
                 <option>英语一</option>
                 <option>英语二</option>
                 <option>408</option>
@@ -380,7 +392,7 @@
             </div>
             <div class="field">
               <label for="task-priority">优先级</label>
-              <select id="task-priority">
+              <select id="task-priority" data-choice-control>
                 <option>高</option>
                 <option selected>中</option>
                 <option>低</option>
@@ -495,7 +507,7 @@
             </div>
             <div class="field">
               <label for="knowledge-subject">科目</label>
-              <select id="knowledge-subject">
+              <select id="knowledge-subject" data-choice-control>
                 <option>数学一</option>
                 <option>英语一</option>
                 <option>英语二</option>
@@ -509,7 +521,7 @@
             </div>
             <div class="field">
               <label for="knowledge-status">状态</label>
-              <select id="knowledge-status">
+              <select id="knowledge-status" data-choice-control>
                 <option>待复盘</option>
                 <option>已复盘</option>
                 <option>已掌握</option>
@@ -581,6 +593,6 @@
     <script src="./vendor/lucide.min.js"></script>
     <script src="./math-books.js?v=20260927-cache1"></script>
     <script src="./store.js?v=20260927-cache1"></script>
-    <script src="./app.js?v=20260927-cache1"></script>
+    <script src="./app.js?v=20260927-heatselect1"></script>
   </body>
 </html>

@@ -2154,6 +2154,126 @@ body.entry-edit .record-banner {
   white-space: nowrap;
 }
 
+/* ------------------------------- 表单点击格与套卷错题热力图 */
+
+.field-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.field-head label {
+  margin-bottom: 0;
+}
+
+.field-counter {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.field-head .text-btn {
+  margin-left: auto;
+}
+
+.text-btn {
+  padding: 3px 9px;
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--blue-soft);
+  border: 1px solid #c7d9fe;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.text-btn:hover {
+  background: #dbe7ff;
+}
+
+.field-hint {
+  margin: 7px 0 0;
+  color: var(--muted-2);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.field .choice-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.choice-tile {
+  max-width: 100%;
+  min-height: 30px;
+  padding: 5px 11px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: left;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.choice-tile:hover {
+  color: var(--blue);
+  border-color: #93c5fd;
+}
+
+.choice-tile.active {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.question-heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 5px;
+  min-width: 0;
+}
+
+.question-cell {
+  min-width: 0;
+  height: 32px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.question-cell:hover {
+  color: var(--red);
+  border-color: #fca5a5;
+}
+
+.question-cell.active {
+  color: #fff;
+  background: var(--red);
+  border-color: var(--red);
+}
+
 .modal-foot {
   display: flex;
   align-items: center;
@@ -5167,5 +5287,22 @@ body.review-log-open #review-log-modal {
 
   .status-select {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .choice-tile {
+    min-height: 28px;
+    padding: 4px 9px;
+  }
+
+  .question-heatmap {
+    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+    gap: 4px;
+  }
+
+  .question-cell {
+    height: 30px;
+    font-size: 11px;
   }
 }
