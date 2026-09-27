@@ -208,14 +208,26 @@ async function verifyIndexEntries(browser, base, out) {
     JSON.stringify(counts),
   );
 
-  const popupPromise = context.waitForEvent("page", { timeout: 15000 }).catch(() => null);
   await page.locator(".is-vocab-entry").first().click();
-  const popup = await popupPromise;
-  const popupUrl = popup ? popup.url() : "";
-  check("点词汇入口真的能跳转", /vocab\.html/.test(popupUrl), popupUrl || "(没有新开页面)");
-  if (popup) {
-    await popup.close();
-  }
+  await page.waitForSelector("#vocabEmbedView:not([hidden])", { timeout: 10000 });
+  await page.waitForFunction(
+    () => {
+      const frame = document.getElementById("vocabEmbedFrame");
+      return frame?.dataset.loaded === "true" && /vocab\.html/.test(frame.src);
+    },
+    { timeout: 15000 },
+  );
+  const vocabFrame = page.frames().find((frame) => /\/vocab\.html/.test(frame.url()));
+  await vocabFrame?.waitForSelector(".vocab-row", { timeout: 15000 }).catch(() => {});
+  const embedUrl = vocabFrame?.url() || "";
+  const embedRows = await vocabFrame?.locator(".vocab-row").count().catch(() => 0);
+  check(
+    "点词汇入口打开站内词汇库",
+    /\/vocab\.html/.test(embedUrl) && embedRows > 0,
+    `${embedUrl || "(iframe 未加载)"} · ${embedRows} 行`,
+  );
+  await page.click("#vocabEmbedCloseButton");
+  await page.waitForSelector("#vocabEmbedView", { state: "hidden", timeout: 5000 });
 
   await page.screenshot({ path: path.join(out, "study-index-desktop.png") });
   check("首页无脚本报错", errors.length === 0, errors.slice(0, 3).join(" | "));
@@ -267,6 +279,8 @@ async function verifyVocab(browser, base, out) {
 
   const rows = await page.locator(".vocab-row").count();
   check("词表已渲染", rows >= 20, `${rows} 行`);
+  const backXxjrHref = await page.locator("#backXxjrButton").getAttribute("href");
+  check("词汇页有返回 XXRJ 入口", backXxjrHref === "./xxrj/", backXxjrHref || "(没有链接)");
 
   const deckOptions = await page
     .locator("#deckSelect option")
@@ -322,6 +336,235 @@ async function verifyVocab(browser, base, out) {
   }
 
   await page.click("#closeWordButton");
+
+  const quickWord = await page.locator(".vocab-row").first().getAttribute("data-word");
+  const quickRow = page.locator(".vocab-row").first();
+  await quickRow.locator('[data-quick-recite="known"]').click();
+  const quickKnown = await page.evaluate(
+    (word) => window.IballVocabRecite?.getRecord("kaoyan", word),
+    quickWord,
+  );
+  check("列表可直接点斩", quickKnown?.status === "known", quickKnown?.status || "(没有记录)");
+  const knownMeta = await page.locator("#deckMeta").innerText();
+  check(
+    "斩后统计从未背扣除",
+    /已斩 1/.test(knownMeta) && /未背/.test(knownMeta),
+    knownMeta.trim(),
+  );
+
+  await quickRow.locator('[data-quick-recite="known"]').click();
+  const quickCancelled = await page.evaluate(
+    (word) => window.IballVocabRecite?.getRecord("kaoyan", word),
+    quickWord,
+  );
+  check("再点当前斩会去掉记录", !quickCancelled, quickCancelled?.status || "记录已删除");
+
+  await page.locator(".vocab-row").first().locator('[data-quick-recite="known"]').click();
+  await page.click("#hideKnownButton");
+  const hiddenAfterKnown = await page.evaluate(
+    (word) =>
+      Array.from(document.querySelectorAll(".vocab-row")).some(
+        (row) => row.dataset.word === word,
+      ),
+    quickWord,
+  );
+  const hidePressed = await page.locator("#hideKnownButton").getAttribute("aria-pressed");
+  check(
+    "只看未背会移除已斩词",
+    hidePressed === "true" && hiddenAfterKnown === false,
+    `aria-pressed=${hidePressed} rowVisible=${hiddenAfterKnown}`,
+  );
+  await page.click("#hideKnownButton");
+  await page.evaluate((word) => {
+    const row = Array.from(document.querySelectorAll(".vocab-row")).find(
+      (node) => node.dataset.word === word,
+    );
+    row?.querySelector('[data-quick-recite="known"]')?.click();
+  }, quickWord);
+
+  await page.click("#blurModeButton");
+  const blurOn = await page.evaluate(() => ({
+    pressed: document.getElementById("blurModeButton")?.getAttribute("aria-pressed"),
+    body: document.body.classList.contains("is-vocab-blur"),
+    filter: getComputedStyle(document.querySelector(".vocab-row-meaning")).filter,
+  }));
+  check(
+    "模糊模式手动开启",
+    blurOn.pressed === "true" && blurOn.body && blurOn.filter !== "none",
+    `aria-pressed=${blurOn.pressed} filter=${blurOn.filter}`,
+  );
+  await page.click("#blurModeButton");
+  await page.waitForFunction(
+    () => getComputedStyle(document.querySelector(".vocab-row-meaning")).filter === "none",
+    { timeout: 3000 },
+  );
+  const blurOff = await page.evaluate(() => ({
+    pressed: document.getElementById("blurModeButton")?.getAttribute("aria-pressed"),
+    body: document.body.classList.contains("is-vocab-blur"),
+    filter: getComputedStyle(document.querySelector(".vocab-row-meaning")).filter,
+  }));
+  check(
+    "模糊模式手动关闭",
+    blurOff.pressed === "false" && !blurOff.body && blurOff.filter === "none",
+    `aria-pressed=${blurOff.pressed} filter=${blurOff.filter}`,
+  );
+
+  const orderedWords = await page
+    .locator(".vocab-row")
+    .evaluateAll((nodes) => nodes.slice(0, 4).map((node) => node.dataset.word || ""));
+  await page.click("#drawModeButton");
+  await page.waitForSelector("#drawPanel:not([hidden])", { timeout: 5000 });
+  const drawControls = await page.evaluate(() => ({
+    orders: document.querySelectorAll("#drawControls [data-draw-order]").length,
+    scopes: document.querySelectorAll("#drawControls [data-draw-scope]").length,
+    activeOrder: document.querySelector("#drawControls [data-draw-order].is-active")
+      ?.dataset.drawOrder,
+    activeScope: document.querySelector("#drawControls [data-draw-scope].is-active")
+      ?.dataset.drawScope,
+  }));
+  check(
+    "抽卡有顺序版与非顺序版",
+    drawControls.orders === 2 && drawControls.activeOrder === "random",
+    `${drawControls.orders} 个顺序 · 当前 ${drawControls.activeOrder}`,
+  );
+  check(
+    "抽卡有四种范围",
+    drawControls.scopes === 4 && drawControls.activeScope === "all",
+    `${drawControls.scopes} 个范围 · 当前 ${drawControls.activeScope}`,
+  );
+  const drawFirst = await page.evaluate(() => ({
+    word: document.getElementById("drawWord")?.textContent?.trim() || "",
+    answerHidden: document.getElementById("drawAnswer")?.hidden,
+    quickButtons: document.querySelectorAll("[data-draw-recite]").length,
+  }));
+  check(
+    "抽卡先显示单词并收起释义",
+    Boolean(drawFirst.word) && drawFirst.answerHidden === true && drawFirst.quickButtons === 3,
+    `${drawFirst.word} · answerHidden=${drawFirst.answerHidden}`,
+  );
+  await page.click("#drawRevealButton");
+  const revealed = await page.evaluate(() => ({
+    hidden: document.getElementById("drawAnswer")?.hidden,
+    text: document.getElementById("drawAnswer")?.textContent?.trim() || "",
+    actionsHidden: document.getElementById("drawReciteActions")?.hidden,
+  }));
+  check(
+    "抽卡释义手动显示",
+    revealed.hidden === false && revealed.text.length > 0 && revealed.actionsHidden === false,
+    `${revealed.text.length} 字`,
+  );
+  await page.screenshot({ path: path.join(out, "study-vocab-draw-desktop.png") });
+  const drawWord = drawFirst.word;
+  await page.click('[data-draw-recite="unknown"]');
+  await page.waitForTimeout(400);
+  const drawNextWord = await page.locator("#drawWord").innerText();
+  const drawRecord = await page.evaluate(
+    (word) => window.IballVocabRecite?.getRecord("kaoyan", word),
+    drawWord,
+  );
+  check(
+    "抽卡判定后记录并自动下一张",
+    drawRecord?.status === "unknown" && drawNextWord.trim() !== drawWord,
+    `${drawWord} -> ${drawNextWord.trim()}`,
+  );
+
+  await page.click('#drawControls [data-draw-order="sequential"]');
+  await page.waitForTimeout(220);
+  const sequentialFirst = (await page.locator("#drawWord").innerText()).trim();
+  check(
+    "顺序版从当前筛选首位开始",
+    sequentialFirst === orderedWords[0],
+    `${orderedWords[0]} -> ${sequentialFirst}`,
+  );
+  await page.click("#drawNextButton");
+  const sequentialSecond = (await page.locator("#drawWord").innerText()).trim();
+  check(
+    "顺序版按词表顺序推进",
+    sequentialSecond === orderedWords[1],
+    `${orderedWords[1]} -> ${sequentialSecond}`,
+  );
+
+  await page.click('#drawControls [data-draw-order="random"]');
+  await page.waitForTimeout(160);
+  const randomFirst = (await page.locator("#drawWord").innerText()).trim();
+  await page.click("#drawNextButton");
+  const randomSecond = (await page.locator("#drawWord").innerText()).trim();
+  const randomPressed = await page
+    .locator('#drawControls [data-draw-order="random"]')
+    .getAttribute("aria-pressed");
+  check(
+    "非顺序版仍可随机抽且不立即重复",
+    randomPressed === "true" && Boolean(randomFirst) && randomSecond !== randomFirst,
+    `${randomFirst} -> ${randomSecond}`,
+  );
+
+  await page.evaluate(
+    ([fuzzyWord, knownWord]) => {
+      const findByWord = (word) =>
+        Array.from(document.querySelectorAll(".vocab-row")).find(
+          (node) => node.dataset.word === word,
+        );
+      findByWord(fuzzyWord)?.querySelector('[data-quick-recite="fuzzy"]')?.click();
+      findByWord(knownWord)?.querySelector('[data-quick-recite="known"]')?.click();
+    },
+    [orderedWords[1], orderedWords[2]],
+  );
+  await page.waitForTimeout(220);
+  await page.click('#drawControls [data-draw-order="sequential"]');
+  await page.click('#drawControls [data-draw-scope="favorites"]');
+  await page.waitForTimeout(180);
+  const favoriteDraw = (await page.locator("#drawWord").innerText()).trim();
+  const favoriteScopePressed = await page
+    .locator('#drawControls [data-draw-scope="favorites"]')
+    .getAttribute("aria-pressed");
+  check(
+    "收藏范围只抽收藏词",
+    favoriteScopePressed === "true" && favoriteDraw === orderedWords[0],
+    `${orderedWords[0]} -> ${favoriteDraw}`,
+  );
+
+  await page.click('#drawControls [data-draw-scope="known"]');
+  await page.waitForTimeout(180);
+  const knownDraw = (await page.locator("#drawWord").innerText()).trim();
+  const knownDrawStatus = await page.locator("#drawStatus").innerText();
+  check(
+    "斩词范围只抽已斩词",
+    knownDraw === orderedWords[2] && /共 1 词/.test(knownDrawStatus),
+    `${knownDraw} · ${knownDrawStatus}`,
+  );
+
+  await page.click('#drawControls [data-draw-scope="learned"]');
+  await page.waitForTimeout(180);
+  const learnedDraw = (await page.locator("#drawWord").innerText()).trim();
+  const learnedHasRecord = await page.evaluate(
+    (word) => Boolean(window.IballVocabRecite?.getRecord("kaoyan", word)),
+    learnedDraw,
+  );
+  check(
+    "已经会的范围只抽有背词记录的词",
+    learnedHasRecord,
+    `${learnedDraw} · record=${learnedHasRecord}`,
+  );
+
+  await page.click('#drawControls [data-draw-scope="all"]');
+  await page.waitForTimeout(180);
+  const allDraw = (await page.locator("#drawWord").innerText()).trim();
+  const allScopePressed = await page
+    .locator('#drawControls [data-draw-scope="all"]')
+    .getAttribute("aria-pressed");
+  check(
+    "所有范围恢复整个筛选词表",
+    allScopePressed === "true" && allDraw === orderedWords[0],
+    `${orderedWords[0]} -> ${allDraw}`,
+  );
+
+  await page.click("#drawCloseButton");
+  check(
+    "抽卡面板可手动关闭",
+    await page.locator("#drawPanel").isHidden(),
+    "已关闭",
+  );
+
   const targetDeck = deckOptions.find((value) => value.includes("kaoyan2"));
   if (targetDeck) {
     const beforeTitle = await page.locator("#deckTitle").innerText();
@@ -341,6 +584,9 @@ async function verifyVocab(browser, base, out) {
   check("搜索能过滤词表", filtered > 0 && filtered <= rows, `${rows} -> ${filtered} 行`);
 
   await page.screenshot({ path: path.join(out, "study-vocab-desktop.png") });
+  await page.locator("#backXxjrButton").click();
+  await page.waitForURL(/\/xxrj\//, { timeout: 10000 });
+  check("返回 XXRJ 可实际打开", /\/xxrj\//.test(page.url()), page.url());
   check("词汇页无脚本报错", errors.length === 0, errors.slice(0, 3).join(" | "));
   await context.close();
 
@@ -352,6 +598,38 @@ async function verifyVocab(browser, base, out) {
     size.scrollWidth <= size.clientWidth + 1,
     `scrollWidth=${size.scrollWidth} clientWidth=${size.clientWidth}`,
   );
+  const mobileQuickButtons = await mobile.page
+    .locator(".vocab-row")
+    .first()
+    .locator("[data-quick-recite]")
+    .count();
+  const mobileDrawVisible = await mobile.page.locator("#drawModeButton").isVisible();
+  check(
+    "移动端保留快捷背词与抽卡入口",
+    mobileQuickButtons === 3 && mobileDrawVisible,
+    `${mobileQuickButtons} 个快捷按钮 · 抽卡入口=${mobileDrawVisible}`,
+  );
+  await mobile.page.locator(".vocab-row").nth(2).scrollIntoViewIfNeeded();
+  await mobile.page.screenshot({ path: path.join(out, "study-vocab-mobile-rows.png") });
+  await mobile.page.locator("#drawModeButton").scrollIntoViewIfNeeded();
+  await mobile.page.click("#drawModeButton");
+  await mobile.page.waitForSelector("#drawPanel:not([hidden])", { timeout: 5000 });
+  await mobile.page.locator("#drawPanel").scrollIntoViewIfNeeded();
+  const mobileDrawControls = await mobile.page.evaluate(() => {
+    const panel = document.getElementById("drawPanel");
+    return {
+      buttons: document.querySelectorAll("#drawControls .segment-button").length,
+      scrollWidth: panel?.scrollWidth || 0,
+      clientWidth: panel?.clientWidth || 0,
+    };
+  });
+  check(
+    "移动端抽卡设置完整且不横向溢出",
+    mobileDrawControls.buttons === 6 &&
+      mobileDrawControls.scrollWidth <= mobileDrawControls.clientWidth + 1,
+    `${mobileDrawControls.buttons} 个设置按钮 · scrollWidth=${mobileDrawControls.scrollWidth} clientWidth=${mobileDrawControls.clientWidth}`,
+  );
+  await mobile.page.screenshot({ path: path.join(out, "study-vocab-mobile-draw.png") });
   await mobile.page.screenshot({ path: path.join(out, "study-vocab-mobile.png") });
   await mobile.context.close();
 }

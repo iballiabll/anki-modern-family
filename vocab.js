@@ -22,6 +22,8 @@
   const SHARD_MAP_URL = versioned("./vocab-index/shard-map.json");
   /** 排序方式：默认词书顺序 / 高频（单元）顺序 / 字母序。 */
   const SORT_MODES = ["default", "frequency", "alpha"];
+  const DRAW_ORDERS = ["sequential", "random"];
+  const DRAW_SCOPES = ["all", "learned", "favorites", "known"];
 
   const FAVORITE_KEY = "iball_vocab_favorites_v1";
   const WORDBOOK_KEY = "iball_vocab_wordbook_v1";
@@ -52,6 +54,8 @@
     favoriteCount: document.getElementById("favoriteCount"),
     hideKnown: document.getElementById("hideKnownButton"),
     knownCount: document.getElementById("knownCount"),
+    blurMode: document.getElementById("blurModeButton"),
+    drawMode: document.getElementById("drawModeButton"),
     wordbookButton: document.getElementById("wordbookButton"),
     wordbookCount: document.getElementById("wordbookCount"),
     clearProgress: document.getElementById("clearProgressButton"),
@@ -69,6 +73,17 @@
     favoriteWord: document.getElementById("favoriteWordButton"),
     wordbookToggle: document.getElementById("wordbookToggleButton"),
     closeWord: document.getElementById("closeWordButton"),
+    drawPanel: document.getElementById("drawPanel"),
+    drawStatus: document.getElementById("drawStatus"),
+    drawWord: document.getElementById("drawWord"),
+    drawPhonetic: document.getElementById("drawPhonetic"),
+    drawKicker: document.getElementById("drawKicker"),
+    drawAnswer: document.getElementById("drawAnswer"),
+    drawReveal: document.getElementById("drawRevealButton"),
+    drawReciteActions: document.getElementById("drawReciteActions"),
+    drawControls: document.getElementById("drawControls"),
+    drawNext: document.getElementById("drawNextButton"),
+    drawClose: document.getElementById("drawCloseButton"),
     wordbookPanel: document.getElementById("wordbookPanel"),
     wordbookList: document.getElementById("wordbookList"),
     exportWordbook: document.getElementById("exportWordbookButton"),
@@ -97,12 +112,25 @@
     sort: "default",
     favoriteOnly: false,
     hideKnown: false,
+    blurMode: false,
+    drawOpen: false,
+    drawWord: "",
+    drawRevealed: false,
+    drawSeen: new Set(),
+    drawOrder: "random",
+    drawScope: "all",
     activeWord: "",
     detailToken: 0,
     recite: new Map(),
     favorites: new Set(),
     wordbook: new Map(),
-    prefs: { deckKey: "kaoyan1", sort: "default" },
+    prefs: {
+      deckKey: "kaoyan1",
+      sort: "default",
+      hideKnown: false,
+      drawOrder: "random",
+      drawScope: "all",
+    },
   };
 
   /* ------------------------------------------------------------- 小工具 */
@@ -346,36 +374,51 @@
     if (els.reciteStatus) {
       if (!record) {
         els.reciteStatus.textContent =
-          "点一个状态就会记下来，斩过的词不再进每日任务";
+          "点一个状态就会记下来；再点当前状态可以取消";
       } else if (record.status === "known") {
-        els.reciteStatus.textContent = `已斩 · 已记 ${record.reviews} 次 · 不再进每日任务`;
+        els.reciteStatus.textContent = `已斩 · 已记 ${record.reviews} 次 · 再点可取消斩`;
       } else {
         els.reciteStatus.textContent = `${
           reciteApi()?.statusLabel(record.status) || record.status
-        } · 已记 ${record.reviews} 次`;
+        } · 已记 ${record.reviews} 次 · 再点可取消`;
       }
     }
   }
 
-  function recordRecite(status) {
+  function recordRecite(status, word = state.activeWord, options = {}) {
     const api = reciteApi();
-    if (!api || !state.activeWord) {
+    const targetWord = String(word || "").trim();
+    if (!api || !targetWord) {
       showToast("背词记录接口还没就绪，稍后再试");
-      return;
+      return false;
+    }
+    const existing = reciteRecord(targetWord);
+    if (existing?.status === status) {
+      if (api.remove(currentDeckId(), targetWord)) {
+        showToast(
+          status === "known"
+            ? "已取消斩：这个词会回到未背"
+            : `已取消「${api.statusLabel(status)}」标记`,
+        );
+      }
+      return true;
     }
     const saved = api.record({
       deck: currentDeckId(),
-      word: state.activeWord,
+      word: targetWord,
       status,
-      source: `vocab:${state.deckKey}`,
+      source: options.source || `vocab:${state.deckKey}`,
     });
     if (saved) {
       showToast(
         status === "known"
           ? "已斩：这个词之后不再进每日任务"
-          : `已记为「${api.statusLabel(status)}」`,
+          : status === "unknown"
+            ? "已记为「不会」，会回到待攻克"
+            : `已记为「${api.statusLabel(status)}」`,
       );
     }
+    return Boolean(saved);
   }
 
   /* --------------------------------------------------------------- 渲染 */
@@ -488,27 +531,62 @@
             )}</span>`,
           );
         }
+        const status = recited?.status || "";
+        const quickActions = [
+          { status: "known", label: "斩", title: "直接标记已经会了；再点取消斩" },
+          { status: "fuzzy", label: "模糊", title: "直接标记还没记牢；再点取消" },
+          { status: "unknown", label: "不会", title: "直接标记不认识；再点取消" },
+        ];
         return `
-          <button class="vocab-row${
+          <div class="vocab-row${
             key === normalize(state.activeWord) ? " is-active" : ""
-          }" type="button" data-word="${escapeHtml(word)}">
-            <span class="vocab-row-index">${index + 1}</span>
-            <span class="vocab-row-copy">
-              <span class="vocab-row-word">${escapeHtml(word)}${
-                quick?.phonetic ? `<small>/${escapeHtml(quick.phonetic)}/</small>` : ""
-              }</span>
-              <span class="vocab-row-meaning">${escapeHtml(
-                quick?.meaning || "词卡详情按分片懒加载，点击查看例句与词根",
-              )}</span>
-            </span>
-            <span class="vocab-row-flags">${marks.join("") || "<span>未学</span>"}</span>
-          </button>`;
+          }" data-word="${escapeHtml(word)}">
+            <button
+              class="vocab-row-main"
+              type="button"
+              data-open-word="${escapeHtml(word)}"
+              aria-label="查看 ${escapeHtml(word)} 的完整词卡"
+            >
+              <span class="vocab-row-index">${index + 1}</span>
+              <span class="vocab-row-copy">
+                <span class="vocab-row-word">${escapeHtml(word)}${
+                  quick?.phonetic ? `<small>/${escapeHtml(quick.phonetic)}/</small>` : ""
+                }</span>
+                <span class="vocab-row-meaning">${escapeHtml(
+                  quick?.meaning || "词卡详情按分片懒加载，点击查看例句与词根",
+                )}</span>
+              </span>
+              <span class="vocab-row-flags">${marks.join("") || "<span>未学</span>"}</span>
+            </button>
+            <div class="vocab-row-actions" role="group" aria-label="${escapeHtml(
+              word,
+            )} 的快捷背词记录">
+              ${quickActions
+                .map(
+                  (action) => `
+                    <button
+                      class="vocab-quick-button is-${action.status}${
+                        status === action.status ? " is-active" : ""
+                      }"
+                      type="button"
+                      data-quick-recite="${action.status}"
+                      data-word="${escapeHtml(word)}"
+                      aria-pressed="${status === action.status}"
+                      title="${action.title}"
+                    >${action.label}</button>`,
+                )
+                .join("")}
+            </div>
+          </div>`;
       })
       .join("");
     if (els.loadMore) {
       els.loadMore.hidden = shown.length >= words.length;
     }
     updateListStatus(shown.length, words.length);
+    if (state.drawOpen) {
+      renderDrawCard();
+    }
   }
 
   function updateListStatus(shown, total) {
@@ -524,10 +602,262 @@
     const config = DECKS[state.deckKey] || DECKS.kaoyan1;
     const total = state.deckWords.length;
     const slain = slainCount();
-    els.deckMeta.textContent = `${config.label} · 共 ${total} 词 · 已斩 ${slain} · 待背 ${Math.max(
+    els.deckMeta.textContent = `${config.label} · 共 ${total} 词 · 已斩 ${slain} · 未背 ${Math.max(
       total - slain,
       0,
     )}`;
+  }
+
+  function drawScopeLabel() {
+    if (state.drawScope === "learned") {
+      return "已经会的";
+    }
+    if (state.drawScope === "favorites") {
+      return "收藏的";
+    }
+    if (state.drawScope === "known") {
+      return "斩的";
+    }
+    return "所有";
+  }
+
+  function drawOrderLabel() {
+    return state.drawOrder === "sequential" ? "顺序版" : "非顺序版";
+  }
+
+  function drawEmptyHint() {
+    if (!state.deckWords.length) {
+      return "词表还在加载，稍后再试。";
+    }
+    if (state.drawScope === "favorites") {
+      return "收藏夹里还没有词，打开词卡点「收藏」后再来。";
+    }
+    if (state.drawScope === "learned") {
+      return "当前范围还没有背词记录，先在列表点「斩 / 模糊 / 不会」。";
+    }
+    if (state.drawScope === "known") {
+      return state.hideKnown
+        ? "当前开着「只看未背」，关掉它才能抽斩过的词。"
+        : "还没有斩过的词，先在列表点「斩」。";
+    }
+    if (state.hideKnown) {
+      return "当前开着「只看未背」，可以关掉后再抽全部词。";
+    }
+    if (state.favoriteOnly) {
+      return "当前只显示收藏词，关掉「收藏夹」后再试。";
+    }
+    if (state.query) {
+      return "当前搜索没有匹配词，换个关键词再试。";
+    }
+    return "换个词库或调整筛选后再试。";
+  }
+
+  function drawCandidates() {
+    let words = filteredWords();
+    if (state.drawScope === "learned") {
+      words = words.filter((word) => Boolean(reciteRecord(word)));
+    } else if (state.drawScope === "favorites") {
+      words = words.filter((word) => state.favorites.has(normalize(word)));
+    } else if (state.drawScope === "known") {
+      words = words.filter((word) => isSlain(word));
+    }
+    return words;
+  }
+
+  function pickDrawWord(candidates) {
+    const validKeys = new Set(candidates.map((word) => normalize(word)));
+    for (const key of [...state.drawSeen]) {
+      if (!validKeys.has(key)) {
+        state.drawSeen.delete(key);
+      }
+    }
+
+    const currentKey = normalize(state.drawWord);
+    let remaining = candidates.filter(
+      (word) => !state.drawSeen.has(normalize(word)),
+    );
+    if (!remaining.length) {
+      state.drawSeen.clear();
+      if (currentKey && candidates.length > 1 && validKeys.has(currentKey)) {
+        state.drawSeen.add(currentKey);
+      }
+      remaining = candidates.filter(
+        (word) => !state.drawSeen.has(normalize(word)),
+      );
+    }
+
+    let selected = "";
+    if (state.drawOrder === "sequential") {
+      selected = remaining[0] || "";
+    } else if (remaining.length) {
+      selected = remaining[Math.floor(Math.random() * remaining.length)];
+    }
+    if (!selected && candidates.length) {
+      selected = candidates.find((word) => normalize(word) !== currentKey) || candidates[0];
+    }
+    if (selected) {
+      state.drawSeen.add(normalize(selected));
+    }
+    return selected;
+  }
+
+  function syncDrawControls() {
+    els.drawControls?.querySelectorAll("[data-draw-order]").forEach((node) => {
+      const active = node.dataset.drawOrder === state.drawOrder;
+      node.classList.toggle("is-active", active);
+      node.setAttribute("aria-pressed", String(active));
+    });
+    els.drawControls?.querySelectorAll("[data-draw-scope]").forEach((node) => {
+      const active = node.dataset.drawScope === state.drawScope;
+      node.classList.toggle("is-active", active);
+      node.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  function renderDrawCard() {
+    if (!els.drawPanel || !els.drawWord || !els.drawAnswer) {
+      return;
+    }
+    const candidates = drawCandidates();
+    const candidateKeys = new Set(candidates.map((word) => normalize(word)));
+    if (state.drawWord && !candidateKeys.has(normalize(state.drawWord))) {
+      state.drawWord = "";
+      state.drawRevealed = false;
+    }
+    if (els.drawKicker) {
+      els.drawKicker.textContent =
+        state.drawOrder === "sequential" ? "SEQUENTIAL CARD" : "RANDOM CARD";
+    }
+    if (els.drawStatus) {
+      const pool = `${drawOrderLabel()} · ${drawScopeLabel()} · 共 ${candidates.length} 词`;
+      els.drawStatus.textContent = state.drawWord
+        ? `${pool} · 本轮已抽 ${Math.min(state.drawSeen.size, candidates.length)} 张`
+        : `${pool}${candidates.length ? " · 点「下一张」开始" : " · 暂无可抽词"}`;
+    }
+    if (!state.drawWord) {
+      els.drawWord.textContent = candidates.length ? "准备抽卡…" : "当前范围里没有可抽的词";
+      if (els.drawPhonetic) {
+        els.drawPhonetic.textContent = candidates.length ? "点「下一张」开始" : drawEmptyHint();
+      }
+      els.drawAnswer.hidden = true;
+      if (els.drawReveal) {
+        els.drawReveal.hidden = true;
+      }
+      if (els.drawReciteActions) {
+        els.drawReciteActions.hidden = true;
+      }
+      return;
+    }
+
+    const quick = quickEntry(state.drawWord);
+    els.drawWord.textContent = state.drawWord;
+    if (els.drawPhonetic) {
+      els.drawPhonetic.textContent = quick?.phonetic ? `/${quick.phonetic}/` : "";
+    }
+    els.drawAnswer.innerHTML = `<p>${escapeHtml(
+      quick?.meaning || "释义正在加载，稍后会显示在这里。",
+    )}</p>`;
+    els.drawAnswer.hidden = !state.drawRevealed;
+    if (els.drawReveal) {
+      els.drawReveal.hidden = state.drawRevealed;
+    }
+    if (els.drawReciteActions) {
+      els.drawReciteActions.hidden = !state.drawRevealed;
+    }
+    const status = reciteRecord(state.drawWord)?.status || "";
+    els.drawReciteActions?.querySelectorAll("[data-draw-recite]").forEach((node) => {
+      const active = node.dataset.drawRecite === status;
+      node.classList.toggle("is-active", active);
+      node.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  function nextDrawCard() {
+    if (!state.drawOpen) {
+      return;
+    }
+    const candidates = drawCandidates();
+    state.drawWord = pickDrawWord(candidates);
+    state.drawRevealed = false;
+    renderDrawCard();
+    if (state.drawWord && !quickEntry(state.drawWord)) {
+      loadQuickIndex().then(() => {
+        if (state.drawOpen && state.drawWord) {
+          renderDrawCard();
+        }
+      });
+    }
+  }
+
+  function resetDrawRound() {
+    state.drawWord = "";
+    state.drawRevealed = false;
+    state.drawSeen.clear();
+    if (state.drawOpen) {
+      nextDrawCard();
+    } else {
+      renderDrawCard();
+    }
+  }
+
+  function openDrawMode() {
+    if (!els.drawPanel) {
+      return;
+    }
+    state.drawOpen = true;
+    state.drawSeen.clear();
+    els.drawPanel.hidden = false;
+    nextDrawCard();
+    syncCounters();
+    window.requestAnimationFrame(() => {
+      els.drawPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function closeDrawMode() {
+    state.drawOpen = false;
+    state.drawRevealed = false;
+    state.drawWord = "";
+    state.drawSeen.clear();
+    if (els.drawPanel) {
+      els.drawPanel.hidden = true;
+    }
+    syncCounters();
+  }
+
+  function revealDrawCard() {
+    if (!state.drawWord) {
+      return;
+    }
+    state.drawRevealed = true;
+    renderDrawCard();
+    if (!quickEntry(state.drawWord)) {
+      loadQuickIndex().then(() => {
+        if (state.drawOpen && state.drawWord) {
+          renderDrawCard();
+        }
+      });
+    }
+  }
+
+  function recordDrawRecite(status) {
+    const word = state.drawWord;
+    if (!word) {
+      return;
+    }
+    const changed = recordRecite(status, word, {
+      source: `vocab-draw:${state.deckKey}`,
+    });
+    if (!changed) {
+      return;
+    }
+    state.drawRevealed = true;
+    renderDrawCard();
+    window.setTimeout(() => {
+      if (state.drawOpen) {
+        nextDrawCard();
+      }
+    }, 180);
   }
 
   function renderDetail(entry, word, options = {}) {
@@ -667,6 +997,15 @@
     }
     els.hideKnown?.setAttribute("aria-pressed", String(state.hideKnown));
     els.hideKnown?.classList.toggle("is-primary", state.hideKnown);
+    els.blurMode?.setAttribute("aria-pressed", String(state.blurMode));
+    els.blurMode?.classList.toggle("is-primary", state.blurMode);
+    els.drawMode?.setAttribute("aria-pressed", String(state.drawOpen));
+    els.drawMode?.classList.toggle("is-primary", state.drawOpen);
+    if (els.drawMode) {
+      els.drawMode.textContent = state.drawOpen ? "关闭抽卡" : "抽卡复习";
+    }
+    syncDrawControls();
+    document.body.classList.toggle("is-vocab-blur", state.blurMode);
     if (els.wordbookCount) {
       els.wordbookCount.textContent = String(state.wordbook.size);
     }
@@ -819,6 +1158,7 @@
 
   async function selectDeck(deckKey) {
     const config = DECKS[deckKey] ? deckKey : "kaoyan1";
+    closeDrawMode();
     state.deckKey = config;
     state.prefs.deckKey = config;
     state.visibleCount = PAGE_SIZE;
@@ -933,15 +1273,68 @@
 
     els.hideKnown?.addEventListener("click", () => {
       state.hideKnown = !state.hideKnown;
+      state.prefs.hideKnown = state.hideKnown;
       state.visibleCount = PAGE_SIZE;
       syncCounters();
       renderList();
+      writeStore(PREFS_KEY, state.prefs);
+    });
+
+    els.blurMode?.addEventListener("click", () => {
+      state.blurMode = !state.blurMode;
+      syncCounters();
+      showToast(state.blurMode ? "释义已模糊，点击「释义模糊」恢复" : "释义已恢复清晰");
+    });
+
+    els.drawMode?.addEventListener("click", () => {
+      if (state.drawOpen) {
+        closeDrawMode();
+      } else {
+        openDrawMode();
+      }
+    });
+
+    els.drawControls?.addEventListener("click", (event) => {
+      const order = event.target.closest("[data-draw-order]");
+      if (order) {
+        const nextOrder = DRAW_ORDERS.includes(order.dataset.drawOrder)
+          ? order.dataset.drawOrder
+          : "random";
+        if (nextOrder !== state.drawOrder) {
+          state.drawOrder = nextOrder;
+          state.prefs.drawOrder = nextOrder;
+          writeStore(PREFS_KEY, state.prefs);
+          syncDrawControls();
+          resetDrawRound();
+        }
+        return;
+      }
+      const scope = event.target.closest("[data-draw-scope]");
+      if (scope) {
+        const nextScope = DRAW_SCOPES.includes(scope.dataset.drawScope)
+          ? scope.dataset.drawScope
+          : "all";
+        if (nextScope !== state.drawScope) {
+          state.drawScope = nextScope;
+          state.prefs.drawScope = nextScope;
+          writeStore(PREFS_KEY, state.prefs);
+          syncDrawControls();
+          resetDrawRound();
+        }
+      }
     });
 
     els.list?.addEventListener("click", (event) => {
-      const row = event.target.closest("[data-word]");
+      const quick = event.target.closest("[data-quick-recite]");
+      if (quick) {
+        recordRecite(quick.dataset.quickRecite, quick.dataset.word, {
+          source: `vocab-list:${state.deckKey}`,
+        });
+        return;
+      }
+      const row = event.target.closest("[data-open-word], .vocab-row");
       if (row) {
-        openWord(row.dataset.word);
+        openWord(row.dataset.openWord || row.dataset.word);
       }
     });
 
@@ -962,6 +1355,16 @@
       const button = event.target.closest("[data-recite]");
       if (button) {
         recordRecite(button.dataset.recite);
+      }
+    });
+
+    els.drawReveal?.addEventListener("click", revealDrawCard);
+    els.drawNext?.addEventListener("click", nextDrawCard);
+    els.drawClose?.addEventListener("click", closeDrawMode);
+    els.drawReciteActions?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-draw-recite]");
+      if (button) {
+        recordDrawRecite(button.dataset.drawRecite);
       }
     });
 
@@ -1028,6 +1431,13 @@
     if (prefs && typeof prefs === "object") {
       state.prefs = { ...state.prefs, ...prefs };
       state.sort = SORT_MODES.includes(state.prefs.sort) ? state.prefs.sort : "default";
+      state.hideKnown = Boolean(state.prefs.hideKnown);
+      state.drawOrder = DRAW_ORDERS.includes(state.prefs.drawOrder)
+        ? state.prefs.drawOrder
+        : "random";
+      state.drawScope = DRAW_SCOPES.includes(state.prefs.drawScope)
+        ? state.prefs.drawScope
+        : "all";
     }
 
     // 封神之路等页面用 ?deck=llyc2027&word=xxx 直接跳到某张词卡。
@@ -1039,6 +1449,7 @@
     const hideKnownParam = params.get("hideKnown");
     if (hideKnownParam === "1" || hideKnownParam === "true") {
       state.hideKnown = true;
+      state.prefs.hideKnown = true;
     }
     const focusWord = (params.get("word") || "").trim();
 
@@ -1050,6 +1461,9 @@
       syncCounters();
       syncReciteBar();
       updateDeckMeta();
+      if (state.drawOpen) {
+        renderDrawCard();
+      }
     });
     refreshRecite();
     syncCounters();

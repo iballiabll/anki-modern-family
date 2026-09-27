@@ -80,15 +80,13 @@
 
 .vocab-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
   background: #fbfbfd;
   border: 1px solid rgba(11, 17, 41, 0.1);
   border-radius: var(--vocab-radius);
-  cursor: pointer;
-  text-align: left;
   transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -100,6 +98,27 @@
 .vocab-row.is-active {
   border-color: var(--forest-deep);
   background: #eef0f6;
+}
+
+.vocab-row-main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vocab-row-main:focus-visible,
+.vocab-quick-button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .vocab-row-index {
@@ -172,6 +191,55 @@
 .vocab-row-flags .is-recited.is-unknown {
   background: rgba(240, 82, 99, 0.16);
   color: var(--coral-dark);
+}
+
+.vocab-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vocab-quick-button {
+  min-height: 32px;
+  padding: 0 9px;
+  color: #5d6274;
+  background: #ffffff;
+  border: 1px solid #d3d5df;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.vocab-quick-button:hover {
+  color: var(--forest);
+  border-color: #8e94ad;
+}
+
+.vocab-quick-button.is-known.is-active {
+  color: #ffffff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.vocab-quick-button.is-fuzzy.is-active {
+  color: #3a2600;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.vocab-quick-button.is-unknown.is-active {
+  color: #ffffff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+.vocab-xxjr-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .vocab-list-foot {
@@ -328,6 +396,21 @@
   line-height: 1.7;
 }
 
+.vocab-row-meaning,
+.vocab-detail .vocab-block p,
+.vocab-detail .vocab-block ul,
+.vocab-draw-answer {
+  transition: filter 0.18s ease;
+}
+
+body.is-vocab-blur .vocab-row-meaning,
+body.is-vocab-blur .vocab-detail .vocab-block p,
+body.is-vocab-blur .vocab-detail .vocab-block ul,
+body.is-vocab-blur .vocab-draw-answer {
+  filter: blur(5px);
+  user-select: none;
+}
+
 .vocab-example {
   padding: 10px 12px;
   background: #f6f7fa;
@@ -336,6 +419,149 @@
   color: #2f3446;
   font-size: 13px;
   line-height: 1.7;
+}
+
+/* ------------------------------------------------------------- 抽卡复习 */
+
+.vocab-draw-panel {
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(11, 17, 41, 0.12);
+  border-radius: var(--vocab-radius);
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.08);
+}
+
+.vocab-draw-panel[hidden],
+.vocab-draw-answer[hidden],
+.vocab-draw-recite-actions[hidden] {
+  display: none;
+}
+
+.vocab-draw-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 14px;
+}
+
+.vocab-draw-controls {
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  gap: 14px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+}
+
+.vocab-draw-control-group {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.vocab-draw-scope {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.vocab-draw-controls .segment-button {
+  padding: 0 8px;
+}
+
+.vocab-draw-stage {
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: #f6f7fa;
+}
+
+.vocab-draw-card {
+  width: min(680px, 100%);
+  min-height: 330px;
+  padding: 28px;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid rgba(11, 17, 41, 0.14);
+  border-radius: var(--vocab-radius);
+  box-shadow: 0 12px 28px rgba(11, 17, 41, 0.1);
+}
+
+.vocab-draw-kicker {
+  color: #7d8193;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.vocab-draw-card h3 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 6vw, 56px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.vocab-draw-phonetic {
+  min-height: 22px;
+  margin: 0;
+  color: #5d6274;
+  font-size: 15px;
+}
+
+.vocab-draw-answer {
+  width: min(560px, 100%);
+  min-height: 52px;
+  color: #333746;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.vocab-draw-answer p {
+  margin: 0;
+}
+
+.vocab-draw-actions {
+  width: min(560px, 100%);
+  margin-top: 8px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+}
+
+.vocab-draw-actions > .tool-button {
+  min-width: 150px;
+}
+
+.vocab-draw-recite-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.draw-recite-button.is-known.is-active {
+  color: #ffffff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.draw-recite-button.is-fuzzy.is-active {
+  color: #3a2600;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.draw-recite-button.is-unknown.is-active {
+  color: #ffffff;
+  background: var(--coral);
+  border-color: var(--coral);
 }
 
 /* ------------------------------------------------------------- 生词本 */
@@ -409,6 +635,15 @@
   .vocab-wordbook-panel {
     width: min(100% - 28px, 760px);
   }
+
+  .vocab-draw-panel {
+    width: min(100% - 28px, 760px);
+  }
+
+  .vocab-draw-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
 }
 
 @media (max-width: 560px) {
@@ -416,18 +651,59 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .vocab-row-main {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
   .vocab-row-index {
     min-width: 0;
   }
 
   .vocab-row-flags {
+    grid-column: 2;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
   }
 
+  .vocab-row-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .vocab-quick-button {
+    min-width: 0;
+    padding: 0 5px;
+  }
+
   .vocab-head-word h3 {
     font-size: 22px;
+  }
+
+  .vocab-draw-stage {
+    padding: 14px;
+  }
+
+  .vocab-draw-card {
+    min-height: 300px;
+    padding: 22px 14px;
+  }
+
+  .vocab-draw-card h3 {
+    font-size: 34px;
+  }
+
+  .vocab-draw-recite-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vocab-draw-controls {
+    padding: 12px;
+  }
+
+  .vocab-draw-scope {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -467,6 +743,7 @@ html[data-vocab-embed="true"] .hero-tools .tool-actions {
 }
 
 html[data-vocab-embed="true"] .vocab-board,
+html[data-vocab-embed="true"] .vocab-draw-panel,
 html[data-vocab-embed="true"] .vocab-wordbook-panel {
   width: calc(100% - 28px);
   margin-top: 16px;
