@@ -1367,27 +1367,67 @@
     }
 
     const difficulty = readingDifficulty(piece);
-    if (difficulty) {
+    const magazineDifficulty = String(piece.magazineDifficulty || "").trim();
+    if (magazineDifficulty || difficulty) {
       const row = el("p", "periodical-mag-levels");
-      const badge = el(
-        "span",
-        "periodical-mag-level",
-        `机读难度 · ${difficulty.level}`,
-      );
-      badge.title = `机读整理：平均每句约 ${difficulty.average} 词，共 ${difficulty.sentences} 句。不是出版方官方评级。`;
-      row.append(badge);
-      row.append(
-        el(
+      if (magazineDifficulty) {
+        const pdfBadge = el(
           "span",
-          "periodical-mag-level is-quiet",
-          `平均句长 ${difficulty.average} 词`,
-        ),
-      );
+          "periodical-mag-level is-pdf",
+          `杂志版难度评级 ${magazineDifficulty}`,
+        );
+        pdfBadge.title = "直接整理自杂志排版 PDF 右上角的难度评级，不是站内估算。";
+        row.append(pdfBadge);
+      }
+      if (difficulty) {
+        const badge = el(
+          "span",
+          "periodical-mag-level",
+          `机读难度 · ${difficulty.level}`,
+        );
+        badge.title = `机读整理：平均每句约 ${difficulty.average} 词，共 ${difficulty.sentences} 句。不是出版方官方评级。`;
+        row.append(badge);
+        row.append(
+          el(
+            "span",
+            "periodical-mag-level is-quiet",
+            `平均句长 ${difficulty.average} 词`,
+          ),
+        );
+      }
       copy.append(row);
     }
 
     head.append(copy);
     return head;
+  }
+
+  /** 文章导读：杂志排版 PDF 原样机读整理，不做翻译或补写。 */
+  function renderMagazineIntro(piece) {
+    const intro = String(piece.magazineIntro || "").trim();
+    if (!intro) {
+      return null;
+    }
+    const details = el("details", "periodical-mag-intro");
+    details.open = true;
+    details.append(
+      el(
+        "summary",
+        "periodical-mag-intro-summary",
+        "文章导读 · 机读整理自杂志排版 PDF",
+      ),
+    );
+    const body = el("div", "periodical-mag-intro-body");
+    body.append(el("p", "periodical-mag-intro-text", intro));
+    body.append(
+      el(
+        "p",
+        "periodical-outline-note",
+        "导读按 PDF 原有文字整理，仅用于提示主题与行文方向；解析不到时保持为空，不机翻、不补造。",
+      ),
+    );
+    details.append(body);
+    return details;
   }
 
   /** 文章脉络：由每段中文首句机读整理，明确标注非 PDF 原文。 */
@@ -1608,6 +1648,11 @@
       actions.append(originalLink, readButton);
       head.append(actions);
       card.append(head);
+
+      const magazineIntro = renderMagazineIntro(piece);
+      if (magazineIntro) {
+        card.append(magazineIntro);
+      }
 
       const outline = renderOutline(piece);
       if (outline) {

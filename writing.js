@@ -172,6 +172,76 @@
     return `${GRADE_PREFIX}${id}`;
   }
 
+  /* ------------------------------------------------ 作答统计（学习记录） */
+
+  // 作文没有官方分值，统计只记「写了 / 批改了 / 评分多少」，不换算考试成绩。
+  const ExamScores = window.ExamScores || null;
+  const SCORE_ITEM_ID = "essay";
+
+  function scoreMeta(prompt) {
+    if (!prompt) {
+      return null;
+    }
+    return {
+      exam: prompt.exam,
+      paperId: `writing-${prompt.id}`,
+      paperLabel: prompt.paperTitle
+        ? `${prompt.paperTitle}｜${prompt.label || ""}`
+        : prompt.label || prompt.id,
+      sectionId: "writing",
+      sectionLabel: [prompt.examLabel || EXAM_LABELS[prompt.exam] || "", prompt.part, "写作"]
+        .filter(Boolean)
+        .join(" · "),
+    };
+  }
+
+  function recordDraftScore(prompt, text) {
+    const meta = scoreMeta(prompt);
+    if (!ExamScores || !meta) {
+      return;
+    }
+    const words = countWords(text);
+    if (!words) {
+      ExamScores.removeSubjective({ ...meta, itemId: SCORE_ITEM_ID });
+      return;
+    }
+    ExamScores.recordSubjective({
+      ...meta,
+      itemId: SCORE_ITEM_ID,
+      label: prompt.label || "作文",
+      status: "draft",
+      words,
+      note: "草稿完成度，站点不对作文给出官方分数。",
+    });
+  }
+
+  function recordGradeScore(prompt, result) {
+    const meta = scoreMeta(prompt);
+    if (!ExamScores || !meta || !result) {
+      return;
+    }
+    const score = Number(result.score);
+    const maxScore = Number(result.maxScore);
+    ExamScores.recordSubjective({
+      ...meta,
+      itemId: SCORE_ITEM_ID,
+      label: prompt.label || "作文",
+      status: "graded",
+      words: countWords(els.essayInput?.value || ""),
+      score: Number.isFinite(score) ? score : null,
+      maxScore: Number.isFinite(maxScore) ? maxScore : null,
+      note: `学习评分（非官方）：${result.engine === "ai" ? "AI 批改" : "本地规则引擎"}`,
+    });
+  }
+
+  function clearScore(prompt) {
+    const meta = scoreMeta(prompt);
+    if (!ExamScores || !meta) {
+      return;
+    }
+    ExamScores.removeSubjective({ ...meta, itemId: SCORE_ITEM_ID });
+  }
+
   function shardCacheKey(name) {
     return `${SHARD_CACHE_PREFIX}${name}`;
   }
@@ -1259,6 +1329,7 @@
       storageRemove(draftKey(prompt.id));
       setDraftStatus("草稿已清空");
       renderDraftCount();
+      recordDraftScore(prompt, "");
       return;
     }
     const savedAt = new Date().toISOString();
@@ -1268,6 +1339,9 @@
       !ok,
     );
     renderDraftCount();
+    if (!state.grade) {
+      recordDraftScore(prompt, text);
+    }
   }
 
   function renderCachedGrade(prompt) {
@@ -1276,6 +1350,7 @@
       state.grade = cached.result;
       renderGrade(cached.result, { cached: true });
       setStatus(`已恢复上次批改结果 · ${formatTime(cached.savedAt)}`);
+      recordGradeScore(prompt, cached.result);
       return;
     }
     state.grade = null;
@@ -1360,6 +1435,7 @@
       state.grade = local;
       renderGrade(local, { cached: false });
       writeJson(gradeKey(prompt.id), { result: local, savedAt: new Date().toISOString() });
+      recordGradeScore(prompt, local);
     } else {
       clearResult();
     }
@@ -1380,6 +1456,7 @@
         state.grade = result;
         renderGrade(result, { cached: false });
         writeJson(gradeKey(prompt.id), { result, savedAt: new Date().toISOString() });
+        recordGradeScore(prompt, result);
         setStatus(
           result.engine === "ai"
             ? "AI 批改完成，结果已保存在本机。"
@@ -2081,6 +2158,7 @@
       clearResult();
       updateWordMeter();
       setDraftStatus("草稿和上次批改结果已清空");
+      clearScore(state.activePrompt);
       renderPromptList();
     });
 

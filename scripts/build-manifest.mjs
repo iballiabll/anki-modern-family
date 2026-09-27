@@ -32,6 +32,8 @@ const staticEntries = [
   "daily-listening-data",
   "daily-listening-papers.js",
   "deck-data.js",
+  "exam-scores.css",
+  "exam-scores.js",
   "index.html",
   "intensive-data",
   "intensive.css",

@@ -71,6 +71,10 @@
   const REVEAL_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-revealed`;
   const CLOZE_TRANSLATION_STORAGE_KEY =
     `${LEVEL_CONFIG.storagePrefix}-cloze-translation`;
+  // 作答统计与页面内的作答分开存储，页面清空作答时同步清掉对应统计。
+  const ExamScores = window.ExamScores || null;
+  const SCORE_EXAM = READING_LEVEL === "cet6" ? "cet6" : "cet4";
+  const SCORE_SECTION_LABEL = `${LEVEL_CONFIG.label}阅读精读`;
 
   const KIND_LABELS = {
     cloze: "选词填空",
@@ -203,6 +207,63 @@
 
   function getAnswerKey(number) {
     return `${state.paperId}|${number}`;
+  }
+
+  function scoreMeta(piece) {
+    const meta = state.data?.meta || {};
+    const kind = KIND_LABELS[piece?.kind] || piece?.type || "";
+    return {
+      exam: SCORE_EXAM,
+      paperId: `${SCORE_EXAM}-reading-${state.paperId}`,
+      paperLabel: meta.title || state.paperId,
+      sectionId: piece?.id || "default",
+      sectionLabel: [SCORE_SECTION_LABEL, kind, piece?.title]
+        .filter(Boolean)
+        .join(" · "),
+    };
+  }
+
+  function recordAnswerScore(number, answer, piece) {
+    if (!ExamScores) {
+      return;
+    }
+    const key = getAnswerKey(number);
+    const chosen = state.answers[key] || "";
+    if (!chosen) {
+      return;
+    }
+    ExamScores.recordObjective({
+      ...scoreMeta(piece),
+      questionNo: number,
+      chosen,
+      answer: answer || "",
+      verified: Boolean(state.revealed[key]),
+    });
+  }
+
+  function recordPieceScores(piece) {
+    if (!ExamScores || !piece) {
+      return;
+    }
+    if (piece.kind === "cloze") {
+      (piece.blanks || []).forEach((blank) =>
+        recordAnswerScore(blank.number, blank.answerLetter, piece),
+      );
+      return;
+    }
+    (piece.questions || []).forEach((question) =>
+      recordAnswerScore(question.number, question.answer, piece),
+    );
+  }
+
+  function removeAnswerScore(number, piece) {
+    if (!ExamScores) {
+      return;
+    }
+    ExamScores.removeQuestion({
+      ...scoreMeta(piece),
+      questionNo: number,
+    });
   }
 
   function normalizeWord(value) {
@@ -2911,6 +2972,7 @@
         state.answers[getAnswerKey(question.number)] = choice.letter;
         persistAnswers();
         applyQuestionCardState(card, question);
+        recordAnswerScore(question.number, question.answer, piece);
       });
       options.append(button);
     });
@@ -2931,6 +2993,7 @@
       state.revealed[getAnswerKey(question.number)] = true;
       persistRevealed();
       applyQuestionCardState(card, question);
+      recordAnswerScore(question.number, question.answer, piece);
     });
 
     const reset = document.createElement("button");
@@ -2943,6 +3006,7 @@
       persistAnswers();
       persistRevealed();
       applyQuestionCardState(card, question);
+      removeAnswerScore(question.number, piece);
     });
 
     const analysisToggle = document.createElement("button");
@@ -2954,6 +3018,9 @@
       state.revealed[key] = !state.revealed[key];
       persistRevealed();
       applyQuestionCardState(card, question);
+      if (state.revealed[key]) {
+        recordAnswerScore(question.number, question.answer, piece);
+      }
     });
 
     actions.append(submit, reset, analysisToggle);
@@ -3022,6 +3089,7 @@
         state.answers[getAnswerKey(question.number)] = letter;
         persistAnswers();
         applyQuestionCardState(card, question);
+        recordAnswerScore(question.number, question.answer, piece);
       });
       options.append(button);
     });
@@ -3042,6 +3110,7 @@
       state.revealed[getAnswerKey(question.number)] = true;
       persistRevealed();
       applyQuestionCardState(card, question);
+      recordAnswerScore(question.number, question.answer, piece);
     });
 
     const reset = document.createElement("button");
@@ -3054,6 +3123,7 @@
       persistAnswers();
       persistRevealed();
       applyQuestionCardState(card, question);
+      removeAnswerScore(question.number, piece);
     });
 
     const analysisToggle = document.createElement("button");
@@ -3065,6 +3135,9 @@
       state.revealed[key] = !state.revealed[key];
       persistRevealed();
       applyQuestionCardState(card, question);
+      if (state.revealed[key]) {
+        recordAnswerScore(question.number, question.answer, piece);
+      }
     });
 
     actions.append(submit, reset, analysisToggle);
@@ -3278,6 +3351,11 @@
       persistAnswers();
       applyBlankRowState(row, blank);
       updatePieceProgress(piece);
+      if (select.value) {
+        recordAnswerScore(blank.number, blank.answerLetter, piece);
+      } else {
+        removeAnswerScore(blank.number, piece);
+      }
     });
 
     const status = document.createElement("span");
@@ -3438,6 +3516,7 @@
         state.revealed[getAnswerKey(blank.number)] = true;
       });
       persistRevealed();
+      recordPieceScores(piece);
       rows.querySelectorAll(".blank-row").forEach((row, index) => {
         applyBlankRowState(row, piece.blanks[index]);
       });
@@ -3453,6 +3532,7 @@
         const key = getAnswerKey(blank.number);
         delete state.answers[key];
         delete state.revealed[key];
+        removeAnswerScore(blank.number, piece);
       });
       persistAnswers();
       persistRevealed();
@@ -3744,6 +3824,9 @@
       }
     });
     persistRevealed();
+    if (!allRevealed) {
+      pieces.forEach((piece) => recordPieceScores(piece));
+    }
 
     pieces.forEach((piece) => {
       const section = document.getElementById(piece.id);

@@ -938,3 +938,164 @@ body.is-english-only .kaoyan-enrichment {
     width: fit-content;
   }
 }
+
+/* ------------------------------------------------- 翻译逐句精读卡片 */
+
+.kaoyan-segments > .translation-machine-note {
+  margin: 0;
+  padding: 10px 12px;
+  color: #7a6330;
+  background: #fdf9ec;
+  border: 1px dashed #e7d9ad;
+  border-radius: 8px;
+  font-size: 11.5px;
+  line-height: 1.75;
+}
+
+.translation-detail {
+  margin-top: 11px;
+  padding: 11px 12px 12px;
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.translation-detail-head {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.translation-detail-tag {
+  padding: 2px 7px;
+  color: #2f6b58;
+  background: #e7f1ec;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.translation-detail-meta {
+  min-width: 0;
+  color: #8b9d95;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.translation-trunk {
+  margin: 0;
+  padding: 8px 10px;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  background: #f5f8f4;
+  border-left: 3px solid var(--forest);
+  border-radius: 0 6px 6px 0;
+}
+
+.translation-detail-label {
+  color: #6d837b;
+  font-size: 10.5px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.translation-trunk-text {
+  flex: 1 1 260px;
+  min-width: 0;
+  color: #1f3a32;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13.5px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.translation-phrases {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.translation-phrases .kaoyan-phrase-row {
+  overflow-wrap: anywhere;
+}
+
+.translation-detail-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.65;
+}
+
+.translation-ambiguity {
+  margin: 0;
+  padding: 8px 10px;
+  color: #7a6330;
+  background: #fdf9ec;
+  border: 1px dashed #e7d9ad;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.kaoyan-translation-draft {
+  margin-top: 11px;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.kaoyan-translation-draft > strong {
+  color: var(--forest);
+  font-size: 12.5px;
+}
+
+.kaoyan-translation-draft textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 84px;
+  padding: 10px 11px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13.5px;
+  line-height: 1.75;
+  resize: vertical;
+}
+
+.kaoyan-translation-draft textarea:focus {
+  border-color: #75a695;
+  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  outline: 0;
+}
+
+@media (max-width: 640px) {
+  .translation-detail {
+    padding: 10px;
+  }
+
+  .translation-trunk {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .translation-detail-label {
+    white-space: normal;
+  }
+
+  .translation-trunk-text {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}

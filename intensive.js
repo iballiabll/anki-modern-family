@@ -65,6 +65,10 @@
   const CUE_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-cues`;
   const DISPLAY_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-display-mode`;
   const ANSWER_STORAGE_KEY = `${LEVEL_CONFIG.storagePrefix}-answers`;
+  // 作答统计与页面内的作答分开存储，页面清空作答时同步清掉对应统计。
+  const ExamScores = window.ExamScores || null;
+  const SCORE_EXAM = LISTENING_LEVEL === "cet6" ? "cet6" : "cet4";
+  const SCORE_SECTION_LABEL = `${LEVEL_CONFIG.label}听力精读`;
 
   const state = {
     paperId: "",
@@ -169,6 +173,46 @@
 
   function getAnswerKey(number) {
     return `${state.paperId}|${number}`;
+  }
+
+  function scoreMeta(piece) {
+    const meta = state.data?.meta || {};
+    return {
+      exam: SCORE_EXAM,
+      paperId: `${SCORE_EXAM}-listening-${state.paperId}`,
+      paperLabel: meta.title || state.paperId,
+      sectionId: piece?.id || "default",
+      sectionLabel: [SCORE_SECTION_LABEL, piece?.title || piece?.type]
+        .filter(Boolean)
+        .join(" · "),
+    };
+  }
+
+  function recordQuestionScore(question, piece, verified) {
+    if (!ExamScores || !question) {
+      return;
+    }
+    const chosen = state.answers[getAnswerKey(question.number)] || "";
+    if (!chosen) {
+      return;
+    }
+    ExamScores.recordObjective({
+      ...scoreMeta(piece),
+      questionNo: question.number,
+      chosen,
+      answer: question.answer || "",
+      verified: Boolean(verified),
+    });
+  }
+
+  function removeQuestionScore(question, piece) {
+    if (!ExamScores || !question) {
+      return;
+    }
+    ExamScores.removeQuestion({
+      ...scoreMeta(piece),
+      questionNo: question.number,
+    });
   }
 
   function normalizeWord(value) {
@@ -1882,6 +1926,11 @@
         persistAnswers();
         applyQuestionCardState(card, question);
         updateQuestionProgress();
+        recordQuestionScore(
+          question,
+          piece,
+          card.dataset.revealed === "true",
+        );
       });
       options.append(button);
     });
@@ -1901,6 +1950,7 @@
       card.dataset.revealed = "true";
       applyQuestionCardState(card, question);
       updateQuestionProgress();
+      recordQuestionScore(question, piece, true);
     });
 
     const translationToggle = document.createElement("button");
@@ -1916,6 +1966,9 @@
       card.dataset.revealed =
         card.dataset.revealed === "true" ? "false" : "true";
       applyQuestionCardState(card, question);
+      if (card.dataset.revealed === "true") {
+        recordQuestionScore(question, piece, true);
+      }
     });
 
     actions.append(submit, translationToggle, analysisToggle);
@@ -1996,6 +2049,7 @@
     reset.addEventListener("click", () => {
       questions.forEach((question) => {
         delete state.answers[getAnswerKey(question.number)];
+        removeQuestionScore(question, piece);
       });
       persistAnswers();
       section.querySelectorAll(".question-card").forEach((card) => {

@@ -29,6 +29,11 @@ SECTION_MARKS = ("➢", "【️", "【")
 DATE_IN_NAME_RE = re.compile(r"^(?:【福利】)?\s*(\d{1,2})\.(\d{1,2})")
 RANGE_IN_NAME_RE = re.compile(r"(\d{1,2})\.(\d{1,2})\s*[—\-~至]\s*(\d{1,2})\.(\d{1,2})")
 SOURCE_HEAD_RE = re.compile(r"^【\s*(\d{1,2}\.\d{1,2})\s*\|\s*([^】]+)】\s*(.*)$")
+# 杂志排版的「文章导读」标题在部分 PDF 里被读成「文文章导读：」，这里两种都认。
+MAG_INTRO_HEAD_RE = re.compile(r"^文{1,2}章导读[\s:：]*$")
+MAG_DIFFICULTY_RE = re.compile(r"难度评级\s*[:：]?\s*([★☆]{1,6})")
+MAG_INTRO_MAX_LINES = 14
+MAG_INTRO_MAX_CHARS = 900
 ARTICLE_FOOT_RE = re.compile(r"^(.+?)\s*\|\s*([A-Za-z][A-Za-z .'&-]{2,40})$")
 OPTION_LINE_RE = re.compile(r"\[([A-G])\]\s*(.+)$")
 BLANK_OPTION_RE = re.compile(r"\[([A-D])\]\s*([^\[\]]+?)(?=\s*\[[A-D]\]|$)")
@@ -469,6 +474,75 @@ def parse_reading_stream(
     }
 
 
+def looks_like_intro_line(text: str, kind: str) -> bool:
+    """导读是整段中文；夹进来的英文词条、词表标签一律不算。"""
+    if kind != "zh":
+        return False
+    cjk = len(CJK_RE.findall(text))
+    latin = len(re.findall(r"[A-Za-z]", text))
+    # 中文行里出现品牌名、缩写很正常，只有英文占多数才算串进了词条行。
+    if cjk < 4 or latin > cjk * 2:
+        return False
+    if re.search(r"[A-Za-z]{12,}", text):
+        return False
+    if "【" in text or "】" in text:
+        return False
+    if re.search(r"(考研大纲词汇|难度评级|^SYN\b|^ANT\b|^[Pp]ara\.?\s*\d)", text):
+        return False
+    return not re.match(
+        r"^[A-Za-z][A-Za-z\-' ]{0,30}\s+(?:n|v|vt|vi|adj|adv|prep|phr|conj|pron)\.", text
+    )
+
+
+def find_magazine_intro(lines: list[dict]) -> str:
+    """摘出杂志排版右上角的「文章导读」整段中文，不与词条例句混排。
+
+    只做文本级还原：导读是连续的中文段落，逐行拼接后遇到行尾句号、段落标记、
+    词条行或英文行即结束；解析不到就返回空串，绝不补写内容。
+    """
+    for index, line in enumerate(lines[:160]):
+        if not MAG_INTRO_HEAD_RE.match(line["text"].strip()):
+            continue
+        parts: list[str] = []
+        for follow in lines[index + 1 :]:
+            text = follow["text"].strip()
+            if not text or is_boilerplate(text):
+                continue
+            # 「文章导读：」后面偶尔挂着一个被切出来的单字，属于噪声。
+            if not parts and len(text) <= 2 and CJK_RE.search(text):
+                continue
+            if PARA_INLINE_RE.match(text) or PARA_MARK_RE.match(text):
+                break
+            if not looks_like_intro_line(text, follow["kind"]):
+                # 上一行是被换行切断的半句时，下一行即使夹着英文或很短也算续行。
+                continued = (
+                    parts
+                    and not re.search(r"[。！？.!?]$", parts[-1])
+                    and bool(CJK_RE.search(text))
+                )
+                if not continued:
+                    break
+                if "【" in text or "】" in text:
+                    break
+            parts.append(text)
+            if len(parts) >= MAG_INTRO_MAX_LINES:
+                break
+            if sum(len(part) for part in parts) >= MAG_INTRO_MAX_CHARS:
+                break
+        cleaned = re.sub(r"\s+", "", strip_promo("".join(parts)))
+        return cleaned if len(cleaned) >= 20 else ""
+    return ""
+
+
+def find_magazine_difficulty(lines: list[dict]) -> str:
+    """杂志排版页里出版方标注的「难度评级 ★★★☆☆」，原样取出。"""
+    for line in lines[:240]:
+        match = MAG_DIFFICULTY_RE.search(line["text"])
+        if match:
+            return match.group(1)
+    return ""
+
+
 def find_headline(lines: list[dict]) -> dict:
     title = ""
     title_zh = ""
@@ -519,6 +593,8 @@ def extract_pdf(path: pathlib.Path, info: dict) -> dict:
     payload["headline"] = headline
     if info["kind"] in {"reading", "layout"}:
         payload["reading"] = parse_reading_stream(lines, headline)
+        payload["reading"]["magazineIntro"] = find_magazine_intro(lines)
+        payload["reading"]["magazineDifficulty"] = find_magazine_difficulty(lines)
     else:
         payload["lines"] = [{"kind": line["kind"], "text": line["text"]} for line in lines]
     return payload

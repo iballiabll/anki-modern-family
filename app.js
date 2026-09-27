@@ -165,6 +165,22 @@ const OPEN_SOURCE_REFERENCES = [
   },
   {
     group: "exam",
+    module: "考研真题",
+    name: "Destinnnnn/kaoyan-english-1-2005-2026",
+    url: "https://github.com/Destinnnnn/kaoyan-english-1-2005-2026",
+    license: "仅借鉴公开结构",
+    takeaway: "2005-2026 真题按年份与题型归档的字段划分，用于校核年份、题型与题号口径。",
+  },
+  {
+    group: "exam",
+    module: "考研解析",
+    name: "m2kar/KaoYan-English",
+    url: "https://github.com/m2kar/KaoYan-English",
+    license: "仅借鉴公开结构",
+    takeaway: "长难句按主干、从句、修饰成分逐层拆解的呈现顺序。",
+  },
+  {
+    group: "exam",
     module: "四六级资料",
     name: "Liuxiangjian-ai/cet-skill",
     url: "https://github.com/Liuxiangjian-ai/cet-skill",

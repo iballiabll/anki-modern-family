@@ -34,6 +34,9 @@
   const ANSWER_STORAGE_KEY = "iball-kaoyan-answers";
   const REVEAL_STORAGE_KEY = "iball-kaoyan-revealed";
   const DRAFT_STORAGE_KEY = "iball-kaoyan-drafts";
+  // 作答统计独立存储：与页面内的作答分开，清空作答时同步清掉统计。
+  const ExamScores = window.ExamScores || null;
+  const SCORE_EXAM = "kaoyan";
 
   const KIND_LABELS = {
     reading: "阅读理解",
@@ -1633,14 +1636,80 @@
     return Boolean(state.revealed[`paper|${state.paperId}`]);
   }
 
+  /* -------------------------------------------------- 作答统计（学习记录） */
+
+  // 题干卡片渲染时登记板块归属，统计面板据此按板块汇总正确率。
+  const scoreQuestionMeta = new Map();
+
+  function scorePaperId() {
+    return `kaoyan-${state.paperId}`;
+  }
+
+  function scoreMeta(info) {
+    return {
+      exam: SCORE_EXAM,
+      paperId: scorePaperId(),
+      paperLabel: state.data?.title || state.paperId,
+      sectionId: info?.sectionId || "default",
+      sectionLabel: info?.sectionLabel || "考研英语真题",
+    };
+  }
+
+  function registerQuestionScore(number, options, answer) {
+    scoreQuestionMeta.set(String(number), {
+      sectionId: options?.sectionId || "",
+      sectionLabel:
+        options?.scoreLabel ||
+        [KIND_LABELS[options?.kind] || "", options?.title || ""]
+          .filter(Boolean)
+          .join(" · ") ||
+        "考研英语真题",
+      answer: String(answer || ""),
+    });
+  }
+
+  function recordQuestionScore(number, verified) {
+    if (!ExamScores) {
+      return;
+    }
+    const info = scoreQuestionMeta.get(String(number));
+    const chosen = getChoice(number);
+    if (!info || !chosen) {
+      return;
+    }
+    ExamScores.recordObjective({
+      ...scoreMeta(info),
+      questionNo: number,
+      chosen,
+      answer: info.answer || "",
+      verified: Boolean(verified || isRevealed(number) || isPaperRevealed()),
+    });
+  }
+
+  function removeQuestionScore(number) {
+    if (!ExamScores) {
+      return;
+    }
+    const info = scoreQuestionMeta.get(String(number));
+    if (!info) {
+      return;
+    }
+    ExamScores.removeQuestion({
+      ...scoreMeta(info),
+      questionNo: number,
+    });
+  }
+
   function setChoice(number, value) {
     state.choices[questionKey(number)] = value;
     persistMap(ANSWER_STORAGE_KEY, state.choices);
+    recordQuestionScore(number);
   }
 
   function revealQuestion(number) {
     state.revealed[questionKey(number)] = true;
     persistMap(REVEAL_STORAGE_KEY, state.revealed);
+    recordQuestionScore(number, true);
   }
 
   function updateAnswerToggleButton() {
@@ -1732,6 +1801,7 @@
     const card = createElement("div", "question-card");
     card.dataset.questionNumber = String(question.number);
     card.dataset.answer = String(question.answer || "");
+    registerQuestionScore(question.number, options, question.answer);
 
     const head = createElement("div", "question-head");
     head.append(createElement("span", "question-number", `第 ${question.number} 题`));
@@ -1796,6 +1866,7 @@
       delete state.revealed[questionKey(question.number)];
       persistMap(ANSWER_STORAGE_KEY, state.choices);
       persistMap(REVEAL_STORAGE_KEY, state.revealed);
+      removeQuestionScore(question.number);
       refreshQuestionCard(card);
       refreshBlankSlots();
       refreshQuestionProgress();
@@ -1971,6 +2042,7 @@
           config: {
             badge: "阅读",
             sectionId: section.id,
+            scoreLabel: `阅读理解 · ${section.label || section.title || ""}`.trim(),
             paragraphs: section.paragraphs || [],
           },
         })),
@@ -1997,6 +2069,7 @@
           config: {
             badge: `第 ${question.number} 空`,
             sectionId: section.id,
+            scoreLabel: `完形填空 · ${section.label || section.title || ""}`.trim(),
             paragraphs: section.paragraphs || [],
           },
         })),
@@ -2037,6 +2110,7 @@
             config: {
               badge: "段落匹配",
               sectionId: section.id,
+              scoreLabel: `新题型 · 段落匹配 · ${section.label || section.title || ""}`.trim(),
               letterGrid: true,
               pool: section.options || [],
               paragraphs: section.paragraphs || [],
@@ -2056,6 +2130,7 @@
           config: {
             badge: "判断正误",
             sectionId: section.id,
+            scoreLabel: `新题型 · 判断正误 · ${section.label || section.title || ""}`.trim(),
             truth: true,
             paragraphs: section.paragraphs || [],
           },
@@ -2076,7 +2151,7 @@
     );
     const callout = createElement("p", "kaoyan-callout");
     callout.innerHTML =
-      "<strong>用法：</strong>先自己翻译，再点开参考译文对照。参考译文与评析均为 Echo 生成的非官方学习材料，只用于自测与复盘。";
+      "<strong>用法：</strong>先读原句并自己翻译，再对照参考译文、逐句精读（主干 / 从句 / 固定搭配 / 长难句）与 Echo 难点评析。参考译文与评析均为 Echo 生成的非官方学习材料，只用于自测与复盘。";
     article.append(callout);
 
     const referenceByNumber = new Map(
@@ -2090,30 +2165,7 @@
       const wrapper = createElement("div", "kaoyan-segments");
       (section.segments || []).forEach((segment) => {
         const reference = referenceByNumber.get(Number(segment.number)) || "";
-        const card = createElement("div", "kaoyan-segment");
-        const segHead = createElement("div", "kaoyan-segment-head");
-        segHead.append(createElement("span", "kaoyan-segment-number", String(segment.number)));
-        segHead.append(createElement("span", "", `${countWords(segment.text)} 词`));
-        const play = createElement("button", "paragraph-play-button", "朗读本句");
-        play.type = "button";
-        play.addEventListener("click", () =>
-          playSingle(segment.text || "", play, `第 ${segment.number} 句`),
-        );
-        segHead.append(play);
-        card.append(segHead);
-        const english = createElement("p", "paragraph-english");
-        appendEnglishText(english, segment.text || "", {
-          sectionId: section.id,
-          translation: reference,
-        });
-        card.append(english);
-        if (reference) {
-          const referenceNode = createElement("div", "kaoyan-reference");
-          referenceNode.append(createElement("span", "kaoyan-reference-label", "参考译文"));
-          referenceNode.append(document.createTextNode(reference));
-          card.append(referenceNode);
-        }
-        wrapper.append(card);
+        appendTranslationCard(wrapper, section, segment, reference);
       });
       article.append(wrapper);
     } else {
@@ -2128,8 +2180,233 @@
         referenceNode.append(document.createTextNode(wholeReference));
         article.append(referenceNode);
       }
+      // 英语二考整段翻译，源只给整段译文；按句末标点机械切句，让每一句也有主干 / 从句 /
+      // 固定搭配 / 长难句回读与翻译草稿，逐句参考译文保持留空并显式说明。
+      const machineSegments = machineSentenceSegments(section);
+      if (machineSegments.length) {
+        const wrapper = createElement("div", "kaoyan-segments");
+        wrapper.append(
+          createElement(
+            "p",
+            "translation-machine-note",
+            `本卷整段翻译，源没有逐句对照译文。下列 ${machineSegments.length} 句由站点按句末标点机械切分，逐句提供主干 / 从句 / 固定搭配 / 长难句回读与翻译草稿；逐句参考译文留空，整段参考译文见上方。`,
+          ),
+        );
+        machineSegments.forEach((segment) => {
+          appendTranslationCard(wrapper, section, segment, "");
+        });
+        article.append(wrapper);
+      }
     }
     renderEnrichment(article, section);
+  }
+
+  /** 把整段译文按句末标点机械切成可以逐句精读的片段。 */
+  function machineSentenceSegments(section) {
+    const sentences = [];
+    (section.paragraphs || []).forEach((paragraph) => {
+      const text = String(paragraph || "").replace(/\s+/g, " ").trim();
+      if (!text) {
+        return;
+      }
+      text.split(/(?<=[.!?])\s+(?=[“"(A-Z])/).forEach((piece) => {
+        const sentence = piece.trim();
+        if (sentence) {
+          sentences.push(sentence);
+        }
+      });
+    });
+    return sentences.map((text, index) => ({ number: index + 1, text }));
+  }
+
+  function appendTranslationCard(wrapper, section, segment, reference) {
+    const card = createElement("div", "kaoyan-segment");
+    const segHead = createElement("div", "kaoyan-segment-head");
+    segHead.append(createElement("span", "kaoyan-segment-number", String(segment.number)));
+    segHead.append(createElement("span", "", `${countWords(segment.text)} 词`));
+    const play = createElement("button", "paragraph-play-button", "朗读本句");
+    play.type = "button";
+    play.addEventListener("click", () =>
+      playSingle(segment.text || "", play, `第 ${segment.number} 句`),
+    );
+    segHead.append(play);
+    card.append(segHead);
+    const english = createElement("p", "paragraph-english");
+    appendEnglishText(english, segment.text || "", {
+      sectionId: section.id,
+      translation: reference,
+    });
+    card.append(english);
+    if (reference) {
+      const referenceNode = createElement("div", "kaoyan-reference");
+      referenceNode.append(
+        createElement("span", "kaoyan-reference-label", "参考译文（Echo 生成，非官方）"),
+      );
+      referenceNode.append(document.createTextNode(reference));
+      card.append(referenceNode);
+    }
+    card.append(createTranslationDetail(section, segment, reference));
+    card.append(createTranslationDraft(section, segment));
+    wrapper.append(card);
+  }
+
+  /**
+   * 每句翻译的逐句精读卡片：主干、从句切分、机读固定搭配、长难句回读提示。
+   * 解析全部由站点规则从原句生成，只做定位参考，不冒充官方解析。
+   */
+  function createTranslationDetail(section, segment, reference) {
+    const text = String(segment?.text || "").trim();
+    const context = { sectionId: section.id, translation: reference || "" };
+    const block = createElement("div", "translation-detail");
+    const head = createElement("p", "translation-detail-head");
+    head.append(createElement("span", "translation-detail-tag", "逐句精读"));
+    head.append(
+      createElement(
+        "span",
+        "translation-detail-meta",
+        `${countWords(text)} 词 ｜ 主干 · 从句 · 搭配 · 长难句`,
+      ),
+    );
+    block.append(head);
+
+    if (!reference) {
+      block.append(
+        createElement(
+          "p",
+          "translation-detail-note",
+          "逐句参考译文：本卷源只提供整段译文，此处留空；主干 / 从句 / 搭配 / 长难句为站点机读解析，仅供参考。",
+        ),
+      );
+    }
+
+    const segments = clauseSegments(text);
+    const main = segments
+      .filter((item) => item.kind === "main")
+      .map((item) => item.text)
+      .join(" ")
+      .trim();
+    const clauses = segments.filter((item) => item.kind === "clause");
+
+    const trunk = createElement("p", "translation-trunk");
+    trunk.append(createElement("span", "translation-detail-label", "句子主干"));
+    const trunkText = createElement("span", "translation-trunk-text", main || text);
+    trunkText.lang = "en";
+    trunk.append(trunkText);
+    block.append(trunk);
+
+    if (!main) {
+      block.append(
+        createElement(
+          "p",
+          "translation-detail-note",
+          "机读未发现显性从句引导词：按「主干 + 修饰成分」整体理解本句。",
+        ),
+      );
+    }
+
+    const phrases = createElement("div", "translation-phrases");
+    mountPhraseRow(phrases, text, context, 8);
+    block.append(phrases);
+    block.append(
+      createElement(
+        "p",
+        "translation-detail-note",
+        "固定搭配按站点短语表在本句中机械匹配；没有命中表示这句暂未收录可展示的搭配条目。",
+      ),
+    );
+
+    const analysis = createSentenceAnalysis(text);
+    if (analysis) {
+      block.append(analysis);
+    } else if (clauses.length) {
+      const list = createElement("div", "clause-list");
+      clauses.forEach((item, index) => {
+        const line = createElement("p", "clause-line");
+        line.append(createElement("span", "clause-badge", `从句 ${index + 1}`));
+        line.append(createElement("span", "clause-connector", item.marker));
+        const body = createElement(
+          "span",
+          "clause-text",
+          item.text.slice(item.marker.length).trim() || item.text,
+        );
+        body.lang = "en";
+        line.append(body);
+        if (item.type) {
+          line.append(
+            createElement("span", "clause-type", `${item.type}·${item.gloss}`),
+          );
+        }
+        list.append(line);
+      });
+      block.append(list);
+    }
+
+    block.append(
+      createElement(
+        "p",
+        "translation-ambiguity",
+        "一词多义提示：主干切分与从句标注按引导词机械定位，that / while / since / as 等连接词要看上下文定词义；整句含义以对照参考译文与上下文为准。",
+      ),
+    );
+    return block;
+  }
+
+  /** 翻译作业：先自己译，再对照参考译文，草稿存在本机并计入学习记录。 */
+  function createTranslationDraft(section, segment) {
+    const key = `${state.paperId}|translation|${section.id}|${segment.number}`;
+    const wrap = createElement("div", "kaoyan-translation-draft");
+    wrap.append(createElement("strong", "", "我的翻译"));
+    const textarea = document.createElement("textarea");
+    textarea.rows = 3;
+    textarea.placeholder = "先自己译，再点开参考译文对照；内容自动保存在本机浏览器。";
+    textarea.value = state.drafts[key] || "";
+    const foot = createElement("div", "kaoyan-draft-foot");
+    const count = createElement("span", "kaoyan-word-count");
+    const updateCount = () => {
+      const chars = String(textarea.value || "").replace(/\s+/g, "").length;
+      count.textContent = chars ? `${chars} 字` : "尚未翻译";
+    };
+    let timer = 0;
+    textarea.addEventListener("input", () => {
+      updateCount();
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        state.drafts[key] = textarea.value;
+        persistMap(DRAFT_STORAGE_KEY, state.drafts);
+        recordTranslationScore(section, segment, textarea.value);
+      }, 450);
+    });
+    updateCount();
+    foot.append(count);
+    wrap.append(textarea, foot);
+    return wrap;
+  }
+
+  function recordTranslationScore(section, segment, text) {
+    if (!ExamScores) {
+      return;
+    }
+    const itemId = `sentence-${segment.number}`;
+    const meta = {
+      exam: SCORE_EXAM,
+      paperId: scorePaperId(),
+      paperLabel: state.data?.title || state.paperId,
+      sectionId: section?.id || "translation",
+      sectionLabel: `翻译 · ${section?.label || section?.title || ""}`.trim(),
+    };
+    const body = String(text || "").trim();
+    if (!body) {
+      ExamScores.removeSubjective({ ...meta, itemId });
+      return;
+    }
+    ExamScores.recordSubjective({
+      ...meta,
+      itemId,
+      label: `翻译第 ${segment.number} 句`,
+      status: "draft",
+      words: String(body).replace(/\s+/g, "").length,
+      note: `自己译完的第 ${segment.number} 句；参考译文为 Echo 生成的非官方学习材料。`,
+    });
   }
 
   function resolveGuide(prompt) {
@@ -2151,6 +2428,34 @@
 
   function draftKey(part) {
     return `${state.paperId}|${part}`;
+  }
+
+  /** 写作草稿按篇记录完成度：只报词数与「已动笔」，不冒充官方评分。 */
+  function recordWritingScore(part, section, text) {
+    if (!ExamScores) {
+      return;
+    }
+    const itemId = `writing-${part?.part || "part"}-${part?.number || "0"}`;
+    const meta = {
+      exam: SCORE_EXAM,
+      paperId: scorePaperId(),
+      paperLabel: state.data?.title || state.paperId,
+      sectionId: section?.id || "writing",
+      sectionLabel: `写作 · ${section?.label || section?.title || state.data?.title || ""}`.trim(),
+    };
+    const words = countWords(text);
+    if (!words) {
+      ExamScores.removeSubjective({ ...meta, itemId });
+      return;
+    }
+    ExamScores.recordSubjective({
+      ...meta,
+      itemId,
+      label: `${part?.part || "写作"} · 第 ${part?.number || "-"} 题`,
+      status: "draft",
+      words,
+      note: `草稿完成度；题目参考 ${part?.wordLimit || "按题目要求"} 词，站点不提供官方评分。`,
+    });
   }
 
   function createWritingCard(part, section) {
@@ -2243,6 +2548,7 @@
     const persistDraft = () => {
       state.drafts[draftKey(part.part)] = textarea.value;
       persistMap(DRAFT_STORAGE_KEY, state.drafts);
+      recordWritingScore(part, section, textarea.value);
     };
     textarea.addEventListener("input", () => {
       updateCount();
@@ -2393,6 +2699,8 @@
     if (!elements.content) {
       return;
     }
+    // 题号只在同一套试卷内唯一，换卷或换筛选时重建板块归属表。
+    scoreQuestionMeta.clear();
     const fragment = document.createDocumentFragment();
     fragment.append(renderOverview(paper));
     const sections = (paper.sections || []).filter(
@@ -2898,6 +3206,9 @@
     persistMap(REVEAL_STORAGE_KEY, state.revealed);
     elements.content?.querySelectorAll("[data-question-number]").forEach((card) => {
       refreshQuestionCard(card);
+      if (!revealed) {
+        recordQuestionScore(Number(card.dataset.questionNumber), true);
+      }
     });
     refreshBlankSlots();
     updateAnswerToggleButton();
@@ -2924,6 +3235,7 @@
     refreshBlankSlots();
     refreshQuestionProgress();
     updateAnswerToggleButton();
+    ExamScores?.clearPaper({ exam: SCORE_EXAM, paperId: scorePaperId() });
     showToast("已清空本套作答");
   }
 

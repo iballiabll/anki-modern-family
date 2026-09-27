@@ -21,7 +21,9 @@
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./writing.css" />
     <link rel="stylesheet" href="./writing-templates.css" />
+    <link rel="stylesheet" href="./exam-scores.css" />
     <script src="./account-store.js" defer></script>
+    <script src="./exam-scores.js" defer></script>
     <script src="./speech-transport.js" defer></script>
   <script src="./writing-grade.js?v=20260925-rubric" defer></script>
   <script src="./writing.js?v=20260925-rubric" defer></script>
@@ -329,6 +331,15 @@
             >Risaner/iwrite-skill</a>。
           </li>
         </ul>
+      </section>
+
+      <section class="exam-scores-section" aria-label="得分统计">
+        <div
+          class="exam-scores"
+          data-exam-scores
+          data-exam="all"
+          data-title="得分统计总览（四级 / 六级 / 考研）"
+        ></div>
       </section>
     </main>
   </body>

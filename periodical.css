@@ -1229,6 +1229,44 @@
   font-weight: 700;
 }
 
+.periodical-mag-level.is-pdf {
+  color: #fff;
+  background: #8a6a12;
+  border-color: #8a6a12;
+}
+
+.periodical-mag-intro {
+  margin: 12px 0 0;
+  background: linear-gradient(180deg, #fff9e8 0, #fffdf7 100%);
+  border: 1px solid #e8d3a4;
+  border-left: 3px solid #b88a1a;
+  border-radius: 6px;
+}
+
+.periodical-mag-intro-summary {
+  padding: 9px 12px;
+  color: #6a4d0b;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.periodical-mag-intro-body {
+  padding: 0 12px;
+}
+
+.periodical-mag-intro-text {
+  margin: 0 0 8px;
+  color: #473b22;
+  font-size: 13px;
+  line-height: 1.95;
+  overflow-wrap: anywhere;
+}
+
+.periodical-mag-intro .periodical-outline-note {
+  padding: 0 0 10px;
+}
+
 .periodical-outline {
   margin: 12px 0 0;
   background: #fbfaf4;

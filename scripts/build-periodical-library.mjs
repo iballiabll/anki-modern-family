@@ -408,7 +408,7 @@ function issueLabel(dateKey, range) {
   return base;
 }
 
-function readingPayload(entry) {
+function readingPayload(entry, magazineEntry) {
   const paragraphs = (entry.reading?.paragraphs || [])
     .map((block) => ({
       index: block.index,
@@ -429,11 +429,35 @@ function readingPayload(entry) {
   return {
     file: entry.file,
     headline: entry.headline || {},
+    magazineIntro: compact(
+      magazineEntry?.reading?.magazineIntro || entry.reading?.magazineIntro,
+    ),
+    magazineDifficulty: compact(
+      magazineEntry?.reading?.magazineDifficulty ||
+        entry.reading?.magazineDifficulty,
+    ),
+    magazineFile: compact(magazineEntry?.file || entry.file),
     paragraphs,
     vocab,
     vocabUnplaced: placed.unplaced,
     sections: sectionPayload(entry),
   };
+}
+
+function magazineForReading(entry, magazines) {
+  if (!magazines.length) {
+    return null;
+  }
+  const title = compact(entry.headline?.title);
+  if (title) {
+    const matched = magazines.find(
+      (magazine) => compact(magazine.headline?.title) === title,
+    );
+    if (matched) {
+      return matched;
+    }
+  }
+  return magazines.length === 1 ? magazines[0] : null;
 }
 
 // 精读讲义里的「今日翻译作业 / 今日句子分析 / 写作积累」引用写作 Para.3 或 (Para. 4)，
@@ -566,6 +590,7 @@ function buildIssue(dateKey, entries) {
   const originals = [];
   const sources = new Set();
   const themes = new Set();
+  const magazines = entries.filter((entry) => entry.kind === "layout");
   const titles = [];
   let range = "";
 
@@ -599,7 +624,7 @@ function buildIssue(dateKey, entries) {
       continue;
     }
     if (entry.kind === "reading") {
-      const payload = readingPayload(entry);
+      const payload = readingPayload(entry, magazineForReading(entry, magazines));
       if (payload) {
         reading.push(payload);
       }

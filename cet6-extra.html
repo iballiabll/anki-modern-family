@@ -20,7 +20,9 @@
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./cet6.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./exam-scores.css" />
     <script src="./account-store.js" defer></script>
+    <script src="./exam-scores.js" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
@@ -197,6 +199,15 @@
           </label>
         </aside>
       </div>
+
+      <section class="exam-scores-section" aria-label="得分统计">
+        <div
+          class="exam-scores"
+          data-exam-scores
+          data-exam="cet6"
+          data-title="六级翻译与写作 · 得分统计"
+        ></div>
+      </section>
     </main>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>

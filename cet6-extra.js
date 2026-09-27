@@ -42,6 +42,10 @@
   const LEVEL_NAMES = ["四级", "六级", "考研"];
   const MIN_WORDS = 150;
   const MAX_WORDS = 200;
+  // 作答统计与草稿分开存储：草稿留在本机，统计只记完成度与词数。
+  const ExamScores = window.ExamScores || null;
+  const SCORE_EXAM = "cet6";
+  const SCORE_ITEM_ID = "essay";
 
   const state = {
     paperId: "",
@@ -167,6 +171,36 @@
   function countWords(text) {
     const matches = String(text || "").match(WORD_PATTERN);
     return matches ? matches.length : 0;
+  }
+
+  function scoreMeta() {
+    return {
+      exam: SCORE_EXAM,
+      paperId: `cet6-extra-${state.paperId}`,
+      paperLabel: state.data?.meta?.label || state.paperId,
+      sectionId: "writing",
+      sectionLabel: "六级写作 · 作文草稿",
+    };
+  }
+
+  /** 草稿只记「写了多少词」这一完成度，不冒充官方评分。 */
+  function recordDraftScore(text) {
+    if (!ExamScores) {
+      return;
+    }
+    const words = countWords(text);
+    if (!words) {
+      ExamScores.removeSubjective({ ...scoreMeta(), itemId: SCORE_ITEM_ID });
+      return;
+    }
+    ExamScores.recordSubjective({
+      ...scoreMeta(),
+      itemId: SCORE_ITEM_ID,
+      label: "六级作文草稿",
+      status: "draft",
+      words,
+      note: "只统计草稿完成度，站点不对作文给出官方分数。",
+    });
   }
 
   function getCombinedMeaning(meanings, note) {
@@ -879,6 +913,7 @@
       saveTimer = window.setTimeout(() => {
         state.drafts[state.paperId] = textarea.value;
         persistMap(DRAFT_STORAGE_KEY, state.drafts);
+        recordDraftScore(textarea.value);
       }, 400);
     });
 
