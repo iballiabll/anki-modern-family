@@ -10,12 +10,30 @@
 
 import { createReadStream } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 import zlib from "node:zlib";
 
 const gzip = promisify(zlib.gzip);
+// api/ 下是 CommonJS，这里用 require 载入会话校验模块（只在需要时加载）。
+const requireFromHere = createRequire(import.meta.url);
+
+/** 未登录访问受保护文件时的提示页（同一套样式，不依赖任何外部资源）。 */
+const LOGIN_REQUIRED_HTML = `<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>需要登录</title>
+<body style="margin:0;padding:12vh 8vw;font:16px/1.7 system-ui,-apple-system,'Segoe UI',sans-serif;color:#1f2933">
+<h1 style="font-size:20px;margin:0 0 12px">这个文件需要登录才能查看</h1>
+<p style="margin:0 0 8px">外刊原件只对已登录的同学开放。请先回学习站登录，再点一次链接。</p>
+<p style="margin:0"><a href="/" style="color:#1f6feb">← 回到学习站</a></p>
+</body>
+</html>
+`;
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -120,6 +138,7 @@ export function createRequestListener({
   apiRoot = root,
   host = "127.0.0.1",
   compress = false,
+  protectedPrefixes = [],
   headers: extraHeaders = {},
   logError = console.error,
 } = {}) {
@@ -129,6 +148,54 @@ export function createRequestListener({
 
   const rootDir = path.resolve(root);
   const apiRootDir = path.resolve(apiRoot);
+  // 需要登录才能下载的静态目录前缀，例如 ["/periodical-files/"]。
+  const guardedPrefixes = (Array.isArray(protectedPrefixes)
+    ? protectedPrefixes
+    : []
+  )
+    .map((prefix) => String(prefix || ""))
+    .filter(Boolean);
+  let sessionApi;
+
+  function loadSessionApi() {
+    if (sessionApi !== undefined) {
+      return sessionApi;
+    }
+    try {
+      sessionApi = requireFromHere(
+        path.join(apiRootDir, "api", "_session.js"),
+      );
+    } catch (error) {
+      logError(error);
+      sessionApi = null;
+    }
+    return sessionApi;
+  }
+
+  function isGuardedPath(pathname) {
+    return guardedPrefixes.some((prefix) => pathname.startsWith(prefix));
+  }
+
+  /** 受保护目录：必须带有效登录 Cookie，否则回提示页（401）。 */
+  async function guardProtectedPath(request, response, pathname) {
+    if (!isGuardedPath(pathname)) {
+      return true;
+    }
+    const api = loadSessionApi();
+    const user = api
+      ? await api.resolveSessionUser(request).catch(() => null)
+      : null;
+    if (user) {
+      return true;
+    }
+    response.writeHead(401, {
+      ...extraHeaders,
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+    });
+    response.end(LOGIN_REQUIRED_HTML);
+    return false;
+  }
 
   function resolveIn(baseDir, pathname) {
     const resolved = path.resolve(baseDir, `.${pathname}`);
@@ -230,6 +297,10 @@ export function createRequestListener({
     if (isPrivatePath(pathname)) {
       response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
       response.end("Not Found");
+      return;
+    }
+
+    if (!(await guardProtectedPath(request, response, pathname))) {
       return;
     }
 

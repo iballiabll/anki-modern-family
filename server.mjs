@@ -62,12 +62,17 @@ const extraHeaders = {
   "x-frame-options": "SAMEORIGIN",
 };
 
+// 外刊原件（含第三方版权内容）不做匿名分发：必须带有效登录 Cookie 才能下载。
+// 未登录访问返回 401 + 提示页，登录后浏览器自动带 Cookie，行为不变。
+const protectedPrefixes = ["/periodical-files/"];
+
 const server = http.createServer(
   createRequestListener({
     root: publicRoot,
     apiRoot: appRoot,
     host,
     compress: true,
+    protectedPrefixes,
     headers: extraHeaders,
   }),
 );
