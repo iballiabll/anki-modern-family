@@ -1,7 +1,7 @@
 /**
  * 背词记录接口 v1（window.IballVocabRecite）。
  *
- * 供词汇库页面、封神之路（yantu/）等同一站点内的页面读写“这个词我背过没有”：
+ * 供词汇库页面、封神之路（xxrj/）等同一站点内的页面读写“这个词我背过没有”：
  *   getSnapshot()                   整份快照 { version, updatedAt, records, history }
  *   getRecords(deck?)               记录数组，可按词库过滤
  *   getRecord(deck, word)           单条记录或 null

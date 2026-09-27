@@ -102,7 +102,7 @@ const staticEntries = [
   "writing.html",
   "writing.js",
   "writing-templates.css",
-  "yantu",
+  "xxrj",
   "materials",
 ];
 // 摩登家庭的逐句原声、字幕与 cue 清单只是 movie-data 的生成源，页面运行时

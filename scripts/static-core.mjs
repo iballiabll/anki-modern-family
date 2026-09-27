@@ -81,6 +81,25 @@ const PRIVATE_FILES = new Set([
   "/vercel.json",
 ]);
 
+/**
+ * 老地址永久跳转：学习档案页从 /yantu/ 改名成 /xxrj/。线上由 vercel.json
+ * 的 redirects 负责，本地开发服务器和自建服务器走这里，保证行为一致。
+ */
+const LEGACY_REDIRECTS = [
+  [/^\/yantu\/?$/, () => "/xxrj/"],
+  [/^\/yantu\/(.+)$/, (rest) => `/xxrj/${rest}`],
+];
+
+export function legacyRedirectTarget(pathname) {
+  for (const [pattern, build] of LEGACY_REDIRECTS) {
+    const match = pattern.exec(pathname);
+    if (match) {
+      return build(match[1] || "");
+    }
+  }
+  return "";
+}
+
 function isPrivatePath(pathname) {
   const lower = pathname.toLowerCase();
   if (PRIVATE_FILES.has(lower)) {
@@ -322,6 +341,14 @@ export function createRequestListener({
         "cache-control": "no-store",
       });
       response.end(JSON.stringify({ ok: true, uptime: process.uptime() }));
+      return;
+    }
+
+    const legacyTarget = legacyRedirectTarget(pathname);
+    if (legacyTarget) {
+      const search = new URL(request.url, `http://${host}`).search;
+      response.writeHead(308, { location: `${legacyTarget}${search}` });
+      response.end();
       return;
     }
 

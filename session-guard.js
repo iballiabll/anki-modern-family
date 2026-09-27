@@ -6,7 +6,7 @@
  *   学习进度走 localStorage，这样搬瓦工机器挂掉时 GitHub 备份还能用。
  */
 (function () {
-  // 接口地址跟着本文件的位置走，而不是当前页面：yantu/ 这类子目录里的页面
+  // 接口地址跟着本文件的位置走，而不是当前页面：xxrj/ 这类子目录里的页面
   // 用 ../session-guard.js 引入时，请求的仍然是站点根目录的 api/auth。
   const ENDPOINT = (() => {
     const src = document.currentScript?.src || "";

@@ -31,7 +31,7 @@
   const SYNC_RETRY_MS = 15000;
   const HEARTBEAT_MS = 60000;
 
-  // 接口地址跟着本文件的位置走，而不是当前页面：yantu/ 这类子目录里的页面
+  // 接口地址跟着本文件的位置走，而不是当前页面：xxrj/ 这类子目录里的页面
   // 用 ../account-store.js 引入时，"api/progress" 仍然指向站点根目录。
   const API_BASE = (() => {
     const src = document.currentScript?.src || "";

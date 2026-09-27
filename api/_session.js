@@ -18,6 +18,18 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 const SESSION_SIGNING_REVISION = "username-iball-password-2026-09-17";
 const DEFAULT_MAX_BODY_BYTES = 512 * 1024;
 
+/**
+ * 站长无状态会话：只读镜像（Vercel 等）写不进 users.json，但只要站点配了
+ * SESSION_SECRET 和站长口令散列，站长仍然应该能登录。这类会话的载荷带
+ * kind:"owner" 和口令指纹，验签后直接合成用户，不查账号库；站长换了
+ * APP_PASSWORD_SHA256，旧会话就自动失效。
+ */
+const OWNER_SESSION_KIND = "owner";
+const DEFAULT_OWNER_USERNAME = "iball";
+const LEGACY_OWNER_USERNAMES = new Set(["wzh"]);
+const DEFAULT_OWNER_PASSWORD_SHA256 =
+  "481f6cc0511143ccdd7e2d1b1b94faf0a700a8b49cd13922a70b5ae28acaa8c5";
+
 class HttpError extends Error {
   constructor(message, statusCode = 400) {
     super(message);
@@ -66,6 +78,54 @@ function secret() {
   return String(process.env.SESSION_SECRET || "");
 }
 
+/** 站长账号名：APP_USERNAME，缺省或历史遗留的 wzh 一律归到 iball。 */
+function ownerUsername() {
+  const configured = String(process.env.APP_USERNAME || "").trim();
+  return !configured || LEGACY_OWNER_USERNAMES.has(configured)
+    ? DEFAULT_OWNER_USERNAME
+    : configured;
+}
+
+/** 站长口令散列：服务器没配 APP_PASSWORD_SHA256 时沿用仓库内置的历史值。 */
+function ownerPasswordHash() {
+  return String(
+    process.env.APP_PASSWORD_SHA256 || DEFAULT_OWNER_PASSWORD_SHA256,
+  )
+    .trim()
+    .toLowerCase();
+}
+
+/** 口令指纹：只进签名载荷，不落盘；换口令即让无状态会话失效。 */
+function ownerRevision() {
+  return crypto
+    .createHash("sha256")
+    .update(
+      `owner-identity:${ownerUsername().toLowerCase()}:${ownerPasswordHash()}`,
+    )
+    .digest("base64url")
+    .slice(0, 22);
+}
+
+/** 无状态站长用户记录：id 稳定，方便本地命名空间跟着站长账号走。 */
+function ownerAccount() {
+  const username = ownerUsername();
+  return {
+    id: `owner-${username.toLowerCase()}`,
+    username,
+    email: "",
+    createdAt: "",
+    authVersion: 1,
+  };
+}
+
+function isOwnerUsername(value) {
+  const key = String(value || "").trim().toLowerCase();
+  return (
+    Boolean(key) &&
+    (key === ownerUsername().toLowerCase() || LEGACY_OWNER_USERNAMES.has(key))
+  );
+}
+
 function getSignature(payload) {
   return crypto
     .createHmac("sha256", secret())
@@ -79,6 +139,21 @@ function createSession(user) {
       userId: user.id,
       username: user.username,
       authVersion: Number(user.authVersion) || 1,
+      expiresAt: Date.now() + SESSION_MAX_AGE * 1000,
+    }),
+  );
+  return `${payload}.${getSignature(payload)}`;
+}
+
+/** 不依赖账号库的站长会话，供只读镜像签发。 */
+function createOwnerSession() {
+  const account = ownerAccount();
+  const payload = base64UrlEncode(
+    JSON.stringify({
+      kind: OWNER_SESSION_KIND,
+      userId: account.id,
+      username: account.username,
+      ownerRevision: ownerRevision(),
       expiresAt: Date.now() + SESSION_MAX_AGE * 1000,
     }),
   );
@@ -128,6 +203,17 @@ async function resolveSessionUser(request) {
     return null;
   }
 
+  if (session.kind === OWNER_SESSION_KIND) {
+    const account = ownerAccount();
+    if (
+      session.userId !== account.id ||
+      session.ownerRevision !== ownerRevision()
+    ) {
+      return null;
+    }
+    return account;
+  }
+
   if (session.userId) {
     const user = await findById(session.userId).catch(() => null);
     if (!user) {
@@ -173,6 +259,14 @@ function createCookie(value, maxAge, host) {
 function sessionCookieFor(request, user) {
   return createCookie(
     createSession(user),
+    SESSION_MAX_AGE,
+    request.headers?.host,
+  );
+}
+
+function ownerSessionCookieFor(request) {
+  return createCookie(
+    createOwnerSession(),
     SESSION_MAX_AGE,
     request.headers?.host,
   );
@@ -240,8 +334,14 @@ module.exports = {
   clearCookieFor,
   clientIp,
   createCookie,
+  createOwnerSession,
   createSession,
   isAdminUser,
+  isOwnerUsername,
+  ownerAccount,
+  ownerPasswordHash,
+  ownerSessionCookieFor,
+  ownerUsername,
   parseCookies,
   publicAccount,
   readJsonBody,

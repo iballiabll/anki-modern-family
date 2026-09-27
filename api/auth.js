@@ -33,6 +33,11 @@ const {
   clearCookieFor,
   clientIp,
   isAdminUser,
+  isOwnerUsername,
+  ownerAccount,
+  ownerPasswordHash,
+  ownerSessionCookieFor,
+  ownerUsername,
   publicAccount,
   readJsonBody,
   resolveSessionUser,
@@ -45,11 +50,7 @@ const {
 } = require("./_site-settings.js");
 const telemetry = require("./_telemetry.js");
 
-const PASSWORD_SHA256 =
-  "481f6cc0511143ccdd7e2d1b1b94faf0a700a8b49cd13922a70b5ae28acaa8c5";
 const SESSION_SIGNING_REVISION = "username-iball-password-2026-09-17";
-const DEFAULT_USERNAME = "iball";
-const LEGACY_USERNAMES = new Set(["wzh"]);
 const DEFAULT_MAX_USERS = 20;
 
 // 简易内存限流：按 IP 和 IP+账号两条线计数，进程重启即清零。
@@ -68,23 +69,12 @@ function hashPassword(password) {
   return crypto.createHash("sha256").update(String(password)).digest("hex");
 }
 
-function getConfiguredUsername() {
-  const configured = String(process.env.APP_USERNAME || "").trim();
-  return !configured || LEGACY_USERNAMES.has(configured)
-    ? DEFAULT_USERNAME
-    : configured;
-}
-
 /**
  * 站长账号不能被注册抢注：旧版单账号登录靠 APP_USERNAME + 内置口令散列，
  * 一旦被陌生人注册走，站长就再也进不去了。
  */
 function isReservedUsername(username) {
-  const key = String(username || "").trim().toLowerCase();
-  if (!key) {
-    return false;
-  }
-  return key === getConfiguredUsername().toLowerCase() || LEGACY_USERNAMES.has(key);
+  return isOwnerUsername(username);
 }
 
 function hitLimit(key, max, windowMs) {
@@ -161,26 +151,34 @@ async function ensureOwnerAccount(username, password) {
 }
 
 async function applyLegacyOwnerLogin(request, response, username, password) {
-  const configuredUsername = getConfiguredUsername();
-  const expectedHash = String(
-    process.env.APP_PASSWORD_SHA256 || PASSWORD_SHA256,
-  ).toLowerCase();
+  const configuredUsername = ownerUsername();
   const matches =
     safeEqual(username.toLowerCase(), configuredUsername.toLowerCase()) &&
-    safeEqual(hashPassword(password), expectedHash);
+    safeEqual(hashPassword(password), ownerPasswordHash());
   if (!matches) {
     return false;
   }
 
   const owner = await ensureOwnerAccount(configuredUsername, password);
   if (!owner) {
-    // 用户库暂时写不进去时，仍然让站长用旧口令进入浏览状态。
+    // 用户库读不出来也写不进去（典型是 Vercel 那份只读镜像）：签发一份
+    // 不依赖账号库的站长会话。以前这里返回 200 却不下发 Cookie，页面
+    // 以为登录成功、刷新后又变成未登录，就成了死循环。
+    const account = ownerAccount();
+    response.setHeader("Set-Cookie", ownerSessionCookieFor(request));
+    telemetry.annotate(response, {
+      user: account.username,
+      userId: account.id,
+      ip: clientIp(request),
+    });
     response.status(200).json({
       ok: true,
-      user: configuredUsername,
-      account: { id: "", username: configuredUsername, email: "" },
+      user: account.username,
+      account: publicAccount(account),
+      admin: isAdminUser(account),
       migrated: false,
-      message: "账号目录不可写，本次登录不保存云端进度。",
+      storageReady: false,
+      message: "账号目录不可写：登录状态可用，云端同步不可用。",
     });
     return true;
   }

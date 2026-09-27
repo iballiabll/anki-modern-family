@@ -3879,7 +3879,7 @@ function renderData() {
 }
 
 const GUIDE_LINKS = [
-  ["XXRJ（封神之路，当前页）", "/yantu/", "考研 11408 学习档案：数学章节进度、今日计划、成绩录入、目标与备份"],
+  ["XXRJ（封神之路，当前页）", "/xxrj/", "考研 11408 学习档案：数学章节进度、今日计划、成绩录入、目标与备份"],
   ["词汇库", "/vocab.html", "恋练有词 2027 等词书：斩 / 已会、背词记录、默认词书顺序与字母序"],
   ["考研英语", "/kaoyan.html", "历年真题逐题精读、全文翻译和作文批改"],
   ["外刊精读", "/periodical.html", "经济学人等外刊的逐段精读与检验题"],
@@ -3940,7 +3940,7 @@ function renderGuide() {
       <section class="card card-pad span-12">
         <div class="card-head">
           <div><h2 class="card-title">全部网址</h2><p class="card-note">直接在浏览器输入下面地址即可打开对应模块。</p></div>
-          <a class="primary-btn" href="${site}/yantu/" target="_blank" rel="noopener">${icon("external-link")} 打开 XXRJ</a>
+          <a class="primary-btn" href="${site}/xxrj/" target="_blank" rel="noopener">${icon("external-link")} 打开 XXRJ</a>
         </div>
         <div class="table-wrap">
           <table>
@@ -4386,7 +4386,7 @@ function exportData() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `yantu-backup-${TODAY_KEY}.json`;
+  link.download = `xxrj-backup-${TODAY_KEY}.json`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -4948,9 +4948,29 @@ function watchSyncStatus() {
   });
 }
 
+/** 有账号服务、能真正写盘的正式入口。 */
+const MAIN_SITE_URL = "https://app.iball.top";
+
+/**
+ * 只读镜像判定：接口在，但服务器没有可写账号目录（典型是 Vercel 那份部署）。
+ * 这种站点登录不进账号库、同步也写不进去，必须如实说"只存本机"，
+ * 否则页面会一直提示去登录，登录完回来还是未登录。
+ */
+function isReadOnlyMirror() {
+  return Boolean(
+    ACCOUNT_SESSION &&
+      ACCOUNT_SESSION.mode === "server" &&
+      ACCOUNT_SESSION.registration &&
+      ACCOUNT_SESSION.registration.storageReady === false,
+  );
+}
+
 function paintAccountChrome() {
   const session = ACCOUNT_SESSION;
-  const online = Boolean(session && session.mode === "server" && session.authenticated);
+  const serverMode = Boolean(session && session.mode === "server");
+  const online = Boolean(serverMode && session.authenticated);
+  const mirror = isReadOnlyMirror();
+  const localMode = !serverMode;
   const nameNode = document.getElementById("account-name");
   const planNode = document.getElementById("account-plan");
   const banner = document.getElementById("account-banner");
@@ -4958,7 +4978,7 @@ function paintAccountChrome() {
   const bannerAction = document.getElementById("account-banner-action");
   const syncNote = document.getElementById("data-sync-note");
 
-  if (online) {
+  if (online && !mirror) {
     const who = session.user || "iball 账号";
     if (nameNode) nameNode.textContent = who;
     if (planNode) planNode.textContent = "已绑定 iball 账号 · 数据跟着账号走";
@@ -4967,8 +4987,35 @@ function paintAccountChrome() {
     if (syncNote) {
       syncNote.innerHTML = `${icon("cloud-check")} 当前状态：已登录 ${escapeHtml(who)}，计划、成绩、章节进度按账号同步。`;
     }
+  } else if (online && mirror) {
+    // 身份是真的，但这台服务器没有可写的账号目录：云端同步用不了，
+    // 数据只在本机，所以不再提示去登录。
+    const who = session.user || "iball 账号";
+    if (nameNode) nameNode.textContent = who;
+    if (planNode) planNode.textContent = "已绑定 iball 账号 · 本机记录";
+    setSyncLine("本机记录 · 云端同步不可用", false);
+    if (banner) banner.hidden = true;
+    if (syncNote) {
+      syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：已登录 ${escapeHtml(who)}，但这台服务器没有可写的账号目录，计划与成绩只保存在本机。需要跨设备同步时到主站 ${MAIN_SITE_URL} 打开本页。`;
+    }
+  } else if (mirror) {
+    // 未登录的只读镜像：登录也写不进账号库，直接把用户引到可写的主站。
+    if (nameNode) nameNode.textContent = "本机模式";
+    if (planNode) planNode.textContent = "只读镜像 · 云端同步不可用";
+    setSyncLine("本机模式 · 数据只在这台设备", false);
+    if (banner) banner.hidden = false;
+    if (bannerText) {
+      bannerText.textContent =
+        "当前访问的是只读镜像：计划、成绩只保存在这台设备。需要跨设备同步请到主站登录。";
+    }
+    if (bannerAction) {
+      bannerAction.textContent = "去主站登录";
+      bannerAction.href = `${MAIN_SITE_URL}/index.html?next=/xxrj/`;
+    }
+    if (syncNote) {
+      syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：只读镜像，数据只在本机；需要账号同步请到主站 ${MAIN_SITE_URL}。`;
+    }
   } else {
-    const localMode = !session || session.mode === "local";
     if (nameNode) nameNode.textContent = "未绑定 iball 账号";
     if (planNode) planNode.textContent = "只和 iball 账号绑定 · 不接第三方登录";
     setSyncLine(localMode ? "本地模式 · 数据只在这台设备" : "未登录 · 数据先存在本机", false);
@@ -4978,7 +5025,10 @@ function paintAccountChrome() {
         ? "当前是本地模式：登录 iball 账号后，XXRJ 的计划、成绩和章节进度会跟着账号同步。"
         : "还没有登录 iball 账号：现在录入的数据先存在这台设备，登录后自动同步到账号里。";
     }
-    if (bannerAction) bannerAction.href = "https://www.iball.top/index.html?next=/yantu/";
+    if (bannerAction) {
+      bannerAction.textContent = "绑定 iball 账号";
+      bannerAction.href = "/index.html?next=/xxrj/";
+    }
     if (syncNote) {
       syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：未绑定 iball 账号，数据只在本机；登录同一个 iball 账号后自动同步。`;
     }
@@ -4994,14 +5044,26 @@ async function initAccount() {
     session = null;
   }
 
-  if (session && session.mode === "server" && session.authenticated) {
+  ACCOUNT_SESSION = session;
+  const mirror = isReadOnlyMirror();
+  const authenticated = Boolean(
+    session && session.mode === "server" && session.authenticated,
+  );
+
+  if (authenticated && !mirror) {
     const reloading = await activateAccount(session.account);
     if (reloading) return;
   } else {
+    // 只读镜像上账号库写不进去，切命名空间没有意义：数据继续留在本机，
+    // 同时关掉云端同步，免得每改一条都报一次同步失败。
     await activateAccount(null);
+    if (mirror) {
+      window.iballProgress?.disableSync(
+        "只读镜像：这台服务器没有可写的账号目录。",
+      );
+    }
   }
 
-  ACCOUNT_SESSION = session;
   paintAccountChrome();
   watchSyncStatus();
   if (STORE) {
