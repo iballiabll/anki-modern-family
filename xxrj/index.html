@@ -183,6 +183,8 @@
               <label for="entry-subject">科目</label>
               <select id="entry-subject" data-choice-control>
                 <option>数学一</option>
+                <option>数学二</option>
+                <option>数学三</option>
                 <option>英语一</option>
                 <option>英语二</option>
                 <option>408</option>
@@ -199,43 +201,16 @@
               </select>
             </div>
             <div class="field">
-              <label for="entry-source">来源 / 试卷</label>
-              <select id="entry-source" data-choice-control>
-                <option>数学一真题</option>
-                <option>数学二真题</option>
-                <option>数学三真题</option>
-                <option>1000题</option>
-                <option>660</option>
-                <option>880</option>
-                <option>新东方1000题</option>
-                <option>英语一真题</option>
-                <option>英语二真题</option>
-                <option>王道课后题</option>
-                <option>408真题</option>
-              </select>
+              <label for="entry-source">资料 / 试卷</label>
+              <select id="entry-source" data-choice-control></select>
             </div>
-            <div class="field">
+            <div class="field" id="entry-year-field">
               <label for="entry-year">年份</label>
-              <select id="entry-year" data-choice-control>
-                <option>2026</option>
-                <option>2025</option>
-                <option>2024</option>
-                <option>2023</option>
-                <option>2022</option>
-                <option>2021</option>
-                <option>2020</option>
-              </select>
+              <select id="entry-year" data-choice-control></select>
             </div>
-            <div class="field">
+            <div class="field" id="entry-paper-field">
               <label for="entry-paper-type">卷种 / 类别</label>
-              <select id="entry-paper-type" data-choice-control>
-                <option>数学一</option>
-                <option>数学二</option>
-                <option>数学三</option>
-                <option>英语一</option>
-                <option>英语二</option>
-                <option>408</option>
-              </select>
+              <select id="entry-paper-type" data-choice-control></select>
             </div>
             <div class="field" id="entry-kind-field" hidden>
               <label for="entry-kind">英语类型</label>
@@ -246,18 +221,17 @@
                 <option value="other">其他模块</option>
               </select>
             </div>
-            <div class="field">
-              <label for="entry-module">模块 / 章节</label>
-              <select id="entry-module" data-choice-control>
-                <option>高等数学 · 多元函数微分学</option>
-                <option>高等数学 · 无穷级数</option>
-                <option>线性代数 · 特征值与特征向量</option>
-                <option>概率论 · 多维随机变量</option>
-                <option>英语阅读 Part A</option>
-                <option>英语完形</option>
-                <option>王道 · 计算机组成原理</option>
-                <option>408 真题</option>
-              </select>
+            <div class="field" id="entry-module-field">
+              <label for="entry-module" id="entry-module-label">分册 / 模块</label>
+              <select id="entry-module" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-chapter-field" hidden>
+              <label for="entry-chapter">章节</label>
+              <select id="entry-chapter" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-range-field" hidden>
+              <label for="entry-range">本章实际题号</label>
+              <input id="entry-range" type="text" placeholder="按手里的书填，例如 1-30 或 1-10,15,20" />
             </div>
             <div class="field">
               <label for="entry-question">题号（可选）</label>
@@ -370,7 +344,7 @@
     </div>
 
     <div class="modal-backdrop" id="task-modal">
-      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+      <section class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
         <div class="modal-head">
           <div>
             <h2 class="modal-title" id="task-modal-title">新建计划</h2>
@@ -381,8 +355,14 @@
           </button>
         </div>
         <div class="modal-body">
+          <div class="modal-tabs" id="task-type-tabs" role="tablist">
+            <button class="active" type="button" data-task-type="custom">普通任务</button>
+            <button type="button" data-task-type="study">学习任务</button>
+            <button type="button" data-task-type="review">复盘任务</button>
+            <button type="button" data-task-type="vocab">单词斩</button>
+          </div>
           <div class="form-grid">
-            <div class="field span-12">
+            <div class="field span-12" id="task-title-field">
               <label for="task-title">任务内容（一行一项）</label>
               <textarea id="task-title" rows="4" placeholder="数学 1000题：第一章全部到第二章前20题
 复盘 1000题：第一章
@@ -393,7 +373,7 @@
               <label for="task-date">日期</label>
               <input id="task-date" type="date" />
             </div>
-            <div class="field">
+            <div class="field" id="task-subject-field">
               <label for="task-subject">科目 · 可多选</label>
               <select id="task-subject" data-choice-control multiple>
                 <option selected>数学一</option>
@@ -403,6 +383,59 @@
                 <option>政治</option>
                 <option>复盘</option>
               </select>
+            </div>
+            <div class="field" id="task-subject-one-field" hidden>
+              <label for="task-subject-one">科目</label>
+              <select id="task-subject-one" data-choice-control></select>
+            </div>
+            <div class="field" id="task-round-field" hidden>
+              <label for="task-round">刷题轮次</label>
+              <select id="task-round" data-choice-control>
+                <option value="1">一刷 · 基础覆盖</option>
+                <option value="2">二刷 · 强化巩固</option>
+                <option value="3">三刷 · 错题回炉</option>
+                <option value="4">四刷 · 套卷冲刺</option>
+                <option value="5">五刷 · 考前保温</option>
+              </select>
+            </div>
+            <div class="field" id="task-source-field" hidden>
+              <label for="task-source">资料 / 试卷</label>
+              <select id="task-source" data-choice-control></select>
+            </div>
+            <div class="field" id="task-year-field" hidden>
+              <label for="task-year">年份</label>
+              <select id="task-year" data-choice-control></select>
+            </div>
+            <div class="field" id="task-paper-field" hidden>
+              <label for="task-paper">卷种 / 类别</label>
+              <select id="task-paper" data-choice-control></select>
+            </div>
+            <div class="field" id="task-module-field" hidden>
+              <label for="task-module" id="task-module-label">分册 / 模块</label>
+              <select id="task-module" data-choice-control></select>
+            </div>
+            <div class="field" id="task-chapter-field" hidden>
+              <label for="task-chapter">章节</label>
+              <select id="task-chapter" data-choice-control></select>
+            </div>
+            <div class="field" id="task-range-field" hidden>
+              <label for="task-range">本章实际题号</label>
+              <input id="task-range" type="text" placeholder="按手里的书填，例如 1-30 或 1-10,15,20" />
+            </div>
+            <div class="field" id="task-preview-field" hidden>
+              <label for="task-preview">任务内容（自动生成）</label>
+              <p class="task-preview-text" id="task-preview">选好科目和资料后自动生成。</p>
+            </div>
+            <div class="field" id="task-vocab-deck-field" hidden>
+              <label for="task-vocab-deck">词库</label>
+              <select id="task-vocab-deck" data-choice-control></select>
+            </div>
+            <div class="field" id="task-vocab-target-field" hidden>
+              <label for="task-vocab-target">目标词数</label>
+              <div class="input-suffix">
+                <input id="task-vocab-target" type="number" min="0" step="5" placeholder="例如 60" />
+                <span>词</span>
+              </div>
             </div>
             <div class="field">
               <label for="task-minutes">预计用时</label>
@@ -608,12 +641,14 @@
       </section>
     </div>
 
-    <script src="../account-store.js?v=20260927-cache1"></script>
-    <script src="../vocab-recite-api.js?v=20260927-cache1"></script>
-    <script src="../session-guard.js?v=20260927-cache1"></script>
+    <script src="../account-store.js?v=20260927-structured1"></script>
+    <script src="../vocab-recite-api.js?v=20260927-structured1"></script>
+    <script src="../session-guard.js?v=20260927-structured1"></script>
     <script src="./vendor/lucide.min.js"></script>
-    <script src="./math-books.js?v=20260927-cache1"></script>
-    <script src="./store.js?v=20260927-cache1"></script>
-    <script src="./app.js?v=20260927-heatselect3"></script>
+    <script src="../kaoyan-data/index.js?v=20260927-structured1"></script>
+    <script src="./math-books.js?v=20260927-structured1"></script>
+    <script src="./material-catalog.js?v=20260927-structured1"></script>
+    <script src="./store.js?v=20260927-structured4"></script>
+    <script src="./app.js?v=20260927-structured4"></script>
   </body>
 </html>

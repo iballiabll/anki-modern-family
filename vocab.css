@@ -411,6 +411,29 @@ body.is-vocab-blur .vocab-draw-answer {
   user-select: none;
 }
 
+/* 点过的单条释义临时看清，关掉模糊时由脚本统一还原。 */
+body.is-vocab-blur .vocab-row.is-revealed .vocab-row-meaning,
+body.is-vocab-blur .vocab-detail .vocab-block.is-revealed p,
+body.is-vocab-blur .vocab-detail .vocab-block.is-revealed ul,
+body.is-vocab-blur .vocab-draw-answer.is-revealed {
+  filter: none;
+  user-select: text;
+}
+
+body.is-vocab-blur .vocab-row .vocab-row-main {
+  cursor: pointer;
+}
+
+/* 模糊复习时按钮跟着页面滚动，滚到哪都能一下恢复清晰。 */
+body.is-vocab-blur #blurModeButton {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  z-index: 80;
+  min-width: 132px;
+  box-shadow: 0 12px 28px rgba(11, 17, 41, 0.26);
+}
+
 .vocab-example {
   padding: 10px 12px;
   background: #f6f7fa;

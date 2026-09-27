@@ -243,7 +243,308 @@ async function planTaskFlow(page, out) {
     afterEdit[0] ? afterEdit[0].subject : "无任务",
   );
 
+  // 结构化每日任务：学习 / 复盘 / 单词斩三种类型共用资料目录，
+  // 字段、备注都要存下来，勾完成后按题号补进章节进度（幂等、不倒扣）。
+  const taskToday = localDateKey();
+  await page.locator("[data-task-new]").first().click();
+  await page.waitForSelector("#task-modal:not([hidden])", { timeout: 10000 });
+  await page.click("#task-type-tabs [data-task-type='study']");
+  check(
+    "学习任务换成结构化表单",
+    (await page.locator("#task-title-field").isHidden()) &&
+      !(await page.locator("#task-subject-one-field").isHidden()) &&
+      !(await page.locator("#task-source-field").isHidden()) &&
+      !(await page.locator("#task-preview-field").isHidden()) &&
+      !(await page.locator("#task-year-field").isHidden()) &&
+      !(await page.locator("#task-paper-field").isHidden()) &&
+      (await page.locator("#task-chapter-field").isHidden()) &&
+      (await page.locator("#task-range-field").isHidden()),
+  );
+  const taskSourceLabels = await page.locator("#task-source option").allInnerTexts();
+  check(
+    "任务资料目录和成绩录入同一份",
+    taskSourceLabels.join(" | ") ===
+      [
+        "2027 武忠祥复习全书",
+        "2027 张宇1000题",
+        "2027 新东方1000题",
+        "2027 李永乐660题",
+        "2027 李林880题",
+        "数学历年真题",
+      ].join(" | "),
+    taskSourceLabels.join(" | "),
+  );
+  await page.selectOption("#task-source", "zy1000");
+  const taskChapters = await page
+    .locator("#task-chapter option")
+    .evaluateAll((nodes) => nodes.map((node) => node.value));
+  check(
+    "习题册任务不出年份套卷、只出分册章节",
+    (await page.locator("#task-year-field").isHidden()) &&
+      (await page.locator("#task-paper-field").isHidden()) &&
+      !(await page.locator("#task-chapter-field").isHidden()) &&
+      !(await page.locator("#task-range-field").isHidden()) &&
+      taskChapters.length > 0,
+    taskChapters.slice(0, 3).join("、"),
+  );
+  await page.click("#save-task");
+  check(
+    "习题册任务没填题号范围时拦下",
+    !(await page.locator("#task-modal").isHidden()) &&
+      /题号/.test(await page.locator("#task-modal-note").innerText()),
+    await page.locator("#task-modal-note").innerText(),
+  );
+
+  const studyNote = "验收备注：做完立刻标错因";
+  await page.fill("#task-range", "1-30");
+  await page.fill("#task-minutes", "90");
+  await page.fill("#task-note", studyNote);
+  const studyPreview = await page.locator("#task-preview").innerText();
+  check(
+    "学习任务标题由资料自动拼出来",
+    /^2027 张宇1000题 · \S+ · \S+ · 第 1-30 题$/.test(studyPreview),
+    studyPreview,
+  );
+  check(
+    "换成习题册后不残留年份和套卷",
+    !/20\d\d · /u.test(studyPreview.replace(/^2027 /u, "")) && !/数学[一二三] · /u.test(studyPreview),
+    studyPreview,
+  );
+  await page.click("#save-task");
+  await page.waitForSelector("#task-modal", { state: "hidden", timeout: 10000 });
+
+  const study = await page.evaluate(() => {
+    const task = window.YANTU_STORE.tasks().find((item) => item.taskType === "study");
+    return task
+      ? {
+          id: task.id,
+          title: task.title,
+          date: task.date,
+          minutes: task.minutes,
+          source: task.source,
+          module: task.module,
+          chapter: task.chapter,
+          questionRange: task.questionRange,
+          note: task.note,
+          round: task.round,
+        }
+      : null;
+  });
+  check(
+    "学习任务存下结构化字段",
+    Boolean(study) &&
+      study.date === taskToday &&
+      study.minutes === 90 &&
+      study.source === "2027 张宇1000题" &&
+      Boolean(study.module) &&
+      Boolean(study.chapter) &&
+      study.questionRange === "1-30" &&
+      study.round === 1,
+    JSON.stringify(study),
+  );
+  check("学习任务存下备注", Boolean(study) && study.note === studyNote, study ? study.note : "(没有任务)");
+  check(
+    "学习任务标题写回计划里",
+    Boolean(study) &&
+      /^2027 张宇1000题 · \S+ · \S+ · 第 1-30 题$/.test(study.title) &&
+      !/数学[一二三]/u.test(study.title),
+    study ? study.title : "(没有任务)",
+  );
+  if (!study) {
+    check("学习任务没保存下来，结构化用例中断", false, "任务没有写进 localStorage");
+    return;
+  }
+
+  const studyRow = page.locator(`.plan-task:has([data-task-toggle="${study.id}"])`);
+  check(
+    "计划行显示备注",
+    (await studyRow.locator(".plan-task-note").innerText()) === studyNote,
+  );
+
+  await studyRow.locator(`[data-task-toggle="${study.id}"]`).click();
+  await page.waitForTimeout(200);
+  const studySync = await page.evaluate((id) => {
+    const ledger = window.YANTU_STORE.taskSyncOf(id);
+    return {
+      ledger,
+      done: ledger ? Number(window.YANTU_STORE.progressOf(ledger.progressKey)?.done) : -1,
+    };
+  }, study.id);
+  check(
+    "勾完成的学习任务补进章节进度",
+    studySync.ledger?.done === 30 && studySync.done === 30,
+    JSON.stringify(studySync),
+  );
+
+  await studyRow.locator(`[data-task-toggle="${study.id}"]`).click();
+  await page.waitForTimeout(200);
+  const afterUncheck = await page.evaluate((id) => {
+    const ledger = window.YANTU_STORE.taskSyncOf(id);
+    return Number(window.YANTU_STORE.progressOf(ledger.progressKey)?.done);
+  }, study.id);
+  check("取消勾选不倒扣章节进度", afterUncheck === 30, `done=${afterUncheck}`);
+
+  await studyRow.locator(`[data-task-toggle="${study.id}"]`).click();
+  await page.waitForTimeout(200);
+  const afterRecheck = await page.evaluate((id) => {
+    const ledger = window.YANTU_STORE.taskSyncOf(id);
+    return {
+      done: Number(window.YANTU_STORE.progressOf(ledger.progressKey)?.done),
+      ledger: ledger.done,
+    };
+  }, study.id);
+  check(
+    "重复勾完成不会重复累加",
+    afterRecheck.done === 30 && afterRecheck.ledger === 30,
+    JSON.stringify(afterRecheck),
+  );
+
+  // 复盘任务：同样的结构化字段，勾完成后进当天复盘题数。
+  await page.locator("[data-task-new]").first().click();
+  await page.waitForSelector("#task-modal:not([hidden])", { timeout: 10000 });
+  await page.click("#task-type-tabs [data-task-type='review']");
+  await page.selectOption("#task-source", "zy1000");
+  await page.fill("#task-range", "1-10");
+  await page.fill("#task-note", "验收备注：复盘第一章错题");
+  const reviewPreview = await page.locator("#task-preview").innerText();
+  check("复盘任务标题带复盘前缀", /^复盘 · 2027 张宇1000题/.test(reviewPreview), reviewPreview);
+  await page.click("#save-task");
+  await page.waitForSelector("#task-modal", { state: "hidden", timeout: 10000 });
+  const reviewTask = await page.evaluate(() => {
+    const task = window.YANTU_STORE.tasks().find((item) => item.taskType === "review");
+    return task ? { id: task.id, title: task.title, range: task.questionRange, note: task.note } : null;
+  });
+  check(
+    "复盘任务存成结构化任务",
+    Boolean(reviewTask) && reviewTask.range === "1-10" && /^复盘 · /.test(reviewTask.title),
+    JSON.stringify(reviewTask),
+  );
+  if (reviewTask) {
+    // 计划页同时渲染「今天」卡片和「全部任务」表，同一个任务有两个完成按钮，按行点。
+    await page
+      .locator(`.plan-task:has([data-task-toggle="${reviewTask.id}"]) [data-task-toggle="${reviewTask.id}"]`)
+      .click();
+    await page.waitForTimeout(200);
+    const reviewSync = await page.evaluate((id) => {
+      const ledger = window.YANTU_STORE.taskSyncOf(id);
+      return {
+        ledger: ledger ? ledger.done : 0,
+        done: ledger ? Number(window.YANTU_STORE.progressOf(ledger.progressKey)?.done) : -1,
+      };
+    }, reviewTask.id);
+    check(
+      "复盘任务同样补章节进度",
+      reviewSync.ledger === 10 && reviewSync.done === 40,
+      JSON.stringify(reviewSync),
+    );
+  }
+
+  // 单词斩任务：选词库、定目标，计划行给出抽卡入口。
+  const vocabNote = "验收备注：睡前过一遍";
+  await page.locator("[data-task-new]").first().click();
+  await page.waitForSelector("#task-modal:not([hidden])", { timeout: 10000 });
+  await page.click("#task-type-tabs [data-task-type='vocab']");
+  check(
+    "单词斩默认落在 2027 词库",
+    (await page.locator("#task-vocab-deck").inputValue()) === "llyc2027",
+    await page.locator("#task-vocab-deck").inputValue(),
+  );
+  check(
+    "单词斩不出资料题号字段",
+    (await page.locator("#task-source-field").isHidden()) &&
+      (await page.locator("#task-range-field").isHidden()),
+  );
+  await page.fill("#task-vocab-target", "60");
+  await page.fill("#task-note", vocabNote);
+  const vocabPreview = await page.locator("#task-preview").innerText();
+  check(
+    "单词斩标题带词库和目标",
+    /^单词斩 · /.test(vocabPreview) && /目标 60 词$/.test(vocabPreview),
+    vocabPreview,
+  );
+  await page.click("#save-task");
+  await page.waitForSelector("#task-modal", { state: "hidden", timeout: 10000 });
+  const vocabTask = await page.evaluate(() => {
+    const task = window.YANTU_STORE.tasks().find((item) => item.taskType === "vocab");
+    return task
+      ? { id: task.id, title: task.title, deck: task.vocabDeck, target: task.vocabTarget, note: task.note }
+      : null;
+  });
+  check(
+    "单词斩任务存下词库和目标",
+    Boolean(vocabTask) &&
+      vocabTask.deck === "llyc2027" &&
+      vocabTask.target === 60 &&
+      vocabTask.note === vocabNote,
+    JSON.stringify(vocabTask),
+  );
+  if (vocabTask) {
+    check(
+      "单词斩任务不写章节进度账本",
+      await page.evaluate((id) => !window.YANTU_STORE.taskSyncOf(id), vocabTask.id),
+    );
+    const vocabHref = await page
+      .locator(`.plan-task:has([data-task-toggle="${vocabTask.id}"]) a.row-action`)
+      .getAttribute("href");
+    check(
+      "单词斩计划行直达未斩抽卡",
+      vocabHref === "/vocab.html?deck=llyc2027&draw=1&drawScope=unlearned",
+      vocabHref || "(没有入口)",
+    );
+  }
+
   await page.screenshot({ path: path.join(out, "xxrj-desktop-plan.png"), fullPage: false });
+
+  // 完成的任务要进当天热力图：做题量算「完成」，复盘任务算「复盘」，同一批题不重复计。
+  await page.locator(".sidebar .nav-item[data-screen='dashboard']").click();
+  await page.waitForSelector(".heatmap-grid .heat-cell", { timeout: 10000 });
+  const heatFromTasks = await page.evaluate((date) => {
+    const read = (subject) => {
+      const cell = document.querySelector(
+        `.heatmap-grid .heat-cell[data-subject="${subject}"][data-date="${date}"]`,
+      );
+      return cell
+        ? {
+            done: Number(cell.dataset.done),
+            review: Number(cell.dataset.review),
+            title: cell.getAttribute("title"),
+          }
+        : null;
+    };
+    return { math: read("math"), english: read("english") };
+  }, taskToday);
+  check(
+    "完成的学习任务进当天完成题数",
+    heatFromTasks.math?.done === 30,
+    JSON.stringify(heatFromTasks.math),
+  );
+  check(
+    "完成的复盘任务进当天复盘题数",
+    heatFromTasks.math?.review === 10 && /复盘 10 道/.test(heatFromTasks.math?.title || ""),
+    JSON.stringify(heatFromTasks.math),
+  );
+  check(
+    "单词斩任务不算刷题量",
+    heatFromTasks.english?.done === 0 && heatFromTasks.english?.review === 0,
+    JSON.stringify(heatFromTasks.english),
+  );
+
+  // 结构化任务只是验收用例：删掉并把章节进度复位，后面用例仍从空白数据开始。
+  const leftTasks = await page.evaluate((ids) => {
+    const STORE = window.YANTU_STORE;
+    ids.forEach((id) => {
+      const ledger = STORE.taskSyncOf(id);
+      if (ledger && ledger.progressKey) STORE.removeProgress(ledger.progressKey);
+      STORE.removeTask(id);
+    });
+    // 手写题号范围也会被记住，清掉才不会影响后面录入弹窗的「不猜题号」断言。
+    const rangeKey = window.YANTU_MATERIALS?.rangeKey;
+    if (rangeKey) localStorage.removeItem(rangeKey);
+    return STORE.tasks().length;
+  }, [study.id, reviewTask?.id, vocabTask?.id].filter(Boolean));
+  check("结构化验收任务收尾清干净", leftTasks === taskLines.length, `${leftTasks} 条`);
+  await page.locator(".sidebar .nav-item[data-screen='plan']").click();
+  await page.waitForSelector("h1:text-is('今日计划 · 随时可改')", { timeout: 10000 });
 }
 
 /** 成绩弹窗：科目点选、做对 / 做错分开标记、套卷题号热力图与逐题详情。 */
@@ -252,23 +553,120 @@ async function entryHeatmapFlow(page, out) {
   await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
 
   const subjectGrid = page.locator("#entry-modal .choice-grid[data-choice-for='entry-subject']");
-  check("科目换成可点选格子", (await subjectGrid.locator(".choice-tile").count()) === 4);
+  check("科目换成可点选格子", (await subjectGrid.locator(".choice-tile").count()) === 6);
   check(
     "默认只有一个科目被选中",
     (await subjectGrid.locator(".choice-tile.active").innerText()) === "数学一",
   );
 
+  // 资料目录：数学只留 5 本考研书 + 数一 / 二 / 三历年真题，界面不再出现目录外的旧资料名。
+  const mathSources = await page.locator("#entry-source option").allInnerTexts();
+  check(
+    "数学只留目录里的 5 本书和真题",
+    mathSources.join(" | ") ===
+      [
+        "2027 武忠祥复习全书",
+        "2027 张宇1000题",
+        "2027 新东方1000题",
+        "2027 李永乐660题",
+        "2027 李林880题",
+        "数学历年真题",
+      ].join(" | "),
+    mathSources.join(" | "),
+  );
+  check(
+    "成绩弹窗默认落在真题上",
+    (await page.locator("#entry-source").inputValue()) === "math-zhenti",
+    await page.locator("#entry-source").inputValue(),
+  );
+  check(
+    "真题才有年份和套卷",
+    !(await page.locator("#entry-year-field").isHidden()) &&
+      !(await page.locator("#entry-paper-field").isHidden()) &&
+      (await page.locator("#entry-range-field").isHidden()),
+  );
+  check(
+    "2026 数学真题是 22 题",
+    (await page.locator("#entry-wrong-grid .question-cell").count()) === 22 &&
+      (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "22",
+  );
+
+  await page.selectOption("#entry-year", "2020");
+  check(
+    "2020 年数学真题回到 23 题",
+    (await page.locator("#entry-wrong-grid .question-cell").count()) === 23,
+  );
+
+  // 选到考研书：年份 / 套卷退场，改成分册 / 章节 / 本章实际题号。
+  await page.selectOption("#entry-source", "zy1000");
+  check(
+    "考研书只出分册章节和题号范围",
+    (await page.locator("#entry-year-field").isHidden()) &&
+      (await page.locator("#entry-paper-field").isHidden()) &&
+      !(await page.locator("#entry-range-field").isHidden()),
+  );
+  check(
+    "没填题号范围前不猜题号",
+    (await page.locator("#entry-wrong-grid .question-cell").count()) === 0,
+  );
+  await page.fill("#entry-range", "1-30");
+  check(
+    "题号格跟着手填范围出 30 格",
+    (await page.locator("#entry-wrong-grid .question-cell").count()) === 30,
+  );
+  const chapterValues = await page
+    .locator("#entry-chapter option")
+    .evaluateAll((options) => options.map((option) => option.value));
+  await page.selectOption("#entry-chapter", chapterValues[1]);
+  check(
+    "换一章节题号范围跟着清空",
+    (await page.locator("#entry-wrong-grid .question-cell").count()) === 0,
+  );
+  await page.selectOption("#entry-chapter", chapterValues[0]);
+  check(
+    "切回原章节自动带出记过的题号",
+    (await page.locator("#entry-range").inputValue()) === "1-30" &&
+      (await page.locator("#entry-wrong-grid .question-cell").count()) === 30,
+  );
+
   check("点科目格子同步原生下拉框", (await clickChoice(page, "#entry-modal", "entry-subject", "英语一")) === "英语一");
   check("单选格子不允许多选", (await subjectGrid.locator(".choice-tile.active").count()) === 1);
   check(
-    "英语题号范围切到 48",
-    (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "48",
+    "英语只留真题一条资料",
+    (await page.locator("#entry-source option").allInnerTexts()).join(" | ") === "英语一历年真题",
+    (await page.locator("#entry-source option").allInnerTexts()).join(" | "),
+  );
+  check(
+    "英语题号按整卷真实编号排",
+    (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "20" &&
+      (await page.locator("#entry-wrong-grid .question-cell").count()) === 20,
+  );
+  await page.selectOption("#entry-module", "reading-text-1");
+  check(
+    "阅读 Text 1 接在完形后面从 21 题起",
+    (await page.locator("#entry-wrong-grid .question-cell").first().innerText()) === "21" &&
+      (await page.locator("#entry-wrong-grid .question-cell").count()) === 5,
+  );
+
+  await clickChoice(page, "#entry-modal", "entry-subject", "408");
+  check(
+    "408 只留王道和真题",
+    (await page.locator("#entry-source option").allInnerTexts()).join(" | ") ===
+      "王道课后题 | 408 历年真题",
+    (await page.locator("#entry-source option").allInnerTexts()).join(" | "),
+  );
+  check(
+    "408 真题默认 47 题",
+    (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "47",
   );
 
   await clickChoice(page, "#entry-modal", "entry-subject", "数学一");
+  await page.selectOption("#entry-source", "math-zhenti");
   check(
-    "数学题号范围回到 23",
-    (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "23",
+    "切回数学真题仍是同一年同一套",
+    (await page.locator("#entry-source").inputValue()) === "math-zhenti" &&
+      (await page.locator("#entry-year").inputValue()) === "2020" &&
+      (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "23",
   );
 
   check(
@@ -355,6 +753,10 @@ async function entryHeatmapFlow(page, out) {
             id: summary.id,
             errorType: summary.errorType,
             subject: summary.subject,
+            source: summary.source,
+            year: summary.year,
+            paper: summary.paper,
+            module: summary.module,
             count: summary.count,
             correct: summary.correct,
             round: summary.round,
@@ -379,6 +781,17 @@ async function entryHeatmapFlow(page, out) {
   const rightDetails = saved.details.filter((item) => item.status === "已复盘");
 
   check("主记录保存为套卷成绩", Boolean(saved.summary) && saved.summary.subject === "数学一");
+  check(
+    "主记录写的是目录里的资料名和年份套卷",
+    Boolean(saved.summary) &&
+      saved.summary.source === "数学历年真题" &&
+      saved.summary.year === "2020" &&
+      saved.summary.paper === "数学一" &&
+      !saved.summary.module,
+    saved.summary
+      ? `${saved.summary.source}/${saved.summary.year}/${saved.summary.paper}/${saved.summary.module}`
+      : "没有主记录",
+  );
   check(
     "错因多选按顿号保存",
     saved.summary && saved.summary.errorType === "计算错误、概念不清",

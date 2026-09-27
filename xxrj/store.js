@@ -10,10 +10,11 @@
   "use strict";
 
   const KEY = "yantu:v1";
-  const VERSION = 3;
+  const VERSION = 4;
   const MIN_ROUND = 1;
   const MAX_ROUND = 5;
   const KNOWLEDGE_STATUS = ["待复盘", "已复盘", "已掌握"];
+  const TASK_TYPES = ["custom", "study", "review", "vocab"];
 
   function nowISO() {
     return new Date().toISOString();
@@ -43,6 +44,7 @@
       records: [],
       knowledge: [],
       progress: {},
+      taskSync: {},
       bookRounds: {},
       meta: { createdAt: nowISO(), updatedAt: "" },
     };
@@ -69,6 +71,45 @@
     return out;
   }
 
+  /**
+   * 任务 → 章节进度的同步账本：记录这条任务已经往哪个进度键里补过多少题。
+   * 只增不减，取消勾选任务不会把历史进度删掉，也不会重复累加。
+   */
+  function cleanTaskSync(value) {
+    const out = {};
+    if (!isObject(value)) return out;
+    for (const [key, item] of Object.entries(value)) {
+      const id = String(key || "").trim().slice(0, 80);
+      if (!id || !isObject(item)) continue;
+      out[id] = {
+        progressKey: String(item.progressKey || "").slice(0, 200),
+        done: Math.max(0, Number(item.done) || 0),
+        date: String(item.date || ""),
+        updatedAt: String(item.updatedAt || nowISO()),
+      };
+    }
+    return out;
+  }
+
+  /**
+   * 结构化字段统一交给资料目录搬家：旧资料名 → 2027 目录，
+   * 卷种、模块、章节跟着一起对齐。目录没加载时原样保留。
+   */
+  function migratedFields(entry) {
+    const migrate = window.YANTU_MATERIALS && window.YANTU_MATERIALS.migrateFields;
+    if (typeof migrate !== "function") return {};
+    try {
+      const out = migrate(entry);
+      return isObject(out) ? out : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function cleanTaskType(value, fallback = "custom") {
+    return TASK_TYPES.includes(value) ? value : TASK_TYPES.includes(fallback) ? fallback : "custom";
+  }
+
   /** 把线上/导入的数据补全成当前版本的结构，缺字段一律退回默认值。 */
   function normalize(raw) {
     const base = emptyState();
@@ -91,45 +132,64 @@
         },
         showPolitics: Boolean(profile.showPolitics),
       },
-      tasks: (Array.isArray(raw.tasks) ? raw.tasks : []).filter(isObject).map((task) => ({
-        id: String(task.id || uid()),
-        date: String(task.date || ""),
-        title: String(task.title || "").slice(0, 200),
-        subject: String(task.subject || ""),
-        minutes: Math.max(0, Number(task.minutes) || 0),
-        priority: ["高", "中", "低"].includes(task.priority) ? task.priority : "中",
-        note: String(task.note || "").slice(0, 500),
-        done: Boolean(task.done),
-        createdAt: String(task.createdAt || nowISO()),
-        updatedAt: String(task.updatedAt || task.createdAt || nowISO()),
-      })),
-      records: (Array.isArray(raw.records) ? raw.records : []).filter(isObject).map((record) => ({
-        id: String(record.id || uid()),
-        date: String(record.date || ""),
-        subject: String(record.subject || ""),
-        source: String(record.source || ""),
-        year: String(record.year || ""),
-        paper: String(record.paper || ""),
-        module: String(record.module || ""),
-        kind: String(record.kind || ""),
-        question: String(record.question || ""),
-        status: String(record.status || "套卷成绩"),
-        full: Math.max(0, Number(record.full) || 0),
-        score: Math.max(0, Number(record.score) || 0),
-        correct: Math.max(0, Number(record.correct) || 0),
-        count: Math.max(0, Number(record.count) || 0),
-        minutes: Math.max(0, Number(record.minutes) || 0),
-        errorType: String(record.errorType || ""),
-        reviewDate: String(record.reviewDate || ""),
-        reviewCount: Math.max(0, Number(record.reviewCount) || 0),
-        lastReviewDate: String(record.lastReviewDate || ""),
-        errorCount: Math.max(0, Number(record.errorCount) || 0),
-        explanation: String(record.explanation || "").slice(0, 6000),
-        note: String(record.note || "").slice(0, 2000),
-        round: cleanRound(record.round),
-        createdAt: String(record.createdAt || nowISO()),
-        updatedAt: String(record.updatedAt || record.createdAt || nowISO()),
-      })),
+      tasks: (Array.isArray(raw.tasks) ? raw.tasks : []).filter(isObject).map((task) => {
+        const moved = migratedFields(task);
+        return {
+          id: String(task.id || uid()),
+          date: String(task.date || ""),
+          title: String(task.title || "").slice(0, 200),
+          subject: String(moved.subject ?? task.subject ?? ""),
+          taskType: cleanTaskType(task.taskType),
+          source: String(moved.source ?? task.source ?? ""),
+          year: String(task.year || ""),
+          paper: String(moved.paper ?? task.paper ?? ""),
+          module: String(moved.module ?? task.module ?? ""),
+          chapter: String(moved.chapter ?? task.chapter ?? ""),
+          questionRange: String(task.questionRange || "").slice(0, 120),
+          vocabDeck: String(task.vocabDeck || ""),
+          vocabTarget: Math.max(0, Number(task.vocabTarget) || 0),
+          progressKey: String(task.progressKey || "").slice(0, 200),
+          round: cleanRound(task.round),
+          minutes: Math.max(0, Number(task.minutes) || 0),
+          priority: ["高", "中", "低"].includes(task.priority) ? task.priority : "中",
+          note: String(task.note || "").slice(0, 500),
+          done: Boolean(task.done),
+          createdAt: String(task.createdAt || nowISO()),
+          updatedAt: String(task.updatedAt || task.createdAt || nowISO()),
+        };
+      }),
+      records: (Array.isArray(raw.records) ? raw.records : []).filter(isObject).map((record) => {
+        const moved = migratedFields(record);
+        return {
+          id: String(record.id || uid()),
+          date: String(record.date || ""),
+          subject: String(moved.subject ?? record.subject ?? ""),
+          source: String(moved.source ?? record.source ?? ""),
+          year: String(record.year || ""),
+          paper: String(moved.paper ?? record.paper ?? ""),
+          module: String(moved.module ?? record.module ?? ""),
+          chapter: String(moved.chapter ?? record.chapter ?? ""),
+          questionRange: String(record.questionRange || "").slice(0, 120),
+          kind: String(record.kind || ""),
+          question: String(record.question || ""),
+          status: String(record.status || "套卷成绩"),
+          full: Math.max(0, Number(record.full) || 0),
+          score: Math.max(0, Number(record.score) || 0),
+          correct: Math.max(0, Number(record.correct) || 0),
+          count: Math.max(0, Number(record.count) || 0),
+          minutes: Math.max(0, Number(record.minutes) || 0),
+          errorType: String(record.errorType || ""),
+          reviewDate: String(record.reviewDate || ""),
+          reviewCount: Math.max(0, Number(record.reviewCount) || 0),
+          lastReviewDate: String(record.lastReviewDate || ""),
+          errorCount: Math.max(0, Number(record.errorCount) || 0),
+          explanation: String(record.explanation || "").slice(0, 6000),
+          note: String(record.note || "").slice(0, 2000),
+          round: cleanRound(record.round),
+          createdAt: String(record.createdAt || nowISO()),
+          updatedAt: String(record.updatedAt || record.createdAt || nowISO()),
+        };
+      }),
       knowledge: (Array.isArray(raw.knowledge) ? raw.knowledge : [])
         .filter(isObject)
         .map((item) => ({
@@ -147,6 +207,7 @@
           updatedAt: String(item.updatedAt || item.createdAt || nowISO()),
         })),
       progress: progress(),
+      taskSync: cleanTaskSync(raw.taskSync),
       bookRounds: cleanBookRounds(raw.bookRounds),
       meta: {
         createdAt: String(raw.meta?.createdAt || nowISO()),
@@ -201,11 +262,31 @@
   function cleanTask(input, base) {
     const source = isObject(input) ? input : {};
     const previous = isObject(base) ? base : {};
+    const pick = (key) => (source[key] === undefined ? previous[key] : source[key]);
+    const moved = migratedFields({
+      subject: pick("subject"),
+      source: pick("source"),
+      year: pick("year"),
+      paper: pick("paper"),
+      module: pick("module"),
+      chapter: pick("chapter"),
+    });
     return {
       id: String(source.id || previous.id || uid()),
       date: String(source.date ?? previous.date ?? ""),
       title: String(source.title ?? previous.title ?? "").slice(0, 200),
-      subject: String(source.subject ?? previous.subject ?? ""),
+      subject: String(moved.subject ?? pick("subject") ?? ""),
+      taskType: cleanTaskType(source.taskType, previous.taskType),
+      source: String(moved.source ?? pick("source") ?? ""),
+      year: String(pick("year") || ""),
+      paper: String(moved.paper ?? pick("paper") ?? ""),
+      module: String(moved.module ?? pick("module") ?? ""),
+      chapter: String(moved.chapter ?? pick("chapter") ?? ""),
+      questionRange: String(pick("questionRange") || "").slice(0, 120),
+      vocabDeck: String(pick("vocabDeck") || ""),
+      vocabTarget: Math.max(0, Number(pick("vocabTarget")) || 0),
+      progressKey: String(pick("progressKey") || "").slice(0, 200),
+      round: cleanRound(pick("round"), cleanRound(previous.round)),
       minutes: Math.max(0, Number(source.minutes ?? previous.minutes) || 0),
       priority: ["高", "中", "低"].includes(source.priority)
         ? source.priority
@@ -223,14 +304,24 @@
     const source = isObject(input) ? input : {};
     const previous = isObject(base) ? base : {};
     const pick = (key) => (source[key] === undefined ? previous[key] : source[key]);
+    const moved = migratedFields({
+      subject: pick("subject"),
+      source: pick("source"),
+      year: pick("year"),
+      paper: pick("paper"),
+      module: pick("module"),
+      chapter: pick("chapter"),
+    });
     return {
       id: String(source.id || previous.id || uid()),
       date: String(pick("date") || ""),
-      subject: String(pick("subject") || ""),
-      source: String(pick("source") || ""),
+      subject: String(moved.subject ?? pick("subject") ?? ""),
+      source: String(moved.source ?? pick("source") ?? ""),
       year: String(pick("year") || ""),
-      paper: String(pick("paper") || ""),
-      module: String(pick("module") || ""),
+      paper: String(moved.paper ?? pick("paper") ?? ""),
+      module: String(moved.module ?? pick("module") ?? ""),
+      chapter: String(moved.chapter ?? pick("chapter") ?? "").slice(0, 120),
+      questionRange: String(pick("questionRange") || "").slice(0, 120),
       kind: String(pick("kind") || ""),
       question: String(pick("question") || ""),
       status: String(pick("status") || "套卷成绩"),
@@ -369,6 +460,7 @@
       const before = state.tasks.length;
       state.tasks = state.tasks.filter((task) => task.id !== id);
       if (state.tasks.length === before) return false;
+      delete state.taskSync[id];
       persist("tasks");
       return true;
     },
@@ -459,6 +551,24 @@
     },
     progressOf(key) {
       return state.progress[key] || null;
+    },
+    taskSyncOf(id) {
+      return state.taskSync[String(id || "")] || null;
+    },
+    /** 同步账本只记录「这条任务已经补过多少题」，不直接改任务本身。 */
+    setTaskSync(id, patch) {
+      const key = String(id || "").trim().slice(0, 80);
+      if (!key) return null;
+      const current = state.taskSync[key] || {};
+      const next = {
+        progressKey: String(patch?.progressKey ?? current.progressKey ?? "").slice(0, 200),
+        done: Math.max(0, Number(patch?.done ?? current.done) || 0),
+        date: String(patch?.date ?? current.date ?? "").slice(0, 20),
+        updatedAt: nowISO(),
+      };
+      state.taskSync[key] = next;
+      persist("task-sync");
+      return next;
     },
     bookRound(key) {
       const normalizedKey = String(key || "").trim();

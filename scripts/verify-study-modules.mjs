@@ -285,12 +285,21 @@ async function verifyVocab(browser, base, out) {
   const deckOptions = await page
     .locator("#deckSelect option")
     .evaluateAll((nodes) => nodes.map((node) => node.value));
+  const activeDeckKey = await page.locator("#deckSelect").inputValue();
+  const activeReciteDeck = ["kaoyan1", "kaoyan2"].includes(activeDeckKey)
+    ? "kaoyan"
+    : activeDeckKey;
   check(
-    "词库覆盖考研一/二、四级、六级",
-    ["cet4", "cet6", "kaoyan1", "kaoyan2"].every((key) =>
+    "词库包含 2027 备考词库、考研一/二、四级、六级",
+    ["llyc2027", "cet4", "cet6", "kaoyan1", "kaoyan2"].every((key) =>
       deckOptions.some((value) => value.includes(key)),
     ),
     deckOptions.join(", "),
+  );
+  check(
+    "默认落在 2027 备考词库",
+    activeDeckKey === "llyc2027",
+    activeDeckKey,
   );
 
   await page.locator(".vocab-row").first().click();
@@ -341,8 +350,8 @@ async function verifyVocab(browser, base, out) {
   const quickRow = page.locator(".vocab-row").first();
   await quickRow.locator('[data-quick-recite="known"]').click();
   const quickKnown = await page.evaluate(
-    (word) => window.IballVocabRecite?.getRecord("kaoyan", word),
-    quickWord,
+    ([deck, word]) => window.IballVocabRecite?.getRecord(deck, word),
+    [activeReciteDeck, quickWord],
   );
   check("列表可直接点斩", quickKnown?.status === "known", quickKnown?.status || "(没有记录)");
   const knownMeta = await page.locator("#deckMeta").innerText();
@@ -354,8 +363,8 @@ async function verifyVocab(browser, base, out) {
 
   await quickRow.locator('[data-quick-recite="known"]').click();
   const quickCancelled = await page.evaluate(
-    (word) => window.IballVocabRecite?.getRecord("kaoyan", word),
-    quickWord,
+    ([deck, word]) => window.IballVocabRecite?.getRecord(deck, word),
+    [activeReciteDeck, quickWord],
   );
   check("再点当前斩会去掉记录", !quickCancelled, quickCancelled?.status || "记录已删除");
 
@@ -477,8 +486,8 @@ async function verifyVocab(browser, base, out) {
   await page.waitForTimeout(400);
   const drawNextWord = await page.locator("#drawWord").innerText();
   const drawRecord = await page.evaluate(
-    (word) => window.IballVocabRecite?.getRecord("kaoyan", word),
-    drawWord,
+    ([deck, word]) => window.IballVocabRecite?.getRecord(deck, word),
+    [activeReciteDeck, drawWord],
   );
   check(
     "抽卡判定后记录并自动下一张",
@@ -555,8 +564,8 @@ async function verifyVocab(browser, base, out) {
   await page.waitForTimeout(180);
   const unlearnedDraw = (await page.locator("#drawWord").innerText()).trim();
   const unlearnedStatus = await page.evaluate(
-    (word) => window.IballVocabRecite?.getRecord("kaoyan", word)?.status || "",
-    unlearnedDraw,
+    ([deck, word]) => window.IballVocabRecite?.getRecord(deck, word)?.status || "",
+    [activeReciteDeck, unlearnedDraw],
   );
   check(
     "未斩范围跳过已斩词",

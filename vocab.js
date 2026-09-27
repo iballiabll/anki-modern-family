@@ -41,19 +41,25 @@
 
   const PAGE_SIZE = 60;
 
-  // 考研英语一 / 英语二共用同一份考研核心词表，界面上分开呈现。
+  // 默认落在 2027 备考词库；考研英语一 / 英语二共用同一份考研核心词表，界面上分开呈现。
+  const DEFAULT_DECK = "llyc2027";
   const DECKS = {
-    kaoyan1: { deck: "kaoyan", label: "考研英语一", title: "考研英语一 · 核心词库" },
-    kaoyan2: { deck: "kaoyan", label: "考研英语二", title: "考研英语二 · 核心词库" },
     llyc2027: {
       deck: "llyc2027",
       label: "恋练有词",
       title: "恋练有词 2027 · 备考词库",
     },
+    kaoyan1: { deck: "kaoyan", label: "考研英语一", title: "考研英语一 · 核心词库" },
+    kaoyan2: { deck: "kaoyan", label: "考研英语二", title: "考研英语二 · 核心词库" },
     cet4: { deck: "cet4", label: "四级", title: "四级核心词库" },
     cet6: { deck: "cet6", label: "六级", title: "六级核心词库" },
     basic: { deck: "basic", label: "零基础", title: "零基础高频词库" },
   };
+
+  /** 认不出来的词库（历史偏好 / URL 参数）一律回退到默认词库。 */
+  function deckConfig(deckKey) {
+    return DECKS[deckKey] || DECKS[DEFAULT_DECK];
+  }
 
   const els = {
     board: document.querySelector(".vocab-board"),
@@ -115,7 +121,7 @@
     shardMapPromise: null,
     shardCache: new Map(),
     deckCache: new Map(),
-    deckKey: "kaoyan1",
+    deckKey: DEFAULT_DECK,
     deckWords: [],
     visibleCount: PAGE_SIZE,
     query: "",
@@ -136,7 +142,7 @@
     favorites: new Set(),
     wordbook: new Map(),
     prefs: {
-      deckKey: "kaoyan1",
+      deckKey: DEFAULT_DECK,
       sort: "default",
       hideKnown: false,
       drawOrder: "random",
@@ -267,7 +273,7 @@
   }
 
   function loadDeck(deckKey) {
-    const config = DECKS[deckKey] || DECKS.kaoyan1;
+    const config = deckConfig(deckKey);
     const cacheKey = config.deck;
     if (state.deckCache.has(cacheKey)) {
       return Promise.resolve(state.deckCache.get(cacheKey));
@@ -334,7 +340,7 @@
   }
 
   function currentDeckId() {
-    return (DECKS[state.deckKey] || DECKS.kaoyan1).deck;
+    return deckConfig(state.deckKey).deck;
   }
 
   function reciteRecord(word) {
@@ -478,7 +484,7 @@
       return;
     }
     const deck = state.index?.decks?.find(
-      (item) => item.deck === (DECKS[state.deckKey] || DECKS.kaoyan1).deck,
+      (item) => item.deck === deckConfig(state.deckKey).deck,
     );
     const chips = [
       { value: String(deck?.words ?? currentDeckWords().length), label: "词库词量" },
@@ -611,7 +617,7 @@
     if (!els.deckMeta || !state.deckWords.length) {
       return;
     }
-    const config = DECKS[state.deckKey] || DECKS.kaoyan1;
+    const config = deckConfig(state.deckKey);
     const total = state.deckWords.length;
     const slain = slainCount();
     els.deckMeta.textContent = `${config.label} · 共 ${total} 词 · 已斩 ${slain} · 未背 ${Math.max(
@@ -1119,6 +1125,12 @@
     els.hideKnown?.classList.toggle("is-primary", state.hideKnown);
     els.blurMode?.setAttribute("aria-pressed", String(state.blurMode));
     els.blurMode?.classList.toggle("is-primary", state.blurMode);
+    if (els.blurMode) {
+      els.blurMode.textContent = state.blurMode ? "恢复清晰" : "释义模糊";
+      els.blurMode.title = state.blurMode
+        ? "恢复全部释义；模糊时点某个单词可以只看这一条"
+        : "遮住列表和词卡的释义，点击开始模糊复习";
+    }
     els.drawMode?.setAttribute("aria-pressed", String(state.drawOpen));
     els.drawMode?.classList.toggle("is-primary", state.drawOpen);
     if (els.drawMode) {
@@ -1150,6 +1162,15 @@
     }
     els.panel.hidden = !open;
     els.board?.classList.toggle("has-detail", open);
+  }
+
+  /** 关掉模糊复习时，把所有「临时看清」的单条释义一起还原。 */
+  function clearReveals() {
+    document
+      .querySelectorAll(
+        ".vocab-row.is-revealed, .vocab-block.is-revealed, .vocab-draw-answer.is-revealed",
+      )
+      .forEach((node) => node.classList.remove("is-revealed"));
   }
 
   /* ----------------------------------------------------------- 交互逻辑 */
@@ -1277,7 +1298,7 @@
   }
 
   async function selectDeck(deckKey) {
-    const config = DECKS[deckKey] ? deckKey : "kaoyan1";
+    const config = DECKS[deckKey] ? deckKey : DEFAULT_DECK;
     closeDrawMode();
     state.deckKey = config;
     state.prefs.deckKey = config;
@@ -1402,8 +1423,15 @@
 
     els.blurMode?.addEventListener("click", () => {
       state.blurMode = !state.blurMode;
+      if (!state.blurMode) {
+        clearReveals();
+      }
       syncCounters();
-      showToast(state.blurMode ? "释义已模糊，点击「释义模糊」恢复" : "释义已恢复清晰");
+      showToast(
+        state.blurMode
+          ? "释义已模糊：点某个单词只看这一条，按钮会跟着页面滚动"
+          : "释义已恢复清晰",
+      );
     });
 
     els.drawMode?.addEventListener("click", () => {
@@ -1465,9 +1493,30 @@
         });
         return;
       }
-      const row = event.target.closest("[data-open-word], .vocab-row");
+      const row = event.target.closest(".vocab-row");
       if (row) {
+        // 模糊复习时第一下先把这一条看清，再点才进词卡。
+        if (state.blurMode && !row.classList.contains("is-revealed")) {
+          row.classList.add("is-revealed");
+          return;
+        }
         openWord(row.dataset.openWord || row.dataset.word);
+      }
+    });
+
+    els.detail?.addEventListener("click", (event) => {
+      if (!state.blurMode) {
+        return;
+      }
+      const block = event.target.closest(".vocab-block");
+      if (block && !block.classList.contains("is-revealed")) {
+        block.classList.add("is-revealed");
+      }
+    });
+
+    els.drawAnswer?.addEventListener("click", () => {
+      if (state.blurMode) {
+        els.drawAnswer.classList.add("is-revealed");
       }
     });
 
@@ -1586,6 +1635,24 @@
       state.hideKnown = true;
       state.prefs.hideKnown = true;
     }
+    // 每日任务里的「单词斩」入口：?deck=xxx&draw=1&drawScope=unlearned
+    const drawScopeParam = params.get("drawScope");
+    if (drawScopeParam && DRAW_SCOPES.includes(drawScopeParam)) {
+      state.drawScope = drawScopeParam;
+      state.prefs.drawScope = drawScopeParam;
+    }
+    const drawOrderParam = params.get("drawOrder");
+    if (drawOrderParam && DRAW_ORDERS.includes(drawOrderParam)) {
+      state.drawOrder = drawOrderParam;
+      state.prefs.drawOrder = drawOrderParam;
+    }
+    const drawDaysParam = Number(params.get("drawDays"));
+    if (DRAW_DAY_RANGES.includes(drawDaysParam)) {
+      state.drawDays = drawDaysParam;
+      state.prefs.drawDays = drawDaysParam;
+    }
+    const drawParam = params.get("draw");
+    const startDraw = drawParam === "1" || drawParam === "true";
     const focusWord = (params.get("word") || "").trim();
 
     bindEvents();
@@ -1617,6 +1684,9 @@
       // 清单失败不影响词表本身，词库统计会退回本地计数。
     }
     await selectDeck(state.prefs.deckKey);
+    if (startDraw) {
+      openDrawMode();
+    }
     if (focusWord) {
       if (els.search) {
         els.search.value = focusWord;

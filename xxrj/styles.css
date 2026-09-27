@@ -4713,6 +4713,29 @@ body.entry-edit .record-banner {
   width: min(560px, calc(100vw - 32px));
 }
 
+.modal.modal-md {
+  width: min(720px, calc(100vw - 32px));
+}
+
+/* 结构化任务预览：只读的一段短说明，跟着上面的选择实时更新。 */
+.task-preview-text {
+  margin: 0;
+  padding: 9px 11px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+  background: #f8fafc;
+  border: 1px dashed var(--line);
+  border-radius: 7px;
+  word-break: break-word;
+}
+
+.task-preview-text.is-empty {
+  color: var(--muted);
+  font-weight: 500;
+}
+
 .tag.coral {
   color: #be123c;
   background: var(--coral-soft);

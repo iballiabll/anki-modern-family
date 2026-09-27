@@ -30,6 +30,7 @@ const state = {
   englishPaper: initialParams.get("paper") || "英语一",
   planBoard: initialParams.get("plan") || "today",
   taskEditId: "",
+  taskType: "custom",
   recordEditId: "",
   knowledgeEditId: "",
   reviewLogId: "",
@@ -965,19 +966,41 @@ function localDateKeyOf(value) {
 
 /**
  * 近 84 天、按科目聚合每天的学习量：
- *   · 完成题数 = 当天主记录 count 之和，轮次只做拆分；
- *   · 复盘题数 = 错题「上次复盘日」＋知识点复盘日志，历史多次复盘只能还原最近一次。
+ *   · 完成题数 = 当天主记录 count ＋ 已完成的学习任务，轮次只做拆分；
+ *   · 复盘题数 = 错题「上次复盘日」＋知识点复盘日志 ＋ 已完成的复盘任务，
+ *     历史多次复盘只能还原最近一次。
+ *
+ * 同一天、同一份资料里，录入的记录和完成的任务常常是同一批题，
+ * 所以按「资料 + 题号」去重：重叠的题号只算一次，没填题号的记录按整卷兜底。
  */
 function heatmapDayStats() {
   const stats = new Map();
+  // key = 日期|科目|资料 → { numbers: 已经算过的题号, whole: 整卷记录（题号无法对齐） }
+  const covered = new Map();
   const bucketOf = (date, subject) => {
     const key = `${date}|${subject}`;
     if (!stats.has(key)) stats.set(key, { done: 0, review: 0, rounds: new Map() });
     return stats.get(key);
   };
-  const addReview = (date, subject) => {
+  const addReview = (date, subject, amount = 1) => {
     if (!date || !subject) return;
-    bucketOf(date, subject).review += 1;
+    const value = Number(amount) || 0;
+    if (value <= 0) return;
+    bucketOf(date, subject).review += value;
+  };
+  const coverageOf = (date, subject, sourceLabel) => {
+    const key = `${date}|${subject}|${sourceLabel}`;
+    if (!covered.has(key)) covered.set(key, { numbers: new Set(), whole: false });
+    return covered.get(key);
+  };
+  /** 只保留还没算过的题号；records 里填了整卷的科目直接跳过。 */
+  const freshNumbers = (date, subject, sourceLabel, numbers) => {
+    if (!date || !subject || !sourceLabel) return numbers;
+    const entry = coverageOf(date, subject, sourceLabel);
+    if (entry.whole) return [];
+    const list = numbers.filter((number) => !entry.numbers.has(number));
+    list.forEach((number) => entry.numbers.add(number));
+    return list;
   };
 
   const all = recordsAll();
@@ -999,6 +1022,17 @@ function heatmapDayStats() {
         const round = mathRoundMeta(record.round).label;
         entry.done += done;
         entry.rounds.set(round, (entry.rounds.get(round) || 0) + done);
+        const item = catalogReady() ? catalog().resolveSource(record.subject, record.source) : null;
+        if (item) {
+          const coverage = coverageOf(record.date, subject, item.label);
+          const numbers = item.kind === "book" ? catalog().questionNumbers(item, record) : [];
+          if (numbers.length) {
+            numbers.forEach((number) => coverage.numbers.add(number));
+          } else {
+            // 真题记录通常只填成绩或题数，题号对不上，按整卷兜底。
+            coverage.whole = true;
+          }
+        }
       }
     }
     if (!isMistakeRecord(record) || !record.lastReviewDate) continue;
@@ -1013,6 +1047,32 @@ function heatmapDayStats() {
     logs.forEach((log) => addReview(localDateKeyOf(log && log.at), subject));
     // 早期知识点没有日志，只能拿最近一次复盘日顶一下。
     if (!logs.length && item.lastReviewDate) addReview(localDateKeyOf(item.lastReviewDate), subject);
+  }
+
+  // 完成的学习 / 复盘任务同样算进当天：学习任务记「完成」，复盘任务记「复盘」。
+  if (STORE && catalogReady()) {
+    const firstDay = dateKey(shiftDate(-(HEATMAP_WEEKS * 7 - 1)));
+    STORE.tasks().forEach((task) => {
+      if (!task || !task.done || !task.date || task.date < firstDay) return;
+      const type = taskTypeOf(task);
+      if (!structuredTaskType(type)) return;
+      const subject = subjectKeyOf(task);
+      if (!subject) return;
+      const item = catalog().resolveSource(task.subject, task.source);
+      if (!item) return;
+      const numbers = catalog().questionNumbers(item, task);
+      if (!numbers.length) return;
+      if (type === "review") {
+        addReview(task.date, subject, numbers.length);
+        return;
+      }
+      const fresh = freshNumbers(task.date, subject, item.label, numbers);
+      if (!fresh.length) return;
+      const entry = bucketOf(task.date, subject);
+      const round = mathRoundMeta(task.round).label;
+      entry.done += fresh.length;
+      entry.rounds.set(round, (entry.rounds.get(round) || 0) + fresh.length);
+    });
   }
   return stats;
 }
@@ -3908,6 +3968,14 @@ function taskPriorityTone(priority) {
 
 function planTaskRow(task) {
   const tone = taskPriorityTone(task.priority);
+  // 单词斩任务的入口：直接跳到词汇库，按词库、未斩范围开抽卡。
+  const vocabLink = task.vocabDeck
+    ? `<a class="row-action" href="/vocab.html?deck=${encodeURIComponent(
+        task.vocabDeck,
+      )}&draw=1&drawScope=unlearned" title="去词汇库开始单词斩" aria-label="去词汇库开始单词斩">${icon(
+        "swords",
+      )}</a>`
+    : "";
   return `
     <div class="plan-task ${task.done ? "done" : ""}">
       <button class="task-check-btn" type="button" data-task-toggle="${escapeAttr(task.id)}" aria-label="${task.done ? "标记为未完成" : "标记为已完成"}">${icon(task.done ? "check-circle-2" : "circle")}</button>
@@ -3922,6 +3990,7 @@ function planTaskRow(task) {
         ${task.note ? `<p class="plan-task-note">${escapeHtml(task.note)}</p>` : ""}
       </div>
       <div class="row-actions">
+        ${vocabLink}
         <button class="row-action" type="button" data-task-edit="${escapeAttr(task.id)}" title="修改这条计划">${icon("pencil-line")}</button>
         <button class="row-action" type="button" data-task-remove="${escapeAttr(task.id)}" title="删除这条计划">${icon("trash-2")}</button>
       </div>
@@ -3940,6 +4009,72 @@ function planTaskList(tasks, emptyText) {
     `;
   }
   return `<div class="plan-task-list">${tasks.map(planTaskRow).join("")}</div>`;
+}
+
+/**
+ * 任务 → 章节进度：只有「勾完成的学习 / 复盘任务」而且是目录里的数学书才同步。
+ * taskSync 账本记着这条任务已经补过多少题，重复勾选 / 保存不会重复累加，
+ * 取消勾选或删掉任务也不会把已经学过的题倒扣掉。
+ */
+function taskProgressTarget(task) {
+  if (!task || !task.done) return null;
+  if (!structuredTaskType(task.taskType)) return null;
+  if (!catalogReady()) return null;
+  const api = catalog();
+  const item = api.resolveSource(task.subject, task.source);
+  if (!item || !item.bookKey) return null;
+  const numbers = api.questionNumbers(item, task);
+  if (!numbers.length) return null;
+  return {
+    item,
+    key: mathProgressKey(item.bookKey, task.module, task.chapter, task.round),
+    count: numbers.length,
+  };
+}
+
+function syncTaskProgress(task) {
+  if (!STORE || !task) return 0;
+  const target = taskProgressTarget(task);
+  if (!target) return 0;
+  const ledger = STORE.taskSyncOf(task.id);
+  const synced = ledger && ledger.progressKey === target.key ? Number(ledger.done) || 0 : 0;
+  const delta = target.count - synced;
+  if (delta <= 0) return 0;
+  const current = STORE.progressOf(target.key);
+  STORE.setProgress(target.key, { done: (Number(current && current.done) || 0) + delta });
+  STORE.setTaskSync(task.id, {
+    progressKey: target.key,
+    done: target.count,
+    date: task.date,
+  });
+  return delta;
+}
+
+let taskSyncRunning = false;
+
+/** 全量扫描已完成任务：刷新页面、切账号、云端同步回来的数据也能补进章节进度。 */
+function syncCompletedTasks() {
+  if (!STORE || taskSyncRunning) return 0;
+  taskSyncRunning = true;
+  let total = 0;
+  try {
+    STORE.tasks().forEach((task) => {
+      if (!task.done) return;
+      total += syncTaskProgress(task);
+    });
+  } finally {
+    taskSyncRunning = false;
+  }
+  return total;
+}
+
+/** 热力图口径：这条任务算多少道题。 */
+function taskQuestionCount(task) {
+  if (!task || !structuredTaskType(task.taskType)) return 0;
+  if (!catalogReady()) return 0;
+  const item = catalog().resolveSource(task.subject, task.source);
+  if (!item) return 0;
+  return catalog().questionNumbers(item, task).length;
 }
 
 function renderPlan() {
@@ -4083,6 +4218,13 @@ function renderPlan() {
                             <td><span class="tag ${taskPriorityTone(task.priority)}">${escapeHtml(task.priority)}</span></td>
                             <td>${task.done ? '<span class="tag blue">已完成</span>' : '<span class="tag amber">待完成</span>'}</td>
                             <td><div class="row-actions">
+                              ${
+                                task.vocabDeck
+                                  ? `<a class="row-action" href="/vocab.html?deck=${encodeURIComponent(
+                                      task.vocabDeck,
+                                    )}&draw=1&drawScope=unlearned" title="去词汇库开始单词斩">${icon("swords")}</a>`
+                                  : ""
+                              }
                               <button class="row-action" type="button" data-task-toggle="${escapeAttr(task.id)}" title="切换完成状态">${icon(task.done ? "rotate-ccw" : "check")}</button>
                               <button class="row-action" type="button" data-task-edit="${escapeAttr(task.id)}" title="修改">${icon("pencil-line")}</button>
                               <button class="row-action" type="button" data-task-remove="${escapeAttr(task.id)}" title="删除">${icon("trash-2")}</button>
@@ -4634,71 +4776,234 @@ const entrySource = document.getElementById("entry-source");
 const entryPaperType = document.getElementById("entry-paper-type");
 const entryKindField = document.getElementById("entry-kind-field");
 const entryKind = document.getElementById("entry-kind");
+const entryModuleField = document.getElementById("entry-module-field");
+const entryModuleLabel = document.getElementById("entry-module-label");
 const entryModule = document.getElementById("entry-module");
+const entryYearField = document.getElementById("entry-year-field");
+const entryPaperField = document.getElementById("entry-paper-field");
+const entryChapterField = document.getElementById("entry-chapter-field");
+const entryChapter = document.getElementById("entry-chapter");
+const entryRangeField = document.getElementById("entry-range-field");
+const entryRange = document.getElementById("entry-range");
 const entryQuestion = document.getElementById("entry-question");
 const entryFull = document.getElementById("entry-full");
 const entryScore = document.getElementById("entry-score");
 const entryLost = document.getElementById("entry-lost");
 
-const ENTRY_OPTIONS = {
-  "数学一": {
-    sources: ["数学一真题", "1000题", "660", "880", "新东方1000题", "数学二真题", "数学三真题"],
-    papers: ["数学一", "数学二", "数学三"],
-    modules: [
-      "高等数学 · 多元函数微分学",
-      "高等数学 · 无穷级数",
-      "高等数学 · 二重积分",
-      "线性代数 · 特征值与特征向量",
-      "概率论 · 多维随机变量",
-    ],
-  },
-  "英语一": {
-    sources: ["英语一真题", "英语二真题"],
-    papers: ["英语一", "英语二"],
-    modules: ["英语阅读 Part A", "英语完形", "英语新题型", "英语翻译", "英语写作"],
-  },
-  "英语二": {
-    sources: ["英语二真题", "英语一真题"],
-    papers: ["英语二", "英语一"],
-    modules: ["英语阅读 Part A", "英语完形", "英语新题型", "英语翻译", "英语写作"],
-  },
-  "408": {
-    sources: ["王道课后题", "408真题"],
-    papers: ["408"],
-    modules: [
-      "王道 · 数据结构",
-      "王道 · 计算机组成原理",
-      "王道 · 操作系统",
-      "王道 · 计算机网络",
-      "408 真题",
-    ],
-  },
-};
-
-function setSelectOptions(select, values, preferredValue) {
-  select.innerHTML = values.map((value) => `<option>${value}</option>`).join("");
-  if (values.includes(preferredValue)) select.value = preferredValue;
+/** 资料目录是录入和每日任务共用的唯一选择来源，界面上不再出现目录外的旧资料名。 */
+function catalog() {
+  return window.YANTU_MATERIALS || null;
 }
 
-function syncEntryOptions() {
-  const options = ENTRY_OPTIONS[entrySubject.value] || ENTRY_OPTIONS["数学一"];
-  setSelectOptions(entrySource, entrySources(entrySubject.value, options), entrySource.value);
-  setSelectOptions(entryPaperType, options.papers, entryPaperType.value);
-  setSelectOptions(entryModule, options.modules, entryModule.value);
+function catalogReady() {
+  const api = catalog();
+  return Boolean(api && typeof api.sources === "function" && typeof api.source === "function");
+}
+
+function optionList(items) {
+  return (Array.isArray(items) ? items : [])
+    .map((item) => {
+      if (item && typeof item === "object") {
+        const value = String(item.id ?? item.value ?? item.label ?? "").trim();
+        const label = String(item.label ?? item.id ?? value).trim();
+        return { value, label };
+      }
+      const value = String(item ?? "").trim();
+      return { value, label: value };
+    })
+    .filter((item) => item.value);
+}
+
+/** 年份下拉从新到旧，默认落在最近一年。 */
+function yearOptionList(years) {
+  return optionList(years).sort((left, right) => Number(right.value) - Number(left.value));
+}
+
+function selectLabelOf(select) {
+  if (!select || select.selectedIndex < 0) return "";
+  const option = select.options[select.selectedIndex];
+  return option ? String(option.textContent || "").trim() : "";
+}
+
+/**
+ * 用目录项重填下拉框；preferred 不在目录里时退回 fallbackValue（没给就是第一项），
+ * 绝不补旧别名。
+ */
+function fillCatalogSelect(
+  select,
+  items,
+  preferredValue,
+  emptyLabel = "暂无可选",
+  fallbackValue = "",
+) {
+  if (!select) return "";
+  const list = optionList(items);
+  const preferred = String(preferredValue ?? "");
+  if (!list.length) {
+    select.innerHTML = `<option value="">${escapeHtml(emptyLabel)}</option>`;
+    select.value = "";
+    refreshChoiceField(select);
+    return "";
+  }
+  select.innerHTML = list
+    .map((item) => `<option value="${escapeAttr(item.value)}">${escapeHtml(item.label)}</option>`)
+    .join("");
+  const fallback = list.some((item) => item.value === fallbackValue)
+    ? String(fallbackValue)
+    : list[0].value;
+  select.value = list.some((item) => item.value === preferred) ? preferred : fallback;
+  refreshChoiceField(select);
+  return select.value;
+}
+
+/**
+ * 新记录 / 新任务的默认资料：优先真题。
+ * 满分、得分只有套卷用得上，习题册再点一下就能切过去。
+ */
+function defaultCatalogSourceId(sourceItems) {
+  const list = Array.isArray(sourceItems) ? sourceItems : [];
+  const hit = list.find((item) => item && item.kind === "zhenti");
+  return hit ? String(hit.id || "") : "";
+}
+
+/**
+ * change 事件触发时下拉框里已经是新值，判断「用户换没换」只能跟上次生效的选择比；
+ * 每轮重填选项后把生效值记回去，换分册 / 章节才能带出对应章节的题号。
+ */
+function appliedValueOf(select) {
+  return select ? String(select.dataset.applied ?? "") : "";
+}
+
+function markAppliedValue(select, value) {
+  if (select) select.dataset.applied = String(value ?? "");
+}
+
+function selectedCatalogSource(subjectSelect, sourceSelect) {
+  if (!catalogReady()) return null;
+  return catalog().source(subjectSelect.value, sourceSelect.value);
+}
+
+function catalogItemLabel(items, value) {
+  const hit = optionList(items).find((item) => item.value === String(value ?? ""));
+  return hit ? hit.label : "";
+}
+
+/** 历史任务 / 记录里存的是资料或分册的名字，回填下拉框时先换成目录里的值。 */
+function catalogSelectValue(items, value) {
+  const wanted = String(value ?? "").trim();
+  if (!wanted) return "";
+  const hit = optionList(items).find(
+    (item) => item.value === wanted || item.label === wanted,
+  );
+  return hit ? hit.value : wanted;
+}
+
+/**
+ * 科目 → 资料 → 年份/套卷 → 分册/章节 → 实际题号。
+ * preferred 里显式给了哪一项就回填哪一项，没给的保持当前选择。
+ */
+function syncEntryOptions(preferred = {}) {
+  if (!catalogReady()) return;
+  const api = catalog();
+  const subject = entrySubject.value;
+  const sourceItems = api.sources(subject);
+  const wantedSource =
+    preferred.source !== undefined ? preferred.source : entrySource.value;
+  const sourceId = fillCatalogSelect(
+    entrySource,
+    sourceItems,
+    wantedSource,
+    "该科目暂无资料",
+    defaultCatalogSourceId(sourceItems),
+  );
+  const item = api.source(subject, sourceId);
+  const isZhenti = Boolean(item && item.kind === "zhenti");
+  const isBook = Boolean(item && item.kind === "book");
+
+  // 年份和卷种只对真题有意义。
+  if (entryYearField) entryYearField.hidden = !isZhenti;
+  if (entryPaperField) entryPaperField.hidden = !isZhenti;
+  const year = isZhenti
+    ? fillCatalogSelect(
+        entryYear,
+        yearOptionList(item.years),
+        preferred.year !== undefined ? preferred.year : entryYear.value,
+        "暂无年份",
+      )
+    : "";
+  const paper = isZhenti
+    ? fillCatalogSelect(
+        entryPaperType,
+        item.papers,
+        preferred.paper !== undefined ? preferred.paper : entryPaperType.value,
+        "无需选择",
+      )
+    : "";
+
+  const selectionChanged =
+    appliedValueOf(entrySource) !== String(entrySource ? entrySource.value : "") ||
+    appliedValueOf(entryModule) !== String(entryModule ? entryModule.value : "") ||
+    appliedValueOf(entryChapter) !== String(entryChapter ? entryChapter.value : "");
+  const previousModule = entryModule.value;
+  const previousChapter = entryChapter.value;
+  const moduleItems = isZhenti
+    ? api.modules(item, { year, paper })
+    : isBook
+      ? item.sections
+      : [];
+  const showModule = Boolean((isZhenti || isBook) && moduleItems.length);
+  if (entryModuleField) entryModuleField.hidden = !showModule;
+  if (entryModuleLabel) entryModuleLabel.textContent = isZhenti ? "模块 / 题型" : "分册 / 书目";
+  const moduleId = showModule
+    ? fillCatalogSelect(
+        entryModule,
+        moduleItems,
+        preferred.module !== undefined ? preferred.module : previousModule,
+        "暂无分册",
+      )
+    : fillCatalogSelect(entryModule, [], "", "");
+  const moduleLabel = catalogItemLabel(moduleItems, moduleId);
+
+  const chapterItems = isBook ? api.chapters(item, moduleId) : [];
+  const showChapter = Boolean(isBook && chapterItems.length);
+  if (entryChapterField) entryChapterField.hidden = !showChapter;
+  const chapterId = showChapter
+    ? fillCatalogSelect(
+        entryChapter,
+        chapterItems,
+        preferred.chapter !== undefined ? preferred.chapter : previousChapter,
+        "暂无章节",
+      )
+    : "";
+  const chapterLabel = catalogItemLabel(chapterItems, chapterId);
+
+  // 习题册每章题量各版本不同：题号范围由使用者按手里的书填，填过就记住。
+  const showRange = Boolean(isBook);
+  if (entryRangeField) entryRangeField.hidden = !showRange;
+  if (showRange) {
+    const remembered = api.savedRange(item, moduleId, chapterId);
+    const explicitRange =
+      preferred.range === undefined ? null : String(preferred.range || "").trim();
+    if (explicitRange) {
+      entryRange.value = explicitRange;
+    } else if (selectionChanged || !entryRange.value || preferred.range !== undefined) {
+      entryRange.value = remembered;
+    }
+  } else if (entryRange) {
+    entryRange.value = "";
+  }
+  markAppliedValue(entryModule, moduleId);
+  markAppliedValue(entryChapter, chapterId);
+  markAppliedValue(entrySource, sourceId);
+
   // 「英语类型」只对英语一 / 英语二有意义，其它科目录进来的 kind 一律清空。
-  const english = entrySubject.value.startsWith("英语");
+  const english = subject.startsWith("英语");
   if (entryKindField) entryKindField.hidden = !english;
   if (!english && entryKind) entryKind.value = "";
+
   refreshChoiceFields(entryModal);
   renderWrongGrid([]);
   syncWrongFieldVisibility();
-}
-
-/** 数学一的来源里带上全部资料名，录成绩时能直接对上封神之路里的书。 */
-function entrySources(subject, options) {
-  if (subject !== "数学一") return options.sources;
-  const bookNames = YM_BOOKS.map((book) => book.tab).filter(Boolean);
-  return [...new Set([...options.sources, ...bookNames])];
 }
 
 function updateLostScore() {
@@ -4742,22 +5047,50 @@ const entryWrongCount = document.getElementById("entry-wrong-count");
 const entryMarkModes = document.getElementById("entry-mark-modes");
 const entryMarkSummary = document.getElementById("entry-mark-summary");
 
-/** 题号范围按科目给一套够用的默认值。 */
-const WRONG_QUESTION_RANGES = [
-  { key: "math", match: (subject) => subject.startsWith("数学"), max: 23, label: "数学真题" },
-  { key: "english", match: (subject) => subject.startsWith("英语"), max: 48, label: "英语真题" },
-  { key: "cs408", match: (subject) => subject === "408" || subject.includes("408"), max: 47, label: "408 真题" },
-];
-
 /** wrong 进复盘，correct 只算完成题数。 */
 const ENTRY_MARKS = ["wrong", "correct"];
 const ENTRY_MARK_HINT =
   "先选「做错」或「做对」，再点题号；同一个题号再点一次取消。做对和做错分开统计，做错的自动进入待复盘。";
 let entryMarkMode = "wrong";
 
-function wrongRangeFor(subject) {
-  const key = String(subject || "");
-  return WRONG_QUESTION_RANGES.find((item) => item.match(key)) || WRONG_QUESTION_RANGES[0];
+/**
+ * 当前选择对应的真实题号：
+ *   · 真题按目录里的整卷编号（数学 22/23、英语整卷、408 47）；
+ *   · 习题册按使用者手填的「本章实际题号」，不猜、不补默认范围。
+ */
+function entryQuestionNumbers() {
+  const api = catalog();
+  const item = api ? selectedCatalogSource(entrySubject, entrySource) : null;
+  if (!api || !item) return [];
+  if (item.kind === "zhenti") {
+    return api.questionNumbers(item, {
+      year: entryYear ? entryYear.value : "",
+      paper: entryPaperType ? entryPaperType.value : "",
+      module: selectLabelOf(entryModule),
+    });
+  }
+  return api.parseRange(entryRange ? entryRange.value : "", 500);
+}
+
+/** 题号格上方的说明：真题给整卷范围，习题册提示先填题号。 */
+function entryQuestionHint() {
+  const api = catalog();
+  const item = api ? selectedCatalogSource(entrySubject, entrySource) : null;
+  if (!item) return "先选资料，再点题号标记";
+  const numbers = entryQuestionNumbers();
+  const range = api.formatNumbers(numbers);
+  if (item.kind === "book") {
+    return range
+      ? `${item.label} · 本章实际题号 第 ${range} 题，点哪个算哪个`
+      : `${item.label} · 先在上面填「本章实际题号」（如 1-30、1-10,15,20），再点题号标记`;
+  }
+  const parts = [item.label];
+  if (entryYear && entryYear.value) parts.push(entryYear.value);
+  if (entryPaperType && entryPaperType.value) parts.push(entryPaperType.value);
+  if (selectLabelOf(entryModule)) parts.push(selectLabelOf(entryModule));
+  return range
+    ? `${parts.join(" · ")} · 第 ${range} 题，点哪个算哪个`
+    : `${parts.join(" · ")} · 先选到具体卷型，再点题号标记`;
 }
 
 function setEntryMarkMode(mode) {
@@ -4826,8 +5159,7 @@ function syncWrongGridState() {
       : "未选择";
   }
   if (entryWrongLabel) {
-    const range = wrongRangeFor(entrySubject.value);
-    entryWrongLabel.textContent = `${range.label} · 第 1-${range.max} 题，点哪个算哪个`;
+    entryWrongLabel.textContent = entryQuestionHint();
   }
   syncEntryMarkSummary(counts);
 }
@@ -4835,15 +5167,16 @@ function syncWrongGridState() {
 /** 重画题号格；Map 是题号到标记，数组 / Set 按旧口径当成「全做错」。 */
 function renderWrongGrid(marks = selectedEntryMarks()) {
   if (!entryWrongGrid) return;
-  const range = wrongRangeFor(entrySubject.value);
+  const numbers = entryQuestionNumbers();
+  const max = numbers.length ? Math.max(...numbers) : 0;
   const source =
     marks instanceof Map
       ? marks
       : new Map(
           (Array.isArray(marks) ? marks : [...(marks || [])]).map((number) => [Number(number), "wrong"]),
         );
-  entryWrongGrid.dataset.range = String(range.max);
-  entryWrongGrid.innerHTML = Array.from({ length: range.max }, (_, index) => index + 1)
+  entryWrongGrid.dataset.range = max ? String(max) : "";
+  entryWrongGrid.innerHTML = numbers
     .map((number) => {
       const mark = ENTRY_MARKS.includes(source.get(number)) ? source.get(number) : "";
       const classes = ["question-cell"];
@@ -4927,6 +5260,8 @@ function syncEntryDetails(summary, marks) {
       year: summary.year,
       paper: summary.paper,
       module: summary.module,
+      chapter: summary.chapter,
+      questionRange: summary.questionRange,
       kind: summary.kind,
       round: summary.round,
       status: wrong ? "错题复盘" : "已复盘",
@@ -4946,13 +5281,41 @@ function syncEntryDetails(summary, marks) {
 const taskModal = document.getElementById("task-modal");
 const taskModalTitle = document.getElementById("task-modal-title");
 const taskModalNote = document.getElementById("task-modal-note");
+const taskTypeTabs = document.getElementById("task-type-tabs");
 const taskTitleInput = document.getElementById("task-title");
+const taskTitleField = document.getElementById("task-title-field");
 const taskDateInput = document.getElementById("task-date");
 const taskSubjectInput = document.getElementById("task-subject");
+const taskSubjectField = document.getElementById("task-subject-field");
+const taskSubjectOneInput = document.getElementById("task-subject-one");
+const taskSubjectOneField = document.getElementById("task-subject-one-field");
+const taskRoundInput = document.getElementById("task-round");
+const taskRoundField = document.getElementById("task-round-field");
+const taskSourceInput = document.getElementById("task-source");
+const taskSourceField = document.getElementById("task-source-field");
+const taskYearInput = document.getElementById("task-year");
+const taskYearField = document.getElementById("task-year-field");
+const taskPaperInput = document.getElementById("task-paper");
+const taskPaperField = document.getElementById("task-paper-field");
+const taskModuleInput = document.getElementById("task-module");
+const taskModuleField = document.getElementById("task-module-field");
+const taskModuleLabel = document.getElementById("task-module-label");
+const taskChapterInput = document.getElementById("task-chapter");
+const taskChapterField = document.getElementById("task-chapter-field");
+const taskRangeInput = document.getElementById("task-range");
+const taskRangeField = document.getElementById("task-range-field");
+const taskPreviewField = document.getElementById("task-preview-field");
+const taskPreview = document.getElementById("task-preview");
+const taskVocabDeckInput = document.getElementById("task-vocab-deck");
+const taskVocabDeckField = document.getElementById("task-vocab-deck-field");
+const taskVocabTargetInput = document.getElementById("task-vocab-target");
+const taskVocabTargetField = document.getElementById("task-vocab-target-field");
 const taskMinutesInput = document.getElementById("task-minutes");
 const taskPriorityInput = document.getElementById("task-priority");
 const taskNoteInput = document.getElementById("task-note");
-const TASK_NOTE_DEFAULT = "一行保存一项；保存后每条都能单独修改。";
+const TASK_TYPES = ["custom", "study", "review", "vocab"];
+const TASK_NOTE_DEFAULT =
+  "普通任务一行一项；学习 / 复盘任务选好科目、资料和题号后自动生成任务内容。";
 
 const progressModal = document.getElementById("progress-modal");
 const progressTitle = document.getElementById("progress-title");
@@ -5073,8 +5436,10 @@ function refreshChoiceFields(root = document) {
 function resetEntryForm() {
   entryDate.value = TODAY_KEY;
   if (entrySubject.options.length) entrySubject.selectedIndex = 0;
-  syncEntryOptions();
-  [entrySource, entryPaperType, entryModule, entryYear, entryStatus, entryErrorType].forEach((select) => {
+  if (entryRound) entryRound.value = "1";
+  if (entryKind) entryKind.value = "";
+  syncEntryOptions({ range: "" });
+  [entryStatus, entryErrorType].forEach((select) => {
     if (select && select.options.length) select.selectedIndex = 0;
   });
   entryQuestion.value = "";
@@ -5086,8 +5451,6 @@ function resetEntryForm() {
   entryReview.value = "";
   entryNote.value = "";
   entryLost.value = "";
-  if (entryRound) entryRound.value = "1";
-  if (entryKind) entryKind.value = "";
   modalNote(entryModalNote, ENTRY_NOTE_DEFAULT);
   refreshChoiceFields(entryModal);
   renderWrongGrid([]);
@@ -5106,28 +5469,40 @@ function fillEntryForm(record) {
   entryNote.value = record.note || "";
   if (entryRound) entryRound.value = String(cleanMathRound(record.round));
   modalNote(entryModalNote, ENTRY_NOTE_DEFAULT);
-  syncEntryOptions();
-  setSelectValue(entrySubject, record.subject);
-  syncEntryOptions();
-  setSelectValue(entrySource, record.source);
-  setSelectValue(entryYear, record.year);
-  setSelectValue(entryPaperType, record.paper);
-  setSelectValue(entryModule, record.module);
+  const knownSubject = ["数学一", "数学二", "数学三", "英语一", "英语二", "408"].includes(
+    String(record.subject || ""),
+  );
+  entrySubject.value = knownSubject ? record.subject : "数学一";
+  const item = catalogReady() ? catalog().resolveSource(record.subject, record.source) : null;
+  syncEntryOptions({
+    source: item ? item.id : record.source,
+    year: record.year,
+    paper: record.paper,
+    module: record.module,
+    chapter: record.chapter,
+    range: record.questionRange,
+  });
   setSelectValue(entryStatus, record.status);
   setMultiSelectValue(entryErrorType, record.errorType);
-  setSelectValue(entryKind, record.kind || "");
+  if (entryKind) entryKind.value = record.kind || "";
   refreshChoiceFields(entryModal);
 }
 
+/** 保存时写目录里的正式名称和结构化字段，旧别名只负责搬家、不再写回。 */
 function entryRecordFromForm(existing) {
+  const item = selectedCatalogSource(entrySubject, entrySource);
+  const isZhenti = Boolean(item && item.kind === "zhenti");
+  const isBook = Boolean(item && item.kind === "book");
   return {
     id: existing ? existing.id : "",
     date: entryDate.value || TODAY_KEY,
     subject: entrySubject.value,
-    source: entrySource.value,
-    year: entryYear.value,
-    paper: entryPaperType.value,
-    module: entryModule.value,
+    source: item ? item.label : entrySource.value,
+    year: isZhenti && entryYear ? entryYear.value : "",
+    paper: isZhenti && entryPaperType ? entryPaperType.value : "",
+    module: (isZhenti || isBook) && !entryModuleField?.hidden ? selectLabelOf(entryModule) : "",
+    chapter: isBook && entryChapterField && !entryChapterField.hidden ? selectLabelOf(entryChapter) : "",
+    questionRange: isBook && entryRange ? String(entryRange.value || "").trim() : "",
     status: entryStatus.value,
     question: entryQuestion.value.trim(),
     full: Number(entryFull.value) || 0,
@@ -5210,10 +5585,236 @@ function taskTitlesFromInput(value) {
     .map((line) => line.slice(0, 200));
 }
 
+function currentTaskType() {
+  return TASK_TYPES.includes(state.taskType) ? state.taskType : "custom";
+}
+
+function taskTypeOf(task) {
+  return task && TASK_TYPES.includes(task.taskType) ? task.taskType : "custom";
+}
+
+function structuredTaskType(type = currentTaskType()) {
+  return type === "study" || type === "review";
+}
+
+function syncTaskTypeTabs() {
+  if (!taskTypeTabs) return;
+  const type = currentTaskType();
+  taskTypeTabs.querySelectorAll("[data-task-type]").forEach((button) => {
+    const active = button.dataset.taskType === type;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+}
+
+function taskStructuredFields() {
+  const subject = taskSubjectOneInput ? taskSubjectOneInput.value : "";
+  const source = taskSourceInput ? taskSourceInput.value : "";
+  const item = catalogReady() ? catalog().resolveSource(subject, source) : null;
+  const isZhenti = Boolean(item && item.kind === "zhenti");
+  const isBook = Boolean(item && item.kind === "book");
+  return {
+    subject,
+    source,
+    // 年份 / 套卷只对真题有意义：换成习题册后下拉框藏起来，旧值不能跟着进任务。
+    year: isZhenti && taskYearInput ? taskYearInput.value : "",
+    paper: isZhenti && taskPaperInput ? taskPaperInput.value : "",
+    module: taskModuleInput ? taskModuleInput.value : "",
+    chapter: isBook && taskChapterInput ? taskChapterInput.value : "",
+    questionRange: isBook && taskRangeInput ? String(taskRangeInput.value || "").trim() : "",
+    round: cleanMathRound(taskRoundInput ? taskRoundInput.value : 1),
+  };
+}
+
+function vocabDeckOf(id) {
+  const decks = catalogReady() ? catalog().vocabDecks || [] : [];
+  return decks.find((item) => item.id === id) || decks[0] || null;
+}
+
+function vocabTaskTitle() {
+  const deck = vocabDeckOf(taskVocabDeckInput ? taskVocabDeckInput.value : "");
+  const label = deck ? deck.label : "恋练有词 2027";
+  const target = Math.max(0, Number(taskVocabTargetInput?.value) || 0);
+  return `单词斩 · ${label}${target ? ` · 目标 ${target} 词` : ""}`;
+}
+
+/** 结构化任务的标题由「科目 + 资料 + 年份/套卷 + 分册/章节 + 题号」自动拼出来。 */
+function taskPreviewText() {
+  const type = currentTaskType();
+  if (type === "vocab") return vocabTaskTitle();
+  if (!structuredTaskType(type)) return "";
+  const base = catalogReady() ? catalog().taskTitle(taskStructuredFields()) : "";
+  if (!base) return "";
+  return type === "review" ? `复盘 · ${base}` : base;
+}
+
+function renderTaskPreview() {
+  if (!taskPreview) return;
+  const text = taskPreviewText();
+  taskPreview.textContent = text || "选好科目和资料后自动生成。";
+  taskPreview.classList.toggle("is-empty", !text);
+}
+
+/**
+ * 计划弹窗的选项同步：科目 → 资料 → 年份/套卷 → 分册/章节 → 实际题号。
+ * 和录入成绩共用资料目录，界面上只出现目录里的资料。
+ */
+function syncTaskOptions(preferred = {}) {
+  const type = currentTaskType();
+  const structured = structuredTaskType(type);
+  const vocab = type === "vocab";
+  if (taskTitleField) taskTitleField.hidden = type !== "custom";
+  if (taskSubjectField) taskSubjectField.hidden = type !== "custom";
+  if (taskSubjectOneField) taskSubjectOneField.hidden = !structured;
+  if (taskRoundField) taskRoundField.hidden = !structured;
+  if (taskSourceField) taskSourceField.hidden = !structured;
+  if (taskPreviewField) taskPreviewField.hidden = type === "custom";
+  if (taskVocabDeckField) taskVocabDeckField.hidden = !vocab;
+  if (taskVocabTargetField) taskVocabTargetField.hidden = !vocab;
+  [taskYearField, taskPaperField, taskModuleField, taskChapterField, taskRangeField].forEach(
+    (field) => {
+      if (field) field.hidden = true;
+    },
+  );
+
+  if (!catalogReady()) {
+    renderTaskPreview();
+    return;
+  }
+  const api = catalog();
+
+  if (vocab) {
+    fillCatalogSelect(
+      taskVocabDeckInput,
+      api.vocabDecks.map((deck) => ({ id: deck.id, label: deck.title || deck.label })),
+      preferred.vocabDeck !== undefined
+        ? preferred.vocabDeck
+        : taskVocabDeckInput.value || "llyc2027",
+      "暂无词库",
+    );
+    renderTaskPreview();
+    refreshChoiceFields(taskModal);
+    return;
+  }
+  if (!structured) {
+    renderTaskPreview();
+    refreshChoiceFields(taskModal);
+    return;
+  }
+
+  fillCatalogSelect(
+    taskSubjectOneInput,
+    api.subjects.map((subject) => ({ id: subject, label: subject })),
+    preferred.subject !== undefined ? preferred.subject : taskSubjectOneInput.value || "数学一",
+    "暂无可选科目",
+  );
+  const subject = taskSubjectOneInput.value;
+  const sourceItems = api.sources(subject);
+  const sourceId = fillCatalogSelect(
+    taskSourceInput,
+    sourceItems,
+    preferred.source !== undefined
+      ? catalogSelectValue(sourceItems, preferred.source)
+      : taskSourceInput.value,
+    "该科目暂无资料",
+    defaultCatalogSourceId(sourceItems),
+  );
+  const item = api.source(subject, sourceId);
+  const isZhenti = Boolean(item && item.kind === "zhenti");
+  const isBook = Boolean(item && item.kind === "book");
+
+  if (taskYearField) taskYearField.hidden = !isZhenti;
+  if (taskPaperField) taskPaperField.hidden = !isZhenti;
+  const year = isZhenti
+    ? fillCatalogSelect(
+        taskYearInput,
+        yearOptionList(item.years),
+        preferred.year !== undefined ? preferred.year : taskYearInput.value,
+        "暂无年份",
+      )
+    : "";
+  const paper = isZhenti
+    ? fillCatalogSelect(
+        taskPaperInput,
+        item.papers,
+        preferred.paper !== undefined ? preferred.paper : taskPaperInput.value,
+        "无需选择",
+      )
+    : "";
+
+  const previousModule = taskModuleInput.value;
+  const previousChapter = taskChapterInput.value;
+  const selectionChanged =
+    appliedValueOf(taskSourceInput) !== String(taskSourceInput ? taskSourceInput.value : "") ||
+    appliedValueOf(taskModuleInput) !== String(previousModule) ||
+    appliedValueOf(taskChapterInput) !== String(previousChapter);
+  const moduleItems = isZhenti
+    ? api.modules(item, { year, paper })
+    : isBook
+      ? item.sections
+      : [];
+  const showModule = Boolean((isZhenti || isBook) && moduleItems.length);
+  if (taskModuleField) taskModuleField.hidden = !showModule;
+  if (taskModuleLabel) taskModuleLabel.textContent = isZhenti ? "模块 / 题型" : "分册 / 书目";
+  const moduleId = showModule
+    ? fillCatalogSelect(
+        taskModuleInput,
+        moduleItems,
+        preferred.module !== undefined
+          ? catalogSelectValue(moduleItems, preferred.module)
+          : previousModule,
+        "暂无分册",
+      )
+    : fillCatalogSelect(taskModuleInput, [], "", "");
+
+  const chapterItems = isBook ? api.chapters(item, moduleId) : [];
+  const showChapter = Boolean(isBook && chapterItems.length);
+  if (taskChapterField) taskChapterField.hidden = !showChapter;
+  const chapterId = showChapter
+    ? fillCatalogSelect(
+        taskChapterInput,
+        chapterItems,
+        preferred.chapter !== undefined
+          ? catalogSelectValue(chapterItems, preferred.chapter)
+          : previousChapter,
+        "暂无章节",
+      )
+    : "";
+  // 藏起来的字段不能留着上一份资料的年份 / 套卷 / 章节，否则预览和任务标题会带上旧值。
+  if (!isZhenti) {
+    fillCatalogSelect(taskYearInput, [], "", "");
+    fillCatalogSelect(taskPaperInput, [], "", "");
+  }
+  if (!showChapter) fillCatalogSelect(taskChapterInput, [], "", "");
+
+  // 习题册每章题量各版本不同：题号范围由使用者按手里的书填，填过就记住。
+  const showRange = Boolean(isBook);
+  if (taskRangeField) taskRangeField.hidden = !showRange;
+  if (showRange) {
+    const remembered = api.savedRange(item, moduleId, chapterId);
+    const explicitRange =
+      preferred.range === undefined ? "" : String(preferred.range || "").trim();
+    if (explicitRange) {
+      taskRangeInput.value = explicitRange;
+    } else if (selectionChanged || !taskRangeInput.value || preferred.range !== undefined) {
+      taskRangeInput.value = remembered;
+    }
+  } else if (taskRangeInput) {
+    taskRangeInput.value = "";
+  }
+  markAppliedValue(taskSourceInput, sourceId);
+  markAppliedValue(taskModuleInput, moduleId);
+  markAppliedValue(taskChapterInput, chapterId);
+
+  renderTaskPreview();
+  refreshChoiceFields(taskModal);
+}
+
 function openTaskModal(date = TODAY_KEY, id = "") {
   if (!STORE) return;
   const task = id ? STORE.getTask(id) : null;
   state.taskEditId = task ? task.id : "";
+  state.taskType = task ? taskTypeOf(task) : "custom";
   taskModalTitle.textContent = task ? "修改任务" : "新建任务";
   taskTitleInput.value = task ? task.title : "";
   taskDateInput.value = task && task.date ? task.date : date || TODAY_KEY;
@@ -5221,13 +5822,37 @@ function openTaskModal(date = TODAY_KEY, id = "") {
   taskMinutesInput.value = task && task.minutes ? String(task.minutes) : "";
   taskPriorityInput.value = task && task.priority ? task.priority : "中";
   taskNoteInput.value = task ? task.note : "";
+  if (taskVocabTargetInput) {
+    taskVocabTargetInput.value = task && task.vocabTarget ? String(task.vocabTarget) : "";
+  }
+  if (taskRoundInput) {
+    taskRoundInput.value = String(cleanMathRound(task ? task.round : 1));
+  }
+  syncTaskTypeTabs();
+  if (task && structuredTaskType(taskTypeOf(task))) {
+    syncTaskOptions({
+      subject: task.subject,
+      source: task.source,
+      year: task.year,
+      paper: task.paper,
+      module: task.module,
+      chapter: task.chapter,
+      range: task.questionRange,
+    });
+  } else {
+    syncTaskOptions({ vocabDeck: task ? task.vocabDeck : "" });
+  }
   refreshChoiceFields(taskModal);
   modalNote(
     taskModalNote,
-    task ? "改完立刻生效；粘贴多行会新增其余任务。" : TASK_NOTE_DEFAULT,
+    task
+      ? "改完立刻生效；已完成的学习 / 复盘任务只往章节进度里补，不会倒扣。"
+      : TASK_NOTE_DEFAULT,
   );
   document.body.classList.add("task-open");
-  taskTitleInput.focus();
+  if (currentTaskType() === "custom") taskTitleInput.focus();
+  else if (structuredTaskType()) taskSubjectOneInput?.focus();
+  else taskVocabDeckInput?.focus();
 }
 
 function closeTaskModal() {
@@ -5236,27 +5861,133 @@ function closeTaskModal() {
   modalNote(taskModalNote, TASK_NOTE_DEFAULT);
 }
 
-function saveTask() {
-  if (!STORE) return;
-  const titles = taskTitlesFromInput(taskTitleInput.value);
-  if (!titles.length) {
-    modalNote(taskModalNote, "任务内容不能为空。", true);
-    taskTitleInput.focus();
-    return;
-  }
-  const basePayload = {
+function setTaskType(type) {
+  state.taskType = TASK_TYPES.includes(type) ? type : "custom";
+  syncTaskTypeTabs();
+  syncTaskOptions();
+  modalNote(taskModalNote, TASK_NOTE_DEFAULT);
+}
+
+function taskPayloadBase() {
+  return {
     date: taskDateInput.value || TODAY_KEY,
-    subject: selectedChoiceValues(taskSubjectInput).join("、"),
     minutes: Number(taskMinutesInput.value) || 0,
     priority: taskPriorityInput.value,
     note: taskNoteInput.value.trim(),
   };
-  if (state.taskEditId) {
-    STORE.updateTask(state.taskEditId, { ...basePayload, title: titles[0] });
-    titles.slice(1).forEach((title) => STORE.addTask({ ...basePayload, title }));
-  } else {
-    titles.forEach((title) => STORE.addTask({ ...basePayload, title }));
+}
+
+/** 普通任务：保留「一行一项」的批量输入，一次能加多条。 */
+function saveCustomTasks() {
+  const titles = taskTitlesFromInput(taskTitleInput.value);
+  if (!titles.length) {
+    modalNote(taskModalNote, "任务内容不能为空。", true);
+    taskTitleInput.focus();
+    return false;
   }
+  const payload = {
+    ...taskPayloadBase(),
+    taskType: "custom",
+    subject: selectedChoiceValues(taskSubjectInput).join("、"),
+    source: "",
+    year: "",
+    paper: "",
+    module: "",
+    chapter: "",
+    questionRange: "",
+    vocabDeck: "",
+    vocabTarget: 0,
+    round: 1,
+  };
+  if (state.taskEditId) {
+    const saved = STORE.updateTask(state.taskEditId, { ...payload, title: titles[0] });
+    if (saved) syncTaskProgress(saved);
+    titles.slice(1).forEach((title) => STORE.addTask({ ...payload, title }));
+  } else {
+    titles.forEach((title) => STORE.addTask({ ...payload, title }));
+  }
+  return true;
+}
+
+function saveStructuredTask() {
+  const type = currentTaskType();
+  const fields = taskStructuredFields();
+  const item = catalogReady() ? catalog().resolveSource(fields.subject, fields.source) : null;
+  if (!item) {
+    modalNote(taskModalNote, "先选好科目和资料，再保存。", true);
+    return false;
+  }
+  const isBook = item.kind === "book";
+  if (isBook && !fields.questionRange) {
+    modalNote(taskModalNote, "习题册要填本章实际题号，章节进度按题号累计。", true);
+    taskRangeInput?.focus();
+    return false;
+  }
+  const title = taskPreviewText();
+  if (!title) {
+    modalNote(taskModalNote, "任务内容还没生成，检查一下科目和资料。", true);
+    return false;
+  }
+  if (isBook) {
+    catalog().rememberRange(item, taskModuleInput.value, taskChapterInput.value, fields.questionRange);
+  }
+  const payload = {
+    ...taskPayloadBase(),
+    title,
+    taskType: type,
+    subject: fields.subject,
+    source: selectLabelOf(taskSourceInput) || item.label,
+    year: fields.year,
+    paper: fields.paper,
+    module: selectLabelOf(taskModuleInput),
+    chapter: isBook ? selectLabelOf(taskChapterInput) : "",
+    questionRange: isBook ? fields.questionRange : "",
+    vocabDeck: "",
+    vocabTarget: 0,
+    round: fields.round,
+  };
+  const saved = state.taskEditId
+    ? STORE.updateTask(state.taskEditId, payload)
+    : STORE.addTask(payload);
+  if (saved) syncTaskProgress(saved);
+  return true;
+}
+
+function saveVocabTask() {
+  const deck = vocabDeckOf(taskVocabDeckInput ? taskVocabDeckInput.value : "");
+  const target = Math.max(0, Number(taskVocabTargetInput?.value) || 0);
+  const payload = {
+    ...taskPayloadBase(),
+    title: vocabTaskTitle(),
+    taskType: "vocab",
+    subject: deck && deck.id === "kaoyan2" ? "英语二" : "英语一",
+    source: "",
+    year: "",
+    paper: "",
+    module: "",
+    chapter: "",
+    questionRange: "",
+    vocabDeck: deck ? deck.id : "llyc2027",
+    vocabTarget: target,
+    round: 1,
+  };
+  const saved = state.taskEditId
+    ? STORE.updateTask(state.taskEditId, payload)
+    : STORE.addTask(payload);
+  if (saved) syncTaskProgress(saved);
+  return true;
+}
+
+function saveTask() {
+  if (!STORE) return;
+  const type = currentTaskType();
+  const ok =
+    type === "custom"
+      ? saveCustomTasks()
+      : type === "vocab"
+        ? saveVocabTask()
+        : saveStructuredTask();
+  if (!ok) return;
   closeTaskModal();
   render();
 }
@@ -5517,33 +6248,87 @@ async function readImportFile(file) {
   }
 }
 
-function editEntry(description) {
-  openEntry("edit", description);
-  if (description.includes("英语一")) entrySubject.value = "英语一";
-  else if (description.includes("英语二")) entrySubject.value = "英语二";
-  else if (description.includes("408")) entrySubject.value = "408";
-  else entrySubject.value = "数学一";
-  syncEntryOptions();
-
-  const yearMatch = description.match(/(20\d{2})/);
-  if (yearMatch && [...document.getElementById("entry-year").options].some((option) => option.value === yearMatch[1])) {
-    document.getElementById("entry-year").value = yearMatch[1];
+/** 从「科目 · 资料 · 年份 · 模块 · 第 X 题」这类历史描述里还原目录选择。 */
+function guessCatalogSelection(subject, text) {
+  const api = catalog();
+  const out = { source: "", year: "", paper: "", module: "", chapter: "" };
+  if (!api || !text) return out;
+  const sourceItems = api.sources(subject);
+  const aliases = sourceItems.map((item) => [item.label, item]);
+  [
+    "武忠祥复习全书",
+    "复习全书",
+    "张宇1000题",
+    "新东方1000题",
+    "李永乐660题",
+    "李林880题",
+    "660",
+    "880",
+    "数学一真题",
+    "数学二真题",
+    "数学三真题",
+    "历年真题",
+    "英语一真题",
+    "英语二真题",
+    "王道课后题",
+    "王道",
+    "408 历年真题",
+    "408真题",
+    "408 真题",
+  ].forEach((alias) => {
+    const hit = api.resolveSource(subject, alias);
+    if (hit) aliases.push([alias, hit]);
+  });
+  let best = null;
+  aliases.forEach(([alias, item]) => {
+    if (!text.includes(alias)) return;
+    if (!best || alias.length > best[0].length) best = [alias, item];
+  });
+  const item = best ? best[1] : sourceItems[0] || null;
+  if (!item) return out;
+  out.source = item.id;
+  const yearMatch = String(text).match(/(20\d{2})/);
+  if (yearMatch && Array.isArray(item.years) && item.years.includes(Number(yearMatch[1]))) {
+    out.year = yearMatch[1];
   }
-  if (description.includes("王道")) entrySource.value = "王道课后题";
-  else if (entrySubject.value === "408") entrySource.value = "408真题";
-  else if (entrySubject.value.startsWith("英语")) entrySource.value = `${entrySubject.value}真题`;
-  else entrySource.value = "数学一真题";
+  if (Array.isArray(item.papers) && item.papers.length === 1) out.paper = item.papers[0];
+  const moduleItems =
+    item.kind === "zhenti"
+      ? api.modules(item, { year: out.year || item.years?.[item.years.length - 1], paper: out.paper })
+      : item.sections || [];
+  const moduleHit = optionList(moduleItems).find((option) => text.includes(option.label));
+  if (moduleHit) out.module = moduleHit.value;
+  const chapterItems = item.kind === "book" ? api.chapters(item, out.module) : [];
+  const chapterHit = optionList(chapterItems).find((option) => text.includes(option.label));
+  if (chapterHit) out.chapter = chapterHit.value;
+  return out;
+}
 
-  if (description.includes("无穷级数") && entrySubject.value === "数学一") entryModule.value = "高等数学 · 无穷级数";
-  if (description.includes("多元函数") && entrySubject.value === "数学一") entryModule.value = "高等数学 · 多元函数微分学";
-  if (description.includes("Cache")) entryModule.value = "王道 · 计算机组成原理";
-  if (description.includes("内存管理")) entryModule.value = "王道 · 操作系统";
+function editEntry(description) {
+  const text = String(description || "");
+  openEntry("edit", text);
+  const subject = text.includes("英语二")
+    ? "英语二"
+    : text.includes("英语一")
+      ? "英语一"
+      : text.includes("408")
+        ? "408"
+        : text.includes("数学三")
+          ? "数学三"
+          : text.includes("数学二")
+            ? "数学二"
+            : "数学一";
+  entrySubject.value = subject;
+  syncEntryOptions(guessCatalogSelection(subject, text));
 
-  const match = description.match(/(第\s*\d+\s*题|Text\s*\d+\s*第\s*\d+\s*题|完形\s*第\s*\d+\s*题|翻译\s*第\s*\d+\s*题)/i);
-  entryQuestion.value = match ? match[0] : description;
-  entryFull.value = entrySubject.value.startsWith("英语") ? "2" : "10";
-  entryScore.value = description.includes("2025") ? "6" : description.includes("2024") ? "5" : "4";
+  const match = text.match(
+    /(第\s*\d+\s*题|Text\s*\d+\s*第\s*\d+\s*题|完形\s*第\s*\d+\s*题|翻译\s*第\s*\d+\s*题)/i,
+  );
+  entryQuestion.value = match ? match[0] : text;
+  entryFull.value = subject.startsWith("英语") ? "2" : "10";
+  entryScore.value = text.includes("2025") ? "6" : text.includes("2024") ? "5" : "4";
   updateLostScore();
+  renderWrongGrid([]);
 }
 
 function setPanelOption(button, attribute) {
@@ -5611,12 +6396,17 @@ document.addEventListener("click", (event) => {
   const entrySubjectButton = event.target.closest("[data-open-entry-subject]");
   if (entrySubjectButton) {
     openEntry("create");
-    setSelectValue(entrySubject, entrySubjectButton.dataset.openEntrySubject);
-    syncEntryOptions();
-    setSelectValue(entrySource, entrySubjectButton.dataset.entrySource);
+    const subject = entrySubjectButton.dataset.openEntrySubject || "数学一";
+    setSelectValue(entrySubject, subject);
+    // 页面上的按钮可能还带着旧资料名（例如「历年真题」），先翻译成目录里的正式资料，
+    // 否则会把已经下线的旧选项重新塞回下拉框。
+    const rawSource = entrySubjectButton.dataset.entrySource || "";
+    const item = catalogReady() ? catalog().resolveSource(subject, rawSource) : null;
+    syncEntryOptions({ source: item ? item.id : rawSource });
+    refreshChoiceFields(entryModal);
     if (entryRound) {
       const selectedBook = YM_BY_KEY[state.mathResource] || null;
-      const fallbackRound = selectedBook && String(entrySubjectButton.dataset.openEntrySubject || "").startsWith("数学")
+      const fallbackRound = selectedBook && String(subject).startsWith("数学")
         ? mathBookRound(selectedBook.key)
         : 1;
       entryRound.value = String(cleanMathRound(entrySubjectButton.dataset.entryRound || fallbackRound));
@@ -5734,7 +6524,9 @@ document.addEventListener("click", (event) => {
   if (taskToggleButton && STORE) {
     const task = STORE.getTask(taskToggleButton.dataset.taskToggle);
     if (task) {
-      STORE.updateTask(task.id, { done: !task.done });
+      const updated = STORE.updateTask(task.id, { done: !task.done });
+      // 勾完成的学习 / 复盘任务立刻补进章节进度；只加不减，取消勾选不倒扣。
+      if (updated) syncTaskProgress(updated);
       render();
     }
     return;
@@ -6012,7 +6804,21 @@ document.getElementById("cancel-edit").addEventListener("click", () => {
   resetEntryForm();
 });
 document.getElementById("save-entry").addEventListener("click", saveEntry);
-entrySubject.addEventListener("change", syncEntryOptions);
+entrySubject.addEventListener("change", () => syncEntryOptions());
+entrySource.addEventListener("change", () => syncEntryOptions());
+entryYear.addEventListener("change", () => renderWrongGrid([]));
+entryPaperType.addEventListener("change", () => syncEntryOptions());
+entryModule.addEventListener("change", () => syncEntryOptions());
+entryChapter?.addEventListener("change", () => syncEntryOptions());
+entryRange?.addEventListener("input", () => {
+  renderWrongGrid(selectedEntryMarks());
+  if (STORE && catalogReady()) {
+    const item = selectedCatalogSource(entrySubject, entrySource);
+    if (item && item.kind === "book") {
+      catalog().rememberRange(item, entryModule.value, entryChapter.value, entryRange.value);
+    }
+  }
+});
 entryStatus.addEventListener("change", syncWrongFieldVisibility);
 entryRound?.addEventListener("change", syncWrongGridState);
 entryFull.addEventListener("input", updateLostScore);
@@ -6027,8 +6833,65 @@ document.getElementById("save-task").addEventListener("click", saveTask);
 taskModal.addEventListener("click", (event) => {
   if (event.target === taskModal) closeTaskModal();
 });
+
+// 任务类型页签：普通任务 / 学习任务 / 复盘任务 / 单词斩，切换时按目录重建选项。
+taskTypeTabs?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-task-type]");
+  if (!button) return;
+  setTaskType(button.dataset.taskType);
+});
+
+// 结构化的五级联动：科目 → 资料 → 年份/套卷 → 分册/章节 → 题号。
+[
+  taskSubjectOneInput,
+  taskSourceInput,
+  taskYearInput,
+  taskPaperInput,
+  taskModuleInput,
+  taskChapterInput,
+  taskRoundInput,
+].forEach((select) => {
+  select?.addEventListener("change", () => {
+    syncTaskOptions();
+    renderTaskPreview();
+    refreshChoiceFields(taskModal);
+  });
+});
+taskVocabDeckInput?.addEventListener("change", () => {
+  renderTaskPreview();
+  refreshChoiceFields(taskModal);
+});
+taskVocabTargetInput?.addEventListener("input", renderTaskPreview);
+taskRangeInput?.addEventListener("input", () => {
+  renderTaskPreview();
+  // 题号范围按「资料 + 分册 + 章节」记住，和录入成绩共用同一份记忆。
+  if (STORE && catalogReady()) {
+    const item = selectedCatalogSource(taskSubjectOneInput, taskSourceInput);
+    if (item && item.kind === "book") {
+      catalog().rememberRange(
+        item,
+        taskModuleInput.value,
+        taskChapterInput.value,
+        taskRangeInput.value,
+      );
+    }
+  }
+});
+refreshChoiceFields(taskModal);
+
+// 普通任务是「一行一项」：回车换行，Ctrl / Cmd + 回车才保存；单行输入框回车直接保存。
 taskTitleInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") saveTask();
+  if (event.key !== "Enter") return;
+  if (!event.ctrlKey && !event.metaKey) return;
+  event.preventDefault();
+  saveTask();
+});
+taskModal.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const target = event.target;
+  if (!target || !target.matches || !target.matches("input")) return;
+  event.preventDefault();
+  saveTask();
 });
 
 document.getElementById("close-progress").addEventListener("click", closeProgressModal);
@@ -6291,6 +7154,7 @@ async function initAccount() {
   if (STORE) {
     // 全量同步会把云端合并结果写回本地存储，这里重新读一次再渲染。
     STORE.reload();
+    syncCompletedTasks();
     render();
   }
 }
@@ -6310,6 +7174,8 @@ if (new URLSearchParams(location.search).get("entry") === "1") {
   openEntry(state.entryMode, record);
 }
 
+// 刷新 / 同步回来的已完成任务也要补一次章节进度，避免换设备后数字对不上。
+syncCompletedTasks();
 render();
 loadLlycDeckMeta();
 initAccount();
