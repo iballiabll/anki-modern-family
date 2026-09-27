@@ -10,7 +10,9 @@
   "use strict";
 
   const KEY = "yantu:v1";
-  const VERSION = 1;
+  const VERSION = 2;
+  const MIN_ROUND = 1;
+  const MAX_ROUND = 5;
 
   function nowISO() {
     return new Date().toISOString();
@@ -33,12 +35,30 @@
       tasks: [],
       records: [],
       progress: {},
+      bookRounds: {},
       meta: { createdAt: nowISO(), updatedAt: "" },
     };
   }
 
   function isObject(value) {
     return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  }
+
+  function cleanRound(value, fallback = MIN_ROUND) {
+    const number = Math.round(Number(value));
+    if (!Number.isFinite(number)) return fallback;
+    return Math.max(MIN_ROUND, Math.min(MAX_ROUND, number));
+  }
+
+  function cleanBookRounds(value) {
+    const out = {};
+    if (!isObject(value)) return out;
+    for (const [key, round] of Object.entries(value)) {
+      const normalizedKey = String(key || "").trim().slice(0, 160);
+      if (!normalizedKey) continue;
+      out[normalizedKey] = cleanRound(round);
+    }
+    return out;
   }
 
   /** 把线上/导入的数据补全成当前版本的结构，缺字段一律退回默认值。 */
@@ -96,10 +116,12 @@
         errorCount: Math.max(0, Number(record.errorCount) || 0),
         explanation: String(record.explanation || "").slice(0, 6000),
         note: String(record.note || "").slice(0, 2000),
+        round: cleanRound(record.round),
         createdAt: String(record.createdAt || nowISO()),
         updatedAt: String(record.updatedAt || record.createdAt || nowISO()),
       })),
       progress: progress(),
+      bookRounds: cleanBookRounds(raw.bookRounds),
       meta: {
         createdAt: String(raw.meta?.createdAt || nowISO()),
         updatedAt: String(raw.meta?.updatedAt || ""),
@@ -183,6 +205,7 @@
       errorCount: Math.max(0, Number(pick("errorCount")) || 0),
       explanation: String(pick("explanation") || "").slice(0, 6000),
       note: String(pick("note") || "").slice(0, 2000),
+      round: cleanRound(pick("round"), cleanRound(previous.round)),
       createdAt: String(source.createdAt || previous.createdAt || nowISO()),
       updatedAt: nowISO(),
     };
@@ -322,6 +345,18 @@
     progressOf(key) {
       return state.progress[key] || null;
     },
+    bookRound(key) {
+      const normalizedKey = String(key || "").trim();
+      return normalizedKey ? cleanRound(state.bookRounds[normalizedKey]) : MIN_ROUND;
+    },
+    setBookRound(key, round) {
+      const normalizedKey = String(key || "").trim().slice(0, 160);
+      if (!normalizedKey) return MIN_ROUND;
+      const value = cleanRound(round);
+      state.bookRounds[normalizedKey] = value;
+      persist("book-round");
+      return value;
+    },
     setProgress(key, patch) {
       if (!key) return null;
       state.progress[key] = cleanProgress({ ...(state.progress[key] || {}), ...(isObject(patch) ? patch : {}) });
@@ -333,6 +368,17 @@
       delete state.progress[key];
       persist("progress");
       return true;
+    },
+    removeProgressKeys(keys) {
+      const list = (Array.isArray(keys) ? keys : [keys]).map((key) => String(key || "")).filter(Boolean);
+      let removed = false;
+      for (const key of list) {
+        if (!state.progress[key]) continue;
+        delete state.progress[key];
+        removed = true;
+      }
+      if (removed) persist("progress");
+      return removed;
     },
     enteredChapters() {
       return Object.keys(state.progress).length;

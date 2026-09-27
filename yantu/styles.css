@@ -2748,6 +2748,22 @@ body.entry-edit .record-banner {
     padding-right: 16px;
     padding-left: 16px;
   }
+
+  .modal-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .modal-actions .secondary-btn,
+  .modal-actions .primary-btn {
+    flex: 1 1 auto;
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 920px) {
@@ -4494,5 +4510,181 @@ body.entry-edit .record-banner {
 @media (max-width: 1240px) {
   .cs408-panel .analysis-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- 封神之路 · 资料分类与一刷到五刷 ---------- */
+
+.book-tab b {
+  align-self: flex-start;
+  padding: 2px 7px;
+  color: #1d4ed8;
+  background: var(--blue-soft);
+  border: 1px solid #d7e4ff;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.book-tab .book-tab-rounds {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.book-tab .book-tab-rounds i {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  color: var(--muted-2);
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 5px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.book-tab .book-tab-rounds i.complete {
+  color: #1d4ed8;
+  background: var(--blue-soft);
+  border-color: #c7dbff;
+}
+
+.book-tab .book-tab-rounds i.active {
+  color: #fff;
+  background: var(--book-color, var(--blue));
+  border-color: var(--book-color, var(--blue));
+}
+
+.round-board {
+  margin-bottom: 14px;
+}
+
+.round-board-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.round-board-head .card-note {
+  margin-top: 5px;
+}
+
+.round-switcher {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 8px;
+}
+
+.round-button {
+  display: grid;
+  gap: 3px;
+  padding: 10px 11px;
+  text-align: left;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 7px;
+  transition: 140ms ease;
+}
+
+.round-button span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.round-button strong {
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.round-button em {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.round-button:hover {
+  border-color: #cbd8e6;
+}
+
+.round-button.complete {
+  background: var(--blue-soft);
+  border-color: #c7dbff;
+}
+
+.round-button.active {
+  background: #fff;
+  border-color: var(--blue);
+  box-shadow: inset 0 -3px 0 var(--blue);
+}
+
+.round-button.active span {
+  color: #1d4ed8;
+}
+
+.resource-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.resource-meta-line span {
+  padding: 2px 8px;
+  color: #475569;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.progress-round-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.progress-round-options button {
+  height: 36px;
+  color: var(--muted);
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: 140ms ease;
+}
+
+.progress-round-options button:hover {
+  color: #1d4ed8;
+  border-color: #c7dbff;
+}
+
+.progress-round-options button.active {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+@media (max-width: 620px) {
+  .round-switcher {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .progress-round-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

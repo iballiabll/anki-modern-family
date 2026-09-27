@@ -179,6 +179,16 @@
               </select>
             </div>
             <div class="field">
+              <label for="entry-round">刷题轮次</label>
+              <select id="entry-round">
+                <option value="1">一刷 · 基础覆盖</option>
+                <option value="2">二刷 · 强化巩固</option>
+                <option value="3">三刷 · 错题回炉</option>
+                <option value="4">四刷 · 套卷冲刺</option>
+                <option value="5">五刷 · 考前保温</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="entry-source">来源 / 试卷</label>
               <select id="entry-source">
                 <option>数学一真题</option>
@@ -389,6 +399,16 @@
         </div>
         <div class="modal-body">
           <div class="form-grid">
+            <div class="field span-12">
+              <label>本轮刷题</label>
+              <div class="progress-round-options" id="progress-round-options" role="tablist" aria-label="本轮刷题">
+                <button type="button" role="tab" data-progress-round="1">一刷</button>
+                <button type="button" role="tab" data-progress-round="2">二刷</button>
+                <button type="button" role="tab" data-progress-round="3">三刷</button>
+                <button type="button" role="tab" data-progress-round="4">四刷</button>
+                <button type="button" role="tab" data-progress-round="5">五刷</button>
+              </div>
+            </div>
             <div class="field">
               <label for="progress-done">已完成题数</label>
               <div class="input-suffix">

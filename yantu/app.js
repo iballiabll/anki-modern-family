@@ -1966,26 +1966,63 @@ function mathBook() {
   return YM_BY_KEY[state.mathResource] || YM_BOOKS[0] || null;
 }
 
+const MATH_ROUNDS = [
+  { value: 1, label: "一刷", plan: "基础覆盖" },
+  { value: 2, label: "二刷", plan: "强化巩固" },
+  { value: 3, label: "三刷", plan: "错题回炉" },
+  { value: 4, label: "四刷", plan: "套卷冲刺" },
+  { value: 5, label: "五刷", plan: "考前保温" },
+];
+
+function cleanMathRound(value) {
+  const number = Math.round(Number(value));
+  if (!Number.isFinite(number)) return 1;
+  return Math.max(1, Math.min(5, number));
+}
+
+function mathRoundMeta(value) {
+  const round = cleanMathRound(value);
+  return MATH_ROUNDS.find((item) => item.value === round) || MATH_ROUNDS[0];
+}
+
+function mathBookRoundKey(bookKey) {
+  return `math:${bookKey}`;
+}
+
+function mathBookRound(bookKey) {
+  return STORE ? cleanMathRound(STORE.bookRound(mathBookRoundKey(bookKey))) : 1;
+}
+
 function clampIndex(value, length) {
   return length ? Math.max(0, Math.min(Number(value) || 0, length - 1)) : 0;
 }
 
 /** 每本书、每个分册、每一章单独一个进度键，互不共用。 */
-function mathProgressKey(bookKey, sectionName, chapter) {
+function mathProgressKey(bookKey, sectionName, chapter, round = mathBookRound(bookKey)) {
+  return `math:${bookKey}:r${cleanMathRound(round)}:${sectionName}:${chapter}`;
+}
+
+/** v1 的旧进度没有轮次字段，统一按一刷读取；保存一刷后写入新键。 */
+function legacyMathProgressKey(bookKey, sectionName, chapter) {
   return `math:${bookKey}:${sectionName}:${chapter}`;
 }
 
-function mathChapterInfo(book, section, chapter) {
-  const saved = STORE ? STORE.progressOf(mathProgressKey(book.key, section.name, chapter)) : null;
+function mathChapterInfo(book, section, chapter, round = mathBookRound(book.key)) {
+  const normalizedRound = cleanMathRound(round);
+  const key = mathProgressKey(book.key, section.name, chapter, normalizedRound);
+  const legacyKey = legacyMathProgressKey(book.key, section.name, chapter);
+  const saved = STORE
+    ? STORE.progressOf(key) || (normalizedRound === 1 ? STORE.progressOf(legacyKey) : null)
+    : null;
   const done = saved ? saved.done : 0;
   const total = saved ? saved.total : 0;
   const accuracy = saved ? saved.accuracy : 0;
   const wrong = saved ? saved.wrong : 0;
   const percent = total ? Math.min(100, Math.round((done / total) * 100)) : done ? 100 : 0;
-  return { saved, done, total, accuracy, wrong, percent, entered: Boolean(saved) };
+  return { saved, done, total, accuracy, wrong, percent, entered: Boolean(saved), round: normalizedRound, key, legacyKey };
 }
 
-function mathSectionStats(book, section) {
+function mathSectionStats(book, section, round = mathBookRound(book.key)) {
   const chapters = Array.isArray(section.chapters) ? section.chapters : [];
   let done = 0;
   let total = 0;
@@ -1993,7 +2030,7 @@ function mathSectionStats(book, section) {
   let accuracyWeight = 0;
   let entered = 0;
   for (const chapter of chapters) {
-    const info = mathChapterInfo(book, section, chapter);
+    const info = mathChapterInfo(book, section, chapter, round);
     done += info.done;
     total += info.total;
     wrong += info.wrong;
@@ -2004,7 +2041,7 @@ function mathSectionStats(book, section) {
   return { done, total, wrong, accuracy, entered, chapters: chapters.length };
 }
 
-function mathBookStats(book) {
+function mathBookStats(book, round = mathBookRound(book.key)) {
   let done = 0;
   let total = 0;
   let wrong = 0;
@@ -2012,7 +2049,7 @@ function mathBookStats(book) {
   let entered = 0;
   let chapters = 0;
   for (const section of book.sections || []) {
-    const stats = mathSectionStats(book, section);
+    const stats = mathSectionStats(book, section, round);
     done += stats.done;
     total += stats.total;
     wrong += stats.wrong;
@@ -2028,6 +2065,62 @@ function mathBookStats(book) {
     chapters,
     accuracy: done ? Math.round(accuracyWeight / done) : 0,
   };
+}
+
+function mathRoundStats(book, round = mathBookRound(book.key)) {
+  const normalizedRound = cleanMathRound(round);
+  if (book.kind === "zhenti") {
+    const years = Array.isArray(book.years) ? book.years.length : 0;
+    const records = STORE
+      ? STORE.records().filter((record) => mathRecordMatch(record, book) && cleanMathRound(record.round) === normalizedRound)
+      : [];
+    const done = records.length;
+    return {
+      done,
+      total: years,
+      chapters: years,
+      entered: done,
+      percent: years ? Math.min(100, Math.round((done / years) * 100)) : 0,
+      summary: `${done}/${years || "未设"} 套`,
+    };
+  }
+  const stats = mathBookStats(book, normalizedRound);
+  return {
+    ...stats,
+    percent: stats.chapters ? Math.min(100, Math.round((stats.entered / stats.chapters) * 100)) : 0,
+    summary: `${stats.entered}/${stats.chapters} 章`,
+  };
+}
+
+function mathRoundSwitcher(book) {
+  const current = mathBookRound(book.key);
+  const currentMeta = mathRoundMeta(current);
+  return `
+    <section class="card card-pad round-board">
+      <div class="round-board-head">
+        <div>
+          <h2 class="card-title">刷题轮次</h2>
+          <p class="card-note">每一轮的章节进度和真题记录独立保存；当前是 ${currentMeta.label} · ${currentMeta.plan}。</p>
+        </div>
+        <span class="tag blue">${currentMeta.label}</span>
+      </div>
+      <div class="round-switcher" role="tablist" aria-label="${escapeAttr(book.tab)} 刷题轮次">
+        ${MATH_ROUNDS.map((round) => {
+          const stats = mathRoundStats(book, round.value);
+          const active = round.value === current;
+          const complete = stats.chapters > 0 && stats.entered >= stats.chapters;
+          return `
+            <button class="round-button ${active ? "active" : ""} ${complete ? "complete" : ""}" type="button"
+              role="tab" aria-selected="${active ? "true" : "false"}" data-math-round="${round.value}">
+              <span>${round.label}</span>
+              <strong>${stats.summary}</strong>
+              <em>${round.plan}${stats.percent ? ` · ${stats.percent}%` : ""}</em>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function mathRecordMatch(record, book) {
@@ -2047,7 +2140,7 @@ function bookRecordTable(book, records) {
         ${icon("clipboard-list")}
         <strong>还没有这本书的记录</strong>
         <span>做完整章或整套卷后，用「录入成绩」记一次，进度和正确率会自动汇总。</span>
-        <button class="secondary-btn" type="button" data-open-entry-subject="${escapeAttr(book.kind === "zhenti" ? "数学一" : "数学一")}" data-entry-source="${escapeAttr(book.tab)}">录入一条记录</button>
+        <button class="secondary-btn" type="button" data-open-entry-subject="数学一" data-entry-source="${escapeAttr(book.tab)}" data-entry-round="${mathBookRound(book.key)}">录入一条记录</button>
       </div>
     `;
   }
@@ -2055,7 +2148,7 @@ function bookRecordTable(book, records) {
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>日期</th><th>来源</th><th>章节 / 卷面</th><th>得分</th><th>正确率</th><th>备注</th><th>操作</th></tr>
+          <tr><th>日期</th><th>轮次</th><th>来源</th><th>章节 / 卷面</th><th>得分</th><th>正确率</th><th>备注</th><th>操作</th></tr>
         </thead>
         <tbody>
           ${records
@@ -2065,6 +2158,7 @@ function bookRecordTable(book, records) {
               return `
                 <tr>
                   <td>${escapeHtml(record.date)}</td>
+                  <td><span class="tag blue">${escapeHtml(mathRoundMeta(record.round).label)}</span></td>
                   <td>${escapeHtml(record.source || record.subject)}</td>
                   <td>${escapeHtml(record.module || record.paper || "-")}${record.question ? ` · ${escapeHtml(record.question)}` : ""}</td>
                   <td class="score ${rate >= 80 ? "good" : rate >= 65 ? "warn" : "bad"}">${record.full ? `${record.score}/${record.full}` : record.count ? `${record.correct}/${record.count}` : "-"}</td>
@@ -2086,9 +2180,13 @@ function bookRecordTable(book, records) {
 
 function mathBookPage(book) {
   const [bookColor, bookSoft] = accentMap[book.tone] || accentMap.blue;
-  const stats = mathBookStats(book);
+  const currentRound = mathBookRound(book.key);
+  const currentRoundMeta = mathRoundMeta(currentRound);
+  const stats = book.kind === "zhenti" ? mathRoundStats(book, currentRound) : mathBookStats(book, currentRound);
   const percent = stats.total ? Math.min(100, Math.round((stats.done / stats.total) * 100)) : 0;
-  const records = STORE ? STORE.records().filter((record) => mathRecordMatch(record, book)) : [];
+  const records = STORE
+    ? STORE.records().filter((record) => mathRecordMatch(record, book) && cleanMathRound(record.round) === currentRound)
+    : [];
 
   if (book.kind === "zhenti") {
     return `
@@ -2098,9 +2196,15 @@ function mathBookPage(book) {
           <div class="resource-title-row">
             <h2>${escapeHtml(book.title)}</h2>
             <span class="tag ${book.tone}">真题</span>
+            <span class="tag blue resource-category">${escapeHtml(book.category)}</span>
             <span class="tag">${escapeHtml(book.meta)}</span>
           </div>
           <p>${escapeHtml(book.note)}</p>
+          <div class="resource-meta-line">
+            <span>${escapeHtml(book.focus)}</span>
+            <span>${escapeHtml(book.stage)}</span>
+            <span>${currentRoundMeta.label} · ${currentRoundMeta.plan}</span>
+          </div>
         </div>
         <div class="resource-progress">
           <div class="resource-progress-top">
@@ -2109,11 +2213,12 @@ function mathBookPage(book) {
             <em>${book.years ? book.years[0] : ""}–${book.years ? book.years[book.years.length - 1] : ""}</em>
           </div>
           ${progressBar(book.years && book.years.length ? Math.round((records.length / book.years.length) * 100) : 0, book.tone)}
-          <div class="resource-progress-foot"><span>数一为主线</span><span>数二 / 数三补充</span></div>
+          <div class="resource-progress-foot"><span>${currentRoundMeta.label}已录入 ${records.length} 套</span><span>数一 / 数二 / 数三</span></div>
         </div>
       </section>
+      ${mathRoundSwitcher(book)}
       <div class="kpi-grid">
-        ${kpiCard({ label: "已录入真题", value: records.length, unit: "套", sub: `共 ${book.years ? book.years.length : 0} 个年份可选`, iconName: "layers", accent: "blue" })}
+        ${kpiCard({ label: `${currentRoundMeta.label}真题`, value: records.length, unit: "套", sub: `共 ${book.years ? book.years.length : 0} 个年份可选`, iconName: "layers", accent: "blue" })}
         ${kpiCard({ label: "最近一次", value: records[0] && records[0].full ? records[0].score : "—", unit: records[0] && records[0].full ? `/${records[0].full}` : "", sub: records[0] ? `${records[0].date} · ${records[0].paper || records[0].subject}` : "还没有记录", iconName: "file-check-2", accent: "violet" })}
         ${kpiCard({ label: "平均得分率", value: records.length ? Math.round(records.filter((item) => item.full).reduce((sum, item) => sum + item.score / item.full, 0) / Math.max(1, records.filter((item) => item.full).length) * 100) : "—", unit: "%", sub: "只统计填了满分的套卷", iconName: "target", accent: "coral" })}
         ${kpiCard({ label: "待复盘错题", value: records.filter((item) => item.reviewDate).length, unit: "条", sub: "填了下次复盘日期的记录", iconName: "notebook-tabs", accent: "amber" })}
@@ -2123,9 +2228,9 @@ function mathBookPage(book) {
           <div class="card-head">
             <div>
               <h2 class="card-title">真题分卷记录</h2>
-              <p class="card-note">数一、数二、数三分开记；每套卷一条记录，得分率自动计算。</p>
+              <p class="card-note">当前只看 ${currentRoundMeta.label}；数一、数二、数三分开记，每套卷一条记录。</p>
             </div>
-            <button class="primary-btn" type="button" data-open-entry-subject="数学一" data-entry-source="历年真题">${icon("plus")} 录入真题成绩</button>
+            <button class="primary-btn" type="button" data-open-entry-subject="数学一" data-entry-source="历年真题" data-entry-round="${currentRound}">${icon("plus")} 录入${currentRoundMeta.label}成绩</button>
           </div>
           ${bookRecordTable(book, records)}
         </section>
@@ -2137,7 +2242,7 @@ function mathBookPage(book) {
   const sectionIndex = clampIndex(state.mathSection, sections.length);
   const section = sections[sectionIndex] || { name: "", short: "", chapters: [] };
   const chapters = Array.isArray(section.chapters) ? section.chapters : [];
-  const sectionStats = mathSectionStats(book, section);
+  const sectionStats = mathSectionStats(book, section, currentRound);
 
   return `
     <section class="card resource-banner" style="--res-color:${bookColor};--res-soft:${bookSoft}">
@@ -2146,9 +2251,15 @@ function mathBookPage(book) {
         <div class="resource-title-row">
           <h2>${escapeHtml(book.title)}</h2>
           <span class="tag ${book.tone}">${escapeHtml(book.tab)}</span>
+          <span class="tag blue resource-category">${escapeHtml(book.category)}</span>
           <span class="tag">${escapeHtml(book.meta)}</span>
         </div>
         <p>${escapeHtml(book.note)}</p>
+        <div class="resource-meta-line">
+          <span>${escapeHtml(book.focus)}</span>
+          <span>${escapeHtml(book.stage)}</span>
+          <span>${currentRoundMeta.label} · ${currentRoundMeta.plan}</span>
+        </div>
       </div>
       <div class="resource-progress">
         <div class="resource-progress-top">
@@ -2157,12 +2268,13 @@ function mathBookPage(book) {
           <em>${percent}%</em>
         </div>
         ${progressBar(percent, book.tone)}
-        <div class="resource-progress-foot"><span>已录入 ${stats.entered}/${stats.chapters} 章</span><span>${stats.accuracy ? `正确率 ${stats.accuracy}%` : "还没有正确率数据"}</span></div>
+        <div class="resource-progress-foot"><span>${currentRoundMeta.label}已录入 ${stats.entered}/${stats.chapters} 章</span><span>${stats.accuracy ? `正确率 ${stats.accuracy}%` : "还没有正确率数据"}</span></div>
       </div>
     </section>
+    ${mathRoundSwitcher(book)}
 
     <div class="kpi-grid">
-      ${kpiCard({ label: `${book.tab}进度`, value: stats.done, unit: `/${stats.total || "未设"} ${book.unit || "题"}`, sub: stats.total ? `完成 ${percent}%` : "按章节录入后会累计", iconName: "list-checks", accent: book.tone })}
+      ${kpiCard({ label: `${currentRoundMeta.label}进度`, value: stats.done, unit: `/${stats.total || "未设"} ${book.unit || "题"}`, sub: stats.total ? `完成 ${percent}%` : "按章节录入后会累计", iconName: "list-checks", accent: book.tone })}
       ${kpiCard({ label: "正确率", value: stats.accuracy || "—", unit: stats.accuracy ? "%" : "", sub: "按已录入章节加权平均", iconName: "target", accent: "violet" })}
       ${kpiCard({ label: "待复盘错题", value: stats.wrong, unit: "题", sub: "章节录入时填写的错题数", iconName: "notebook-tabs", accent: "amber" })}
       ${kpiCard({ label: "已录入章节", value: `${stats.entered}/${stats.chapters}`, unit: "", sub: stats.entered ? "点击章节可随时修改" : "点击任意章节开始录入", iconName: "book-open-check", accent: "coral" })}
@@ -2172,15 +2284,15 @@ function mathBookPage(book) {
       <section class="card card-pad span-8">
         <div class="card-head">
           <div>
-            <h2 class="card-title">章节进度 · ${escapeHtml(section.name)}</h2>
-            <p class="card-note">这本书自己的章节导航；点任意一章录入完成题数、正确率和错题，随时可以改。</p>
+            <h2 class="card-title">章节进度 · ${escapeHtml(section.name)} · ${currentRoundMeta.label}</h2>
+            <p class="card-note">当前轮次独立保存；点任意一章录入完成题数、正确率和错题，切轮后不会覆盖。</p>
           </div>
           <span class="tag ${book.tone}">${sectionStats.done}/${sectionStats.total || "未设"} ${book.unit || "题"}</span>
         </div>
         <div class="section-tabs">
           ${sections
             .map((item, index) => {
-              const itemStats = mathSectionStats(book, item);
+              const itemStats = mathSectionStats(book, item, currentRound);
               return `
                 <button class="${index === sectionIndex ? "active" : ""}" type="button" data-math-section="${index}">
                   <strong>${escapeHtml(item.name)}</strong>
@@ -2193,11 +2305,11 @@ function mathBookPage(book) {
         <div class="chapter-grid resource-grid">
           ${chapters
             .map((chapter, index) => {
-              const info = mathChapterInfo(book, section, chapter);
+              const info = mathChapterInfo(book, section, chapter, currentRound);
               const tone = !info.entered ? "blank" : info.percent >= 100 ? "done" : info.percent >= 60 ? "active" : info.percent >= 30 ? "warn" : "weak";
               return `
                 <button class="chapter-cell ${tone}" type="button" data-math-chapter="${index}"
-                  title="${escapeAttr(chapter)} · ${info.entered ? `完成 ${info.percent}% · 正确率 ${info.accuracy}% · 错题 ${info.wrong} 题` : "还没有录入进度"}">
+                  title="${escapeAttr(chapter)} · ${currentRoundMeta.label} · ${info.entered ? `完成 ${info.percent}% · 正确率 ${info.accuracy}% · 错题 ${info.wrong} 题` : "还没有录入进度"}">
                   <span class="chapter-name">${escapeHtml(chapter)}</span>
                   <span class="chapter-value">${info.entered ? `${info.percent}%` : "未录入"}</span>
                   <span class="chapter-acc">${info.entered ? `正确 ${info.accuracy}% · 错 ${info.wrong}` : "点击录入进度"}</span>
@@ -2220,12 +2332,12 @@ function mathBookPage(book) {
             <h2 class="card-title">这本书的记录</h2>
             <p class="card-note">只显示和这本资料有关的记录，不混用其它书的导航和进度。</p>
           </div>
-          <button class="icon-btn" type="button" data-open-entry-subject="数学一" data-entry-source="${escapeAttr(book.tab)}" aria-label="新增记录">${icon("plus")}</button>
+          <button class="icon-btn" type="button" data-open-entry-subject="数学一" data-entry-source="${escapeAttr(book.tab)}" data-entry-round="${currentRound}" aria-label="新增记录">${icon("plus")}</button>
         </div>
         ${records.length
           ? `<div class="review-list">${records
               .slice(0, 6)
-              .map((record) => reviewItem(record.date.slice(5) || "--", escapeHtml(record.module || record.paper || record.source), `${escapeHtml(record.source)} · ${record.full ? `${record.score}/${record.full}` : record.count ? `${record.correct}/${record.count} 题` : "已记录"}`, book.tone))
+              .map((record) => reviewItem(record.date.slice(5) || "--", escapeHtml(record.module || record.paper || record.source), `${currentRoundMeta.label} · ${escapeHtml(record.source)} · ${record.full ? `${record.score}/${record.full}` : record.count ? `${record.correct}/${record.count} 题` : "已记录"}`, book.tone))
               .join("")}</div>`
           : `<div class="empty-state compact">${icon("clipboard-list")}<strong>还没有记录</strong><span>整章做完后点右上角加号记一次。</span></div>`}
       </section>
@@ -2251,11 +2363,11 @@ function renderMath() {
     <div class="page-head">
       <div>
         <h1>封神之路 · 数学</h1>
-        <p class="page-desc">每本资料有自己的分册和章节导航，进度、正确率、错题都记在 iball 账号里；换书不串数据。</p>
+        <p class="page-desc">22 本现有资料各自分类、各自章节导航；每本都能切一刷到五刷，进度、正确率、错题按轮次独立保存。</p>
       </div>
       <div class="head-actions">
         <button class="secondary-btn" data-screen="plan">${icon("calendar-range")} 今日计划</button>
-        <button class="primary-btn" data-open-entry-subject="数学一" data-entry-source="${escapeAttr(book.tab)}">${icon("plus")} 录入数学成绩</button>
+        <button class="primary-btn" data-open-entry-subject="数学一" data-entry-source="${escapeAttr(book.tab)}" data-entry-round="${mathBookRound(book.key)}">${icon("plus")} 录入数学成绩</button>
       </div>
     </div>
 
@@ -2269,7 +2381,16 @@ function renderMath() {
             (item) => `
               <button type="button" class="book-tab ${item.key === book.key ? "active" : ""}" style="--book-color:${(accentMap[item.tone] || accentMap.blue)[0]}" data-math-resource="${escapeAttr(item.key)}">
                 <span>${escapeHtml(item.tab)}</span>
+                <b>${escapeHtml(item.category)}</b>
                 <em>${(item.sections || []).length ? `${(item.sections || []).length} 个分册` : "真题卷"}</em>
+                <span class="book-tab-rounds" aria-label="${escapeAttr(item.tab)} 一刷到五刷完成标记">
+                  ${MATH_ROUNDS.map((round) => {
+                    const roundStats = mathRoundStats(item, round.value);
+                    const active = mathBookRound(item.key) === round.value;
+                    const complete = roundStats.chapters > 0 && roundStats.entered >= roundStats.chapters;
+                    return `<i class="${active ? "active" : ""} ${complete ? "complete" : ""}" title="${escapeAttr(`${round.label} · ${roundStats.summary}`)}">${round.value}</i>`;
+                  }).join("")}
+                </span>
               </button>
             `,
           )
@@ -3677,6 +3798,7 @@ function setEntryMode(mode = "create", description = "") {
 
 const entryDate = document.getElementById("entry-date");
 const entryYear = document.getElementById("entry-year");
+const entryRound = document.getElementById("entry-round");
 const entryStatus = document.getElementById("entry-status");
 const entryCount = document.getElementById("entry-count");
 const entryCorrect = document.getElementById("entry-correct");
@@ -3707,6 +3829,7 @@ const progressDone = document.getElementById("progress-done");
 const progressTotal = document.getElementById("progress-total");
 const progressAccuracy = document.getElementById("progress-accuracy");
 const progressWrong = document.getElementById("progress-wrong");
+const progressRoundOptions = document.getElementById("progress-round-options");
 const clearProgressButton = document.getElementById("clear-progress");
 const PROGRESS_NOTE_DEFAULT = "只影响这一本书这一章；错题请到「录入成绩」里逐题标注。";
 
@@ -3742,6 +3865,7 @@ function resetEntryForm() {
   entryReview.value = "";
   entryNote.value = "";
   entryLost.value = "";
+  if (entryRound) entryRound.value = "1";
   modalNote(entryModalNote, ENTRY_NOTE_DEFAULT);
 }
 
@@ -3755,6 +3879,7 @@ function fillEntryForm(record) {
   entryTime.value = record.minutes ? String(record.minutes) : "";
   entryReview.value = record.reviewDate || "";
   entryNote.value = record.note || "";
+  if (entryRound) entryRound.value = String(cleanMathRound(record.round));
   modalNote(entryModalNote, ENTRY_NOTE_DEFAULT);
   syncEntryOptions();
   setSelectValue(entrySubject, record.subject);
@@ -3785,6 +3910,7 @@ function entryRecordFromForm(existing) {
     minutes: Number(entryTime.value) || 0,
     errorType: entryErrorType.value,
     reviewDate: entryReview.value,
+    round: cleanMathRound(entryRound ? entryRound.value : existing?.round),
     reviewCount: existing ? existing.reviewCount : 0,
     note: entryNote.value.trim(),
   };
@@ -3884,17 +4010,40 @@ function saveTask() {
   render();
 }
 
-function openProgressModal(book, section, chapter) {
-  const info = mathChapterInfo(book, section, chapter);
-  state.progressChapter = { book: book.key, section: section.name, chapter };
-  progressTitle.textContent = `${book.tab} · ${chapter}`;
-  progressSub.textContent = `${book.title} · ${section.name} · 只记这一本书这一章，不和其它资料共用进度。`;
+function syncProgressRoundButtons(round) {
+  if (!progressRoundOptions) return;
+  const normalized = cleanMathRound(round);
+  progressRoundOptions.querySelectorAll("[data-progress-round]").forEach((button) => {
+    const active = cleanMathRound(button.dataset.progressRound) === normalized;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+}
+
+/** 按 target.round 重新读取这一本书、这一章、这一轮的进度并回填弹窗。 */
+function fillProgressForm(target) {
+  if (!target) return;
+  const book = YM_BY_KEY[target.book];
+  const sections = book && Array.isArray(book.sections) ? book.sections : [];
+  const section = sections.find((item) => item.name === target.section);
+  if (!book || !section) return;
+  const info = mathChapterInfo(book, section, target.chapter, target.round);
+  const meta = mathRoundMeta(info.round);
+  target.round = info.round;
+  progressTitle.textContent = `${book.tab} · ${target.chapter}`;
+  progressSub.textContent = `${book.title} · ${section.name} · ${meta.label}独立记录，不和其它轮次或其它资料共用进度。`;
   progressDone.value = info.done ? String(info.done) : "";
   progressTotal.value = info.total ? String(info.total) : "";
   progressAccuracy.value = info.accuracy ? String(info.accuracy) : "";
   progressWrong.value = info.wrong ? String(info.wrong) : "";
   progressNoteInput.value = info.saved ? info.saved.note || "" : "";
   clearProgressButton.disabled = !info.saved;
+  syncProgressRoundButtons(info.round);
+}
+
+function openProgressModal(book, section, chapter, round = mathBookRound(book.key)) {
+  state.progressChapter = { book: book.key, section: section.name, chapter, round: cleanMathRound(round) };
+  fillProgressForm(state.progressChapter);
   modalNote(progressModalNote, PROGRESS_NOTE_DEFAULT);
   document.body.classList.add("progress-open");
   progressDone.focus();
@@ -3909,16 +4058,19 @@ function closeProgressModal() {
 function saveProgress() {
   const target = state.progressChapter;
   if (!target || !STORE) return;
+  const round = cleanMathRound(target.round);
   let done = Math.max(0, Number(progressDone.value) || 0);
   const total = Math.max(0, Number(progressTotal.value) || 0);
   if (total && done > total) done = total;
-  STORE.setProgress(mathProgressKey(target.book, target.section, target.chapter), {
+  STORE.setProgress(mathProgressKey(target.book, target.section, target.chapter, round), {
     done,
     total,
     accuracy: Math.max(0, Math.min(100, Number(progressAccuracy.value) || 0)),
     wrong: Math.max(0, Number(progressWrong.value) || 0),
     note: progressNoteInput.value.trim(),
   });
+  // 保存哪一轮就把这本书切到哪一轮，回到页面能直接看到刚录入的数据。
+  STORE.setBookRound(mathBookRoundKey(target.book), round);
   closeProgressModal();
   render();
 }
@@ -3926,8 +4078,13 @@ function saveProgress() {
 function clearProgress() {
   const target = state.progressChapter;
   if (!target || !STORE) return;
-  if (!window.confirm(`清除「${target.chapter}」的进度记录？其它章节和这本书的其它分册不受影响。`)) return;
-  STORE.removeProgress(mathProgressKey(target.book, target.section, target.chapter));
+  const round = cleanMathRound(target.round);
+  const meta = mathRoundMeta(round);
+  if (!window.confirm(`清除「${target.chapter}」${meta.label}的进度记录？其它轮次、章节和分册不受影响。`)) return;
+  const keys = [mathProgressKey(target.book, target.section, target.chapter, round)];
+  // v1 旧数据没有轮次字段，按一刷读取；清一刷时把旧键一起清掉，避免清完又冒出来。
+  if (round === 1) keys.push(legacyMathProgressKey(target.book, target.section, target.chapter));
+  STORE.removeProgressKeys(keys);
   closeProgressModal();
   render();
 }
@@ -4040,6 +4197,13 @@ document.addEventListener("click", (event) => {
     setSelectValue(entrySubject, entrySubjectButton.dataset.openEntrySubject);
     syncEntryOptions();
     setSelectValue(entrySource, entrySubjectButton.dataset.entrySource);
+    if (entryRound) {
+      const selectedBook = YM_BY_KEY[state.mathResource] || null;
+      const fallbackRound = selectedBook && String(entrySubjectButton.dataset.openEntrySubject || "").startsWith("数学")
+        ? mathBookRound(selectedBook.key)
+        : 1;
+      entryRound.value = String(cleanMathRound(entrySubjectButton.dataset.entryRound || fallbackRound));
+    }
     return;
   }
 
@@ -4066,6 +4230,16 @@ document.addEventListener("click", (event) => {
       state.mathResource = nextBook.key;
       state.mathSection = 0;
       history.replaceState(null, "", `?screen=math&math=${state.mathResource}`);
+      render();
+    }
+    return;
+  }
+
+  const mathRoundButton = event.target.closest("[data-math-round]");
+  if (mathRoundButton) {
+    const book = mathBook();
+    if (book && STORE) {
+      STORE.setBookRound(mathBookRoundKey(book.key), mathRoundButton.dataset.mathRound);
       render();
     }
     return;
@@ -4104,9 +4278,16 @@ document.addEventListener("click", (event) => {
       const chapters = section && Array.isArray(section.chapters) ? section.chapters : [];
       const chapterIndex = Number(mathChapterButton.dataset.mathChapter);
       if (section && chapters[chapterIndex]) {
-        openProgressModal(book, section, chapters[chapterIndex]);
+        openProgressModal(book, section, chapters[chapterIndex], mathBookRound(book.key));
       }
     }
+    return;
+  }
+
+  const progressRoundButton = event.target.closest("[data-progress-round]");
+  if (progressRoundButton && state.progressChapter) {
+    state.progressChapter.round = cleanMathRound(progressRoundButton.dataset.progressRound);
+    fillProgressForm(state.progressChapter);
     return;
   }
 
