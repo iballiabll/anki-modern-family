@@ -188,7 +188,7 @@ test("状态文件损坏时按“从未备份”展示，而不是 500", async (
   assert.equal(read.body.backup.status.lastStatus, "never");
 });
 
-test("空仓库首次备份会在 main 上创建第一个提交", async () => {
+test("空仓库首次备份会先初始化 main 再提交快照", async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "iball-backup-empty-"));
   fs.writeFileSync(path.join(dataDir, "users.json"), '{"users":[]}', "utf8");
   const previous = {
@@ -204,6 +204,7 @@ test("空仓库首次备份会在 main 上创建第一个提交", async () => {
 
   const calls = [];
   const originalFetch = global.fetch;
+  let headReads = 0;
   global.fetch = async (url, options = {}) => {
     const method = options.method || "GET";
     const parsed = new URL(String(url));
@@ -219,10 +220,22 @@ test("空仓库首次备份会在 main 上创建第一个提交", async () => {
       );
     }
     if (parsed.pathname.endsWith("/git/ref/heads/main")) {
-      // GitHub 对没有任何提交的空仓库返回 409，而不是 404。
-      return new Response(JSON.stringify({ message: "Git Repository is empty." }), {
-        status: 409,
-      });
+      headReads += 1;
+      if (headReads === 1) {
+        // GitHub 对没有任何提交的空仓库返回 409，而不是 404；而且此时
+        // 连创建 blob 都会被拒绝，必须先用 Contents API 建首个提交。
+        return new Response(JSON.stringify({ message: "Git Repository is empty." }), {
+          status: 409,
+        });
+      }
+      return new Response(JSON.stringify({ object: { sha: "init-sha" } }), { status: 200 });
+    }
+    if (parsed.pathname.endsWith("/contents/README.md")) {
+      assert.equal(method, "PUT");
+      return new Response(JSON.stringify({ commit: { sha: "init-sha" } }), { status: 201 });
+    }
+    if (parsed.pathname.endsWith("/git/commits/init-sha")) {
+      return new Response(JSON.stringify({ tree: { sha: "init-tree" } }), { status: 200 });
     }
     if (parsed.pathname.endsWith("/git/blobs")) {
       return new Response(JSON.stringify({ sha: "blob-sha" }), { status: 201 });
@@ -233,7 +246,8 @@ test("空仓库首次备份会在 main 上创建第一个提交", async () => {
     if (parsed.pathname.endsWith("/git/commits")) {
       return new Response(JSON.stringify({ sha: "commit-sha" }), { status: 201 });
     }
-    if (parsed.pathname.endsWith("/git/refs")) {
+    if (parsed.pathname.endsWith("/git/refs/heads/main")) {
+      assert.equal(method, "PATCH");
       return new Response(JSON.stringify({ ref: "refs/heads/main" }), { status: 201 });
     }
     throw new Error(`unexpected fetch: ${method} ${parsed.pathname}`);
@@ -245,14 +259,14 @@ test("空仓库首次备份会在 main 上创建第一个提交", async () => {
     assert.equal(result.ok, true, result.message);
     assert.equal(result.commitSha, "commit-sha");
     assert.ok(
-      calls.includes("POST /repos/iballiabll/iball-cabin-backup/git/refs"),
-      "空仓库应该直接创建 refs/heads/main",
+      calls.includes("PUT /repos/iballiabll/iball-cabin-backup/contents/README.md"),
+      "空仓库应该先用 Contents API 初始化 README",
     );
-    assert.equal(
-      calls.some((entry) => entry.startsWith("PATCH ")),
-      false,
-      "空仓库没有旧 HEAD，不应该走 PATCH",
+    assert.ok(
+      calls.includes("PATCH /repos/iballiabll/iball-cabin-backup/git/refs/heads/main"),
+      "初始化后的快照提交应该更新 main",
     );
+    assert.equal(headReads, 2, "初始化前后各读一次 HEAD");
   } finally {
     global.fetch = originalFetch;
     for (const [name, value] of Object.entries(previous)) {

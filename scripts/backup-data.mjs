@@ -226,6 +226,34 @@ async function resolveHead(config) {
   }
 }
 
+/**
+ * 空仓库连创建 blob 都会被 GitHub 拒绝，所以先用 Contents API 写一个
+ * 初始化 README，让分支拥有第一个提交，再走正常的快照提交。
+ */
+async function ensureBaseCommit(config) {
+  let head = await resolveHead(config);
+  if (head) return head;
+  const readme = [
+    "# iball-cabin-backup",
+    "",
+    "Private snapshots of the iball cabin data directory.",
+    "",
+  ].join("\n");
+  await githubRequest(config, `/repos/${config.repo}/contents/README.md`, {
+    method: "PUT",
+    body: {
+      message: "Initialize private backup repository",
+      content: Buffer.from(readme, "utf8").toString("base64"),
+      branch: config.branch,
+    },
+  });
+  head = await resolveHead(config);
+  if (!head) {
+    throw new BackupError("备份仓库初始化后仍然找不到 HEAD。", 502);
+  }
+  return head;
+}
+
 /** 把一批文件写成 blob，再组成一个基于当前 HEAD 的新 tree。 */
 async function uploadSnapshot(config, files, { snapshot, baseTreeSha }) {
   const tree = [];
@@ -301,15 +329,15 @@ export async function runBackup({ trigger = "manual" } = {}) {
     }
 
     const snapshot = `snapshots/${snapshotStamp(started)}`;
-    const head = await resolveHead(config);
+    const head = await ensureBaseCommit(config);
     const treeSha = await uploadSnapshot(config, files, {
       snapshot,
-      baseTreeSha: head ? head.treeSha : "",
+      baseTreeSha: head.treeSha,
     });
     const message = `Backup ${snapshot} (${files.length} files, ${totalBytes} bytes)`;
     const commitSha = await commitSnapshot(config, {
       treeSha,
-      parentSha: head ? head.commitSha : "",
+      parentSha: head.commitSha,
       message,
     });
 
