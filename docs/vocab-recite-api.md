@@ -1,6 +1,6 @@
 # 背词记录接口（window.IballVocabRecite）
 
-供站内其他页面（例如 `yantu/` 研途计划页）读取词汇库的背词记录，用来做
+供站内其他页面（例如 `yantu/` 封神之路学习档案页）读取词汇库的背词记录，用来做
 「今天背了多少词 / 哪些词还不认识」这类统计与复习排程。
 
 ## 引入方式
@@ -26,13 +26,34 @@
 | `getRecords(deck?)` | 记录数组，传 deck 时只返回该词库 |
 | `getRecord(deck, word)` | 单条记录或 `null` |
 | `summary(deck?)` | `{ total, known, fuzzy, unknown, reviews }` |
+| `daily(deck?, { days?, now? })` | 每日学习情况：`{ today, streak, totals, days, updatedAt }`，见下 |
 | `record({ deck, word, status, reviewedAt?, source? })` | 记一次，`status` 取 `known` / `fuzzy` / `unknown` |
 | `remove(deck, word)` | 删除一条，返回是否删除成功 |
 | `clear(deck?)` | 清空某个词库；不传 deck 时清空全部 |
 | `exportJson()` / `importJson(payload, { merge })` | 备份与导入，默认按 `lastAt` 合并 |
 | `subscribe(listener, { immediate? })` | 订阅变更，返回取消订阅函数 |
 | `statusLabel(status)` | `known` → 认识，`fuzzy` → 模糊，`unknown` → 不认识 |
+| `statusBadge(status)` | 词卡角标文案，`known` → 已斩，其余同 `statusLabel` |
 | `storageKey` / `statuses` / `version` | 常量 |
+
+`daily()` 的返回结构（`days` 默认 7 天，按本地日期聚合 `history.at`）：
+
+```json
+{
+  "deck": "llyc2027",
+  "today": { "date": "2026-09-27", "studied": 42, "newWords": 30, "reviews": 12,
+             "known": 8, "fuzzy": 6, "unknown": 4 },
+  "streak": 5,
+  "totals": { "studied": 1180, "known": 640, "fuzzy": 300, "unknown": 240,
+              "reviews": 2200, "remaining": 6915 },
+  "days": [{ "date": "2026-09-27", "label": "9/27", "weekday": "六",
+             "isToday": true, "total": 42, "known": 8, "fuzzy": 6, "unknown": 4 }],
+  "updatedAt": "2026-09-27T05:40:00.000Z"
+}
+```
+
+背词状态里的「斩」就是 `known`：词卡上按「斩 · 已会」后该词不再排进每日任务，
+统计时计入 `totals.known`，`totals.remaining` 为未斩词数。
 
 记录字段：
 
@@ -54,10 +75,14 @@
 const api = window.IballVocabRecite;
 
 // 记一次「模糊」
-api.record({ deck: "llyc2027", word: "workforce", status: "fuzzy", source: "yantu" });
+api.record({ deck: "llyc2027", word: "workforce", status: "fuzzy", source: "fengshen" });
 
 // 当前词库进度
 const { total, known, unknown } = api.summary("llyc2027");
+
+// 最近 7 天的每日学习情况（封神之路首页面板用的就是这个）
+const daily = api.daily("llyc2027", { days: 7 });
+console.log(daily.today.newWords, daily.streak, daily.totals.remaining);
 
 // 今天背过的词（history 保留最近 500 次记录）
 const today = new Date().toISOString().slice(0, 10);

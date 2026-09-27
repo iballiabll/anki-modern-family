@@ -3777,3 +3777,287 @@ body.entry-edit .record-banner {
     justify-content: center;
   }
 }
+
+/* ---------- 恋练有词 · 每日学习面板 ---------- */
+
+.llyc-card {
+  margin-bottom: 14px;
+}
+
+.llyc-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.llyc-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.llyc-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.llyc-stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 13px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+}
+
+.llyc-stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  color: var(--blue);
+  font-size: 24px;
+  font-weight: 760;
+  line-height: 1.1;
+}
+
+.llyc-stat:nth-child(2) .llyc-stat-value {
+  color: var(--green);
+}
+
+.llyc-stat:nth-child(3) .llyc-stat-value {
+  color: var(--violet);
+}
+
+.llyc-stat:nth-child(4) .llyc-stat-value {
+  color: var(--amber);
+}
+
+.llyc-stat-value small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-2);
+}
+
+.llyc-stat-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.llyc-progress {
+  display: grid;
+  align-content: center;
+  gap: 9px;
+  padding: 13px 14px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(219, 39, 119, 0.06));
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+}
+
+.llyc-progress-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.llyc-progress-head strong {
+  font-size: 13.5px;
+}
+
+.llyc-progress-head span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.llyc-track {
+  position: relative;
+  height: 12px;
+  overflow: hidden;
+  background: #e2e8f0;
+  border-radius: 999px;
+}
+
+.llyc-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  border-radius: 999px;
+}
+
+.llyc-fill.is-studied {
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+}
+
+.llyc-fill.is-slain {
+  background: linear-gradient(90deg, #a855f7, #db2777);
+}
+
+.llyc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.llyc-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.llyc-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.llyc-legend i.is-slain {
+  background: #db2777;
+}
+
+.llyc-legend i.is-studied {
+  background: #2563eb;
+}
+
+.llyc-legend i.is-rest {
+  background: #e2e8f0;
+}
+
+.llyc-days {
+  display: grid;
+  gap: 10px;
+}
+
+.llyc-days-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.llyc-days-head strong {
+  font-size: 13.5px;
+}
+
+.llyc-days-head span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.llyc-spark {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+  height: 116px;
+  padding: 10px 12px 8px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+}
+
+.llyc-spark-col {
+  display: grid;
+  height: 100%;
+  grid-template-rows: auto 1fr auto;
+  gap: 5px;
+  justify-items: center;
+}
+
+.llyc-spark-value {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--muted);
+}
+
+.llyc-spark-bar {
+  width: 100%;
+  max-width: 26px;
+  min-height: 4px;
+  align-self: end;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  border-radius: 6px 6px 3px 3px;
+  transition: height 200ms ease;
+}
+
+.llyc-spark-col.is-today .llyc-spark-bar {
+  background: linear-gradient(180deg, #f472b6, #db2777);
+}
+
+.llyc-spark-col.is-today .llyc-spark-value,
+.llyc-spark-col.is-today .llyc-spark-label {
+  color: var(--violet);
+  font-weight: 700;
+}
+
+.llyc-spark-label {
+  font-size: 11px;
+  color: var(--muted-2);
+}
+
+.llyc-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.llyc-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.llyc-note svg {
+  width: 14px;
+  height: 14px;
+}
+
+.llyc-empty {
+  margin: 0;
+  padding: 12px 13px;
+  font-size: 12.5px;
+  color: var(--muted);
+  background: var(--panel-soft);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+@media (max-width: 920px) {
+  .llyc-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .llyc-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .llyc-spark {
+    height: 104px;
+    gap: 6px;
+    padding: 9px 8px 7px;
+  }
+
+  .llyc-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .llyc-foot .primary-btn,
+  .llyc-foot .secondary-btn {
+    width: 100%;
+  }
+
+  .llyc-note {
+    justify-content: center;
+  }
+}

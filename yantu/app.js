@@ -604,6 +604,156 @@ function planItem(title, meta, priority = "中", tone = "amber") {
   `;
 }
 
+/* ------------------------------------------- 恋练有词 · 每日学习情况 */
+
+/**
+ * 这一块直接吃词汇库的背词记录（window.IballVocabRecite.daily）：
+ * 词汇库页面里按「斩 · 已会」记过的词算已斩，不再计进待背；
+ * 今日新学 / 今日复习 / 连续天数都按本地日期算，账号同步后自动刷新。
+ */
+const LLYC_DECK = "llyc2027";
+const LLYC_TOTAL_FALLBACK = 8095;
+const llycMeta = { total: LLYC_TOTAL_FALLBACK, source: "fallback" };
+let llycUnsubscribe = null;
+
+function llycDaily() {
+  const api = window.IballVocabRecite;
+  if (!api || typeof api.daily !== "function") {
+    return null;
+  }
+  try {
+    return api.daily(LLYC_DECK, { days: 7 });
+  } catch {
+    return null;
+  }
+}
+
+function llycSparkline(days) {
+  const peak = days.reduce((max, day) => Math.max(max, day.total), 0);
+  const total = days.reduce((sum, day) => sum + day.total, 0);
+  return `
+    <div class="llyc-spark" role="img" aria-label="近 7 天共记录 ${total} 次背词">
+      ${days
+        .map((day) => {
+          const ratio = peak > 0 ? day.total / peak : 0;
+          const height = day.total === 0 ? 6 : Math.max(18, Math.round(ratio * 100));
+          return `
+            <div class="llyc-spark-col${day.isToday ? " is-today" : ""}">
+              <span class="llyc-spark-value">${day.total || ""}</span>
+              <span class="llyc-spark-bar" style="height:${height}%"></span>
+              <span class="llyc-spark-label">${day.isToday ? "今天" : `周${day.weekday}`}</span>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function llycPanelBody() {
+  const daily = llycDaily();
+  if (!daily) {
+    return `<p class="llyc-empty">背词接口还没就绪：刷新页面后这里会显示恋练有词的每日学习情况。</p>`;
+  }
+  const total = llycMeta.total || LLYC_TOTAL_FALLBACK;
+  const { today: todayStats, totals, streak } = daily;
+  const studiedPct = total ? Math.min((totals.studied / total) * 100, 100) : 0;
+  const slainPct = totals.studied ? (totals.known / totals.studied) * 100 : 0;
+  const untouched = Math.max(total - totals.studied, 0);
+  const cards = [
+    { label: "今日新学", value: todayStats.newWords, unit: "词" },
+    { label: "今日复习", value: todayStats.reviews, unit: "次" },
+    { label: "今日斩词", value: todayStats.known, unit: "词" },
+    { label: "连续打卡", value: streak, unit: "天" },
+  ];
+  const lastActive = daily.updatedAt
+    ? `最近一次记录 ${daily.updatedAt.slice(0, 10)}`
+    : "还没有背词记录";
+  return `
+    <div class="llyc-overview">
+      <div class="llyc-stats">
+        ${cards
+          .map(
+            (card) => `
+              <div class="llyc-stat">
+                <span class="llyc-stat-value">${card.value}<small>${card.unit}</small></span>
+                <span class="llyc-stat-label">${card.label}</span>
+              </div>
+            `,
+          )
+          .join("")}
+      </div>
+      <div class="llyc-progress">
+        <div class="llyc-progress-head">
+          <strong>已斩 ${totals.known} / ${total} 词</strong>
+          <span>模糊 ${totals.fuzzy} · 不认识 ${totals.unknown} · 未背 ${untouched}</span>
+        </div>
+        <div class="llyc-track">
+          <span class="llyc-fill is-studied" style="width:${studiedPct.toFixed(2)}%">
+            <span class="llyc-fill is-slain" style="width:${slainPct.toFixed(2)}%"></span>
+          </span>
+        </div>
+        <div class="llyc-legend">
+          <span><i class="is-slain"></i>已斩</span>
+          <span><i class="is-studied"></i>背过还没斩</span>
+          <span><i class="is-rest"></i>没背过</span>
+        </div>
+      </div>
+    </div>
+    <div class="llyc-days">
+      <div class="llyc-days-head">
+        <strong>近 7 天</strong>
+        <span>${streak > 0 ? `已连续 ${streak} 天，今天别断` : "今天还没开始背词"}</span>
+      </div>
+      ${llycSparkline(daily.days)}
+    </div>
+    <div class="llyc-foot">
+      <a class="primary-btn" href="../vocab.html?deck=llyc2027">${icon("swords")} 去背词</a>
+      <a class="secondary-btn" href="../vocab.html?deck=llyc2027&hideKnown=1">只看没斩的</a>
+      <span class="llyc-note">${icon("database")} ${lastActive} · 跟账号同步</span>
+    </div>
+  `;
+}
+
+function paintLlycPanel() {
+  const host = document.getElementById("llycPanel");
+  if (!host) {
+    return;
+  }
+  host.innerHTML = llycPanelBody();
+  if (window.lucide) {
+    window.lucide.createIcons({ attrs: { "stroke-width": 1.8 } });
+  }
+}
+
+function mountLlycPanel() {
+  if (!document.getElementById("llycPanel")) {
+    return;
+  }
+  paintLlycPanel();
+  if (!llycUnsubscribe && window.IballVocabRecite?.subscribe) {
+    llycUnsubscribe = window.IballVocabRecite.subscribe(() => paintLlycPanel());
+  }
+}
+
+async function loadLlycDeckMeta() {
+  try {
+    const response = await fetch("../vocab-index/lexemes.json", { cache: "force-cache" });
+    if (!response.ok) {
+      return;
+    }
+    const data = await response.json();
+    const deck = (data?.decks || []).find((item) => item.deck === LLYC_DECK);
+    if (deck?.words) {
+      llycMeta.total = deck.words;
+      llycMeta.source = "index";
+      paintLlycPanel();
+    }
+  } catch {
+    // 拿不到清单就用内置词量，面板照常显示。
+  }
+}
+
 function renderDashboard() {
   return `
     <div class="page-head">
@@ -654,6 +804,17 @@ function renderDashboard() {
         delta: "+8",
       })}
     </div>
+
+    <section class="card card-pad llyc-card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">恋练有词 · 每日学习</h2>
+          <p class="card-note">数据从词汇库的背词记录直接读；词卡上「斩 · 已会」的词算已会，不再排进待背。</p>
+        </div>
+        <span class="tag violet">${icon("book-marked")} 恋练有词 2027</span>
+      </div>
+      <div id="llycPanel" class="llyc-panel"></div>
+    </section>
 
     <div class="grid">
       <section class="card card-pad span-5">
@@ -4101,6 +4262,7 @@ function render() {
   if (window.lucide) {
     window.lucide.createIcons({ attrs: { "stroke-width": 1.8 } });
   }
+  mountLlycPanel();
   window.__ready = true;
 }
 
@@ -4419,3 +4581,4 @@ if (new URLSearchParams(location.search).get("entry") === "1") {
 }
 
 render();
+loadLlycDeckMeta();

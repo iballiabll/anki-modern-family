@@ -44,6 +44,8 @@
     sortGroup: document.querySelector(".segmented-control[aria-label='排序方式']"),
     favoriteOnly: document.getElementById("favoriteOnlyButton"),
     favoriteCount: document.getElementById("favoriteCount"),
+    hideKnown: document.getElementById("hideKnownButton"),
+    knownCount: document.getElementById("knownCount"),
     wordbookButton: document.getElementById("wordbookButton"),
     wordbookCount: document.getElementById("wordbookCount"),
     clearProgress: document.getElementById("clearProgressButton"),
@@ -88,6 +90,7 @@
     query: "",
     sort: "frequency",
     favoriteOnly: false,
+    hideKnown: false,
     activeWord: "",
     detailToken: 0,
     recite: new Map(),
@@ -292,6 +295,21 @@
     return state.recite.get(normalize(word)) || null;
   }
 
+  /** 已斩 = 已经会的词，每日任务不再排它。 */
+  function isSlain(word) {
+    return reciteRecord(word)?.status === "known";
+  }
+
+  function slainCount() {
+    let count = 0;
+    for (const record of state.recite.values()) {
+      if (record.status === "known") {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   function refreshRecite() {
     const api = reciteApi();
     const next = new Map();
@@ -320,11 +338,16 @@
       node.setAttribute("aria-pressed", String(isActive));
     });
     if (els.reciteStatus) {
-      els.reciteStatus.textContent = record
-        ? `${reciteApi()?.statusLabel(record.status) || record.status} · 已记 ${
-            record.reviews
-          } 次`
-        : "点一个状态就会记下来";
+      if (!record) {
+        els.reciteStatus.textContent =
+          "点一个状态就会记下来，斩过的词不再进每日任务";
+      } else if (record.status === "known") {
+        els.reciteStatus.textContent = `已斩 · 已记 ${record.reviews} 次 · 不再进每日任务`;
+      } else {
+        els.reciteStatus.textContent = `${
+          reciteApi()?.statusLabel(record.status) || record.status
+        } · 已记 ${record.reviews} 次`;
+      }
     }
   }
 
@@ -341,7 +364,11 @@
       source: `vocab:${state.deckKey}`,
     });
     if (saved) {
-      showToast(`已记为「${api.statusLabel(status)}」`);
+      showToast(
+        status === "known"
+          ? "已斩：这个词之后不再进每日任务"
+          : `已记为「${api.statusLabel(status)}」`,
+      );
     }
   }
 
@@ -356,6 +383,9 @@
     let words = currentDeckWords();
     if (state.favoriteOnly) {
       words = words.filter((word) => state.favorites.has(normalize(word)));
+    }
+    if (state.hideKnown) {
+      words = words.filter((word) => !isSlain(word));
     }
     if (query) {
       const isAscii = /^[a-z0-9'\-.\s]+$/i.test(query);
@@ -388,9 +418,10 @@
     );
     const chips = [
       { value: String(deck?.words ?? currentDeckWords().length), label: "词库词量" },
+      { value: String(slainCount()), label: "已斩" },
+      { value: String(state.recite.size), label: "已学" },
       { value: String(state.favorites.size), label: "已收藏" },
       { value: String(state.wordbook.size), label: "生词本" },
-      { value: String(state.recite.size), label: "已背词" },
       {
         value: state.quick ? "已就绪" : "加载中",
         label: "点词释义",
@@ -442,7 +473,9 @@
         if (recited) {
           marks.push(
             `<span class="is-recited is-${escapeHtml(recited.status)}">${escapeHtml(
-              reciteApi()?.statusLabel(recited.status) || recited.status,
+              reciteApi()?.statusBadge?.(recited.status) ||
+                reciteApi()?.statusLabel(recited.status) ||
+                recited.status,
             )}</span>`,
           );
         }
@@ -473,6 +506,19 @@
     if (els.listStatus) {
       els.listStatus.textContent = `已显示 ${shown} / ${total} 个单词`;
     }
+  }
+
+  function updateDeckMeta() {
+    if (!els.deckMeta || !state.deckWords.length) {
+      return;
+    }
+    const config = DECKS[state.deckKey] || DECKS.kaoyan1;
+    const total = state.deckWords.length;
+    const slain = slainCount();
+    els.deckMeta.textContent = `${config.label} · 共 ${total} 词 · 已斩 ${slain} · 待背 ${Math.max(
+      total - slain,
+      0,
+    )}`;
   }
 
   function renderDetail(entry, word, options = {}) {
@@ -607,6 +653,11 @@
     if (els.favoriteCount) {
       els.favoriteCount.textContent = String(state.favorites.size);
     }
+    if (els.knownCount) {
+      els.knownCount.textContent = String(slainCount());
+    }
+    els.hideKnown?.setAttribute("aria-pressed", String(state.hideKnown));
+    els.hideKnown?.classList.toggle("is-primary", state.hideKnown);
     if (els.wordbookCount) {
       els.wordbookCount.textContent = String(state.wordbook.size);
     }
@@ -783,11 +834,10 @@
     }
     try {
       state.deckWords = await loadDeck(config);
-      if (els.deckMeta) {
-        els.deckMeta.textContent = `${DECKS[config].label} · ${state.deckWords.length} 词 · 点单词看词卡`;
-      }
+      updateDeckMeta();
       renderList();
       renderStats();
+      syncCounters();
     } catch (error) {
       if (els.list) {
         els.list.innerHTML = `<p class="vocab-empty">${escapeHtml(
@@ -814,6 +864,7 @@
     renderList();
     renderWordbook();
     renderStats();
+    updateDeckMeta();
     showToast("已清空本机词汇记录");
   }
 
@@ -866,6 +917,13 @@
 
     els.favoriteOnly?.addEventListener("click", () => {
       state.favoriteOnly = !state.favoriteOnly;
+      state.visibleCount = PAGE_SIZE;
+      syncCounters();
+      renderList();
+    });
+
+    els.hideKnown?.addEventListener("click", () => {
+      state.hideKnown = !state.hideKnown;
       state.visibleCount = PAGE_SIZE;
       syncCounters();
       renderList();
@@ -963,12 +1021,26 @@
       state.sort = state.prefs.sort === "alpha" ? "alpha" : "frequency";
     }
 
+    // 封神之路等页面用 ?deck=llyc2027&word=xxx 直接跳到某张词卡。
+    const params = new URLSearchParams(window.location.search);
+    const deckParam = params.get("deck");
+    if (deckParam && DECKS[deckParam]) {
+      state.prefs.deckKey = deckParam;
+    }
+    const hideKnownParam = params.get("hideKnown");
+    if (hideKnownParam === "1" || hideKnownParam === "true") {
+      state.hideKnown = true;
+    }
+    const focusWord = (params.get("word") || "").trim();
+
     bindEvents();
     window.IballVocabRecite?.subscribe(() => {
       refreshRecite();
       renderList();
       renderStats();
+      syncCounters();
       syncReciteBar();
+      updateDeckMeta();
     });
     refreshRecite();
     syncCounters();
@@ -989,6 +1061,12 @@
       // 清单失败不影响词表本身，词库统计会退回本地计数。
     }
     await selectDeck(state.prefs.deckKey);
+    if (focusWord) {
+      if (els.search) {
+        els.search.value = focusWord;
+      }
+      openWord(focusWord);
+    }
     scheduleQuickIndex();
   }
 

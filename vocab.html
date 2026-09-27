@@ -53,7 +53,8 @@
             <h1 id="pageTitle">词汇库</h1>
             <p class="hero-description">
               恋练有词 2027 备考词库、考研英语一/英语二、四级、六级、零基础核心词。每张词卡带音标、释义、
-              例句、词根词缀与记忆法，可按「认识 / 模糊 / 不认识」记背词记录；记录随账号同步，未登录时只存本机。
+              例句、词根词缀与记忆法，可按「斩 · 已会 / 模糊 / 不认识」记背词记录。斩表示这个词已经会了，
+              不再计入每日任务；记录随账号同步，未登录时只存本机。
             </p>
             <div id="heroStats" class="hero-stats" aria-label="词库统计"></div>
           </div>
@@ -98,6 +99,15 @@
             <div class="tool-actions">
               <button id="favoriteOnlyButton" class="tool-button" type="button" aria-pressed="false">
                 收藏夹 (<span id="favoriteCount">0</span>)
+              </button>
+              <button
+                id="hideKnownButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="只留还没斩的单词，方便继续背"
+              >
+                隐藏已斩 (<span id="knownCount">0</span>)
               </button>
               <button id="wordbookButton" class="tool-button" type="button">
                 生词本 (<span id="wordbookCount">0</span>)
@@ -145,13 +155,28 @@
           <div id="reciteBar" class="vocab-recite" hidden>
             <span class="vocab-recite-label">背词记录</span>
             <div class="vocab-recite-actions" role="group" aria-label="背词记录">
-              <button class="compact-button recite-button" type="button" data-recite="known">
-                认识
+              <button
+                class="compact-button recite-button"
+                type="button"
+                data-recite="known"
+                title="斩：这个词已经会了，之后不再进每日任务"
+              >
+                斩 · 已会
               </button>
-              <button class="compact-button recite-button" type="button" data-recite="fuzzy">
+              <button
+                class="compact-button recite-button"
+                type="button"
+                data-recite="fuzzy"
+                title="模糊：还没记牢，明天继续复习"
+              >
                 模糊
               </button>
-              <button class="compact-button recite-button" type="button" data-recite="unknown">
+              <button
+                class="compact-button recite-button"
+                type="button"
+                data-recite="unknown"
+                title="不认识：完全没见过，标进待攻克"
+              >
                 不认识
               </button>
             </div>

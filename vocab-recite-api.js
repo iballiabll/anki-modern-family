@@ -1,12 +1,13 @@
 /**
  * 背词记录接口 v1（window.IballVocabRecite）。
  *
- * 供词汇库页面、研途计划页等同一站点内的页面读写“这个词我背过没有”：
+ * 供词汇库页面、封神之路（yantu/）等同一站点内的页面读写“这个词我背过没有”：
  *   getSnapshot()                   整份快照 { version, updatedAt, records, history }
  *   getRecords(deck?)               记录数组，可按词库过滤
  *   getRecord(deck, word)           单条记录或 null
  *   summary(deck?)                  各状态计数，用于进度条
- *   record({ deck, word, status })  记一次（认识 / 模糊 / 不认识）
+ *   daily(deck?, { days })          每日学习情况：今日新学 / 复习、连续天数、近 N 天
+ *   record({ deck, word, status })  记一次（已会（斩）/ 模糊 / 不认识）
  *   remove(deck, word)              删除一条
  *   clear(deck?)                    清空某个词库或全部
  *   exportJson() / importJson()     备份与合并导入
@@ -22,11 +23,14 @@
 
   const STORAGE_KEY = "iball_vocab_recite_v1";
   const HISTORY_LIMIT = 500;
-  const STATUSES = { known: "认识", fuzzy: "模糊", unknown: "不认识" };
+  // known 就是词卡上的「斩」：这个词已经会了，之后不再进每日任务。
+  const STATUSES = { known: "已会", fuzzy: "模糊", unknown: "不认识" };
+  const STATUS_BADGES = { known: "已斩", fuzzy: "模糊", unknown: "不认识" };
   const STATUS_KEYS = Object.keys(STATUSES);
 
   const listeners = new Set();
   let memory = null;
+  let memoryRaw = null;
 
   function emptyState() {
     return { version: 1, updatedAt: "", records: {}, history: [] };
@@ -74,13 +78,23 @@
     return state;
   }
 
+  /**
+   * 每次读都比对一遍底层的原始字符串：换账号、云端回写、另一个标签页
+   * 写入之后这里都会自然失效，不会拿着旧账号的缓存算每日进度。
+   */
   function readState() {
-    if (memory) {
+    let text = null;
+    try {
+      text = window.localStorage.getItem(STORAGE_KEY);
+    } catch {
+      text = null;
+    }
+    if (memory && text === memoryRaw) {
       return memory;
     }
+    memoryRaw = text;
     let raw = null;
     try {
-      const text = window.localStorage.getItem(STORAGE_KEY);
       raw = text ? JSON.parse(text) : null;
     } catch {
       raw = null;
@@ -91,8 +105,9 @@
 
   function writeState(state) {
     memory = state;
+    memoryRaw = JSON.stringify(state);
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      window.localStorage.setItem(STORAGE_KEY, memoryRaw);
     } catch {
       // 隐私模式或配额不足时保留内存副本，页面功能照常。
     }
@@ -152,6 +167,153 @@
       }
     }
     return totals;
+  }
+
+  function localDayKey(value) {
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+    const pad = (number) => String(number).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  function shiftDay(date, offset) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + offset);
+  }
+
+  /**
+   * 每日学习情况。封神之路的「恋练有词」面板直接吃这一份，不用自己数历史。
+   *
+   * 口径：
+   *   · 新学 = 某个词的 firstAt 落在今天；
+   *   · 复习 = 今天记的次数减去今天新学的词数（同一天反复记只算一次新学）；
+   *   · 连续天数 = 从今天（今天没记就从昨天）往前数的连续有记录日；
+   *   · history 只留最近 500 条，所以日期集合额外用记录的 firstAt / lastAt 兜底。
+   */
+  function daily(deck, options = {}) {
+    const state = readState();
+    const dayCount = Math.min(Math.max(Number(options.days) || 7, 1), 31);
+    const now = options.now ? new Date(options.now) : new Date();
+    const today = Number.isNaN(now.getTime()) ? new Date() : now;
+    const deckId = deck ? String(deck) : "";
+
+    const records = Object.values(state.records).filter(
+      (item) => !deckId || item.deck === deckId,
+    );
+    const history = state.history.filter((item) => !deckId || item.deck === deckId);
+
+    const perDay = new Map();
+    const activeDays = new Set();
+
+    function bucketFor(dayKey) {
+      let bucket = perDay.get(dayKey);
+      if (!bucket) {
+        bucket = { total: 0, known: 0, fuzzy: 0, unknown: 0 };
+        perDay.set(dayKey, bucket);
+      }
+      return bucket;
+    }
+
+    for (const item of history) {
+      const dayKey = localDayKey(item.at);
+      if (!dayKey) {
+        continue;
+      }
+      const bucket = bucketFor(dayKey);
+      bucket.total += 1;
+      if (bucket[item.status] !== undefined) {
+        bucket[item.status] += 1;
+      }
+      activeDays.add(dayKey);
+    }
+    for (const item of records) {
+      for (const stamp of [item.firstAt, item.lastAt]) {
+        const dayKey = localDayKey(stamp);
+        if (dayKey) {
+          activeDays.add(dayKey);
+        }
+      }
+    }
+
+    const todayKey = localDayKey(today);
+    const todayBucket = perDay.get(todayKey) || {
+      total: 0,
+      known: 0,
+      fuzzy: 0,
+      unknown: 0,
+    };
+    const newWordsToday = records.filter(
+      (item) => localDayKey(item.firstAt) === todayKey,
+    ).length;
+
+    let streak = 0;
+    let cursor = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (!activeDays.has(localDayKey(cursor))) {
+      cursor = shiftDay(cursor, -1);
+    }
+    while (activeDays.has(localDayKey(cursor)) && streak < 3650) {
+      streak += 1;
+      cursor = shiftDay(cursor, -1);
+    }
+
+    const days = [];
+    for (let offset = dayCount - 1; offset >= 0; offset -= 1) {
+      const date = shiftDay(today, -offset);
+      const dayKey = localDayKey(date);
+      const bucket = perDay.get(dayKey) || {
+        total: 0,
+        known: 0,
+        fuzzy: 0,
+        unknown: 0,
+      };
+      days.push({
+        date: dayKey,
+        label: `${date.getMonth() + 1}/${date.getDate()}`,
+        weekday: ["日", "一", "二", "三", "四", "五", "六"][date.getDay()],
+        isToday: dayKey === todayKey,
+        ...bucket,
+      });
+    }
+
+    let known = 0;
+    let fuzzy = 0;
+    let unknown = 0;
+    let reviews = 0;
+    for (const item of records) {
+      if (item.status === "known") {
+        known += 1;
+      } else if (item.status === "fuzzy") {
+        fuzzy += 1;
+      } else if (item.status === "unknown") {
+        unknown += 1;
+      }
+      reviews += item.reviews || 0;
+    }
+
+    return {
+      deck: deckId,
+      date: todayKey,
+      updatedAt: state.updatedAt,
+      today: {
+        studied: todayBucket.total,
+        newWords: newWordsToday,
+        reviews: Math.max(todayBucket.total - newWordsToday, 0),
+        known: todayBucket.known,
+        fuzzy: todayBucket.fuzzy,
+        unknown: todayBucket.unknown,
+      },
+      streak,
+      totals: {
+        studied: records.length,
+        known,
+        fuzzy,
+        unknown,
+        reviews,
+        remaining: Math.max(records.length - known, 0),
+      },
+      days,
+    };
   }
 
   function record({ deck, word, status, reviewedAt, source } = {}) {
@@ -260,6 +422,24 @@
     return () => listeners.delete(listener);
   }
 
+  // 换账号、或被别的标签页写过之后，订阅方要能重新算一遍。
+  if (window.iballAccounts?.onChange) {
+    try {
+      window.iballAccounts.onChange(() => {
+        memory = null;
+        memoryRaw = null;
+        emit();
+      });
+    } catch {
+      // 账号模块版本不匹配时忽略，本地记录照常。
+    }
+  }
+  window.addEventListener("storage", (event) => {
+    if (event?.key && String(event.key).includes(STORAGE_KEY)) {
+      emit();
+    }
+  });
+
   window.IballVocabRecite = {
     version: 1,
     storageKey: STORAGE_KEY,
@@ -267,10 +447,14 @@
     statusLabel(status) {
       return STATUSES[status] || status || "";
     },
+    statusBadge(status) {
+      return STATUS_BADGES[status] || STATUSES[status] || status || "";
+    },
     getSnapshot,
     getRecords,
     getRecord,
     summary,
+    daily,
     record,
     remove,
     clear,

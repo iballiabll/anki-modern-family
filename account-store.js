@@ -31,6 +31,24 @@
   const SYNC_RETRY_MS = 15000;
   const HEARTBEAT_MS = 60000;
 
+  // 接口地址跟着本文件的位置走，而不是当前页面：yantu/ 这类子目录里的页面
+  // 用 ../account-store.js 引入时，"api/progress" 仍然指向站点根目录。
+  const API_BASE = (() => {
+    const src = document.currentScript?.src || "";
+    if (src) {
+      try {
+        return new URL(".", src).href;
+      } catch {
+        // 下面还有兜底。
+      }
+    }
+    return new URL("./", window.location.href).href;
+  })();
+
+  function apiUrl(path) {
+    return `${API_BASE}${path}`;
+  }
+
   // ── 底层存储 ──────────────────────────────────────────────────────────
   // 优先用真的 localStorage；被隐私模式禁用时退回内存，功能照常只是不持久。
   let backing = null;
@@ -450,7 +468,7 @@
   }
 
   async function postProgress(body, keepalive) {
-    const response = await fetch("./api/progress", {
+    const response = await fetch(apiUrl("api/progress"), {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
@@ -602,7 +620,7 @@
       return null;
     }
     try {
-      const response = await fetch("./api/telemetry", {
+      const response = await fetch(apiUrl("api/telemetry"), {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
