@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#17204f" />
+    <meta
+      name="description"
+      content="词汇库：考研英语一/二、四级、六级、零基础核心词，音标、释义、例句、词根词缀与记忆法，支持列表快捷标记、抽卡复习、未背筛选、释义模糊、收藏与生词本。"
+    />
+    <title>词汇库 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2317204f'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <script>
+      // 主站用 iframe 内嵌时的紧凑版式：只保留筛选与词表。
+      if (new URLSearchParams(window.location.search).get("embed") === "1") {
+        document.documentElement.dataset.vocabEmbed = "true";
+      }
+    </script>
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <link rel="stylesheet" href="./vocab.css?v=20260927-blur4" />
+    <script src="./account-store.js?v=20260927-blur4" defer></script>
+    <script src="./vocab-recite-api.js?v=20260927-blur4" defer></script>
+    <script src="./speech-transport.js?v=20260927-blur4" defer></script>
+    <script src="./vocab.js?v=20260927-blur4" defer></script>
+  </head>
+  <body class="vocab-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./kaoyan.html">考研真题</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link topbar-link-extra" href="./writing.html">作文批改</a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>词汇库</strong>
+          <small>VOCABULARY DECK</small>
+        </span>
+      </a>
+      <a class="topbar-link topbar-source" href="./review.html">复习</a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">WORD BANK</p>
+            <h1 id="pageTitle">词汇库</h1>
+            <p class="hero-description">
+              恋练有词 2027 备考词库、考研英语一/英语二、四级、六级、零基础核心词。每张词卡带音标、释义、
+              例句、词根词缀与记忆法，可按「斩 · 已会 / 模糊 / 不认识」记背词记录。斩表示这个词已经会了，
+              不再计入每日任务；列表里可以直接点快捷状态，再点当前状态可以取消，也可以用抽卡模式先看单词、
+              再手动显示释义。记录随账号同步，未登录时只存本机。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="词库统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="词库设置">
+            <div class="setting-group">
+              <label class="setting-label" for="deckSelect">考试词库</label>
+              <select id="deckSelect" class="paper-select">
+                <option value="llyc2027" selected>恋练有词 2027（备考词库）</option>
+                <option value="kaoyan1">考研英语一（核心词）</option>
+                <option value="kaoyan2">考研英语二（核心词）</option>
+                <option value="cet4">四级核心词</option>
+                <option value="cet6">六级核心词</option>
+                <option value="basic">零基础高频词</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label class="setting-label" for="searchInput">查词</label>
+              <input
+                id="searchInput"
+                class="paper-select"
+                type="search"
+                placeholder="输入英文或中文释义"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">排序</span>
+              <div class="segmented-control sort-control" role="group" aria-label="排序方式">
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-sort="default"
+                  aria-pressed="true"
+                  title="按词书文件里的原始顺序显示，恋练有词 2027 就是 27 个单元的顺序"
+                >
+                  默认词书顺序
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-sort="frequency"
+                  aria-pressed="false"
+                  title="词表本身按词频导出，切换到恋练有词时这里是单元顺序"
+                >
+                  高频优先
+                </button>
+                <button class="segment-button" type="button" data-sort="alpha" aria-pressed="false">
+                  字母序
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <a
+                id="backXxjrButton"
+                class="tool-button vocab-xxjr-link"
+                href="./xxrj/"
+                target="_top"
+                title="返回刷题计划页面"
+              >
+                返回 XXRJ
+              </a>
+              <button id="favoriteOnlyButton" class="tool-button" type="button" aria-pressed="false">
+                收藏夹 (<span id="favoriteCount">0</span>)
+              </button>
+              <button
+                id="hideKnownButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="只留还没斩的单词；再点恢复全部"
+              >
+                只看未背 (<span id="knownCount">0</span> 已斩)
+              </button>
+              <button
+                id="blurModeButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="遮住列表和词卡的释义，点击开始或关闭模糊复习"
+              >
+                释义模糊
+              </button>
+              <button
+                id="drawModeButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="从当前筛选里随机抽词，先看单词，再手动显示释义"
+              >
+                抽卡复习
+              </button>
+              <button id="wordbookButton" class="tool-button" type="button">
+                生词本 (<span id="wordbookCount">0</span>)
+              </button>
+              <button id="clearProgressButton" class="tool-button" type="button">
+                清空进度
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="vocab-board">
+        <div class="vocab-list-panel">
+          <div class="vocab-panel-head">
+            <h2 id="deckTitle">考研核心词库</h2>
+            <span id="deckMeta" class="vocab-panel-hint">正在准备词表…</span>
+          </div>
+          <div id="vocabList" class="vocab-list" tabindex="0" aria-label="单词列表">
+            <div class="loading-state">
+              <strong>正在准备词表</strong>
+              <span>词表按考试分开加载，词卡详情再按分片懒加载。</span>
+            </div>
+          </div>
+          <div class="vocab-list-foot">
+            <button id="loadMoreButton" class="tool-button" type="button" hidden>加载更多</button>
+            <span id="listStatus" class="vocab-list-status" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <aside id="wordPanel" class="vocab-detail-panel" aria-labelledby="wordPanelTitle" hidden>
+          <div class="vocab-panel-head">
+            <h2 id="wordPanelTitle">词卡</h2>
+            <div class="vocab-detail-actions">
+              <button id="speakWordButton" class="compact-button" type="button">朗读</button>
+              <button id="favoriteWordButton" class="compact-button" type="button" aria-pressed="false">
+                收藏
+              </button>
+              <button id="wordbookToggleButton" class="compact-button" type="button" aria-pressed="false">
+                加入生词本
+              </button>
+              <button id="closeWordButton" class="compact-button" type="button">关闭</button>
+            </div>
+          </div>
+          <div id="reciteBar" class="vocab-recite" hidden>
+            <span class="vocab-recite-label">背词记录</span>
+            <div class="vocab-recite-actions" role="group" aria-label="背词记录">
+              <button
+                class="compact-button recite-button"
+                type="button"
+                data-recite="known"
+                title="斩：这个词已经会了，之后不再进每日任务；再点取消斩"
+              >
+                斩 · 已会
+              </button>
+              <button
+                class="compact-button recite-button"
+                type="button"
+                data-recite="fuzzy"
+                title="模糊：还没记牢，明天继续复习；再点取消"
+              >
+                模糊
+              </button>
+              <button
+                class="compact-button recite-button"
+                type="button"
+                data-recite="unknown"
+                title="不认识：完全没见过，标进待攻克；再点取消"
+              >
+                不认识
+              </button>
+            </div>
+            <span id="reciteStatus" class="vocab-recite-status" role="status" aria-live="polite"></span>
+          </div>
+          <div id="wordDetail" class="vocab-detail" role="status" aria-live="polite"></div>
+        </aside>
+      </section>
+
+      <section id="drawPanel" class="vocab-draw-panel" hidden aria-labelledby="drawTitle">
+        <div class="vocab-panel-head">
+          <div class="vocab-draw-heading">
+            <h2 id="drawTitle">抽卡复习</h2>
+            <span id="drawStatus" class="vocab-panel-hint">正在准备抽卡…</span>
+          </div>
+          <div class="vocab-panel-actions">
+            <button id="drawNextButton" class="compact-button" type="button">下一张</button>
+            <button id="drawCloseButton" class="compact-button" type="button">关闭</button>
+          </div>
+        </div>
+        <div id="drawControls" class="vocab-draw-controls" aria-label="抽卡设置">
+          <div class="vocab-draw-control-group">
+            <span class="setting-label">出卡顺序</span>
+            <div class="segmented-control" role="group" aria-label="抽卡顺序">
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-order="sequential"
+                aria-pressed="false"
+                title="按当前筛选后的词表排列逐张推进"
+              >
+                顺序版
+              </button>
+              <button
+                class="segment-button is-active"
+                type="button"
+                data-draw-order="random"
+                aria-pressed="true"
+                title="每轮随机抽取，抽过的词尽量不重复"
+              >
+                非顺序版
+              </button>
+            </div>
+          </div>
+          <div class="vocab-draw-control-group">
+            <span class="setting-label">抽卡范围</span>
+            <div class="segmented-control vocab-draw-scope" role="group" aria-label="抽卡范围">
+              <button
+                class="segment-button is-active"
+                type="button"
+                data-draw-scope="all"
+                aria-pressed="true"
+                title="从当前词库和筛选结果里的全部单词抽取"
+              >
+                所有
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="unlearned"
+                aria-pressed="false"
+                title="跳过已经斩掉的词，模糊、不会和没背过的都算"
+              >
+                未斩
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="known"
+                aria-pressed="false"
+                title="只抽已经斩掉的单词"
+              >
+                已斩
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="fuzzy"
+                aria-pressed="false"
+                title="只抽标记为「模糊」的单词"
+              >
+                模糊
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="unknown"
+                aria-pressed="false"
+                title="只抽标记为「不会」的单词"
+              >
+                不会
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="favorites"
+                aria-pressed="false"
+                title="只抽收藏夹里的单词"
+              >
+                收藏
+              </button>
+            </div>
+          </div>
+          <div class="vocab-draw-control-group">
+            <span class="setting-label">记录时间</span>
+            <div class="segmented-control vocab-draw-days" role="group" aria-label="按背词记录时间抽卡">
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="1"
+                aria-pressed="false"
+                title="只抽今天背过的词"
+              >
+                今天
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="3"
+                aria-pressed="false"
+                title="只抽近 3 天背过的词"
+              >
+                近 3 天
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="7"
+                aria-pressed="false"
+                title="只抽近 7 天背过的词"
+              >
+                近 7 天
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="30"
+                aria-pressed="false"
+                title="只抽近 30 天背过的词"
+              >
+                近 30 天
+              </button>
+              <button
+                class="segment-button is-active"
+                type="button"
+                data-draw-days="0"
+                aria-pressed="true"
+                title="不按时间过滤，有背词记录的词都能抽到"
+              >
+                不限
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="vocab-draw-stage">
+          <article class="vocab-draw-card" aria-live="polite">
+            <span id="drawKicker" class="vocab-draw-kicker">RANDOM CARD</span>
+            <h3 id="drawWord">准备抽卡…</h3>
+            <p id="drawPhonetic" class="vocab-draw-phonetic"></p>
+            <div id="drawAnswer" class="vocab-draw-answer" hidden></div>
+            <div class="vocab-draw-actions">
+              <button id="drawRevealButton" class="tool-button is-primary" type="button">
+                显示释义
+              </button>
+              <div id="drawReciteActions" class="vocab-draw-recite-actions" role="group" aria-label="抽卡背词记录" hidden>
+                <button class="compact-button draw-recite-button" type="button" data-draw-recite="known">
+                  斩 · 已会
+                </button>
+                <button class="compact-button draw-recite-button" type="button" data-draw-recite="fuzzy">
+                  模糊
+                </button>
+                <button class="compact-button draw-recite-button" type="button" data-draw-recite="unknown">
+                  不会
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="wordbookPanel" class="vocab-wordbook-panel" hidden aria-labelledby="wordbookTitle">
+        <div class="vocab-panel-head">
+          <h2 id="wordbookTitle">生词本</h2>
+          <div class="vocab-panel-actions">
+            <button id="exportWordbookButton" class="compact-button" type="button">导出 JSON</button>
+            <button id="copyWordbookButton" class="compact-button" type="button">复制单词表</button>
+            <button id="clearWordbookButton" class="compact-button" type="button">清空</button>
+            <button id="closeWordbookButton" class="compact-button" type="button">收起</button>
+          </div>
+        </div>
+        <div id="wordbookList" class="vocab-wordbook-list"></div>
+      </section>
+
+      <section class="kaoyan-attribution" aria-labelledby="vocabCreditTitle">
+        <h2 id="vocabCreditTitle">数据来源与开源借鉴</h2>
+        <p>
+          词表按考试类型整理自站内考试词表，音标、英释与词形变化来自开源词典数据，词根词缀与形近词辨析同样来自公开词典数据；
+          词卡分片、点词索引由 <code>scripts/build-vocab-shards.mjs</code> 生成，页面按分片懒加载并缓存。
+        </p>
+        <ul>
+          <li>
+            <a href="https://github.com/blueweiwei/wordbook-llyc" target="_blank" rel="noopener noreferrer">blueweiwei/wordbook-llyc</a>
+            （未标注许可证）：提供《恋练有词》词头与单元顺序，站点只取这份事实性列表，不复制其释义；
+            公开渠道暂无《恋练有词 2027》官方电子词表，本页词库以可获取的最新公开词头顺序作为备考基线，
+            释义由 ECDict 补齐，不代表官方 2027 版内容。
+          </li>
+          <li>
+            <a href="https://github.com/lilinji/English" target="_blank" rel="noopener noreferrer">lilinji/English</a>
+            （未标注许可证）：按考试类型分类的词汇数据结构与列表式展示思路。
+          </li>
+          <li>
+            <a href="https://github.com/skywind3000/ECDict" target="_blank" rel="noopener noreferrer">skywind3000/ECDict</a>
+            （MIT）：音标、释义、词形变化、词根与形近词数据。
+          </li>
+          <li>
+            <a href="https://github.com/tangshimin/MuJing" target="_blank" rel="noopener noreferrer">tangshimin/MuJing</a>
+            （GPL-3.0）：点词查义的交互组织方式，仅参考设计思路，未使用其代码。
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

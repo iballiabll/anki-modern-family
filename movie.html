@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#2b2338" />
+    <meta
+      name="description"
+      content="美剧台词精读：完整台词、逐句精翻、日常替换说法，标注四级、六级、考研单词与固定搭配。"
+    />
+    <title>美剧台词精读 · iball的小屋</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232b2338'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./movie.css" />
+    <link rel="stylesheet" href="./speech-transport.css" />
+    <script src="./account-store.js" defer></script>
+    <script src="./speech-transport.js" defer></script>
+    <script src="./deck-data.js" defer></script>
+    <script src="./vocab-index.js" defer></script>
+    <script src="./collocation-index.js" defer></script>
+    <script src="./movie-data/index.js" defer></script>
+    <script src="./movie.js" defer></script>
+  </head>
+  <body class="movie-page">
+    <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
+
+    <header class="intensive-topbar">
+      <span class="topbar-links">
+        <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
+        <a class="topbar-link" href="./quiz.html">单词测试</a>
+        <a class="topbar-link" href="./kaoyan.html">考研英语</a>
+        <a class="topbar-link topbar-link-extra" href="./periodical.html">
+          外刊精读
+        </a>
+      </span>
+      <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
+        <span class="brand-mark" aria-hidden="true">ib</span>
+        <span class="brand-copy">
+          <strong>台词精读</strong>
+          <small>IBALL'S SCREENPLAY CABIN</small>
+        </span>
+      </a>
+      <a
+        id="sourceLink"
+        class="topbar-link topbar-source"
+        href="./index.html"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        剧集素材
+      </a>
+    </header>
+
+    <main>
+      <section class="intensive-hero" aria-labelledby="pageTitle">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">SCREENPLAY INTENSIVE</p>
+            <h1 id="pageTitle">美剧台词精读</h1>
+            <p class="hero-description">
+              完整台词逐句精翻，指出固定搭配与日常更自然的说法，点击单词优先查站内词库。
+            </p>
+            <div id="heroStats" class="hero-stats" aria-label="剧集内容统计"></div>
+          </div>
+
+          <div class="hero-tools" aria-label="阅读设置">
+            <div class="setting-group">
+              <label class="setting-label" for="episodeSelect">选择剧集</label>
+              <select id="episodeSelect" class="paper-select"></select>
+            </div>
+
+            <div class="setting-group">
+              <span class="setting-label">显示模式</span>
+              <div class="segmented-control" role="group" aria-label="显示模式">
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-display-mode="bilingual"
+                  aria-pressed="true"
+                >
+                  中英对照
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-display-mode="english"
+                  aria-pressed="false"
+                >
+                  只看英文
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-display-mode="chinese"
+                  aria-pressed="false"
+                >
+                  只看中文
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-actions">
+              <button id="levelToggleButton" class="tool-button" type="button">
+                隐藏考试词标记
+              </button>
+              <button
+                id="sentenceVocabToggleButton"
+                class="tool-button"
+                type="button"
+              >
+                隐藏本句词汇
+              </button>
+              <button id="alternativeToggleButton" class="tool-button" type="button">
+                隐藏替换说法
+              </button>
+              <button
+                id="abLoopButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="先点这里，再点任意两句的“循环”，即可反复精听这一段"
+              >
+                A-B 选段循环
+              </button>
+              <button id="readAllButton" class="tool-button is-primary" type="button">
+                全集播放
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="movieLayout" class="intensive-layout">
+        <nav
+          id="sceneNavigation"
+          class="piece-navigation"
+          aria-label="分场导航"
+        ></nav>
+
+        <section id="movieContent" class="intensive-content">
+          <div class="loading-state">
+            <strong>正在读取台词</strong>
+            <span>请稍候。</span>
+          </div>
+        </section>
+
+        <aside
+          id="wordPanel"
+          class="word-panel"
+          aria-labelledby="wordPanelTitle"
+          aria-hidden="true"
+          hidden
+        >
+          <div class="word-panel-head">
+            <span>台词生词</span>
+            <button id="closeWordPanelButton" class="icon-button" type="button">
+              关闭
+            </button>
+          </div>
+
+          <div class="word-actions">
+            <button id="markUnknownButton" class="mark-button is-unknown" type="button">
+              不会
+            </button>
+            <button id="markKnownButton" class="mark-button is-known" type="button">
+              掌握
+            </button>
+          </div>
+
+          <p class="word-panel-footnote">
+            标记后进入电影不会卡组，复习页可按分类单独查看。
+          </p>
+
+          <div class="word-heading">
+            <h2 id="wordPanelTitle" lang="en"></h2>
+            <button id="speakWordButton" class="compact-button" type="button">
+              朗读
+            </button>
+          </div>
+          <p id="wordPanelPhonetic" class="word-phonetic" lang="en"></p>
+          <p id="wordLevelBadges" class="word-levels" hidden></p>
+          <p id="wordLookupStatus" class="word-lookup-status" role="status"></p>
+          <div id="wordMeanings" class="word-meanings"></div>
+
+          <section id="wordPhraseSection" class="word-block" hidden>
+            <span class="word-block-label">固定搭配</span>
+            <div id="wordPhrases" class="word-phrases"></div>
+          </section>
+
+          <section id="wordExampleSection" class="word-block" hidden>
+            <span class="word-block-label">例句</span>
+            <div id="wordExamples" class="word-examples"></div>
+          </section>
+
+          <div class="word-context">
+            <span>当前语境</span>
+            <p id="wordContextSentence" lang="en"></p>
+            <p id="wordContextTranslation"></p>
+          </div>
+
+          <label class="word-note-field" for="wordNoteInput">
+            <span>补充释义</span>
+            <textarea
+              id="wordNoteInput"
+              rows="3"
+              maxlength="800"
+              placeholder="可手动补充词义或记忆提示"
+            ></textarea>
+          </label>
+
+        </aside>
+      </div>
+
+      <section class="movie-attribution" aria-labelledby="movieCreditTitle">
+        <h2 id="movieCreditTitle">数据来源与开源借鉴</h2>
+        <p>
+          字幕按句切分、逐句复听、字幕联动与播放控制参考了
+          <a
+            href="https://github.com/tangshimin/MuJing"
+            target="_blank"
+            rel="noopener noreferrer"
+          >tangshimin/MuJing</a>
+          的公开实现思路；
+          <a
+            href="https://github.com/isboyjc/le-agent"
+            target="_blank"
+            rel="noopener noreferrer"
+          >isboyjc/le-agent</a>
+          提供了“原音 → 跟读 → 评分 → 反馈”的交互顺序参考。
+          本站只借鉴结构与交互思路，未复制其代码或受版权保护的素材。
+        </p>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

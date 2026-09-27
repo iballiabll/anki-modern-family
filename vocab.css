@@ -1,0 +1,823 @@
+/**
+ * 词汇库页面样式。
+ * 只作用于 body.vocab-page，避免影响站内其它模块。
+ * 版式：左侧可滚动单词列表 + 右侧词卡详情（移动端上下堆叠）。
+ */
+
+.vocab-page {
+  --vocab-radius: 8px;
+  --vocab-topbar: 64px;
+}
+
+.vocab-board {
+  width: min(1160px, calc(100% - 44px));
+  margin: 20px auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.vocab-board.has-detail {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+}
+
+.vocab-list-panel,
+.vocab-detail-panel,
+.vocab-wordbook-panel {
+  background: #ffffff;
+  border: 1px solid rgba(11, 17, 41, 0.12);
+  border-radius: var(--vocab-radius);
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.08);
+}
+
+.vocab-list-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: calc(100vh - var(--vocab-topbar) - 40px);
+  position: sticky;
+  top: calc(var(--vocab-topbar) + 12px);
+  overflow: hidden;
+}
+
+.vocab-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
+  border-radius: var(--vocab-radius) var(--vocab-radius) 0 0;
+}
+
+.vocab-panel-head h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--forest-deep);
+}
+
+.vocab-panel-hint {
+  color: #5d6274;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vocab-list {
+  overflow-y: auto;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  scrollbar-width: thin;
+}
+
+.vocab-list:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.vocab-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fbfbfd;
+  border: 1px solid rgba(11, 17, 41, 0.1);
+  border-radius: var(--vocab-radius);
+  transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.vocab-row:hover {
+  border-color: rgba(21, 29, 60, 0.42);
+  box-shadow: 0 6px 16px rgba(11, 17, 41, 0.1);
+}
+
+.vocab-row.is-active {
+  border-color: var(--forest-deep);
+  background: #eef0f6;
+}
+
+.vocab-row-main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vocab-row-main:focus-visible,
+.vocab-quick-button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.vocab-row-index {
+  min-width: 34px;
+  color: #7d8193;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.vocab-row-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.vocab-row-word {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--forest-deep);
+  overflow-wrap: anywhere;
+}
+
+.vocab-row-word small {
+  color: #7d8193;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vocab-row-meaning {
+  color: #4d5162;
+  font-size: 12px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vocab-row-flags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #5d6274;
+}
+
+.vocab-row-flags .is-marked {
+  color: var(--coral);
+}
+
+.vocab-row-flags .is-recited {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.vocab-row-flags .is-recited.is-fuzzy {
+  background: rgba(255, 176, 0, 0.18);
+  color: #8a5300;
+}
+
+.vocab-row-flags .is-recited.is-unknown {
+  background: rgba(240, 82, 99, 0.16);
+  color: var(--coral-dark);
+}
+
+.vocab-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vocab-quick-button {
+  min-height: 32px;
+  padding: 0 9px;
+  color: #5d6274;
+  background: #ffffff;
+  border: 1px solid #d3d5df;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.vocab-quick-button:hover {
+  color: var(--forest);
+  border-color: #8e94ad;
+}
+
+.vocab-quick-button.is-known.is-active {
+  color: #ffffff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.vocab-quick-button.is-fuzzy.is-active {
+  color: #3a2600;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.vocab-quick-button.is-unknown.is-active {
+  color: #ffffff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+.vocab-xxjr-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.vocab-list-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
+  border-radius: 0 0 var(--vocab-radius) var(--vocab-radius);
+}
+
+.vocab-list-status {
+  color: #5d6274;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------- 词卡详情 */
+
+.vocab-detail-panel {
+  position: sticky;
+  top: calc(var(--vocab-topbar) + 12px);
+  max-height: calc(100vh - var(--vocab-topbar) - 40px);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.vocab-recite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
+}
+
+.vocab-recite-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #5d6274;
+}
+
+.vocab-recite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vocab-recite-status {
+  color: #5d6274;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.recite-button.is-known.is-active {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: #ffffff;
+}
+
+.recite-button.is-fuzzy.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #3a2600;
+}
+
+.recite-button.is-unknown.is-active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #ffffff;
+}
+
+.vocab-detail-actions,
+.vocab-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vocab-detail {
+  overflow-y: auto;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  scrollbar-width: thin;
+}
+
+.vocab-detail.is-loading {
+  opacity: 0.62;
+}
+
+.vocab-head-word {
+  display: grid;
+  gap: 6px;
+}
+
+.vocab-head-word h3 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+  color: var(--forest-deep);
+  overflow-wrap: anywhere;
+}
+
+.vocab-head-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #5d6274;
+  font-size: 13px;
+}
+
+.vocab-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef0f6;
+  color: #2f385a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.vocab-block {
+  display: grid;
+  gap: 6px;
+}
+
+.vocab-block h4 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #7d8193;
+}
+
+.vocab-block ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: #333746;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.vocab-block p {
+  margin: 0;
+  color: #333746;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.vocab-row-meaning,
+.vocab-detail .vocab-block p,
+.vocab-detail .vocab-block ul,
+.vocab-draw-answer {
+  transition: filter 0.18s ease;
+}
+
+body.is-vocab-blur .vocab-row-meaning,
+body.is-vocab-blur .vocab-detail .vocab-block p,
+body.is-vocab-blur .vocab-detail .vocab-block ul,
+body.is-vocab-blur .vocab-draw-answer {
+  filter: blur(5px);
+  user-select: none;
+}
+
+/* 点过的单条释义临时看清，关掉模糊时由脚本统一还原。 */
+body.is-vocab-blur .vocab-row.is-revealed .vocab-row-meaning,
+body.is-vocab-blur .vocab-detail .vocab-block.is-revealed p,
+body.is-vocab-blur .vocab-detail .vocab-block.is-revealed ul,
+body.is-vocab-blur .vocab-draw-answer.is-revealed {
+  filter: none;
+  user-select: text;
+}
+
+body.is-vocab-blur .vocab-row .vocab-row-main {
+  cursor: pointer;
+}
+
+/* 模糊复习时按钮跟着页面滚动，滚到哪都能一下恢复清晰。 */
+body.is-vocab-blur #blurModeButton {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  z-index: 80;
+  min-width: 132px;
+  box-shadow: 0 12px 28px rgba(11, 17, 41, 0.26);
+}
+
+.vocab-example {
+  padding: 10px 12px;
+  background: #f6f7fa;
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--vocab-radius) var(--vocab-radius) 0;
+  color: #2f3446;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------- 抽卡复习 */
+
+.vocab-draw-panel {
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(11, 17, 41, 0.12);
+  border-radius: var(--vocab-radius);
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.08);
+}
+
+.vocab-draw-panel[hidden],
+.vocab-draw-answer[hidden],
+.vocab-draw-recite-actions[hidden] {
+  display: none;
+}
+
+.vocab-draw-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 14px;
+}
+
+.vocab-draw-controls {
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: minmax(170px, 0.6fr) minmax(0, 1.5fr) minmax(0, 1.1fr);
+  gap: 14px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+}
+
+.vocab-draw-control-group {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.vocab-draw-scope {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.vocab-draw-days {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.vocab-draw-controls .segment-button {
+  padding: 0 8px;
+}
+
+.vocab-draw-stage {
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: #f6f7fa;
+}
+
+.vocab-draw-card {
+  width: min(680px, 100%);
+  min-height: 330px;
+  padding: 28px;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid rgba(11, 17, 41, 0.14);
+  border-radius: var(--vocab-radius);
+  box-shadow: 0 12px 28px rgba(11, 17, 41, 0.1);
+}
+
+.vocab-draw-kicker {
+  color: #7d8193;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.vocab-draw-card h3 {
+  margin: 0;
+  color: var(--forest-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 6vw, 56px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.vocab-draw-phonetic {
+  min-height: 22px;
+  margin: 0;
+  color: #5d6274;
+  font-size: 15px;
+}
+
+.vocab-draw-answer {
+  width: min(560px, 100%);
+  min-height: 52px;
+  color: #333746;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.vocab-draw-answer p {
+  margin: 0;
+}
+
+.vocab-draw-actions {
+  width: min(560px, 100%);
+  margin-top: 8px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+}
+
+.vocab-draw-actions > .tool-button {
+  min-width: 150px;
+}
+
+.vocab-draw-recite-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.draw-recite-button.is-known.is-active {
+  color: #ffffff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.draw-recite-button.is-fuzzy.is-active {
+  color: #3a2600;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.draw-recite-button.is-unknown.is-active {
+  color: #ffffff;
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+/* ------------------------------------------------------------- 生词本 */
+
+.vocab-wordbook-panel {
+  width: min(1160px, calc(100% - 44px));
+  margin: 18px auto 0;
+  overflow: hidden;
+}
+
+.vocab-wordbook-list {
+  padding: 12px 16px 16px;
+  display: grid;
+  gap: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.vocab-wordbook-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fbfbfd;
+  border: 1px solid rgba(11, 17, 41, 0.1);
+  border-radius: var(--vocab-radius);
+}
+
+.vocab-wordbook-item strong {
+  color: var(--forest-deep);
+  overflow-wrap: anywhere;
+}
+
+.vocab-wordbook-item span {
+  display: block;
+  margin-top: 3px;
+  color: #5d6274;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.vocab-empty {
+  margin: 0;
+  padding: 18px;
+  text-align: center;
+  color: #7d8193;
+  font-size: 13px;
+}
+
+@media (max-width: 980px) {
+  .vocab-board {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100% - 28px, 760px);
+  }
+
+  .vocab-board.has-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vocab-list-panel,
+  .vocab-detail-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .vocab-list {
+    max-height: 60vh;
+  }
+
+  .vocab-wordbook-panel {
+    width: min(100% - 28px, 760px);
+  }
+
+  .vocab-draw-panel {
+    width: min(100% - 28px, 760px);
+  }
+
+  .vocab-draw-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .vocab-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vocab-row-main {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .vocab-row-index {
+    min-width: 0;
+  }
+
+  .vocab-row-flags {
+    grid-column: 2;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .vocab-row-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .vocab-quick-button {
+    min-width: 0;
+    padding: 0 5px;
+  }
+
+  .vocab-head-word h3 {
+    font-size: 22px;
+  }
+
+  .vocab-draw-stage {
+    padding: 14px;
+  }
+
+  .vocab-draw-card {
+    min-height: 300px;
+    padding: 22px 14px;
+  }
+
+  .vocab-draw-card h3 {
+    font-size: 34px;
+  }
+
+  .vocab-draw-recite-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vocab-draw-controls {
+    padding: 12px;
+  }
+
+  .vocab-draw-scope {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .vocab-draw-days {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ------------------------------------------- 主站内嵌模式（?embed=1） */
+
+html[data-vocab-embed="true"] .vocab-page {
+  --vocab-topbar: 0px;
+}
+
+html[data-vocab-embed="true"] .reading-progress,
+html[data-vocab-embed="true"] .intensive-topbar,
+html[data-vocab-embed="true"] .hero-copy,
+html[data-vocab-embed="true"] .kaoyan-attribution {
+  display: none;
+}
+
+html[data-vocab-embed="true"] .intensive-hero {
+  padding: 14px 16px;
+}
+
+html[data-vocab-embed="true"] .hero-inner {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+}
+
+html[data-vocab-embed="true"] .hero-tools {
+  padding: 0;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  align-items: end;
+  border: 0;
+}
+
+html[data-vocab-embed="true"] .hero-tools .tool-actions {
+  grid-column: 1 / -1;
+}
+
+html[data-vocab-embed="true"] .vocab-board,
+html[data-vocab-embed="true"] .vocab-draw-panel,
+html[data-vocab-embed="true"] .vocab-wordbook-panel {
+  width: calc(100% - 28px);
+  margin-top: 16px;
+}
+
+html[data-vocab-embed="true"] .vocab-list-panel,
+html[data-vocab-embed="true"] .vocab-detail-panel {
+  top: 12px;
+  max-height: calc(100vh - 40px);
+}
+
+@media (max-width: 980px) {
+  html[data-vocab-embed="true"] .vocab-list-panel,
+  html[data-vocab-embed="true"] .vocab-detail-panel {
+    top: auto;
+    max-height: none;
+  }
+}
+
+@media (max-width: 900px) {
+  html[data-vocab-embed="true"] .intensive-hero {
+    padding: 12px 14px;
+  }
+
+  html[data-vocab-embed="true"] .hero-tools {
+    gap: 12px;
+  }
+}
+
+/* 排序：默认词书顺序 / 高频（单元）顺序 / 字母序，三格等宽。 */
+.segmented-control.sort-control {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.segmented-control.sort-control .segment-button {
+  padding: 8px 6px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@media (max-width: 620px) {
+  .segmented-control.sort-control .segment-button {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,694 @@
+{
+  "exam": "english-i",
+  "examLabel": "考研英语一",
+  "wordTarget": "小作文约 100 词；大作文 160-200 词",
+  "note": "本站原创整理的写作骨架与自查清单，用于和你自己的模板资料对照；不是官方范文，考场必须替换槽位来回应具体题目。",
+  "templates": [
+    {
+      "id": "english-i-small-suggestion",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "建议信",
+      "title": "建议信 · 向负责人提改进建议",
+      "scenario": "给图书馆、学生会、社团或项目负责人写信，就某项活动或服务提出改进建议。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {收件人},",
+          "zh": "尊敬的……：",
+          "note": "收件人用题目给定的身份；不知道姓名时写 Dear Sir or Madam, 不要自造姓名。"
+        },
+        {
+          "section": "开篇点题",
+          "en": "I am writing to offer some suggestions concerning {话题}.",
+          "zh": "我写信是想就……提出几点建议。",
+          "note": "一句话交代写信目的，不铺垫背景，约 100 词的小作文没有空间写长引子。"
+        },
+        {
+          "section": "建议一",
+          "en": "To begin with, it would be advisable to {建议一}, which would {预期效果}.",
+          "zh": "首先，宜……，这会……。",
+          "note": "建议要具体到可执行的动作，并说明好处，避免只写 It is important to ...。"
+        },
+        {
+          "section": "建议二",
+          "en": "In addition, I suggest that {建议二} so that {受益对象} can {受益结果}.",
+          "zh": "此外，我建议……，这样……就能……。",
+          "note": "两条建议写透即可；题目要求三点时必须写满三点，漏要点直接按任务完成度扣分。"
+        },
+        {
+          "section": "礼貌收尾",
+          "en": "I would appreciate it if you could take my suggestions into consideration.",
+          "zh": "如果您能考虑我的建议，我将不胜感激。",
+          "note": "收尾只表达感谢与期待，不要另起新话题。"
+        },
+        {
+          "section": "落款",
+          "en": "Yours sincerely,\nLi Ming",
+          "zh": "此致\n李明",
+          "note": "署名一律用题目给定的名字，没有就给 Li Ming；不要写真实姓名。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "开篇点题",
+          "en": "I am writing to offer some suggestions concerning the service of our library.",
+          "zh": "我写信是想就图书馆的服务提出几点建议。"
+        },
+        {
+          "function": "提出建议",
+          "en": "It would be advisable for the club to hold monthly reading sessions.",
+          "zh": "社团宜每月举办一次读书会。"
+        },
+        {
+          "function": "说明理由",
+          "en": "This arrangement would not only save students' time but also encourage wider participation.",
+          "zh": "这样的安排不仅能节省学生的时间，还能鼓励更多人参与。"
+        },
+        {
+          "function": "礼貌收尾",
+          "en": "I hope you will find these suggestions helpful.",
+          "zh": "希望这些建议对您有帮助。"
+        }
+      ],
+      "demo": {
+        "topic": "向图书馆馆长建议延长开馆时间并增设自习区",
+        "paragraphs": [
+          "Dear Mr. Wang,\nI am writing to offer some suggestions concerning the service of our university library.",
+          "To begin with, it would be advisable to extend the opening hours during the examination period, which would allow students to prepare for their tests in a quieter environment. In addition, I suggest that a separate self-study area be set up on the third floor so that readers can concentrate without being disturbed by borrowers.",
+          "I would appreciate it if you could take my suggestions into consideration.\n\nYours sincerely,\nLi Ming"
+        ],
+        "translation": [
+          "尊敬的王老师：我写信是想就我校图书馆的服务提出几点建议。",
+          "首先，宜在考试周延长开馆时间，这样学生就能在更安静的环境中备考。此外，我建议在三楼单独辟出自习区，让读者不被打扰地专注学习。",
+          "如果您能考虑我的建议，我将不胜感激。此致，李明。"
+        ]
+      },
+      "pitfalls": [
+        "只谈问题不给建议：题目要求提建议，通篇抱怨服务差会被判任务完成度不足。",
+        "建议过于笼统：It is important to improve the service 这类句子没有可执行内容，拿不到内容分。",
+        "头重脚轻：把 100 词的篇幅用在前两段铺垫，导致建议和落款被压缩甚至漏写。"
+      ],
+      "adapt": [
+        "先圈出题干里的收件人、身份和目的，把开头一句话改写成对应的交际场景。",
+        "把两人称替换成题目给定的对象，例如由 students 换成 international students / new members。",
+        "写完数一遍词数，小作文控制在 90-110 词之间最稳。"
+      ]
+    },
+    {
+      "id": "english-i-small-thanks",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "感谢信",
+      "title": "感谢信 · 致谢指导、接待或帮助",
+      "scenario": "感谢外教的指导、同学的照顾、对方的热情接待或某个机构的协助。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {收件人},",
+          "zh": "尊敬的……：",
+          "note": "称呼后必须用逗号，首行顶格。"
+        },
+        {
+          "section": "开篇致谢",
+          "en": "I am writing to express my sincere gratitude for {感谢的事由}.",
+          "zh": "我写信是为了对……表达诚挚的谢意。",
+          "note": "gratitude for + 名词 / 动名词；不要写 gratitude of。"
+        },
+        {
+          "section": "具体回忆",
+          "en": "Without your help, I would not have been able to {结果}.",
+          "zh": "没有您的帮助，我就无法……。",
+          "note": "用虚拟语气写具体影响，比反复说 thank you very much 有效得多。"
+        },
+        {
+          "section": "再次致谢",
+          "en": "Your kindness and patience meant a great deal to me.",
+          "zh": "您的善意与耐心对我意义重大。",
+          "note": "补一句个人感受，让感谢落到具体品质上。"
+        },
+        {
+          "section": "收尾与落款",
+          "en": "Once again, thank you for your time and help.\n\nYours sincerely,\nLi Ming",
+          "zh": "再次感谢您的时间与帮助。此致，李明。",
+          "note": "落款用 Yours sincerely，题目给定署名照抄。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "开篇致谢",
+          "en": "I am writing to express my sincere gratitude for your generous help.",
+          "zh": "我写信是为了对您的慷慨帮助表达诚挚谢意。"
+        },
+        {
+          "function": "写出影响",
+          "en": "It was your encouragement that gave me the confidence to carry on.",
+          "zh": "正是您的鼓励给了我坚持下去的信心。"
+        },
+        {
+          "function": "具体回忆",
+          "en": "I still remember how patiently you explained every difficult point to me.",
+          "zh": "我至今记得您是多么耐心地为我讲解每一个难点。"
+        },
+        {
+          "function": "祝福收尾",
+          "en": "I wish you all the best in your future work.",
+          "zh": "祝您今后工作顺利。"
+        }
+      ],
+      "demo": {
+        "topic": "感谢外教一学期的口语指导",
+        "paragraphs": [
+          "Dear Professor Smith,\nI am writing to express my sincere gratitude for your guidance during the past semester.",
+          "I still remember how patiently you corrected my pronunciation and encouraged me to speak in class. Without your support, I would not have been able to present my project in English with confidence. It was your encouragement that gave me the courage to carry on.",
+          "Once again, thank you for your time and kindness. I wish you all the best in your future work.\n\nYours sincerely,\nLi Ming"
+        ],
+        "translation": [
+          "尊敬的史密斯教授：我写信是为了对您过去一学期的指导表达诚挚的谢意。",
+          "我至今记得您是多么耐心地纠正我的发音、鼓励我在课堂上开口。没有您的支持，我就无法自信地用英语进行项目展示。正是您的鼓励给了我继续下去的勇气。",
+          "再次感谢您的时间与善意，祝您今后工作顺利。此致，李明。"
+        ]
+      },
+      "pitfalls": [
+        "感谢事由写得太泛：只说 thank you for your help 而不写帮了什么，任务完成度不足。",
+        "堆砌感谢句：连续三句 I am very grateful，缺少具体回忆与影响。",
+        "时态混乱：回忆过去用一般过去时或过去完成时，致谢本身用一般现在时。"
+      ],
+      "adapt": [
+        "把感谢对象和事由换成本题给定的场景，具体影响保留一句虚拟语气即可。",
+        "如果题目要求附带一个请求或建议，把它放在再次致谢之前，单独成句。",
+        "署名与收信人照抄题干，不改成自己的名字。"
+      ]
+    },
+    {
+      "id": "english-i-small-notice",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "通知 / 告示",
+      "title": "通知 · 活动招募或事项告知",
+      "scenario": "为学生会或社团写通知，告知讲座、比赛、招募或志愿者活动的安排。",
+      "skeleton": [
+        {
+          "section": "标题",
+          "en": "Notice",
+          "zh": "通知",
+          "note": "通知必须有标题，居中或首行都可；不要用书信的 Dear 代替标题。"
+        },
+        {
+          "section": "背景目的",
+          "en": "This notice is intended to inform you that {活动} will be held {时间地点}.",
+          "zh": "本通知旨在告知……将于……举行。",
+          "note": "一句话写清是什么活动、什么时候、在哪里，硬信息不能缺。"
+        },
+        {
+          "section": "要点一",
+          "en": "The activity is open to {对象}, and participants are expected to {要求}.",
+          "zh": "活动面向……，参与者需……。",
+          "note": "题目给的要点逐条对应，一条一句话，不展开议论。"
+        },
+        {
+          "section": "要点二",
+          "en": "Those who are interested are expected to sign up by {截止方式}.",
+          "zh": "有意者请在……之前报名。",
+          "note": "报名方式要写具体：邮箱、群号或联系人。"
+        },
+        {
+          "section": "结尾与落款",
+          "en": "For further details, please contact {联系人}.\n\n{发布单位}",
+          "zh": "如需了解更多信息，请联系……。……（发布单位）",
+          "note": "落款写题目给定的单位名，例如 the Student Union，不要出现个人姓名。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "目的句",
+          "en": "This notice is intended to inform you that a lecture on Chinese culture will be held next Friday.",
+          "zh": "本通知旨在告知：下周五将举办一场中国文化讲座。"
+        },
+        {
+          "function": "要求",
+          "en": "Applicants are expected to bring their student cards.",
+          "zh": "报名者需携带学生证。"
+        },
+        {
+          "function": "报名",
+          "en": "Those who are interested are expected to sign up before May 10.",
+          "zh": "有意者请在 5 月 10 日前报名。"
+        },
+        {
+          "function": "联系方式",
+          "en": "For further details, please contact Li Ming at liming@example.com.",
+          "zh": "欲知详情，请联系李明：liming@example.com。"
+        }
+      ],
+      "demo": {
+        "topic": "志愿者招募通知",
+        "paragraphs": [
+          "Notice",
+          "This notice is intended to inform you that the Student Union is recruiting volunteers for the university sports meeting, which will be held on the main campus next Saturday.",
+          "The activity is open to all sophomores, and participants are expected to arrive at the stadium by 8:00 a.m. Those who are interested are expected to sign up before Thursday by sending an email to sports@example.com. For further details, please contact Li Ming at 138-0000-0000.\n\nThank you for your attention.\n\nThe Student Union"
+        ],
+        "translation": [
+          "通知",
+          "本通知旨在告知：学生会正在为下周星期六在校本部举行的校运动会招募志愿者。",
+          "活动面向全体大二学生，参与者需于上午 8:00 前到达体育场。有意者请在周四前发邮件至 sports@example.com 报名。欲知详情，请联系李明：138-0000-0000。感谢关注。学生会。"
+        ]
+      },
+      "pitfalls": [
+        "写成书信：出现 Dear students 和 Yours sincerely 会和通知格式冲突。",
+        "硬信息含糊：时间只写 next week、地点只写 somewhere，属于要点缺失。",
+        "漏落款：没有单位名会被视为格式不完整。"
+      ],
+      "adapt": [
+        "把活动、时间、地点、对象、要求、报名方式六个要素列成清单，写完逐项打勾。",
+        "如果题目没有给联系人，可以合理补充一个邮箱或办公室地点。",
+        "通知词数通常低于书信，控制在 90-110 词即可，不要为了凑字数加议论。"
+      ]
+    },
+    {
+      "id": "english-i-small-invitation",
+      "kind": "small",
+      "kindLabel": "小作文 · 约 100 词",
+      "genre": "邀请信",
+      "title": "邀请信 · 邀请参与活动或担任嘉宾",
+      "scenario": "邀请教授、外教、同学或国外友人参加比赛、晚会、论坛或文化交流活动。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {收件人},",
+          "zh": "尊敬的……：",
+          "note": "邀请信的称呼通常带职务或头衔，例如 Professor Smith。"
+        },
+        {
+          "section": "发出邀请",
+          "en": "On behalf of {机构}, I am writing to invite you to {活动}.",
+          "zh": "我谨代表……邀请您参加……。",
+          "note": "On behalf of 后面接组织名，能体现语域；没有机构名时可省略。"
+        },
+        {
+          "section": "活动信息",
+          "en": "The event is scheduled for {时间} in {地点}.",
+          "zh": "活动定于……在……举行。",
+          "note": "时间、地点必须具体，这是本类题的采分点。"
+        },
+        {
+          "section": "说明期待",
+          "en": "Your presence would be a great encouragement to {对象}.",
+          "zh": "您的出席将是给……的巨大鼓励。",
+          "note": "写清为什么邀请对方，比空喊 We hope you can come 更有效。"
+        },
+        {
+          "section": "收尾与落款",
+          "en": "I would be grateful if you could confirm your attendance before {日期}.\n\nYours sincerely,\nLi Ming",
+          "zh": "如果您能在……之前确认出席，我将不胜感激。此致，李明。",
+          "note": "邀请信通常需要对方回复，别漏掉确认时间。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "发出邀请",
+          "en": "I am writing to invite you to deliver a speech at our English festival.",
+          "zh": "我写信是想邀请您在英语节上做演讲。"
+        },
+        {
+          "function": "说明安排",
+          "en": "The event is scheduled for June 5 in the lecture hall.",
+          "zh": "活动定于 6 月 5 日在报告厅举行。"
+        },
+        {
+          "function": "表达期待",
+          "en": "Your presence would mean a great deal to our members.",
+          "zh": "您的出席对我们的成员意义重大。"
+        },
+        {
+          "function": "请求回复",
+          "en": "I would be grateful if you could confirm your attendance by Friday.",
+          "zh": "如果您能在周五前确认出席，我将不胜感激。"
+        }
+      ],
+      "demo": {
+        "topic": "邀请外教担任英语演讲比赛评委",
+        "paragraphs": [
+          "Dear Professor Smith,\nOn behalf of the English Club, I am writing to invite you to serve as a judge at our annual speech contest.",
+          "The contest is scheduled for May 20 in the Students' Center. About fifteen contestants will deliver five-minute speeches on cultural exchange. Your presence would be a great encouragement to all the participants.",
+          "I would be grateful if you could confirm your attendance by May 12.\n\nYours sincerely,\nLi Ming"
+        ],
+        "translation": [
+          "尊敬的史密斯教授：我谨代表英语俱乐部邀请您担任我们一年一度演讲比赛的评委。",
+          "比赛定于 5 月 20 日在学生活动中心举行，约有十五名选手围绕文化交流发表五分钟演讲。您的出席对全体参赛者都是巨大的鼓励。",
+          "如果您能在 5 月 12 日前确认出席，我将不胜感激。此致，李明。"
+        ]
+      },
+      "pitfalls": [
+        "只写邀请不写安排：没有时间地点，任务要点不完整。",
+        "语气过硬：We hope you must come 这类表达不符合邀请语的委婉语气。",
+        "结尾不提回复：正式邀请通常需要确认出席，漏掉会显得不完整。"
+      ],
+      "adapt": [
+        "把活动名称、时间、地点、对方角色（嘉宾 / 评委 / 演讲人）四个槽位逐一替换。",
+        "如果题目要求介绍活动意义，就在活动信息后补一句 the event aims to ...。",
+        "礼貌收尾保留一句请求回复，其余信息精简到 100 词附近。"
+      ]
+    },
+    {
+      "id": "english-i-large-quality",
+      "kind": "large",
+      "kindLabel": "大作文 · 160-200 词",
+      "genre": "图画 · 品质精神类",
+      "title": "图画作文 · 品质与精神（坚持、合作、乐观）",
+      "scenario": "图画呈现某个体现品格的行为或场景，要求描述图画、阐释寓意并发表评论。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 描述图画",
+          "en": "As is vividly shown in the picture, {画面主体动作}. Simple as it is, the drawing conveys a message that {寓意}.",
+          "zh": "正如图片生动展示的：……。画面虽简单，却传达出……的信息。",
+          "note": "一句话写画面、一句话写文字说明与寓意，图画作文第 1 段不展开论证。"
+        },
+        {
+          "section": "第 2 段 · 分论点一",
+          "en": "To begin with, {品质} serves as the inner driving force behind {结果}.",
+          "zh": "首先，……是……背后的内在驱动力。",
+          "note": "先给判断句，再用一两句解释，不要在段首直接讲故事。"
+        },
+        {
+          "section": "第 2 段 · 例证",
+          "en": "Take {例子} as an example. Only by {做法} can one {结果}.",
+          "zh": "以……为例。只有……，一个人才能……。",
+          "note": "例子用一句话写完，重点放在例子和论点的关系上。"
+        },
+        {
+          "section": "第 3 段 · 评论与建议",
+          "en": "In my view, it is high time that we {行动}.",
+          "zh": "在我看来，我们该……了。",
+          "note": "结尾给态度加行动，不引入新论点。"
+        },
+        {
+          "section": "第 3 段 · 升华",
+          "en": "Only in this way can we {积极结果}.",
+          "zh": "只有这样，我们才能……。",
+          "note": "倒装句收尾可以提亮语言分，但整篇出现一次即可。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "描述图画",
+          "en": "As is vividly shown in the picture, a young man keeps climbing despite the heavy rain.",
+          "zh": "正如图片生动展示的那样，一位年轻人冒着大雨坚持攀登。"
+        },
+        {
+          "function": "点明寓意",
+          "en": "The drawing is meant to remind us that perseverance matters more than talent.",
+          "zh": "这幅画意在提醒我们：坚持比天赋更重要。"
+        },
+        {
+          "function": "举例论证",
+          "en": "Take scientific research as an example: few breakthroughs are made overnight.",
+          "zh": "以科研为例：很少有突破是一夜之间取得的。"
+        },
+        {
+          "function": "评论升华",
+          "en": "So significant is this quality that we cannot afford to ignore it.",
+          "zh": "这一品质如此重要，我们无法忽视。"
+        }
+      ],
+      "demo": {
+        "topic": "图画：雨中坚持攀登的登山者",
+        "paragraphs": [
+          "As is vividly shown in the picture, a young climber keeps moving upward in heavy rain, with his eyes fixed on the summit. Simple as the drawing is, it conveys a message that perseverance is the inner force that carries us through difficulties.",
+          "To begin with, perseverance serves as the driving force behind almost every meaningful achievement. Take scientific research as an example: no breakthrough is made overnight, and it is repeated trials that finally lead to success. Moreover, this quality also shapes our character. Those who give up at the first setback can hardly develop the patience and courage that long-term goals demand.",
+          "In my view, it is high time that we trained ourselves to hold on when progress seems slow. Only in this way can we turn today's hardship into tomorrow's strength."
+        ],
+        "translation": [
+          "正如图片生动展示的那样，一位年轻登山者冒着大雨不断向上攀登，目光锁定峰顶。画面虽简单，却传达出这样的信息：坚持是支撑我们穿越困难的内在力量。",
+          "首先，坚持几乎是每一项有意义成就背后的驱动力。以科学研究为例：没有哪项突破是一夜之间取得的，正是反复试验最终带来成功。此外，这种品质还塑造我们的性格：一遇挫折就放弃的人，很难培养长期目标所需的耐心和勇气。",
+          "在我看来，我们该训练自己在进展缓慢时坚持下去。只有这样，才能把今天的艰难变成明天的力量。"
+        ]
+      },
+      "pitfalls": [
+        "只描述图画不点寓意：第 1 段停留于“画了什么”，没有回应题目要求的阐释。",
+        "例证与论点脱节：讲了名人故事却不说明它如何支持中心论点。",
+        "没有评论段：题目明确要求 give your comments，缺少个人态度会按要点缺失扣分。"
+      ],
+      "adapt": [
+        "图画题先在心里把画面翻译成一句现象句，再决定中心论点落在个人、社会还是两者。",
+        "品质类话题的中心句要具体到品质名称，例如 cooperation / perseverance / optimism，不要写 good qualities。",
+        "结尾行动建议要与话题一致：品质类多写个人行动，现象类才写政府与社会协同。"
+      ]
+    },
+    {
+      "id": "english-i-large-phenomenon",
+      "kind": "large",
+      "kindLabel": "大作文 · 160-200 词",
+      "genre": "图画 · 社会现象类",
+      "title": "图画作文 · 社会现象评析",
+      "scenario": "图画反映某一社会现象（如沉迷手机、浪费、代际关系），要求描述、分析原因或影响并评论。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 现象描述",
+          "en": "As is shown in the picture, {现象描述}. The phenomenon has aroused wide concern in recent years.",
+          "zh": "如图片所示：……。近年来这一现象引起了广泛关注。",
+          "note": "现象句控制在两句，第二句直接指向社会影响。"
+        },
+        {
+          "section": "第 2 段 · 原因一",
+          "en": "One leading cause of this phenomenon is that {原因一}.",
+          "zh": "造成这一现象的主要原因之一是……。",
+          "note": "原因要有层次：先说个人层面，再说社会或技术层面。"
+        },
+        {
+          "section": "第 2 段 · 原因二 + 例证",
+          "en": "Another factor is {原因二}. For instance, {例子}.",
+          "zh": "另一因素是……。例如……。",
+          "note": "例子放在第二个原因后面，避免两个原因都只停留在抽象判断。"
+        },
+        {
+          "section": "第 3 段 · 评论",
+          "en": "From my perspective, {态度}. What matters is not {表面做法} but {实质}.",
+          "zh": "在我看来……。真正重要的不是……而是……。",
+          "note": "评论段给判断，不要只重复原因段的句子。"
+        },
+        {
+          "section": "第 3 段 · 建议",
+          "en": "It is therefore advisable for {主体} to {行动}.",
+          "zh": "因此，宜由……来……。",
+          "note": "建议指向具体主体：个人、学校、平台或政府部门。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "描述现象",
+          "en": "As is shown in the picture, a family sits around a table with their eyes glued to screens.",
+          "zh": "如图片所示，一家人围坐桌旁，目光都粘在屏幕上。"
+        },
+        {
+          "function": "引出原因",
+          "en": "One leading cause of this phenomenon is the convenience of mobile technology.",
+          "zh": "造成这一现象的主要原因之一是移动技术的便利。"
+        },
+        {
+          "function": "举例",
+          "en": "For instance, a single click now brings us news, food and entertainment.",
+          "zh": "例如，如今轻点一下就能获取资讯、食物和娱乐。"
+        },
+        {
+          "function": "评论",
+          "en": "From my perspective, what matters is not how much time we spend online but how we use it.",
+          "zh": "在我看来，重要的不是上网时长，而是如何使用网络。"
+        }
+      ],
+      "demo": {
+        "topic": "图画：一家人聚餐却各自看手机",
+        "paragraphs": [
+          "As is shown in the picture, a family gathers around the dinner table, yet everyone is staring at a screen instead of talking to one another. This phenomenon has aroused wide concern in recent years.",
+          "One leading cause of this phenomenon is the convenience of mobile technology. For instance, a single click now brings us news, food and entertainment, which makes the phone hard to put down. Another factor is the weakening of face-to-face communication. When people are used to expressing themselves online, they may find it awkward to start a real conversation at the table.",
+          "From my perspective, what matters is not how much time we spend online but how we use it. It is therefore advisable for families to set aside screen-free hours and enjoy a meal together."
+        ],
+        "translation": [
+          "如图片所示，一家人围坐餐桌旁，却人人都盯着屏幕，彼此不说话。近年来这一现象引起了广泛关注。",
+          "造成这一现象的主要原因之一是移动技术的便利。例如，如今轻点一下就能获取资讯、食物和娱乐，让人很难放下手机。另一因素是面对面交流的弱化：当人们习惯在网上表达自己，餐桌上开启真正的对话反而变得别扭。",
+          "在我看来，重要的不是上网时长，而是如何使用网络。因此，家庭宜留出无屏幕时段，一起好好吃顿饭。"
+        ]
+      },
+      "pitfalls": [
+        "现象描述与寓意混在一起：第 1 段既要写清画面，也要给出中心判断，两者不能互相取代。",
+        "原因全在同一层次：两个原因都是“科技发展”，等于只写了一个。",
+        "评论段写成口号：Our society must pay attention 这类空转句没有实际内容。"
+      ],
+      "adapt": [
+        "先把现象归入一个熟悉的话题族（科技、教育、环境、健康、代际），再调用对应原因。",
+        "原因段按个人—社会—技术三层中选两层，避免同义重复。",
+        "评论角度可以是利弊权衡、价值排序或行动建议，只选一种写透。"
+      ]
+    },
+    {
+      "id": "english-i-large-tech",
+      "kind": "large",
+      "kindLabel": "大作文 · 160-200 词",
+      "genre": "图画 · 科技发展类",
+      "title": "图画作文 · 科技与生活变化",
+      "scenario": "图画反映人工智能、智能手机、线上学习等科技话题，要求描述、评价并给出态度。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 图画与主题",
+          "en": "As is illustrated in the picture, {科技场景}. The drawing reflects the far-reaching influence of {技术} on our daily life.",
+          "zh": "如图片所示：……。这幅画反映了……对我们日常生活的深远影响。",
+          "note": "科技类题目的主题句要落到影响上，不要只写技术很先进。"
+        },
+        {
+          "section": "第 2 段 · 积极面",
+          "en": "Undoubtedly, {技术} has brought considerable convenience to {对象}.",
+          "zh": "毫无疑问，……给……带来了可观的便利。",
+          "note": "用具体场景说明便利：省时间、降成本、扩资源。"
+        },
+        {
+          "section": "第 2 段 · 隐忧",
+          "en": "However, we should not turn a blind eye to its potential risks, such as {隐忧}.",
+          "zh": "然而，我们不应忽视其潜在风险，例如……。",
+          "note": "辩证段必须真的写出一处风险，否则会被判论证单薄。"
+        },
+        {
+          "section": "第 3 段 · 平衡态度",
+          "en": "In my view, the key lies in striking a balance between {A} and {B}.",
+          "zh": "在我看来，关键在于在……与……之间取得平衡。",
+          "note": "平衡句是科技类最稳的立场，避免一边倒的绝对化表达。"
+        },
+        {
+          "section": "第 3 段 · 呼吁",
+          "en": "Only when {条件} can we truly benefit from {技术}.",
+          "zh": "只有当……，我们才能真正从……中受益。",
+          "note": "呼吁句给出可执行条件，例如提高数字素养、完善规范。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "引出科技主题",
+          "en": "The drawing reflects the far-reaching influence of artificial intelligence on our daily life.",
+          "zh": "这幅画反映了人工智能对我们日常生活的深远影响。"
+        },
+        {
+          "function": "写便利",
+          "en": "Online platforms have made quality learning resources available to students in remote areas.",
+          "zh": "在线平台让偏远地区的学生也能获得优质学习资源。"
+        },
+        {
+          "function": "写风险",
+          "en": "Over-reliance on algorithms may weaken our ability to think independently.",
+          "zh": "过度依赖算法可能削弱我们独立思考的能力。"
+        },
+        {
+          "function": "给出态度",
+          "en": "The key lies in striking a balance between efficiency and independent judgment.",
+          "zh": "关键在于在效率与独立判断之间取得平衡。"
+        }
+      ],
+      "demo": {
+        "topic": "图画：学生用 AI 辅助学习",
+        "paragraphs": [
+          "As is illustrated in the picture, a student is discussing a difficult problem with an intelligent assistant on a laptop. The drawing reflects the far-reaching influence of artificial intelligence on our daily life.",
+          "Undoubtedly, AI has brought considerable convenience to learners. It can explain concepts at any time, offer instant feedback on writing, and free teachers from repetitive work. However, we should not turn a blind eye to its potential risks. Over-reliance on algorithms may weaken our ability to think independently and leave us unable to judge whether an answer is reliable.",
+          "In my view, the key lies in striking a balance between efficiency and independent judgment. Only when we treat AI as a tool rather than a substitute for thinking can we truly benefit from it."
+        ],
+        "translation": [
+          "如图片所示，一名学生正用笔记本电脑与智能助手讨论一道难题。这幅画反映了人工智能对我们日常生活的深远影响。",
+          "毫无疑问，人工智能给学习者带来了可观的便利：它可以随时讲解概念、即时反馈作文，还能把教师从重复性工作中解放出来。然而，我们不应忽视其潜在风险：过度依赖算法可能削弱独立思考的能力，使我们无法判断答案是否可靠。",
+          "在我看来，关键在于在效率与独立判断之间取得平衡。只有把人工智能当作工具而不是思考的替代品，我们才能真正从中受益。"
+        ]
+      },
+      "pitfalls": [
+        "写成技术说明文：堆砌专业名词却不说对人的影响，偏离图画作文要求。",
+        "立场绝对化：要么全盘赞美要么彻底否定，缺少辩证段。",
+        "风险段泛泛而谈：只说 has disadvantages 而不指出具体风险。"
+      ],
+      "adapt": [
+        "把技术名称、使用场景、受益对象三个槽位换成本题内容。",
+        "风险段从隐私、依赖、失业、公平、伦理中选一个写透，不贪多。",
+        "结尾的“平衡”句保留结构，替换两个平衡项即可复用。"
+      ]
+    },
+    {
+      "id": "english-i-large-culture",
+      "kind": "large",
+      "kindLabel": "大作文 · 160-200 词",
+      "genre": "图画 · 文化交流类",
+      "title": "图画作文 · 文化传承与交流",
+      "scenario": "图画涉及传统文化、中外交流、文化自信等主题，要求描述、阐释价值并评论。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 图画与寓意",
+          "en": "As is vividly depicted in the picture, {文化场景}. The drawing highlights the value of {文化主题} in modern times.",
+          "zh": "正如图片生动描绘的：……。这幅画凸显了……在当今时代的价值。",
+          "note": "文化类题目的寓意句要落到“为什么现在仍然重要”，不要停留在赞美。"
+        },
+        {
+          "section": "第 2 段 · 价值一",
+          "en": "For one thing, {文化主题} provides us with a sense of identity.",
+          "zh": "一方面，……给我们提供身份认同。",
+          "note": "价值一写对内：认同、凝聚、精神根基。"
+        },
+        {
+          "section": "第 2 段 · 价值二 + 例证",
+          "en": "For another, it serves as a bridge for cross-cultural communication. Take {例子} as an example.",
+          "zh": "另一方面，它是跨文化交流的桥梁。以……为例。",
+          "note": "价值二写对外：交流、理解、影响力，两个层面形成递进。"
+        },
+        {
+          "section": "第 3 段 · 评论与行动",
+          "en": "In my view, inheriting tradition does not mean {误解}; rather, it means {正确做法}.",
+          "zh": "在我看来，传承传统并不意味着……，而是……。",
+          "note": "用 not ... but ... 澄清一个常见误解，容易写出思想深度。"
+        },
+        {
+          "section": "第 3 段 · 收束",
+          "en": "Only by {做法} can we keep our culture alive and share it with the world.",
+          "zh": "只有……，才能让我们的文化保持活力并走向世界。",
+          "note": "收束句同时呼应传承与交流两个层面。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "描述图画",
+          "en": "As is vividly depicted in the picture, a foreign student is learning calligraphy from a Chinese teacher.",
+          "zh": "正如图片生动描绘的，一名留学生正向中国老师学习书法。"
+        },
+        {
+          "function": "写认同价值",
+          "en": "Traditional culture gives us a sense of identity that no imported fashion can replace.",
+          "zh": "传统文化给我们一种任何外来时尚都无法替代的身份认同。"
+        },
+        {
+          "function": "写交流价值",
+          "en": "It serves as a bridge that helps foreigners understand how we think and live.",
+          "zh": "它是帮助外国人理解我们如何思考与生活的桥梁。"
+        },
+        {
+          "function": "澄清误解",
+          "en": "Inheriting tradition does not mean rejecting foreign cultures; rather, it means knowing our roots well enough to communicate with confidence.",
+          "zh": "传承传统并不意味着拒绝外来文化，而是深入了解自己的根脉，从而自信地交流。"
+        }
+      ],
+      "demo": {
+        "topic": "图画：留学生学习中国书法",
+        "paragraphs": [
+          "As is vividly depicted in the picture, a foreign student is learning calligraphy from a Chinese teacher, holding the brush with great care. The drawing highlights the value of traditional culture in modern times.",
+          "For one thing, traditional culture provides us with a sense of identity that no imported fashion can replace. For another, it serves as a bridge for cross-cultural communication. Take calligraphy as an example: through the movement of the brush, overseas students understand not only Chinese characters but also the patience and balance behind them.",
+          "In my view, inheriting tradition does not mean rejecting foreign cultures; rather, it means knowing our roots well enough to communicate with confidence. Only by passing our heritage on in daily life can we keep it alive and share it with the world."
+        ],
+        "translation": [
+          "正如图片生动描绘的，一名留学生正小心翼翼握着毛笔，向中国老师学习书法。这幅画凸显了传统文化在当今时代的价值。",
+          "一方面，传统文化给我们一种任何外来时尚都无法替代的身份认同。另一方面，它是跨文化交流的桥梁。以书法为例：通过笔锋的运转，留学生理解的不只是汉字，还有汉字背后的耐心与平衡。",
+          "在我看来，传承传统并不意味着拒绝外来文化，而是深入了解自己的根脉，从而自信地交流。只有把传统渗透进日常生活，才能让它保持活力并走向世界。"
+        ]
+      },
+      "pitfalls": [
+        "通篇赞美文化：缺少具体例证与当代价值分析，内容分上不去。",
+        "把文化自信写成排外：出现 resist Western culture 这类表述会偏离主流立场。",
+        "专有名词拼写出错：书法、儒家、春节等要写 calligraphy、Confucianism、the Spring Festival，注意大小写。"
+      ],
+      "adapt": [
+        "把文化载体（书法、戏曲、节日、非遗）替换进骨架，例证一句写在价值二后面。",
+        "身份认同句与交流桥梁句是最常用的两个价值层，可以按题目只保留其中一层并写深。",
+        "结尾用 not ... but ... 澄清误解的写法可迁移到科技、教育等其他话题。"
+      ]
+    }
+  ]
+}

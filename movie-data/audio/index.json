@@ -1,0 +1,174 @@
+{
+  "generatedBy": "scripts/build-movie-audio-manifest.mjs",
+  "generatedAt": "2026-09-25",
+  "episodes": [
+    {
+      "id": "S01E24",
+      "status": "ready",
+      "cueCount": 453,
+      "lineCueCount": 453,
+      "segmentCount": 453
+    },
+    {
+      "id": "S01E23",
+      "status": "ready",
+      "cueCount": 484,
+      "lineCueCount": 484,
+      "segmentCount": 484
+    },
+    {
+      "id": "S01E22",
+      "status": "ready",
+      "cueCount": 473,
+      "lineCueCount": 473,
+      "segmentCount": 473
+    },
+    {
+      "id": "S01E21",
+      "status": "ready",
+      "cueCount": 454,
+      "lineCueCount": 454,
+      "segmentCount": 454
+    },
+    {
+      "id": "S01E20",
+      "status": "ready",
+      "cueCount": 491,
+      "lineCueCount": 491,
+      "segmentCount": 491
+    },
+    {
+      "id": "S01E19",
+      "status": "ready",
+      "cueCount": 495,
+      "lineCueCount": 495,
+      "segmentCount": 495
+    },
+    {
+      "id": "S01E18",
+      "status": "ready",
+      "cueCount": 467,
+      "lineCueCount": 467,
+      "segmentCount": 467
+    },
+    {
+      "id": "S01E17",
+      "status": "ready",
+      "cueCount": 505,
+      "lineCueCount": 505,
+      "segmentCount": 505
+    },
+    {
+      "id": "S01E16",
+      "status": "ready",
+      "cueCount": 463,
+      "lineCueCount": 463,
+      "segmentCount": 463
+    },
+    {
+      "id": "S01E15",
+      "status": "ready",
+      "cueCount": 490,
+      "lineCueCount": 490,
+      "segmentCount": 490
+    },
+    {
+      "id": "S01E14",
+      "status": "ready",
+      "cueCount": 504,
+      "lineCueCount": 504,
+      "segmentCount": 504
+    },
+    {
+      "id": "S01E13",
+      "status": "ready",
+      "cueCount": 503,
+      "lineCueCount": 503,
+      "segmentCount": 503
+    },
+    {
+      "id": "S01E12",
+      "status": "ready",
+      "cueCount": 477,
+      "lineCueCount": 477,
+      "segmentCount": 477
+    },
+    {
+      "id": "S01E11",
+      "status": "ready",
+      "cueCount": 527,
+      "lineCueCount": 527,
+      "segmentCount": 527
+    },
+    {
+      "id": "S01E10",
+      "status": "ready",
+      "cueCount": 492,
+      "lineCueCount": 492,
+      "segmentCount": 492
+    },
+    {
+      "id": "S01E09",
+      "status": "ready",
+      "cueCount": 469,
+      "lineCueCount": 469,
+      "segmentCount": 469
+    },
+    {
+      "id": "S01E08",
+      "status": "ready",
+      "cueCount": 478,
+      "lineCueCount": 478,
+      "segmentCount": 478
+    },
+    {
+      "id": "S01E07",
+      "status": "ready",
+      "cueCount": 414,
+      "lineCueCount": 414,
+      "segmentCount": 414
+    },
+    {
+      "id": "S01E06",
+      "status": "ready",
+      "cueCount": 500,
+      "lineCueCount": 500,
+      "segmentCount": 500
+    },
+    {
+      "id": "S01E05",
+      "status": "ready",
+      "cueCount": 511,
+      "lineCueCount": 511,
+      "segmentCount": 511
+    },
+    {
+      "id": "S01E04",
+      "status": "ready",
+      "cueCount": 509,
+      "lineCueCount": 509,
+      "segmentCount": 509
+    },
+    {
+      "id": "S01E03",
+      "status": "ready",
+      "cueCount": 465,
+      "lineCueCount": 465,
+      "segmentCount": 465
+    },
+    {
+      "id": "S01E02",
+      "status": "ready",
+      "cueCount": 385,
+      "lineCueCount": 457,
+      "segmentCount": 385
+    },
+    {
+      "id": "S01E01",
+      "status": "ready",
+      "cueCount": 329,
+      "lineCueCount": 496,
+      "segmentCount": 329
+    }
+  ]
+}
