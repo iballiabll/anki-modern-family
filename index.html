@@ -14,14 +14,14 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260925-convo1" />
+    <link rel="stylesheet" href="./styles.css?v=20260927-embed1" />
     <link rel="stylesheet" href="./speech-transport.css?v=20260925-perf1" />
     <script src="./account-store.js?v=20260925-perf1" defer></script>
     <script src="./speech-transport.js?v=20260925-perf1" defer></script>
     <script src="./deck-data.js?v=20260925-perf1" defer></script>
     <script src="./vocab-index.js?v=20260925-perf1" defer></script>
     <script src="./session-guard.js?v=20260925-perf1" defer></script>
-    <script src="./app.js?v=20260925-convo1" defer></script>
+    <script src="./app.js?v=20260927-embed1" defer></script>
   </head>
   <body>
     <div
@@ -266,9 +266,13 @@
             <strong>单词测试</strong>
             <span>分级出题 · 排行榜</span>
           </a>
-          <a class="library-shortcut" href="./vocab.html">
+          <a
+            id="vocabLibraryShortcut"
+            class="library-shortcut"
+            href="./vocab.html"
+          >
             <strong>词汇库</strong>
-            <span>考研 · 四六级</span>
+            <span>小屋内置 · 考研四六级</span>
           </a>
           <a class="library-shortcut" href="./review.html">
             <strong>错词复习</strong>
@@ -353,6 +357,56 @@
             </div>
           </div>
         </header>
+
+        <section
+          id="vocabEmbedView"
+          class="vocab-embed-view"
+          aria-labelledby="vocabEmbedTitle"
+          hidden
+        >
+          <header class="vocab-embed-toolbar">
+            <div class="vocab-embed-copy">
+              <p class="section-label">WORD BANK</p>
+              <div class="vocab-embed-title-row">
+                <h1 id="vocabEmbedTitle">词汇库</h1>
+                <span class="vocab-embed-status">
+                  <span class="vocab-embed-status-dot" aria-hidden="true"></span>
+                  账号进度同步
+                </span>
+              </div>
+              <p>
+                恋练有词 2027、考研英语一/二、四六级与零基础词库。点“斩 ·
+                已会”后不再进入每日任务，背词记录会随账号同步。
+              </p>
+            </div>
+            <div class="vocab-embed-actions">
+              <a
+                class="vocab-embed-open"
+                href="./vocab.html?deck=llyc2027"
+                target="_blank"
+                rel="noreferrer"
+              >
+                新窗口打开
+              </a>
+              <button
+                id="vocabEmbedCloseButton"
+                class="vocab-embed-close"
+                type="button"
+              >
+                返回素材
+              </button>
+            </div>
+          </header>
+          <iframe
+            id="vocabEmbedFrame"
+            class="vocab-embed-frame"
+            title="iball 词汇库"
+            src="about:blank"
+            data-src="./vocab.html?embed=1"
+            loading="lazy"
+            allow="clipboard-write; fullscreen"
+          ></iframe>
+        </section>
 
         <section
           id="vocabularyToolbar"

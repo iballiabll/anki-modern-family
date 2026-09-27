@@ -430,3 +430,68 @@
     font-size: 22px;
   }
 }
+
+/* ------------------------------------------- 主站内嵌模式（?embed=1） */
+
+html[data-vocab-embed="true"] .vocab-page {
+  --vocab-topbar: 0px;
+}
+
+html[data-vocab-embed="true"] .reading-progress,
+html[data-vocab-embed="true"] .intensive-topbar,
+html[data-vocab-embed="true"] .hero-copy,
+html[data-vocab-embed="true"] .kaoyan-attribution {
+  display: none;
+}
+
+html[data-vocab-embed="true"] .intensive-hero {
+  padding: 14px 16px;
+}
+
+html[data-vocab-embed="true"] .hero-inner {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+}
+
+html[data-vocab-embed="true"] .hero-tools {
+  padding: 0;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  align-items: end;
+  border: 0;
+}
+
+html[data-vocab-embed="true"] .hero-tools .tool-actions {
+  grid-column: 1 / -1;
+}
+
+html[data-vocab-embed="true"] .vocab-board,
+html[data-vocab-embed="true"] .vocab-wordbook-panel {
+  width: calc(100% - 28px);
+  margin-top: 16px;
+}
+
+html[data-vocab-embed="true"] .vocab-list-panel,
+html[data-vocab-embed="true"] .vocab-detail-panel {
+  top: 12px;
+  max-height: calc(100vh - 40px);
+}
+
+@media (max-width: 980px) {
+  html[data-vocab-embed="true"] .vocab-list-panel,
+  html[data-vocab-embed="true"] .vocab-detail-panel {
+    top: auto;
+    max-height: none;
+  }
+}
+
+@media (max-width: 900px) {
+  html[data-vocab-embed="true"] .intensive-hero {
+    padding: 12px 14px;
+  }
+
+  html[data-vocab-embed="true"] .hero-tools {
+    gap: 12px;
+  }
+}

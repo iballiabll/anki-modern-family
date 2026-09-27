@@ -1764,6 +1764,7 @@ const state = {
   favorites: new Set(),
   unknown: new Set(),
   view: "all",
+  vocabEmbedded: false,
   query: "",
   materialQuery: "",
   mobileLibraryExpanded: false,
@@ -1913,8 +1914,14 @@ const elements = {
   resourceList: document.querySelector("#resourceList"),
   backToLibraryButton: document.querySelector("#backToLibraryButton"),
   workspace: document.querySelector(".workspace"),
+  workspaceHeader: document.querySelector(".workspace-header"),
+  workspaceFooter: document.querySelector(".workspace-footer"),
   activeTitle: document.querySelector("#activeTitle"),
   activeDescription: document.querySelector("#activeDescription"),
+  vocabLibraryShortcut: document.querySelector("#vocabLibraryShortcut"),
+  vocabEmbedView: document.querySelector("#vocabEmbedView"),
+  vocabEmbedFrame: document.querySelector("#vocabEmbedFrame"),
+  vocabEmbedCloseButton: document.querySelector("#vocabEmbedCloseButton"),
   progressRing: document.querySelector("#progressRing"),
   progressPercent: document.querySelector("#progressPercent"),
   progressText: document.querySelector("#progressText"),
@@ -8764,13 +8771,13 @@ function createVocabEntry(categoryName) {
   const link = document.createElement("a");
   link.className = "resource-button is-vocab-entry";
   link.href = "./vocab.html";
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
   link.dataset.vocabEntry = categoryName;
+  link.dataset.vocabEmbedEntry = "true";
   link.setAttribute(
     "aria-label",
-    `打开词汇库，按考试词库背单词并加入生词本，位于${categoryName}分类`,
+    `在小屋中打开词汇库，按考试词库背单词并加入生词本，位于${categoryName}分类`,
   );
+  link.addEventListener("click", openVocabEmbed);
 
   const badge = document.createElement("span");
   badge.className = "resource-index";
@@ -9187,6 +9194,7 @@ async function activateResource(resource, unitIndex = null) {
   cancelPracticeRecognition();
   state.practiceActive = false;
   state.reviewActive = false;
+  state.vocabEmbedded = false;
   state.reviewQueue = [];
   state.reviewQueueIndex = 0;
   state.reviewRevealed = false;
@@ -9885,9 +9893,80 @@ function updateMeaningControls() {
   );
 }
 
+function ensureVocabEmbedFrame() {
+  const frame = elements.vocabEmbedFrame;
+  if (!frame || frame.dataset.loaded === "true") {
+    return;
+  }
+
+  const source = frame.dataset.src;
+  if (!source) {
+    return;
+  }
+
+  frame.dataset.loaded = "true";
+  frame.src = source;
+}
+
+function openVocabEmbed(event) {
+  event?.preventDefault();
+  stopRealtimeConversation("", { silent: true });
+  cancelPracticeRecognition();
+  state.practiceActive = false;
+  state.reviewActive = false;
+  state.vocabEmbedded = true;
+  render();
+
+  if (isMobileLibraryLayout()) {
+    setLibraryPanelExpanded(false);
+    scrollToWorkspace();
+    return;
+  }
+
+  window.scrollTo({ top: 0, behavior: getScrollBehavior() });
+}
+
+function closeVocabEmbed({ restoreFocus = true } = {}) {
+  if (!state.vocabEmbedded) {
+    return;
+  }
+
+  state.vocabEmbedded = false;
+  render();
+
+  if (restoreFocus) {
+    elements.vocabLibraryShortcut?.focus();
+  }
+}
+
 function render() {
   closeWordPopover();
   renderAnkiExport();
+
+  if (state.vocabEmbedded) {
+    elements.workspace.classList.add("is-vocab-embedded");
+    elements.workspaceHeader.hidden = true;
+    elements.workspaceFooter.hidden = true;
+    elements.vocabEmbedView.hidden = false;
+    elements.vocabularyToolbar.hidden = true;
+    elements.practiceStudio.hidden = true;
+    elements.reviewStudio.hidden = true;
+    elements.cardGrid.hidden = true;
+    elements.emptyState.hidden = true;
+    ensureVocabEmbedFrame();
+    renderResourceList();
+    updateProgress();
+    updateViewSwitcher();
+    updateMeaningControls();
+    renderCollectionFilters();
+    return;
+  }
+
+  elements.workspace.classList.remove("is-vocab-embedded");
+  elements.workspaceHeader.hidden = false;
+  elements.workspaceFooter.hidden = false;
+  elements.vocabEmbedView.hidden = true;
+
   const resource = getActiveResource();
   const activeResourceLoaded = isDeckLoaded(resource);
   const visibleEntriesReady =
@@ -10661,6 +10740,10 @@ elements.practiceButton.addEventListener("click", () => {
   openPractice();
 });
 elements.reviewButton.addEventListener("click", openReview);
+elements.vocabLibraryShortcut?.addEventListener("click", openVocabEmbed);
+elements.vocabEmbedCloseButton?.addEventListener("click", () => {
+  closeVocabEmbed();
+});
 elements.reviewExitButton.addEventListener("click", closeReview);
 elements.reviewRestartButton.addEventListener("click", () => {
   startReviewSession();
@@ -11068,6 +11151,10 @@ document.addEventListener("keydown", (event) => {
     const button = activeWordButton;
     closeWordPopover();
     button?.focus();
+    return;
+  }
+  if (event.key === "Escape" && state.vocabEmbedded) {
+    closeVocabEmbed();
   }
 });
 document.addEventListener("keydown", (event) => {
