@@ -577,6 +577,648 @@
     return String(text || "").trim();
   }
 
+  /* --------------------------------------------- 固定搭配 / 段落旁注 */
+
+  const PHRASE_LEVEL_SHORT = { 四级: "四", 六级: "六", 考研: "研" };
+  const PHRASE_LEVEL_CLASS = {
+    四级: "is-cet4",
+    六级: "is-cet6",
+    考研: "is-kaoyan",
+  };
+  const phraseState = { ready: false, loading: null, scheduled: false };
+
+  /** 搭配索引和词库并行预热；加载完成后补一次渲染，首屏不会白等。 */
+  function ensurePhraseIndex() {
+    if (phraseState.loading) {
+      return phraseState.loading;
+    }
+    const tasks = [];
+    if (window.CollocationIndex && typeof window.CollocationIndex.load === "function") {
+      tasks.push(window.CollocationIndex.load().catch(() => null));
+    }
+    if (window.VocabIndex && typeof window.VocabIndex.load === "function") {
+      tasks.push(window.VocabIndex.load().catch(() => null));
+    }
+    phraseState.loading = Promise.all(tasks).then(() => {
+      phraseState.ready = Boolean(window.CollocationIndex?.ready);
+      return phraseState.ready;
+    });
+    return phraseState.loading;
+  }
+
+  function schedulePhraseRender() {
+    if (phraseState.ready || phraseState.scheduled) {
+      return;
+    }
+    phraseState.scheduled = true;
+    ensurePhraseIndex().then((ready) => {
+      phraseState.scheduled = false;
+      if (!ready) {
+        return;
+      }
+      if (state.data && (state.tab === "reading" || state.tab === "articles")) {
+        renderContent();
+      }
+    });
+  }
+
+  function phrasesInText(text, limit) {
+    const index = window.CollocationIndex;
+    if (!index || typeof index.findInText !== "function" || !index.ready) {
+      return [];
+    }
+    return index.findInText(String(text || "")).slice(0, limit);
+  }
+
+  /** 点单个词时，从「当前句子里出现的搭配 + 精确命中」里挑出属于这个词的搭配。 */
+  function phrasesForWord(word, sentence) {
+    const index = window.CollocationIndex;
+    if (!index || !index.ready || typeof index.findInText !== "function") {
+      return [];
+    }
+    const forms = new Set();
+    const key = normalizeWord(word);
+    if (key) {
+      forms.add(key);
+      if (typeof index.formsFor === "function") {
+        index.formsFor(key).forEach((form) => forms.add(String(form).toLowerCase()));
+      }
+    }
+    const exact = typeof index.lookup === "function" ? index.lookup(word) : null;
+    const pool = [];
+    if (exact) {
+      pool.push({ item: exact, always: true });
+    }
+    index.findInText(sentence || word).forEach((item) => pool.push({ item, always: false }));
+
+    const seen = new Set();
+    const result = [];
+    pool.forEach(({ item, always }) => {
+      const phrase = String(item?.phrase || "");
+      if (!phrase) {
+        return;
+      }
+      const lower = phrase.toLowerCase();
+      if (seen.has(lower)) {
+        return;
+      }
+      if (!always && forms.size) {
+        const tokens =
+          typeof index.tokenize === "function" ? index.tokenize(phrase) : [];
+        if (tokens.length && !tokens.some((token) => forms.has(token))) {
+          return;
+        }
+      }
+      seen.add(lower);
+      result.push(item);
+    });
+    return result.slice(0, 8);
+  }
+
+  function createPhraseBadges(levels) {
+    const usable = (Array.isArray(levels) ? levels : []).filter(
+      (level) => PHRASE_LEVEL_SHORT[level],
+    );
+    if (!usable.length) {
+      return null;
+    }
+    const wrap = el("span", "phrase-levels");
+    usable.forEach((level) => {
+      const badge = el(
+        "i",
+        `phrase-level ${PHRASE_LEVEL_CLASS[level] || ""}`.trim(),
+        PHRASE_LEVEL_SHORT[level],
+      );
+      badge.title = `${level}词汇`;
+      wrap.append(badge);
+    });
+    return wrap;
+  }
+
+  function createPhraseChip(entry, context) {
+    const button = el("button", "key-word-chip phrase-chip");
+    button.type = "button";
+    const text = el("span", "phrase-chip-text", entry.phrase);
+    text.lang = "en";
+    button.append(text);
+    const badges = createPhraseBadges(entry.levels);
+    if (badges) {
+      button.append(badges);
+    }
+    if (entry.meaning) {
+      button.title = `${entry.phrase}：${entry.meaning}`;
+    }
+    button.setAttribute(
+      "aria-label",
+      `查看固定搭配 ${entry.phrase} 的释义${entry.meaning ? `：${entry.meaning}` : ""}`,
+    );
+    button.addEventListener("click", () => {
+      openWordPanel(
+        entry.phrase,
+        context.sentence,
+        context.issueId,
+        context.paragraphIndex,
+        context.sentenceZh,
+        [entry],
+      );
+    });
+    return button;
+  }
+
+  function createPhraseRow(text, context, limit) {
+    const phrases = phrasesInText(text, limit || 10);
+    if (!phrases.length) {
+      return null;
+    }
+    const row = el("div", "key-word-row phrase-row");
+    row.append(el("span", "key-word-label", "固定搭配"));
+    phrases.forEach((entry) => row.append(createPhraseChip(entry, context)));
+    return row;
+  }
+
+  /* ------------------------------- 词条卡（对标精读版绿色词条块） */
+
+  function wordSenses(entry) {
+    return (entry.senses || []).filter(
+      (sense) => sense.defEn || sense.defZh || sense.exampleEn || sense.exampleZh,
+    );
+  }
+
+  function wordRawLines(entry) {
+    return [entry.head, entry.definition, entry.gloss, entry.example, entry.exampleZh]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean);
+  }
+
+  /**
+   * 单个词条：词性、音标、英英释义、中文释义、词表级别、例句与例句译文。
+   * 结构化解析失败时回退到 PDF 原始字段，保证讲解只增不减。
+   */
+  function createWordCard(entry, context) {
+    const card = el("article", "periodical-word-card");
+    const head = el("p", "periodical-word-head");
+    const term = el("strong", "periodical-word-term", entry.label || entry.term);
+    term.lang = "en";
+    head.append(term);
+    if (entry.pos) {
+      head.append(el("i", "periodical-word-pos", entry.pos));
+    }
+    if (isUsablePhonetic(entry.phonetic)) {
+      head.append(el("span", "periodical-word-phonetic", entry.phonetic));
+    }
+    card.append(head);
+
+    const levels = (entry.levels || []).map((level) => String(level).trim()).filter(Boolean);
+    if (levels.length) {
+      const row = el("p", "periodical-word-levels");
+      levels.forEach((level) => row.append(el("span", "periodical-word-level", level)));
+      card.append(row);
+    }
+
+    const senses = wordSenses(entry);
+    if (senses.length) {
+      const list = el("ol", "periodical-word-senses");
+      senses.forEach((sense) => {
+        const item = el("li", "periodical-word-sense");
+        if (sense.pos) {
+          item.append(el("i", "periodical-word-sense-pos", sense.pos));
+        }
+        if (sense.defEn) {
+          const text = el("p", "periodical-word-def-en", sense.defEn);
+          text.lang = "en";
+          item.append(text);
+        }
+        if (sense.defZh) {
+          item.append(el("p", "periodical-word-def-zh", sense.defZh));
+        }
+        if (sense.exampleEn) {
+          const text = el("p", "periodical-word-ex-en", sense.exampleEn);
+          text.lang = "en";
+          item.append(text);
+        }
+        if (sense.exampleZh) {
+          item.append(el("p", "periodical-word-ex-zh", sense.exampleZh));
+        }
+        list.append(item);
+      });
+      card.append(list);
+    } else {
+      const raw = el("div", "periodical-word-raw");
+      wordRawLines(entry).forEach((line) =>
+        raw.append(el("p", "periodical-word-raw-line", line)),
+      );
+      card.append(raw);
+    }
+
+    if ((entry.synonyms || []).length) {
+      const syn = el("p", "periodical-word-syn", entry.synonyms.join(" · "));
+      syn.lang = "en";
+      card.append(syn);
+    }
+
+    const actions = el("div", "periodical-word-actions");
+    const lookup = el("button", "periodical-word-action", "查词");
+    lookup.type = "button";
+    lookup.addEventListener("click", () =>
+      openWordPanel(
+        entry.term,
+        context.sentence,
+        context.issueId,
+        context.paragraphIndex,
+        context.sentenceZh,
+      ),
+    );
+    const speak = el("button", "periodical-word-action", "朗读");
+    speak.type = "button";
+    speak.addEventListener("click", () =>
+      speakText(entry.label || entry.term, { runId: null }, speak, state.readingRun),
+    );
+    actions.append(lookup, speak);
+    card.append(actions);
+    return card;
+  }
+
+  function resolveParagraphVocab(paragraph, vocabIndex) {
+    return (paragraph.vocab || [])
+      .map((item) => {
+        const term = typeof item === "string" ? item : item?.term;
+        const entry = vocabIndex.get(term);
+        if (!entry) {
+          return null;
+        }
+        return item?.label && item.label !== entry.term
+          ? { ...entry, label: item.label }
+          : entry;
+      })
+      .filter(Boolean);
+  }
+
+  function createVocabList(entries, context) {
+    const list = el("div", "periodical-word-list");
+    entries.forEach((entry) => list.append(createWordCard(entry, context)));
+    return list;
+  }
+
+  /* ------------------------- 句子分析（成分色块，对齐杂志版黄绿青标注） */
+
+  const SYNTAX_TOKENS = [
+    "非限定性定语从句",
+    "限定性定语从句",
+    "水平/程度状语",
+    "宾语从句",
+    "主语从句",
+    "表语从句",
+    "同位语从句",
+    "定语从句",
+    "状语从句",
+    "名词性从句",
+    "宾语补足语",
+    "主语补足语",
+    "形式主语",
+    "形式宾语",
+    "独立主格",
+    "真正的主语",
+    "非谓语动词",
+    "时间状语",
+    "地点状语",
+    "方式状语",
+    "原因状语",
+    "目的状语",
+    "结果状语",
+    "条件状语",
+    "让步状语",
+    "伴随状语",
+    "范围状语",
+    "程度状语",
+    "比较状语",
+    "后置定语",
+    "前置定语",
+    "并列连词",
+    "并列谓语",
+    "并列宾语",
+    "关系代词",
+    "关系副词",
+    "介词短语",
+    "名词短语",
+    "分词短语",
+    "引导词",
+    "主句",
+    "分句",
+    "主语",
+    "谓语",
+    "系动词",
+    "系语",
+    "宾语",
+    "表语",
+    "定语",
+    "状语",
+    "补语",
+    "同位语",
+    "插入语",
+    "连词",
+  ].sort((left, right) => right.length - left.length);
+
+  const SYNTAX_CLAUSE_PATTERN =
+    /^(主句|分句\s*\d*|并列句|宾语从句|主语从句|表语从句|同位语从句|非限定性定语从句|限定性定语从句|定语从句|状语从句|名词性从句|时间状语从句|条件状语从句|让步状语从句|原因状语从句|结果状语从句|目的状语从句|地点状语从句|方式状语从句|比较状语从句|伴随状语从句|独立主格|插入语)(?:[（(][^）)]*[）)])?\s*[：:]?$/;
+
+  const SYNTAX_TONES = [
+    { pattern: /从句|主句|分句|引导词|连词/, tone: "is-clause" },
+    { pattern: /状语/, tone: "is-adverbial" },
+    { pattern: /定语|同位语/, tone: "is-modifier" },
+    { pattern: /主语|形式主语|形式宾语/, tone: "is-subject" },
+    { pattern: /谓语|系动词|系语/, tone: "is-verb" },
+    { pattern: /宾语|表语|补语/, tone: "is-object" },
+  ];
+
+  /** 把「主语谓语宾语」这类连排标注拆回成分列表；拆不出就整体当说明文字。 */
+  function syntaxChips(text) {
+    const value = String(text || "")
+      .replace(/[\s；;：:，,。、（）()\-—…“”"'’]/g, "");
+    if (!value || value.length > 40) {
+      return null;
+    }
+    const chips = [];
+    let rest = value;
+    while (rest) {
+      const token = SYNTAX_TOKENS.find((item) => rest.startsWith(item));
+      if (!token) {
+        return null;
+      }
+      chips.push(token);
+      rest = rest.slice(token.length);
+    }
+    return chips.length ? chips : null;
+  }
+
+  function syntaxTone(chip) {
+    const found = SYNTAX_TONES.find((item) => item.pattern.test(chip));
+    return found ? found.tone : "is-clause";
+  }
+
+  function createSyntaxChips(chips) {
+    const row = el("div", "periodical-syntax-chips");
+    chips.forEach((chip) =>
+      row.append(el("i", `periodical-syntax-chip ${syntaxTone(chip)}`, chip)),
+    );
+    return row;
+  }
+
+  function buildSyntaxParts(group) {
+    const head = { en: [], zh: [] };
+    const parts = [];
+    const notes = [];
+    let clause = "";
+    let inBody = false;
+    let current = null;
+    (group.lines || []).forEach((line) => {
+      const text = String(line.text || "").trim();
+      if (!text) {
+        return;
+      }
+      const isZh = line.kind !== "en";
+      if (!inBody && isZh && (syntaxChips(text) || SYNTAX_CLAUSE_PATTERN.test(text))) {
+        inBody = true;
+      }
+      if (!inBody) {
+        head[isZh ? "zh" : "en"].push(text);
+        return;
+      }
+      if (!isZh) {
+        current = { clause, en: text, chips: [] };
+        parts.push(current);
+        clause = "";
+        return;
+      }
+      const chips = syntaxChips(text);
+      if (chips) {
+        if (current && !current.chips.length) {
+          current.chips = chips;
+        } else {
+          notes.push(text);
+        }
+        return;
+      }
+      if (SYNTAX_CLAUSE_PATTERN.test(text)) {
+        clause = text.replace(/\s*[：:]\s*$/, "");
+        return;
+      }
+      notes.push(text);
+    });
+    return { head, parts, notes };
+  }
+
+  const SYNTAX_LEGEND = [
+    { label: "从句 / 引导词", tone: "is-clause" },
+    { label: "状语", tone: "is-adverbial" },
+    { label: "定语 / 同位语", tone: "is-modifier" },
+    { label: "主语", tone: "is-subject" },
+    { label: "谓语", tone: "is-verb" },
+    { label: "宾语 / 表语 / 补语", tone: "is-object" },
+  ];
+
+  function createSyntaxBlock(title, groups) {
+    const details = el("details", "periodical-aside-details periodical-syntax");
+    details.append(el("summary", "periodical-aside-label", title));
+    let rendered = 0;
+    groups.forEach((group) => {
+      const built = buildSyntaxParts(group);
+      const body = el("div", "periodical-aside-body");
+      if (built.head.en.length || built.head.zh.length) {
+        const source = el("div", "periodical-syntax-source");
+        built.head.en.forEach((text) => {
+          const line = el("p", "periodical-syntax-source-en", text);
+          line.lang = "en";
+          source.append(line);
+        });
+        built.head.zh.forEach((text) =>
+          source.append(el("p", "periodical-syntax-source-zh", text)),
+        );
+        body.append(source);
+      }
+      if (built.parts.length) {
+        const list = el("ol", "periodical-syntax-parts");
+        built.parts.forEach((part) => {
+          const item = el("li", "periodical-syntax-part");
+          if (part.clause) {
+            item.append(el("span", "periodical-syntax-clause", part.clause));
+          }
+          const english = el("p", "periodical-syntax-en", part.en);
+          english.lang = "en";
+          item.append(english);
+          if (part.chips.length) {
+            item.append(createSyntaxChips(part.chips));
+          }
+          list.append(item);
+        });
+        body.append(list);
+      }
+      if (built.notes.length) {
+        const notes = el("div", "periodical-syntax-notes");
+        built.notes.forEach((text) => notes.append(el("p", "periodical-note-zh", text)));
+        body.append(notes);
+      }
+      if (!body.childNodes.length) {
+        return;
+      }
+      rendered += 1;
+      details.append(body);
+    });
+    if (!rendered) {
+      return null;
+    }
+    const legend = el("p", "periodical-syntax-legend");
+    legend.append(el("span", "periodical-syntax-legend-label", "成分色标（机读整理）"));
+    SYNTAX_LEGEND.forEach((item) =>
+      legend.append(el("i", `periodical-syntax-chip ${item.tone}`, item.label)),
+    );
+    details.append(legend);
+    return details;
+  }
+
+  function createHomeworkBlock(groups) {
+    const details = el("details", "periodical-aside-details periodical-homework");
+    details.open = true;
+    details.append(el("summary", "periodical-aside-label", "今日翻译作业"));
+    groups.forEach((group) => {
+      const body = el("div", "periodical-aside-body");
+      renderNoteLines(body, group.lines);
+      details.append(body);
+    });
+    return details;
+  }
+
+  /** 把「今日句子分析 / 写作积累」按 Para 序号挂回对应段落。 */
+  function buildParagraphNotes(piece) {
+    const notes = new Map();
+    (piece.sections || []).forEach((section) => {
+      const heading = String(section.heading || "");
+      (section.groups || []).forEach((group) => {
+        const ref = Number(group.ref) || 0;
+        if (!ref) {
+          return;
+        }
+        const bucket =
+          notes.get(ref) || { analysis: [], writing: [], homework: [] };
+        if (heading.includes("句子分析")) {
+          bucket.analysis.push(group);
+        } else if (heading.includes("写作积累")) {
+          bucket.writing.push(group);
+        } else if (heading.includes("翻译")) {
+          bucket.homework.push(group);
+        }
+        notes.set(ref, bucket);
+      });
+    });
+    return notes;
+  }
+
+  function renderNoteLines(target, lines) {
+    (lines || []).forEach((line) => {
+      if (line.kind === "en") {
+        const paragraph = el("p", "periodical-note-en", line.text);
+        paragraph.lang = "en";
+        target.append(paragraph);
+        return;
+      }
+      const text = String(line.text || "");
+      const short = text.length <= 16 && !/[。！？；]/.test(text);
+      target.append(
+        el("p", short ? "periodical-note-label" : "periodical-note-zh", text),
+      );
+    });
+  }
+
+  function createNoteDetails(title, groups) {
+    const details = el("details", "periodical-aside-details");
+    details.append(el("summary", "periodical-aside-label", title));
+    groups.forEach((group) => {
+      const body = el("div", "periodical-aside-body");
+      renderNoteLines(body, group.lines);
+      details.append(body);
+    });
+    return details;
+  }
+
+  function createParagraphAside(paragraph, notes, context) {
+    const note = notes.get(context.paragraphIndex) || null;
+    const phrases = phrasesInText(paragraph.en, 8);
+    const vocab = resolveParagraphVocab(paragraph, context.vocabIndex);
+    if (!phrases.length && !note && !vocab.length) {
+      return null;
+    }
+    const aside = el("aside", "periodical-aside");
+    aside.setAttribute("aria-label", `第 ${context.paragraphIndex} 段旁注`);
+
+    if (vocab.length) {
+      const block = el("section", "periodical-aside-block periodical-vocab-block");
+      block.append(el("span", "periodical-aside-label", `本段词条 · ${vocab.length}`));
+      block.append(createVocabList(vocab, context));
+      aside.append(block);
+    }
+    if (phrases.length) {
+      const block = el("section", "periodical-aside-block");
+      block.append(el("span", "periodical-aside-label", "固定搭配"));
+      const chips = el("div", "periodical-aside-chips");
+      phrases.forEach((entry) => chips.append(createPhraseChip(entry, context)));
+      block.append(chips);
+      aside.append(block);
+    }
+    if (note?.analysis?.length) {
+      const syntax = createSyntaxBlock("语法 · 长难句分析", note.analysis);
+      aside.append(syntax || createNoteDetails("语法 · 长难句分析", note.analysis));
+    }
+    if (note?.homework?.length) {
+      aside.append(createHomeworkBlock(note.homework));
+    }
+    if (note?.writing?.length) {
+      aside.append(createNoteDetails("写作积累", note.writing));
+    }
+    return aside;
+  }
+
+  function appendSectionDigest(card, piece) {
+    const sections = piece.sections || [];
+    if (!sections.length) {
+      return;
+    }
+    const details = el("details", "periodical-sections");
+    details.append(
+      el(
+        "summary",
+        "periodical-sections-summary",
+        `精读讲义 · ${sections.map((section) => section.heading).join(" / ")}`,
+      ),
+    );
+    sections.forEach((section) => {
+      details.append(el("h4", "periodical-section-title", section.heading));
+      const body = el("div", "periodical-section-body");
+      (section.groups || []).forEach((group) => {
+        renderNoteLines(body, group.lines);
+      });
+      details.append(body);
+    });
+    card.append(details);
+  }
+
+  function escapeRegExpLiteral(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  /**
+   * 杂志版把本期重点词在正文里标红，这里用段落词条的真实写法拼一个高亮正则；
+   * 匹配不到词条时退化成原来的逐词切分，不影响任何既有交互。
+   */
+  function keyTermSource(terms) {
+    const list = (terms || [])
+      .map((item) => (typeof item === "string" ? item : item?.label || item?.term))
+      .map((value) => String(value || "").trim())
+      .filter((value) => value.length >= 3 && /[A-Za-z]/.test(value))
+      .sort((left, right) => right.length - left.length)
+      .slice(0, 40)
+      .map(escapeRegExpLiteral);
+    return list.length ? list.join("|") : "";
+  }
+
   function appendEnglishTokens(
     target,
     text,
@@ -584,19 +1226,27 @@
     issueId,
     paragraphIndex,
     sentenceZh,
+    keyTerms,
   ) {
     const source = String(text || "");
+    const keys = keyTermSource(keyTerms);
+    const pattern = new RegExp(
+      keys ? `(${keys})|(${WORD_PATTERN.source})` : `(${WORD_PATTERN.source})`,
+      "gi",
+    );
     let cursor = 0;
-    WORD_PATTERN.lastIndex = 0;
-    let match = WORD_PATTERN.exec(source);
+    let match = pattern.exec(source);
     while (match) {
       if (match.index > cursor) {
         target.append(document.createTextNode(source.slice(cursor, match.index)));
       }
-      const phrase = match[0];
+      const phrase = match[1] || match[2];
       const key = normalizeWord(phrase);
       const token = el("span", "word-token", phrase);
       token.dataset.word = key;
+      if (match[1]) {
+        token.classList.add("is-key-token");
+      }
       if (state.unknown.has(key)) {
         token.classList.add("is-unknown-token");
       }
@@ -613,7 +1263,7 @@
       });
       target.append(token);
       cursor = match.index + phrase.length;
-      match = WORD_PATTERN.exec(source);
+      match = pattern.exec(source);
     }
     if (cursor < source.length) {
       target.append(document.createTextNode(source.slice(cursor)));
@@ -634,35 +1284,319 @@
     return button;
   }
 
+  /* --------------------------------------- 杂志版卡头 / 脉络 / 整篇速览 */
+
+  /** 机读难度：按平均句长估算，只作阅读节奏参考，不是出版方评级。 */
+  function readingDifficulty(piece) {
+    const paragraphs = piece.paragraphs || [];
+    let words = 0;
+    let sentences = 0;
+    paragraphs.forEach((paragraph) => {
+      const text = String(paragraph.en || "");
+      words += (text.match(/[A-Za-z]+(?:['\u2019-][A-Za-z]+)*/g) || []).length;
+      sentences += Math.max(1, (text.match(/[.!?]+(?=\s|$)/g) || []).length);
+    });
+    if (!words || !sentences) {
+      return null;
+    }
+    const average = words / sentences;
+    let level = "基础";
+    if (average >= 30) {
+      level = "高阶";
+    } else if (average >= 25) {
+      level = "挑战";
+    } else if (average >= 20) {
+      level = "进阶";
+    }
+    return {
+      level,
+      average: Math.round(average),
+      words,
+      sentences,
+      paragraphs: paragraphs.length,
+    };
+  }
+
+  /** 卡头：栏目标签、中英标题、来源、系列、期号、机读难度。 */
+  function renderReadingHead(piece, data) {
+    const meta = data.meta || {};
+    const headline = piece.headline || {};
+    const head = el("div", "periodical-card-head periodical-mag-head");
+    const copy = el("div", "periodical-mag-copy");
+
+    const kicker = el("p", "periodical-mag-kicker");
+    kicker.append(el("span", "periodical-mag-tag", "精读讲义"));
+    (meta.themes || []).slice(0, 3).forEach((theme) =>
+      kicker.append(el("span", "periodical-mag-tag is-theme", theme)),
+    );
+    copy.append(kicker);
+
+    copy.append(
+      el(
+        "h3",
+        "periodical-mag-title",
+        headline.titleZh || headline.title || meta.titleZh || "精读讲义",
+      ),
+    );
+    if (headline.title) {
+      const english = el("p", "periodical-mag-title-en", headline.title);
+      english.lang = "en";
+      copy.append(english);
+    }
+
+    const facts = [
+      { label: "来源", value: headline.source || (meta.sources || [])[0] },
+      { label: "系列", value: headline.series },
+      { label: "期号", value: meta.label || meta.id },
+      {
+        label: "篇幅",
+        value: (piece.paragraphs || []).length
+          ? `${(piece.paragraphs || []).length} 段 · ${(piece.vocab || []).length} 个精读词条`
+          : "",
+      },
+    ].filter((item) => item.value);
+    if (facts.length) {
+      const row = el("p", "periodical-mag-meta");
+      facts.forEach((item) => {
+        const cell = el("span", "periodical-mag-meta-item");
+        cell.append(el("i", "periodical-mag-meta-label", item.label));
+        cell.append(el("span", "periodical-mag-meta-value", item.value));
+        row.append(cell);
+      });
+      copy.append(row);
+    }
+
+    const difficulty = readingDifficulty(piece);
+    if (difficulty) {
+      const row = el("p", "periodical-mag-levels");
+      const badge = el(
+        "span",
+        "periodical-mag-level",
+        `机读难度 · ${difficulty.level}`,
+      );
+      badge.title = `机读整理：平均每句约 ${difficulty.average} 词，共 ${difficulty.sentences} 句。不是出版方官方评级。`;
+      row.append(badge);
+      row.append(
+        el(
+          "span",
+          "periodical-mag-level is-quiet",
+          `平均句长 ${difficulty.average} 词`,
+        ),
+      );
+      copy.append(row);
+    }
+
+    head.append(copy);
+    return head;
+  }
+
+  /** 文章脉络：由每段中文首句机读整理，明确标注非 PDF 原文。 */
+  function firstSentenceOf(text) {
+    const value = String(text || "").trim();
+    if (!value) {
+      return "";
+    }
+    const match = value.match(/^[^。！？；.!?]*[。！？；.!?]?/);
+    return ((match && match[0]) || value).trim() || value;
+  }
+
+  function renderOutline(piece) {
+    const paragraphs = piece.paragraphs || [];
+    const items = paragraphs
+      .map((paragraph, order) => {
+        const index = paragraph.index || order + 1;
+        const zh = String(paragraph.zh || "").trim();
+        const en = String(paragraph.en || "").trim();
+        const source = zh || en;
+        if (!source) {
+          return null;
+        }
+        const first = firstSentenceOf(source);
+        return {
+          index,
+          text: first.trim().slice(0, 90),
+          lang: zh ? "zh" : "en",
+        };
+      })
+      .filter(Boolean);
+    if (items.length < 2) {
+      return null;
+    }
+
+    const details = el("details", "periodical-outline");
+    const summary = el(
+      "summary",
+      "periodical-outline-summary",
+      `文章脉络 · 机读整理（${items.length} 段）`,
+    );
+    details.append(summary);
+    const list = el("ol", "periodical-outline-list");
+    items.forEach((item) => {
+      const li = el("li", "periodical-outline-item");
+      li.append(el("span", "periodical-outline-index", `Para. ${item.index}`));
+      const text = el("span", "periodical-outline-text", item.text);
+      text.lang = item.lang;
+      li.append(text);
+      list.append(li);
+    });
+    details.append(list);
+    details.append(
+      el(
+        "p",
+        "periodical-outline-note",
+        "脉络取每段首句机读整理，用于快速定位段落，不是 PDF 原文，也不替代精读讲义。",
+      ),
+    );
+    return details;
+  }
+
+  /** 词条速览里，索引查不到的写法原样保留，绝不因为解析不到就丢词。 */
+  function vocabEntriesFromTerms(terms, vocabIndex, fallbackLabel) {
+    const seen = new Set();
+    const entries = [];
+    (terms || []).forEach((item) => {
+      const term = String((typeof item === "string" ? item : item?.term) || "").trim();
+      if (!term) {
+        return;
+      }
+      const key = term.toLowerCase();
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      const entry = vocabIndex.get(term);
+      const label =
+        (typeof item === "object" && item?.label) || fallbackLabel || "";
+      if (entry) {
+        entries.push(
+          label && label !== entry.term ? { ...entry, label } : entry,
+        );
+        return;
+      }
+      entries.push({
+        term,
+        label: label || term,
+        senses: [],
+        levels: [],
+        synonyms: [],
+      });
+    });
+    return entries;
+  }
+
+  /** 整篇速览：未挂段词条 + 全篇词条 + 全篇固定搭配。 */
+  function appendArticlePanels(card, piece, context) {
+    const vocabIndex = context.vocabIndex || new Map();
+    const unplaced = vocabEntriesFromTerms(piece.vocabUnplaced, vocabIndex);
+    const unplacedKeys = new Set(
+      unplaced.map((entry) => String(entry.term || "").toLowerCase()),
+    );
+    // 未挂段词条单独成块展示，整篇列表里就不再重复出现同名词条。
+    const placed = vocabEntriesFromTerms(
+      (piece.vocab || []).map((entry) => entry.term),
+      vocabIndex,
+    ).filter((entry) => !unplacedKeys.has(String(entry.term || "").toLowerCase()));
+    const total = unplaced.length + placed.length;
+
+    if (total) {
+      const details = el("details", "periodical-article-panel periodical-vocab-panel");
+      const summaryParts = [`整篇词条速览 · ${total} 条`];
+      if (unplaced.length) {
+        summaryParts.push(`其中 ${unplaced.length} 条未机械挂到段落`);
+      }
+      details.append(
+        el("summary", "periodical-article-panel-summary", summaryParts.join(" · ")),
+      );
+      const body = el("div", "periodical-article-panel-body");
+      if (unplaced.length) {
+        const block = el("section", "periodical-unplaced");
+        block.append(
+          el(
+            "p",
+            "periodical-unplaced-note",
+            `以下 ${unplaced.length} 条词条在精读讲义里出现，但机械定位没有匹配到具体段落，因此在段落旁注里不会重复出现，在此原样保留（不删词、不改写）。`,
+          ),
+        );
+        const unplacedList = createVocabList(unplaced, {
+          ...context,
+          paragraphIndex: 0,
+        });
+        unplacedList.querySelectorAll(".periodical-word-card").forEach((entry) => {
+          entry.classList.add("is-unplaced");
+        });
+        block.append(unplacedList);
+        body.append(block);
+      }
+      if (placed.length) {
+        body.append(createVocabList(placed, { ...context, paragraphIndex: 0 }));
+      }
+      details.append(body);
+      card.append(details);
+    }
+
+    const phrases = [];
+    const seen = new Set();
+    (piece.paragraphs || []).forEach((paragraph, order) => {
+      const paragraphIndex = paragraph.index || order + 1;
+      phrasesInText(paragraph.en, 14).forEach((entry) => {
+        const key = String(entry?.phrase || "").toLowerCase();
+        if (!key || seen.has(key)) {
+          return;
+        }
+        seen.add(key);
+        phrases.push({
+          entry,
+          context: {
+            ...context,
+            paragraphIndex,
+            sentence: buildSentenceFromParagraph(paragraph.en),
+            sentenceZh: paragraph.zh,
+          },
+        });
+      });
+    });
+
+    if (phrases.length) {
+      const details = el("details", "periodical-article-panel periodical-phrase-panel");
+      details.append(
+        el(
+          "summary",
+          "periodical-article-panel-summary",
+          `整篇固定搭配速览 · ${phrases.length} 条`,
+        ),
+      );
+      const body = el("div", "periodical-article-panel-body");
+      const chips = el("div", "periodical-aside-chips");
+      phrases.slice(0, 80).forEach((item) => {
+        chips.append(createPhraseChip(item.entry, item.context));
+      });
+      body.append(chips);
+      body.append(
+        el(
+          "p",
+          "periodical-outline-note",
+          "搭配命中来自站内四／六／考研搭配词表，点开可查释义、级别与当前语境。",
+        ),
+      );
+      details.append(body);
+      card.append(details);
+    }
+  }
+
   function renderReadingTab(data) {
     const block = el("div", "periodical-block");
     if (!(data.reading || []).length) {
       block.append(el("p", "periodical-empty", "这一期没有精读讲义。"));
       return block;
     }
+    schedulePhraseRender();
 
     data.reading.forEach((piece) => {
-      const card = el("article", "periodical-card");
-      const head = el("div", "periodical-card-head");
-      const headCopy = el("div");
-      headCopy.append(
-        el(
-          "h3",
-          "",
-          piece.headline?.titleZh
-            ? `${piece.headline.titleZh}`
-            : piece.headline?.title || "精读讲义",
-        ),
+      const card = el("article", "periodical-card periodical-mag");
+      const vocabIndex = new Map(
+        (piece.vocab || []).map((entry) => [entry.term, entry]),
       );
-      const subParts = [
-        piece.headline?.title,
-        piece.headline?.source,
-        piece.headline?.series,
-      ].filter(Boolean);
-      if (subParts.length) {
-        headCopy.append(el("p", "", subParts.join(" · ")));
-      }
-
+      const head = renderReadingHead(piece, data);
       const actions = el("div", "periodical-card-actions");
       const originalLink = el("a", "periodical-icon-button", "查看原件");
       originalLink.href = fileUrl(piece.file);
@@ -672,14 +1606,32 @@
       readButton.type = "button";
       readButton.dataset.readAll = "reading";
       actions.append(originalLink, readButton);
-      head.append(headCopy, actions);
+      head.append(actions);
       card.append(head);
 
+      const outline = renderOutline(piece);
+      if (outline) {
+        card.append(outline);
+      }
+
       const paragraphs = el("div", "periodical-paragraphs");
+      const notes = buildParagraphNotes(piece);
       (piece.paragraphs || []).forEach((paragraph, order) => {
         const row = el("div", "periodical-paragraph");
+        const paragraphIndex = paragraph.index || order + 1;
+        const context = {
+          sentence: buildSentenceFromParagraph(paragraph.en),
+          sentenceZh: paragraph.zh,
+          issueId: data.meta.id,
+          paragraphIndex,
+          vocabIndex,
+        };
+        const note = notes.get(paragraphIndex) || null;
+        if (note?.homework?.length) {
+          row.classList.add("is-homework");
+        }
         row.append(
-          el("span", "periodical-paragraph-index", String(paragraph.index || order + 1)),
+          el("span", "periodical-paragraph-index", String(paragraphIndex)),
         );
         const tools = el("div", "periodical-paragraph-tools");
         const playAll = el("button", "periodical-icon-button", "本段");
@@ -690,22 +1642,27 @@
         tools.append(playAll);
         row.append(tools);
 
+        const main = el("div", "periodical-paragraph-main");
+        if (note?.homework?.length) {
+          main.append(el("span", "periodical-homework-flag", "今日翻译作业"));
+        }
         const english = el("p", "periodical-en");
         english.lang = "en";
         appendEnglishTokens(
           english,
           paragraph.en,
-          buildSentenceFromParagraph(paragraph.en),
+          context.sentence,
           data.meta.id,
-          paragraph.index || order + 1,
+          paragraphIndex,
           paragraph.zh,
+          paragraph.vocab,
         );
-        row.append(english);
+        main.append(english);
 
         if (paragraph.zh) {
-          row.append(el("p", "periodical-zh", paragraph.zh));
+          main.append(el("p", "periodical-zh", paragraph.zh));
         } else {
-          row.append(
+          main.append(
             el(
               "p",
               "periodical-zh is-empty",
@@ -713,9 +1670,24 @@
             ),
           );
         }
+        row.append(main);
+
+        const aside = createParagraphAside(paragraph, notes, context);
+        if (aside) {
+          row.classList.add("has-aside");
+          row.append(aside);
+        }
         paragraphs.append(row);
       });
       card.append(paragraphs);
+      appendArticlePanels(card, piece, {
+        issueId: data.meta.id,
+        paragraphIndex: 0,
+        sentence: "",
+        sentenceZh: "",
+        vocabIndex,
+      });
+      appendSectionDigest(card, piece);
       block.append(card);
       readButton.addEventListener("click", () => {
         const text = (piece.paragraphs || [])
@@ -737,6 +1709,7 @@
       block.append(el("p", "periodical-empty", "这一期没有拆分出来的原文。"));
       return block;
     }
+    schedulePhraseRender();
     data.articles.forEach((file) => {
       (file.articles || []).forEach((article) => {
         const card = el("article", "periodical-card");
@@ -764,11 +1737,12 @@
         const paragraphs = el("div", "periodical-paragraphs");
         (article.paragraphs || []).forEach((paragraph, order) => {
           const row = el("div", "periodical-paragraph");
+          const paragraphIndex = paragraph.index || order + 1;
           row.append(
             el(
               "span",
               "periodical-paragraph-index",
-              String(paragraph.index || order + 1),
+              String(paragraphIndex),
             ),
           );
           const tools = el("div", "periodical-paragraph-tools");
@@ -779,6 +1753,7 @@
             ),
           );
           row.append(tools);
+          const main = el("div", "periodical-paragraph-main");
           const english = el("p", "periodical-en");
           english.lang = "en";
           appendEnglishTokens(
@@ -786,9 +1761,19 @@
             paragraph.text,
             paragraph.text,
             data.meta.id,
-            paragraph.index || order + 1,
+            paragraphIndex,
           );
-          row.append(english);
+          main.append(english);
+          const phraseRow = createPhraseRow(paragraph.text, {
+            sentence: paragraph.text,
+            sentenceZh: "",
+            issueId: data.meta.id,
+            paragraphIndex,
+          }, 12);
+          if (phraseRow) {
+            main.append(phraseRow);
+          }
+          row.append(main);
           paragraphs.append(row);
         });
         card.append(paragraphs);
@@ -1673,13 +2658,49 @@
     return parseQuickRecord(active.phrase, key, record);
   }
 
-  function openWordPanel(phrase, sentence, issueId, paragraphIndex, sentenceZh) {
+  /** 站内词库索引兜底：弱网时外刊点词也能直接出释义。 */
+  async function lookupActiveWordIndex(word) {
+    const index = window.VocabIndex;
+    if (!index || typeof index.lookup !== "function") {
+      return null;
+    }
+    const entry = await index.lookup(word).catch(() => null);
+    if (!entry || !entry.meaning) {
+      return null;
+    }
+    return {
+      word: entry.word || word,
+      phonetic: entry.phonetic || "",
+      translations: String(entry.meaning)
+        .split(/[；;]+/)
+        .map((item) => item.trim())
+        .filter(Boolean),
+      definitions: [],
+      phrases: [],
+      tags: [],
+      source: "local-vocab",
+    };
+  }
+
+  function openWordPanel(
+    phrase,
+    sentence,
+    issueId,
+    paragraphIndex,
+    sentenceZh,
+    presetPhrases,
+  ) {
+    const presets =
+      Array.isArray(presetPhrases) && presetPhrases.length
+        ? presetPhrases
+        : phrasesForWord(phrase, sentence);
     state.activeWord = {
       phrase,
       sentence: sentence || phrase,
       sentenceZh: sentenceZh || "",
       issueId,
       paragraphIndex,
+      presets,
     };
     highlightActiveToken(phrase);
     if (elements.wordPanelTitle) {
@@ -1699,9 +2720,22 @@
         sentenceZh || "当前语境暂无译文。";
     }
     renderMeanings([]);
-    renderPhrases([]);
+    renderPhrases(presets);
     renderExamples([]);
     updateWordPanelMarkState();
+    if (!presets.length) {
+      // 搭配索引可能还在下载，就绪后补一次，不阻塞词卡先出现。
+      ensurePhraseIndex().then((ready) => {
+        if (!ready || state.activeWord?.phrase !== phrase) {
+          return;
+        }
+        const late = phrasesForWord(phrase, sentence);
+        if (late.length) {
+          state.activeWord.presets = late;
+          renderPhrases(late);
+        }
+      });
+    }
     if (elements.wordPanel) {
       elements.wordPanel.hidden = false;
       elements.wordPanel.setAttribute("aria-hidden", "false");
@@ -1770,6 +2804,15 @@
       applyWordResult(local, "本地词库");
       return;
     }
+    const indexed = await lookupActiveWordIndex(word);
+    if (run !== state.lookupRun || !state.activeWord) {
+      return;
+    }
+    if (indexed) {
+      state.lookupCache.set(word, indexed);
+      applyWordResult(indexed, "站内词库");
+      return;
+    }
     try {
       const response = await fetch(
         `${WORD_API}?word=${encodeURIComponent(word)}`,
@@ -1814,9 +2857,33 @@
         : "词典没有返回释义";
     }
     renderMeanings(meanings.slice(0, 8));
-    renderPhrases(Array.isArray(data.phrases) ? data.phrases : []);
+    renderPhrases(
+      mergePhraseList(
+        state.activeWord.presets,
+        Array.isArray(data.phrases) ? data.phrases : [],
+      ),
+    );
     renderExamples(buildWordExamples(data, state.activeWord));
     state.activeWord.meanings = meanings;
+  }
+
+  /** 本地搭配库和在线词典的固定搭配合并去重，先本地后词典。 */
+  function mergePhraseList(presets, extra) {
+    const list = [];
+    const seen = new Set();
+    [...(presets || []), ...(extra || [])].forEach((item) => {
+      const phrase = String(item?.phrase || item?.en || "").trim();
+      if (!phrase) {
+        return;
+      }
+      const key = phrase.toLowerCase();
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      list.push({ ...item, phrase });
+    });
+    return list;
   }
 
   /** 例句优先用词典释义里的完整句，其次回退到当前外刊语境。 */
@@ -2141,6 +3208,8 @@
   function init() {
     cacheElements();
     readStoredState();
+    // 搭配索引与站内词库在首屏后台预热，段落旁注和查词都不用等。
+    ensurePhraseIndex();
     renderHeroStats();
     renderFilters();
 

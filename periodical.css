@@ -589,6 +589,137 @@
   display: none;
 }
 
+/* ------------------------------------------- 段落旁注（讲义挂靠） */
+
+.periodical-paragraph {
+  --periodical-aside-width: 288px;
+}
+
+.periodical-paragraph.has-aside {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--periodical-aside-width);
+  align-items: start;
+  column-gap: 16px;
+}
+
+.periodical-paragraph.has-aside .periodical-paragraph-tools {
+  right: calc(var(--periodical-aside-width) + 14px);
+}
+
+.periodical-paragraph-main {
+  min-width: 0;
+}
+
+.periodical-aside {
+  display: grid;
+  gap: 9px;
+  align-content: start;
+  min-width: 0;
+  padding: 10px 12px;
+  background: #f5faf6;
+  border: 1px solid #dde9e0;
+  border-radius: 8px;
+}
+
+.periodical-aside-block {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.periodical-aside-label {
+  display: block;
+  color: #6b7d72;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.periodical-aside-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.periodical-aside-details {
+  min-width: 0;
+}
+
+.periodical-aside-details > summary {
+  cursor: pointer;
+  color: var(--forest);
+}
+
+.periodical-aside-body {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line);
+}
+
+.periodical-note-en {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12.5px;
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}
+
+.periodical-note-zh {
+  margin: 0 0 4px;
+  color: #4c615a;
+  font-size: 12px;
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}
+
+.periodical-note-label {
+  margin: 6px 0 2px;
+  color: #6a4d0b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.periodical-aside-body > *:last-child {
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------- 整篇精读讲义 */
+
+.periodical-sections {
+  margin-top: 12px;
+  background: #faf9f3;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-sections-summary {
+  padding: 9px 12px;
+  color: var(--forest);
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.periodical-section-title {
+  margin: 0;
+  padding: 10px 12px 0;
+  color: var(--forest-deep);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.periodical-section-body {
+  padding: 0 12px 10px;
+}
+
+.periodical-section-body .periodical-note-en,
+.periodical-section-body .periodical-note-zh,
+.periodical-section-body .periodical-note-label {
+  font-size: 12.5px;
+}
+
 .word-token.is-unknown-token {
   color: #8a4a12;
   background: #fdf1dd;
@@ -986,6 +1117,581 @@
   color: var(--forest);
 }
 
+/* ----------------------------------------- 杂志版卡头 / 文章脉络 */
+
+.periodical-mag {
+  padding-top: 16px;
+  border-top: 3px solid var(--forest-deep);
+  background: linear-gradient(180deg, #fffdf6 0, #ffffff 140px);
+}
+
+.periodical-mag-head {
+  align-items: flex-start;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--forest-deep);
+}
+
+.periodical-mag-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.periodical-mag-kicker {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.periodical-mag-tag {
+  padding: 2px 8px;
+  color: #fff;
+  background: var(--forest-deep);
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.periodical-mag-tag.is-theme {
+  color: var(--forest-deep);
+  background: var(--forest-soft);
+}
+
+.periodical-mag-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.periodical-mag-title-en {
+  margin: 0;
+  color: var(--forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.periodical-mag-meta {
+  margin: 3px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 14px;
+}
+
+.periodical-mag-meta-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+}
+
+.periodical-mag-meta-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.periodical-mag-meta-value {
+  color: #3f544d;
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
+.periodical-mag-levels {
+  margin: 3px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.periodical-mag-level {
+  padding: 2px 8px;
+  color: #6a4d0b;
+  background: #fdf3dd;
+  border: 1px solid #e8d3a4;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.periodical-mag-level.is-quiet {
+  color: var(--muted);
+  background: #f4f6f3;
+  border-color: var(--line);
+  font-weight: 700;
+}
+
+.periodical-outline {
+  margin: 12px 0 0;
+  background: #fbfaf4;
+  border: 1px solid var(--line);
+  border-left: 3px solid #d7c27a;
+  border-radius: 6px;
+}
+
+.periodical-outline-summary {
+  padding: 9px 12px;
+  color: #6a4d0b;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.periodical-outline-list {
+  margin: 0;
+  padding: 0 12px 8px 30px;
+  display: grid;
+  gap: 5px;
+}
+
+.periodical-outline-item {
+  color: #4c615a;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.periodical-outline-index {
+  margin-right: 6px;
+  color: var(--forest);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.periodical-outline-text {
+  overflow-wrap: anywhere;
+}
+
+.periodical-outline-note {
+  margin: 0;
+  padding: 0 12px 10px;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------- 正文重点词（对齐杂志版标红） */
+
+.word-token.is-key-token {
+  color: #a8332a;
+  font-weight: 700;
+}
+
+.word-token.is-key-token:not(.is-unknown-token) {
+  background: linear-gradient(transparent 58%, #f7d9d4 58%);
+}
+
+.word-token.is-key-token.is-unknown-token {
+  color: #8a4a12;
+}
+
+/* ------------------------------------------- 精读词条卡（绿色词条块） */
+
+.periodical-vocab-block {
+  gap: 8px;
+}
+
+.periodical-word-list {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.periodical-word-card {
+  min-width: 0;
+  padding: 9px 10px;
+  background: #fff;
+  border: 1px solid #cfe0d5;
+  border-left: 3px solid #2f855a;
+  border-radius: 6px;
+}
+
+.periodical-word-head {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+}
+
+.periodical-word-term {
+  color: #1b5e3f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14.5px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-pos {
+  color: #6a4d0b;
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.periodical-word-phonetic {
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-levels {
+  margin: 5px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.periodical-word-level {
+  padding: 1px 6px;
+  color: #6a4d0b;
+  background: #fdf3dd;
+  border: 1px solid #e8d3a4;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 800;
+}
+
+.periodical-word-senses {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 6px;
+}
+
+.periodical-word-sense {
+  color: var(--ink);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.periodical-word-sense-pos {
+  margin-right: 5px;
+  color: #6a4d0b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.periodical-word-def-en {
+  margin: 1px 0 0;
+  color: #2f4a42;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11.5px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-def-zh {
+  margin: 1px 0 0;
+  color: #17422f;
+  font-size: 12px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-ex-en {
+  margin: 4px 0 0;
+  padding-left: 8px;
+  color: #4c615a;
+  border-left: 2px solid #dbe7df;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-ex-zh {
+  margin: 2px 0 0;
+  padding-left: 8px;
+  color: var(--muted);
+  border-left: 2px solid #eef3ef;
+  font-size: 10.5px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-raw {
+  margin: 6px 0 0;
+  display: grid;
+  gap: 3px;
+}
+
+.periodical-word-raw-line {
+  margin: 0;
+  color: #4c615a;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-syn {
+  margin: 6px 0 0;
+  color: var(--blue);
+  font-size: 10.5px;
+  overflow-wrap: anywhere;
+}
+
+.periodical-word-actions {
+  margin-top: 7px;
+  display: flex;
+  gap: 6px;
+}
+
+.periodical-word-action {
+  padding: 3px 10px;
+  color: var(--forest);
+  background: #f2f7f3;
+  border: 1px solid #d5e3da;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.periodical-word-action:hover {
+  background: #e6f0e9;
+}
+
+/* ------------------------------------------- 句子成分色块（黄 / 绿 / 青） */
+
+.periodical-syntax-source {
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  background: #f7f9f6;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.periodical-syntax-source-en {
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.periodical-syntax-source-zh {
+  margin: 4px 0 0;
+  color: #4c615a;
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.periodical-syntax-parts {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+}
+
+.periodical-syntax-part {
+  color: var(--ink);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.periodical-syntax-clause {
+  display: inline-block;
+  margin-bottom: 2px;
+  padding: 1px 6px;
+  color: #14532d;
+  background: #e6f3ea;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.periodical-syntax-en {
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11.5px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.periodical-syntax-chips {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.periodical-syntax-chip {
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  font-size: 9.5px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.periodical-syntax-chip.is-adverbial {
+  color: #6a4d0b;
+  background: #fdf1cf;
+  border-color: #e6cf95;
+}
+
+.periodical-syntax-chip.is-modifier {
+  color: #7a5410;
+  background: #fbe9c8;
+  border-color: #e3c68c;
+}
+
+.periodical-syntax-chip.is-clause {
+  color: #14532d;
+  background: #e2f0e7;
+  border-color: #b6d8c3;
+}
+
+.periodical-syntax-chip.is-subject {
+  color: #14532d;
+  background: #ddf0e3;
+  border-color: #a9d3b8;
+}
+
+.periodical-syntax-chip.is-verb {
+  color: #0f4a3c;
+  background: #cfe9dd;
+  border-color: #9cccb4;
+}
+
+.periodical-syntax-chip.is-object {
+  color: #134f5c;
+  background: #d8ecf1;
+  border-color: #a8cfd9;
+}
+
+.periodical-syntax-legend {
+  margin: 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.periodical-syntax-legend-label {
+  margin-right: 2px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.periodical-syntax-notes {
+  margin-top: 6px;
+}
+
+/* ------------------------------------------- 今日翻译作业 */
+
+.periodical-paragraph.is-homework {
+  background: #f6f6f1;
+  border-left: 3px solid #c9b273;
+}
+
+.periodical-homework-flag {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  color: #6a4d0b;
+  background: #fdf1cf;
+  border: 1px solid #e6cf95;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.periodical-homework > summary {
+  color: #6a4d0b;
+}
+
+.periodical-homework .periodical-note-en {
+  padding-left: 8px;
+  border-left: 2px solid #e6dfc9;
+}
+
+/* ------------------------------------------- 整篇速览（词条 + 搭配） */
+
+.periodical-article-panel {
+  margin-top: 12px;
+  background: #fbfbf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.periodical-article-panel-summary {
+  padding: 10px 12px;
+  color: var(--forest);
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.periodical-article-panel-body {
+  padding: 0 12px 12px;
+}
+
+.periodical-vocab-panel .periodical-word-list,
+.periodical-unplaced .periodical-word-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+}
+
+.periodical-unplaced {
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #fdf8ec;
+  border: 1px dashed #e0cb96;
+  border-radius: 6px;
+}
+
+.periodical-unplaced-note {
+  margin: 0 0 8px;
+  color: #6a4d0b;
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
+.periodical-word-card.is-unplaced {
+  border-left: 3px solid #e0b64f;
+}
+
+.periodical-phrase-panel .periodical-aside-chips {
+  gap: 6px;
+}
+
+@media (min-width: 981px) {
+  /* 桌面端把段落旁注收进一屏：词条多时列内滚动，正文旁边不再拖出大片空白。 */
+  .periodical-paragraph.has-aside .periodical-aside {
+    position: sticky;
+    top: 76px;
+    max-height: min(68vh, 760px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .periodical-paragraph.has-aside .periodical-aside::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .periodical-paragraph.has-aside .periodical-aside::-webkit-scrollbar-thumb {
+    background: #cfded4;
+    border-radius: 4px;
+  }
+
+  .periodical-paragraph.has-aside .periodical-aside::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
 /* ------------------------------------------------------------- 移动端 */
 
 @media (max-width: 980px) {
@@ -1011,6 +1717,20 @@
     margin-bottom: 8px;
     opacity: 1;
   }
+
+  .periodical-paragraph.has-aside {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+
+  .periodical-paragraph.has-aside .periodical-paragraph-tools {
+    right: auto;
+  }
+
+  .periodical-vocab-panel .periodical-word-list,
+  .periodical-unplaced .periodical-word-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
@@ -1027,6 +1747,27 @@
   .periodical-test,
   .periodical-issue-head {
     padding: 14px;
+  }
+
+  .periodical-aside {
+    padding: 9px 10px;
+  }
+
+  .periodical-mag {
+    padding-top: 12px;
+  }
+
+  .periodical-mag-title {
+    font-size: 20px;
+  }
+
+  .periodical-article-panel-body,
+  .periodical-unplaced {
+    padding: 9px;
+  }
+
+  .periodical-word-card {
+    padding: 8px 9px;
   }
 
   .periodical-original-item {

@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#0b2925" />
     <meta
       name="description"
-      content="外刊精读：按时间与主题导引，收录经济学人、卫报、巴伦周刊等 50 期外刊，逐段中英精读、点词查义、原文阅读、检验题作答与原件清单，单期懒加载不卡顿。"
+      content="外刊精读：按时间与主题导引，收录经济学人、卫报、巴伦周刊等外刊，逐段中英精读并配词性、音标、英英释义、中文释义、四/六/考研词汇级别、例句译文、固定搭配、语法与长难句分析，附原文阅读、检验题作答与原件清单，单期懒加载不卡顿。"
     />
     <title>外刊精读 · iball的小屋</title>
     <link
@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="./speech-transport.css" />
     <script src="./account-store.js" defer></script>
     <script src="./speech-transport.js" defer></script>
+    <script src="./vocab-index.js" defer></script>
+    <script src="./collocation-index.js" defer></script>
     <script src="./periodical-index.js" defer></script>
     <script src="./periodical-papers.js" defer></script>
     <script src="./periodical.js" defer></script>
@@ -134,7 +136,7 @@
         <section id="periodicalContent" class="intensive-content">
           <div class="loading-state">
             <strong>正在读取外刊索引</strong>
-            <span>共 50 期，每期正文单独加载。</span>
+            <span>按期懒加载，每期正文单独加载。</span>
           </div>
         </section>
 
@@ -198,6 +200,10 @@
         <p>
           原文、精读与检验题来自本地资料目录 <code>D:\外刊</code>，已归入站点静态资源，仅作个人学习使用，版权归原作者与出版机构所有。
           检验题为第三方模拟练习，<strong>非官方真题</strong>，答案与解析按原始资料如实呈现，未作改写。
+        </p>
+        <p>
+          词条卡（词性、音标、英英释义、中文释义、词汇级别、例句译文）、固定搭配、句子成分色标、文章脉络与机读难度，都是按精读讲义与杂志排版逐字<strong>机读整理</strong>后再呈现的，
+          用于辅助阅读，可能与原件排版存在细微出入；解析不到的内容一律照录原文或留空，<strong>不做机器翻译、不补造讲解</strong>。
         </p>
         <p>
           页面交互借鉴本站考研板块的<strong>按套懒加载 + 空闲预取</strong>思路，查词走本站

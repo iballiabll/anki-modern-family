@@ -997,6 +997,508 @@
     return best;
   }
 
+  /* ------------------------------------- 固定搭配 / 长难句切分（机读） */
+  // 与阅读定位同一原则：只用可复核的机械匹配，界面上明确标注为机读结果，
+  // 不代替官方解析，也不生成译文。
+
+  const PHRASE_LEVEL_SHORT = { 四级: "四", 六级: "六", 考研: "研" };
+  const PHRASE_LEVEL_CLASS = {
+    四级: "is-cet4",
+    六级: "is-cet6",
+    考研: "is-kaoyan",
+  };
+  // 从句引导词 → 从句类型 / 常见义。多词连接词排在单词前面，命中后长词优先。
+  const CLAUSE_MARKERS = [
+    ["even though", "让步状语从句", "即使／尽管"],
+    ["even if", "让步状语从句", "即使"],
+    ["in order that", "目的状语从句", "为了"],
+    ["as long as", "条件状语从句", "只要"],
+    ["as soon as", "时间状语从句", "一…就"],
+    ["as though", "方式状语从句", "好像"],
+    ["as if", "方式状语从句", "好像"],
+    ["so that", "目的状语从句", "以便"],
+    ["although", "让步状语从句", "虽然"],
+    ["though", "让步状语从句", "虽然／尽管"],
+    ["whereas", "对比状语从句", "而／然而"],
+    ["unless", "条件状语从句", "除非"],
+    ["because", "原因状语从句", "因为"],
+    ["whenever", "时间状语从句", "每当"],
+    ["wherever", "地点状语从句", "无论哪里"],
+    ["until", "时间状语从句", "直到"],
+    ["while", "时间／让步状语从句", "当…时／虽然"],
+    ["since", "原因／时间状语从句", "既然／自从"],
+    ["whether", "名词性从句", "是否"],
+    ["which", "定语从句", "which 引导"],
+    ["whose", "定语从句", "whose 引导"],
+    ["whom", "定语从句", "whom 引导"],
+    ["who", "定语从句", "who 引导"],
+    ["when", "时间／定语从句", "when 引导"],
+    ["where", "定语／地点状语从句", "where 引导"],
+    ["that", "定语／名词性从句", "that 引导"],
+    ["if", "条件状语从句", "如果；wonder／know 后为「是否」"],
+  ];
+  // 「that + be/助动词」多为指示代词，作为从句标记会误判，直接跳过。
+  const DEMONSTRATIVE_FOLLOWERS = new Set([
+    "is", "are", "was", "were", "has", "have", "had", "will", "would",
+    "can", "could", "may", "might", "must", "should", "does", "do", "did",
+  ]);
+  // that 前面是这些动词时，更可能是宾语从句。
+  const REPORTING_VERBS = new Set([
+    "say", "says", "said", "think", "thinks", "thought", "believe",
+    "believes", "believed", "know", "knows", "knew", "known", "find",
+    "finds", "found", "show", "shows", "showed", "shown", "suggest",
+    "suggests", "suggested", "note", "notes", "noted", "argue", "argues",
+    "argued", "claim", "claims", "claimed", "admit", "admits", "admitted",
+    "reveal", "reveals", "revealed", "indicate", "indicates", "indicated",
+    "report", "reports", "reported", "warn", "warns", "warned", "hope",
+    "hopes", "hoped", "fear", "fears", "feared", "ensure", "ensures",
+  ]);
+  const phraseState = { ready: false, loading: null };
+
+  /** 搭配索引与站内词库并行预热，只跑一次。 */
+  function ensurePhraseIndex() {
+    if (phraseState.loading) {
+      return phraseState.loading;
+    }
+    const tasks = [];
+    if (window.CollocationIndex && typeof window.CollocationIndex.load === "function") {
+      tasks.push(window.CollocationIndex.load().catch(() => null));
+    }
+    if (window.VocabIndex && typeof window.VocabIndex.load === "function") {
+      tasks.push(window.VocabIndex.load().catch(() => null));
+    }
+    phraseState.loading = Promise.all(tasks).then(() => {
+      phraseState.ready = Boolean(window.CollocationIndex?.ready);
+      return phraseState.ready;
+    });
+    return phraseState.loading;
+  }
+
+  function phrasesInText(text, limit) {
+    const index = window.CollocationIndex;
+    if (!index || typeof index.findInText !== "function" || !index.ready) {
+      return [];
+    }
+    return index.findInText(String(text || "")).slice(0, limit || 12);
+  }
+
+  /** 点词时只保留含这个词的搭配，避免把整段的搭配都堆到面板里。 */
+  function phrasesForWord(word, sentence) {
+    const index = window.CollocationIndex;
+    if (!index || !index.ready || typeof index.findInText !== "function") {
+      return [];
+    }
+    const forms = new Set();
+    const key = normalizeWord(word);
+    if (key) {
+      forms.add(key);
+      if (typeof index.formsFor === "function") {
+        index.formsFor(key).forEach((form) => forms.add(String(form).toLowerCase()));
+      }
+    }
+    const exact = typeof index.lookup === "function" ? index.lookup(word) : null;
+    const pool = exact ? [{ item: exact, always: true }] : [];
+    index
+      .findInText(sentence || word)
+      .forEach((item) => pool.push({ item, always: false }));
+
+    const seen = new Set();
+    const result = [];
+    pool.forEach(({ item, always }) => {
+      const phrase = String(item?.phrase || "");
+      if (!phrase) {
+        return;
+      }
+      const lower = phrase.toLowerCase();
+      if (seen.has(lower)) {
+        return;
+      }
+      if (!always && forms.size) {
+        const tokens =
+          typeof index.tokenize === "function" ? index.tokenize(phrase) : [];
+        if (tokens.length && !tokens.some((token) => forms.has(token))) {
+          return;
+        }
+      }
+      seen.add(lower);
+      result.push(item);
+    });
+    return result.slice(0, 8);
+  }
+
+  function mergePhraseList(presets, extra) {
+    const seen = new Set();
+    const result = [];
+    [...(presets || []), ...(extra || [])].forEach((item) => {
+      const key = String(item?.phrase || "").trim().toLowerCase();
+      if (!key || seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      result.push(item);
+    });
+    return result.slice(0, 8);
+  }
+
+  function createPhraseBadges(levels) {
+    const usable = (Array.isArray(levels) ? levels : []).filter(
+      (level) => PHRASE_LEVEL_SHORT[level],
+    );
+    if (!usable.length) {
+      return null;
+    }
+    const wrap = createElement("span", "phrase-levels");
+    usable.forEach((level) => {
+      const badge = createElement(
+        "i",
+        `phrase-level ${PHRASE_LEVEL_CLASS[level] || ""}`.trim(),
+        PHRASE_LEVEL_SHORT[level],
+      );
+      badge.title = `${level}词汇`;
+      wrap.append(badge);
+    });
+    return wrap;
+  }
+
+  function createPhraseChip(entry, context) {
+    const button = createElement("button", "key-word-chip phrase-chip");
+    button.type = "button";
+    const text = createElement("span", "phrase-chip-text", entry.phrase);
+    text.lang = "en";
+    button.append(text);
+    const badges = createPhraseBadges(entry.levels);
+    if (badges) {
+      button.append(badges);
+    }
+    if (entry.meaning) {
+      button.title = `${entry.phrase}：${entry.meaning}`;
+    }
+    button.setAttribute(
+      "aria-label",
+      `查看固定搭配 ${entry.phrase} 的释义${entry.meaning ? `：${entry.meaning}` : ""}`,
+    );
+    button.addEventListener("click", () => {
+      openWordPanel(entry.phrase, context.sentence, context.translation);
+    });
+    return button;
+  }
+
+  function sentenceForPhrase(text, phrase) {
+    const source = String(text || "");
+    const ranges = splitSentenceRanges(source);
+    const at = source.toLowerCase().indexOf(String(phrase || "").toLowerCase());
+    return sentenceAt(ranges, at >= 0 ? at : 0, source);
+  }
+
+  function createPhraseRow(entries, context) {
+    const list = (entries || []).filter((entry) => entry?.phrase);
+    if (!list.length) {
+      return null;
+    }
+    const row = createElement("div", "key-word-row phrase-row");
+    row.append(createElement("span", "key-word-label", "固定搭配"));
+    list.forEach((entry) => row.append(createPhraseChip(entry, context)));
+    return row;
+  }
+
+  /** 首屏可能早于搭配索引就绪，先占位、就绪后补渲染。 */
+  function mountPhraseRow(container, text, context, limit) {
+    const live = phrasesInText(text, limit);
+    if (live.length) {
+      const row = createPhraseRow(live, context);
+      if (row) {
+        container.append(row);
+      }
+      return;
+    }
+    if (window.CollocationIndex?.ready) {
+      return;
+    }
+    ensurePhraseIndex().then((ready) => {
+      if (!ready || !container.isConnected) {
+        return;
+      }
+      const later = phrasesInText(text, limit);
+      if (!later.length) {
+        return;
+      }
+      const row = createPhraseRow(later, context);
+      if (row) {
+        container.append(row);
+      }
+    });
+  }
+
+  function clauseSegments(sentence) {
+    const source = String(sentence || "").trim();
+    if (!source) {
+      return [];
+    }
+    const lower = source.toLowerCase();
+    const hits = [];
+    CLAUSE_MARKERS.forEach(([marker, type, gloss]) => {
+      const pattern = new RegExp(
+        `\\b${marker.replace(/ /g, "\\s+")}\\b`,
+        "g",
+      );
+      let match = pattern.exec(lower);
+      while (match) {
+        const before = lower.slice(0, match.index).trimEnd();
+        const after = lower.slice(match.index + match[0].length).trimStart();
+        const nextWord = (after.match(/^[a-z']+/) || [""])[0];
+        const prevWord = (before.match(/[a-z']+$/) || [""])[0];
+        const skip =
+          /\b(?:a|the|one|this|that|some|every|each)$/.test(before) ||
+          (marker === "that" && DEMONSTRATIVE_FOLLOWERS.has(nextWord));
+        if (!skip) {
+          let label = type;
+          let note = gloss;
+          if (marker === "that") {
+            const reporting = REPORTING_VERBS.has(prevWord);
+            label = reporting ? "宾语从句" : "定语／同位语从句";
+            note = reporting ? "that 引导（前接动词）" : "that 引导";
+          }
+          hits.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            marker: match[0],
+            type: label,
+            gloss: note,
+          });
+        }
+        match = pattern.exec(lower);
+      }
+    });
+    hits.sort((left, right) => left.start - right.start || right.end - left.end);
+    const unique = [];
+    hits.forEach((hit) => {
+      if (unique.some((keep) => hit.start < keep.end && hit.end > keep.start)) {
+        return;
+      }
+      unique.push(hit);
+    });
+    if (!unique.length) {
+      return [];
+    }
+    // 从句窗口若在下一个引导词前还有逗号／分号，就在标点处断开，
+    // 让「从句」和「衔接片段」各自成行，避免一行塞进半句话。
+    const cutAt = (body) => {
+      const positions = [];
+      for (let index = 0; index < body.length; index += 1) {
+        const char = body[index];
+        if (char === "," || char === ";" || char === ":") {
+          positions.push(index);
+        }
+      }
+      if (!positions.length) {
+        return -1;
+      }
+      // 优先在「已经成句」的第一个标点处断开，避免 which, as … 这类
+      // 插入语把从句切成碎片；都不够长时退回最后一个标点。
+      const enough = positions.find(
+        (at) => countWords(body.slice(0, at)) >= 3,
+      );
+      return enough === undefined ? positions[positions.length - 1] : enough;
+    };
+    const segments = [];
+    const headBody = source.slice(0, unique[0].start);
+    const headCut = cutAt(headBody);
+    const headStop = headCut >= 0 ? headCut + 1 : unique[0].start;
+    const headText = source.slice(0, headStop).trim();
+    if (headText) {
+      segments.push({ kind: "main", text: headText, type: "", gloss: "" });
+    }
+    const headTail = source.slice(headStop, unique[0].start).trim();
+    if (headTail) {
+      segments.push({ kind: "junction", text: headTail, type: "", gloss: "" });
+    }
+    unique.forEach((hit, index) => {
+      const windowEnd =
+        index + 1 < unique.length ? unique[index + 1].start : source.length;
+      const body = source.slice(hit.end, windowEnd);
+      const cut = cutAt(body);
+      const stop = cut >= 0 ? hit.end + cut + 1 : windowEnd;
+      segments.push({
+        kind: "clause",
+        marker: hit.marker,
+        type: hit.type,
+        gloss: hit.gloss,
+        text: source.slice(hit.start, stop).trim(),
+      });
+      const tail = source.slice(stop, windowEnd).trim();
+      if (tail) {
+        segments.push({ kind: "junction", text: tail, type: "", gloss: "" });
+      }
+    });
+    return segments;
+  }
+
+  function longSentenceCandidates(text, limit) {
+    return splitSentenceRanges(String(text || ""))
+      .map((range) => {
+        const sentence = range.text.trim();
+        const segments = clauseSegments(sentence);
+        return {
+          sentence,
+          segments,
+          words: countWords(sentence),
+          clauses: segments.filter((segment) => segment.kind === "clause").length,
+        };
+      })
+      // 判定口径：两处以上从句、或「一处从句且句子够长」、或非常长的单句。
+      .filter(
+        (item) =>
+          item.clauses >= 2 ||
+          (item.clauses >= 1 && item.words >= 22) ||
+          item.words >= 34,
+      )
+      .sort(
+        (left, right) =>
+          right.clauses - left.clauses || right.words - left.words,
+      )
+      .slice(0, limit || 3);
+  }
+
+  function createSentenceAnalysis(text) {
+    const targets = longSentenceCandidates(text, 3);
+    if (!targets.length) {
+      return null;
+    }
+    const details = createElement("details", "sentence-analysis");
+    const summary = createElement("summary", "sentence-analysis-summary");
+    summary.append(createElement("span", "sentence-analysis-tag", "长难句"));
+    const head = targets[0].sentence;
+    summary.append(
+      createElement(
+        "strong",
+        "",
+        head.length > 72 ? `${head.slice(0, 72)}…` : head,
+      ),
+    );
+    details.append(summary);
+
+    const body = createElement("div", "sentence-analysis-body");
+    targets.forEach((item) => {
+      body.append(
+        createElement(
+          "p",
+          "sentence-analysis-meta",
+          `${item.words} 词 ｜ 从句/引导词 ${item.clauses} 处`,
+        ),
+      );
+      const list = createElement("div", "clause-list");
+      let clauseNo = 0;
+      item.segments.forEach((segment) => {
+        if (segment.kind === "clause") {
+          clauseNo += 1;
+        }
+        const line = createElement("p", "clause-line");
+        if (segment.kind === "junction") {
+          line.classList.add("is-junction");
+        }
+        line.append(
+          createElement(
+            "span",
+            "clause-badge",
+            segment.kind === "main"
+              ? "主干区"
+              : segment.kind === "junction"
+                ? "衔接"
+                : `从句 ${clauseNo}`,
+          ),
+        );
+        if (segment.marker) {
+          line.append(createElement("span", "clause-connector", segment.marker));
+        }
+        // 引导词已经单独成块，正文里去掉重复的开头，避免出现「if if …」。
+        const bodyText =
+          segment.marker && segment.text.length > segment.marker.length
+            ? segment.text.slice(segment.marker.length).trim()
+            : segment.text;
+        const clause = createElement("span", "clause-text", bodyText);
+        clause.lang = "en";
+        line.append(clause);
+        if (segment.type) {
+          line.append(
+            createElement("span", "clause-type", `${segment.type}·${segment.gloss}`),
+          );
+        }
+        list.append(line);
+      });
+      body.append(list);
+    });
+    body.append(
+      createElement(
+        "p",
+        "sentence-analysis-note",
+        "切分按引导词机械定位，连接词存在一词多义（如 that／while／since），仅用于长难句回读与语法点定位；篇章理解与题目正误以官方解析为准。",
+      ),
+    );
+    details.append(body);
+    return details;
+  }
+
+  function renderPhraseDigest(article, section) {
+    const paragraphs = section.paragraphs || [];
+    if (!paragraphs.length || article.dataset.phraseDigest === "1") {
+      return;
+    }
+    if (!window.CollocationIndex?.ready) {
+      ensurePhraseIndex().then((ready) => {
+        if (ready && article.isConnected) {
+          renderPhraseDigest(article, section);
+        }
+      });
+      return;
+    }
+    const seen = new Set();
+    const pool = [];
+    paragraphs.forEach((paragraph) => {
+      phrasesInText(paragraph, 40).forEach((entry) => {
+        const key = String(entry.phrase).toLowerCase();
+        if (seen.has(key)) {
+          return;
+        }
+        seen.add(key);
+        pool.push(entry);
+      });
+    });
+    if (!pool.length) {
+      return;
+    }
+    article.dataset.phraseDigest = "1";
+    const details = createElement("details", "phrase-digest");
+    details.append(
+      createElement(
+        "summary",
+        "phrase-digest-summary",
+        `本篇固定搭配 · 机读命中 ${pool.length} 条`,
+      ),
+    );
+    const body = createElement("div", "phrase-digest-body");
+    const text = paragraphs.join(" ");
+    pool
+      .sort((left, right) => (right.levels?.length || 0) - (left.levels?.length || 0))
+      .slice(0, 80)
+      .forEach((entry) =>
+        body.append(
+          createPhraseChip(entry, {
+            sentence: sentenceForPhrase(text, entry.phrase),
+            translation: "",
+          }),
+        ),
+      );
+    body.append(
+      createElement(
+        "p",
+        "phrase-digest-note",
+        "按站点四级／六级／考研短语表在本篇原文中机械匹配，释义以词库为准，未做人工筛选。",
+      ),
+    );
+    details.append(body);
+    article.append(details);
+  }
+
   function answerOptionText(question, options, answer) {
     const key = String(answer || "").trim().toUpperCase();
     if (!key) {
@@ -1392,6 +1894,26 @@
         appendEnglishText(paragraph, text, context);
       }
       row.append(paragraph);
+
+      const notes = createElement("div", "paragraph-notes");
+      mountPhraseRow(
+        notes,
+        text,
+        {
+          sentence: text,
+          translation: options.translation || "",
+          sectionId: section.id,
+        },
+        10,
+      );
+      const analysis = createSentenceAnalysis(text);
+      if (analysis) {
+        notes.append(analysis);
+      }
+      if (notes.childElementCount) {
+        row.classList.add("has-notes");
+        row.append(notes);
+      }
       list.append(row);
     });
     article.append(list);
@@ -1441,6 +1963,7 @@
       createPlayButton(section.paragraphs || [], section.label),
     );
     renderParagraphList(article, section, section.paragraphs || []);
+    renderPhraseDigest(article, section);
     article.append(
       createQuestionSection(
         (section.questions || []).map((question) => ({
@@ -2067,9 +2590,13 @@
     }
     elements.wordPhraseSection.hidden = false;
     const ul = document.createElement("ul");
-    list.slice(0, 6).forEach((item) => {
+    list.slice(0, 8).forEach((item) => {
       const li = document.createElement("li");
       li.append(createElement("strong", "", item.phrase));
+      const badges = createPhraseBadges(item.levels);
+      if (badges) {
+        li.append(badges);
+      }
       if (item.meaning) {
         li.append(createElement("span", "", item.meaning));
       }
@@ -2086,10 +2613,12 @@
   }
 
   function openWordPanel(phrase, sentence, translation) {
+    const presets = phrasesForWord(phrase, sentence);
     state.activeWord = {
       phrase,
       sentence: sentence || phrase,
       translation: translation || "",
+      presetPhrases: presets,
       item: {
         id: makeWordId(phrase, sentence || phrase),
         phrase,
@@ -2109,7 +2638,7 @@
       elements.wordLookupStatus.textContent = "正在查询词典…";
     }
     renderMeanings([]);
-    renderPhrases([]);
+    renderPhrases(presets);
     if (elements.wordContextSentence) {
       elements.wordContextSentence.textContent = state.activeWord.sentence;
     }
@@ -2158,7 +2687,9 @@
         : "词典没有返回释义，可手动补充";
     }
     renderMeanings(activeWord.meanings);
-    renderPhrases(activeWord.item.phrases);
+    renderPhrases(
+      mergePhraseList(activeWord.presetPhrases, activeWord.item.phrases),
+    );
   }
 
   async function lookupLocalEntry(value) {
@@ -2254,7 +2785,7 @@
         elements.wordLookupStatus.textContent = `${error.message || "查询失败"}，可手动补充释义`;
       }
       renderMeanings(activeWord.meanings || []);
-      renderPhrases([]);
+      renderPhrases(activeWord.presetPhrases || []);
     }
   }
 
@@ -2529,4 +3060,7 @@
   }
 
   boot();
+
+  // 搭配索引体积较大，和试卷数据并行预热，避免首屏之后才出现固定搭配。
+  ensurePhraseIndex();
 })();
