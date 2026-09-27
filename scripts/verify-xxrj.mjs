@@ -362,6 +362,7 @@ async function adminFlow(browser, base, out, password) {
     await page.waitForSelector("#adminBody:not([hidden])", { timeout: 15000 });
     const badge = page.locator("#backupBadge");
     await badge.waitFor({ timeout: 10000 });
+    await waitForBackupBadge(page);
     const badgeText = await badge.innerText();
     const metaText = await page.locator("#backupMeta").innerText();
     const backupInfo = (
@@ -565,6 +566,23 @@ async function waitForBackupFinish(page, base, beforeRunAt, timeoutMs = 150000) 
 }
 
 /**
+ * 管理台首屏会先显示 adminBody 再异步补备份卡片，
+ * 所以这里等徽章不再是静态占位文案，再交给调用方读取。
+ */
+async function waitForBackupBadge(page) {
+  await page
+    .waitForFunction(
+      () =>
+        !/备份状态未知/.test(
+          document.querySelector("#backupBadge")?.textContent || "",
+        ),
+      null,
+      { timeout: 20000, polling: 250 },
+    )
+    .catch(() => null);
+}
+
+/**
  * 只读管理台检查：用一份现成的站长会话 Cookie 打开 /admin.html。
  * 不注册账号、不停用、不删除；只有显式 --trigger-backup 时才会点一次备份。
  */
@@ -706,6 +724,7 @@ async function adminReadonlyFlow(
       check("线上立即备份执行成功", finished.ok, finished.detail);
       await page.reload({ waitUntil: "load" });
       await page.waitForSelector("#adminBody:not([hidden])", { timeout: 15000 });
+      await waitForBackupBadge(page);
       const afterBadge = await page.locator("#backupBadge").innerText();
       const afterMeta = (await page.locator("#backupMeta").innerText()).replace(/\s+/g, " ");
       check("备份成功后徽章显示成功", /上次备份成功/.test(afterBadge), afterBadge);
