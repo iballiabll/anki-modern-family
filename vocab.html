@@ -92,8 +92,23 @@
 
             <div class="setting-group">
               <span class="setting-label">排序</span>
-              <div class="segmented-control" role="group" aria-label="排序方式">
-                <button class="segment-button is-active" type="button" data-sort="frequency" aria-pressed="true">
+              <div class="segmented-control sort-control" role="group" aria-label="排序方式">
+                <button
+                  class="segment-button is-active"
+                  type="button"
+                  data-sort="default"
+                  aria-pressed="true"
+                  title="按词书文件里的原始顺序显示，恋练有词 2027 就是 27 个单元的顺序"
+                >
+                  默认词书顺序
+                </button>
+                <button
+                  class="segment-button"
+                  type="button"
+                  data-sort="frequency"
+                  aria-pressed="false"
+                  title="词表本身按词频导出，切换到恋练有词时这里是单元顺序"
+                >
                   高频优先
                 </button>
                 <button class="segment-button" type="button" data-sort="alpha" aria-pressed="false">

@@ -60,6 +60,10 @@
             <i data-lucide="target"></i>
             <span>目标与倒计时</span>
           </button>
+          <button class="nav-item" data-screen="guide">
+            <i data-lucide="book-open-check"></i>
+            <span>使用说明与网址</span>
+          </button>
           <button class="nav-item" data-screen="data">
             <i data-lucide="database-backup"></i>
             <span>数据与备份</span>
@@ -69,13 +73,13 @@
         <div class="sidebar-foot">
           <div class="sync-line">
             <span class="sync-dot"></span>
-            <span>已同步 · 今天 21:36</span>
+            <span id="sync-status">本地模式 · 未登录</span>
           </div>
           <div class="user-mini">
             <div class="avatar">神</div>
             <div>
-              <div class="user-name">我的备考空间</div>
-              <div class="user-plan">单人账号 · 手机 / 电脑同步</div>
+              <div class="user-name" id="account-name">未绑定 iball 账号</div>
+              <div class="user-plan" id="account-plan">只和 iball 账号绑定 · 不接第三方登录</div>
             </div>
           </div>
         </div>
@@ -102,6 +106,11 @@
             </button>
           </div>
         </header>
+
+        <div class="account-banner" id="account-banner" hidden>
+          <span class="account-banner-text" id="account-banner-text"></span>
+          <a class="primary-btn" id="account-banner-action" href="https://www.iball.top/index.html?next=/yantu/">绑定 iball 账号</a>
+        </div>
 
         <main class="content" id="app"></main>
       </div>
@@ -158,7 +167,7 @@
           <div class="form-grid">
             <div class="field">
               <label for="entry-date">日期</label>
-              <input id="entry-date" type="date" value="2026-09-27" />
+              <input id="entry-date" type="date" />
             </div>
             <div class="field">
               <label for="entry-subject">科目</label>
@@ -223,7 +232,7 @@
             </div>
             <div class="field">
               <label for="entry-question">题号（可选）</label>
-              <input id="entry-question" type="text" value="第 12 题" placeholder="例如 第 12 题 / Text 3 第 4 题" />
+              <input id="entry-question" type="text" placeholder="例如 第 12 题 / Text 3 第 4 题" />
             </div>
             <div class="field">
               <label for="entry-status">记录类型</label>
@@ -237,27 +246,34 @@
             </div>
             <div class="field">
               <label for="entry-full">满分</label>
-              <input id="entry-full" type="number" value="40" />
+              <input id="entry-full" type="number" placeholder="例如 150" />
             </div>
             <div class="field">
               <label for="entry-score">得分</label>
-              <input id="entry-score" type="number" value="28" />
+              <input id="entry-score" type="number" placeholder="例如 118" />
             </div>
             <div class="field">
               <label for="entry-lost">失分（自动）</label>
-              <input id="entry-lost" type="number" value="12" readonly />
+              <input id="entry-lost" type="number" readonly />
             </div>
             <div class="field">
-              <label for="entry-correct">正确题数</label>
+              <label for="entry-count">本次题数</label>
               <div class="input-suffix">
-                <input id="entry-correct" type="number" value="14" />
-                <span>/ 20</span>
+                <input id="entry-count" type="number" placeholder="例如 20" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="entry-correct">做对题数</label>
+              <div class="input-suffix">
+                <input id="entry-correct" type="number" placeholder="例如 14" />
+                <span>题</span>
               </div>
             </div>
             <div class="field">
               <label for="entry-time">用时</label>
               <div class="input-suffix">
-                <input id="entry-time" type="number" value="52" />
+                <input id="entry-time" type="number" placeholder="例如 52" />
                 <span>分钟</span>
               </div>
             </div>
@@ -273,16 +289,16 @@
             </div>
             <div class="field">
               <label for="entry-review">下次复盘</label>
-              <input id="entry-review" type="date" value="2026-09-30" />
+              <input id="entry-review" type="date" />
             </div>
             <div class="field span-12">
               <label for="entry-note">复盘备注</label>
-              <textarea id="entry-note">第 12 题二阶偏导符号错误，第 17 题链式法则漏乘。两题标记为“一直不会”，安排 3 天后、7 天后再次复盘。</textarea>
+              <textarea id="entry-note" placeholder="记下错因、卡点和下次复盘要重点看的步骤"></textarea>
             </div>
           </div>
         </div>
         <div class="modal-foot">
-          <div class="modal-foot-note">失分自动计算；保存后同步更新年度总分、得分图和失分模块图。</div>
+          <div class="modal-foot-note" id="entry-modal-note">失分自动计算；保存后写进当前 iball 账号的数据档案。</div>
           <div class="modal-actions">
             <button class="secondary-btn" id="cancel-entry">取消</button>
             <button class="primary-btn" id="save-entry">
@@ -294,9 +310,139 @@
       </section>
     </div>
 
+    <div class="modal-backdrop" id="task-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="task-modal-title">新建计划</h2>
+            <p class="modal-sub">今天、明天或任意一天都能随时加、随时改；不用提前一天布置。</p>
+          </div>
+          <button class="icon-btn" id="close-task" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field span-12">
+              <label for="task-title">任务内容</label>
+              <input id="task-title" type="text" placeholder="例如 数学 1000题 · 第 8 章 · 20 题" />
+            </div>
+            <div class="field">
+              <label for="task-date">日期</label>
+              <input id="task-date" type="date" />
+            </div>
+            <div class="field">
+              <label for="task-subject">科目</label>
+              <select id="task-subject">
+                <option>数学一</option>
+                <option>英语一</option>
+                <option>英语二</option>
+                <option>408</option>
+                <option>政治</option>
+                <option>复盘</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="task-minutes">预计用时</label>
+              <div class="input-suffix">
+                <input id="task-minutes" type="number" min="0" step="5" placeholder="例如 90" />
+                <span>分钟</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="task-priority">优先级</label>
+              <select id="task-priority">
+                <option>高</option>
+                <option selected>中</option>
+                <option>低</option>
+              </select>
+            </div>
+            <div class="field span-12">
+              <label for="task-note">备注</label>
+              <textarea id="task-note" placeholder="例如 重点补强无穷级数，做完立刻标错因"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="task-modal-note">保存后立刻出现在对应日期的计划里。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-task">取消</button>
+            <button class="primary-btn" id="save-task">
+              <i data-lucide="check"></i>
+              <span>保存计划</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="progress-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="progress-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="progress-title">录入章节进度</h2>
+            <p class="modal-sub" id="progress-sub">按这一本书、这一章单独记录，不与其它资料共用进度。</p>
+          </div>
+          <button class="icon-btn" id="close-progress" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="progress-done">已完成题数</label>
+              <div class="input-suffix">
+                <input id="progress-done" type="number" min="0" placeholder="例如 42" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-total">本章题数</label>
+              <div class="input-suffix">
+                <input id="progress-total" type="number" min="0" placeholder="例如 60" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-accuracy">正确率</label>
+              <div class="input-suffix">
+                <input id="progress-accuracy" type="number" min="0" max="100" placeholder="例如 70" />
+                <span>%</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-wrong">待复盘错题</label>
+              <div class="input-suffix">
+                <input id="progress-wrong" type="number" min="0" placeholder="例如 6" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field span-12">
+              <label for="progress-note">本章备注</label>
+              <textarea id="progress-note" placeholder="例如 换序和雅可比容易错，下次先画区域"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="progress-modal-note">只影响这一本书这一章；错题请到「录入成绩」里逐题标注。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="clear-progress">清除本章进度</button>
+            <button class="secondary-btn" id="cancel-progress">取消</button>
+            <button class="primary-btn" id="save-progress">
+              <i data-lucide="check"></i>
+              <span>保存进度</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <script src="../account-store.js"></script>
     <script src="../vocab-recite-api.js"></script>
+    <script src="../session-guard.js"></script>
     <script src="./vendor/lucide.min.js"></script>
+    <script src="./math-books.js"></script>
+    <script src="./store.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

@@ -6,7 +6,19 @@
  *   学习进度走 localStorage，这样搬瓦工机器挂掉时 GitHub 备份还能用。
  */
 (function () {
-  const ENDPOINT = "./api/auth";
+  // 接口地址跟着本文件的位置走，而不是当前页面：yantu/ 这类子目录里的页面
+  // 用 ../session-guard.js 引入时，请求的仍然是站点根目录的 api/auth。
+  const ENDPOINT = (() => {
+    const src = document.currentScript?.src || "";
+    if (src) {
+      try {
+        return new URL("api/auth", new URL(".", src)).href;
+      } catch {
+        // 下面还有兜底。
+      }
+    }
+    return new URL("./api/auth", window.location.href).href;
+  })();
   const TIMEOUT_MS = 6000;
   const LOCAL_MODE_STATUSES = new Set([404, 405, 501, 502, 503, 504]);
 

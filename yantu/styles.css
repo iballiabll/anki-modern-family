@@ -20,6 +20,8 @@
   --violet: #db2777;
   --violet-soft: #fde7f1;
   --cyan: #0891b2;
+  --coral: #f43f5e;
+  --coral-soft: #ffe7ec;
   --shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
@@ -1979,7 +1981,9 @@ tbody tr:hover td {
   backdrop-filter: blur(3px);
 }
 
-body.entry-open .modal-backdrop {
+body.entry-open #entry-modal,
+body.task-open #task-modal,
+body.progress-open #progress-modal {
   display: flex;
 }
 
@@ -4059,5 +4063,436 @@ body.entry-edit .record-banner {
 
   .llyc-note {
     justify-content: center;
+  }
+}
+
+/* --------------------------------------------- 封神之路 · 选书 / 计划 / 说明 */
+
+.account-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-bottom: 14px;
+  padding: 11px 14px;
+  background: linear-gradient(100deg, #fff1f4 0%, #f1ebff 100%);
+  border: 1px solid #f6d3dc;
+  border-left: 3px solid var(--coral);
+  border-radius: 8px;
+}
+
+.account-banner[hidden] {
+  display: none;
+}
+
+.account-banner-text {
+  flex: 1 1 220px;
+  min-width: 0;
+  color: #7f1d3a;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+.book-picker {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.segmented.book-groups {
+  flex-wrap: wrap;
+}
+
+.book-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 8px;
+}
+
+.book-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: 140ms ease;
+}
+
+.book-tab span {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.book-tab em {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.book-tab:hover {
+  border-color: var(--book-color, var(--blue));
+}
+
+.book-tab.active {
+  background: #fbfcff;
+  border-color: var(--book-color, var(--blue));
+  box-shadow: inset 0 -3px 0 var(--book-color, var(--blue));
+}
+
+.plan-task-list {
+  display: grid;
+  gap: 8px;
+}
+
+.plan-task {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  padding: 11px 12px;
+  background: #fff;
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+}
+
+.plan-task.done {
+  background: var(--panel-soft);
+  border-left-color: #cbd5e1;
+}
+
+.task-check-btn {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  color: var(--blue);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: 140ms ease;
+}
+
+.task-check-btn:hover {
+  border-color: var(--blue);
+}
+
+.task-check-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.plan-task.done .task-check-btn {
+  color: #64748b;
+}
+
+.plan-task-main {
+  min-width: 0;
+}
+
+.plan-task-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.plan-task.done .plan-task-title {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.plan-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.plan-task-note {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.row-done td {
+  color: var(--muted-2);
+}
+
+.row-done td:nth-child(2) {
+  text-decoration: line-through;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 26px 16px;
+  color: var(--muted);
+  text-align: center;
+  background: var(--panel-soft);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+.empty-state svg {
+  width: 22px;
+  height: 22px;
+  color: var(--muted-2);
+}
+
+.empty-state strong {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.empty-state span {
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.empty-state .primary-btn {
+  margin-top: 6px;
+}
+
+.empty-state.compact {
+  padding: 16px 12px;
+}
+
+.list-action {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  color: var(--ink);
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: 140ms ease;
+}
+
+.list-action:hover {
+  background: #fbfcff;
+  border-color: #c7d2fe;
+}
+
+.list-action svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--blue);
+}
+
+.list-action span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.list-action strong {
+  font-size: 12px;
+}
+
+.list-action em {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.list-action.danger svg {
+  color: var(--red);
+}
+
+.list-action.danger:hover {
+  background: var(--red-soft);
+  border-color: #fbd6d6;
+}
+
+.guide-books {
+  display: grid;
+  gap: 9px;
+}
+
+.guide-book-group {
+  padding: 10px 11px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+}
+
+.guide-book-group strong {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.guide-book-group p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.75;
+}
+
+.link {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.32);
+}
+
+.link:hover {
+  color: #1d4ed8;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+}
+
+.checkbox-field input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--blue);
+}
+
+.checkbox-field span {
+  color: #475569;
+  font-size: 11px;
+}
+
+.task-body {
+  min-width: 0;
+}
+
+.count-field .count-stepper {
+  width: 100%;
+}
+
+.rank-row.board-row {
+  background: #fff;
+  border-color: var(--line);
+}
+
+.modal.modal-sm {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.tag.coral {
+  color: #be123c;
+  background: var(--coral-soft);
+  border-color: #fbd0da;
+}
+
+.progress.coral > span {
+  background: var(--coral);
+}
+
+.chapter-cell.blank {
+  color: #64748b;
+  background: #f8fafc;
+  border-color: var(--line-soft);
+}
+
+@media (max-width: 620px) {
+  .account-banner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .account-banner .primary-btn {
+    width: 100%;
+  }
+
+  .book-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .book-tab {
+    padding: 9px 10px;
+  }
+
+  .plan-task {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .plan-task .row-actions {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .segmented.book-groups button {
+    flex: 1 1 auto;
+    padding: 0 10px;
+  }
+}
+
+/* ---------- 408 题目讲解 ---------- */
+
+.cs408-panel .analysis-grid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+.cs408-explain-text {
+  width: 100%;
+  min-height: 280px;
+  padding: 11px 12px;
+  color: #1f2937;
+  font-size: 12px;
+  line-height: 1.75;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+
+.cs408-explain-text:focus {
+  border-color: var(--blue);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--blue-soft);
+}
+
+.cs408-explain-tip {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.cs408-explain-tip svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  color: var(--blue);
+}
+
+.cs408-panel .related-list {
+  margin-top: 10px;
+}
+
+@media (max-width: 1240px) {
+  .cs408-panel .analysis-grid {
+    grid-template-columns: 1fr;
   }
 }

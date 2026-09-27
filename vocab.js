@@ -16,6 +16,8 @@
   const INDEX_URL = "./vocab-index/lexemes.json";
   const QUICK_URL = "./vocab-index/word-quick.json";
   const SHARD_MAP_URL = "./vocab-index/shard-map.json";
+  /** 排序方式：默认词书顺序 / 高频（单元）顺序 / 字母序。 */
+  const SORT_MODES = ["default", "frequency", "alpha"];
 
   const FAVORITE_KEY = "iball_vocab_favorites_v1";
   const WORDBOOK_KEY = "iball_vocab_wordbook_v1";
@@ -88,7 +90,7 @@
     deckWords: [],
     visibleCount: PAGE_SIZE,
     query: "",
-    sort: "frequency",
+    sort: "default",
     favoriteOnly: false,
     hideKnown: false,
     activeWord: "",
@@ -96,7 +98,7 @@
     recite: new Map(),
     favorites: new Set(),
     wordbook: new Map(),
-    prefs: { deckKey: "kaoyan1", sort: "frequency" },
+    prefs: { deckKey: "kaoyan1", sort: "default" },
   };
 
   /* ------------------------------------------------------------- 小工具 */
@@ -403,6 +405,9 @@
         );
       });
     }
+    // 「默认词书顺序」和「高频 / 单元顺序」都直接用词表文件的原始顺序
+    // （kaoyan、cet、basic 词表本身就是按词频导出的，恋练有词 2027 是按单元顺序导出的），
+    // 只有字母序需要在这里重新排序。
     if (state.sort === "alpha") {
       words = [...words].sort((left, right) => left.localeCompare(right));
     }
@@ -903,7 +908,7 @@
       if (!button) {
         return;
       }
-      state.sort = button.dataset.sort === "alpha" ? "alpha" : "frequency";
+      state.sort = SORT_MODES.includes(button.dataset.sort) ? button.dataset.sort : "default";
       state.prefs.sort = state.sort;
       els.sortGroup.querySelectorAll("[data-sort]").forEach((node) => {
         const active = node === button;
@@ -1018,7 +1023,7 @@
     const prefs = readStore(PREFS_KEY, null);
     if (prefs && typeof prefs === "object") {
       state.prefs = { ...state.prefs, ...prefs };
-      state.sort = state.prefs.sort === "alpha" ? "alpha" : "frequency";
+      state.sort = SORT_MODES.includes(state.prefs.sort) ? state.prefs.sort : "default";
     }
 
     // 封神之路等页面用 ?deck=llyc2027&word=xxx 直接跳到某张词卡。
@@ -1047,13 +1052,11 @@
     renderStats();
     scrollProgress();
 
-    if (state.sort === "alpha") {
-      els.sortGroup?.querySelectorAll("[data-sort]").forEach((node) => {
-        const active = node.dataset.sort === "alpha";
-        node.classList.toggle("is-active", active);
-        node.setAttribute("aria-pressed", String(active));
-      });
-    }
+    els.sortGroup?.querySelectorAll("[data-sort]").forEach((node) => {
+      const active = node.dataset.sort === state.sort;
+      node.classList.toggle("is-active", active);
+      node.setAttribute("aria-pressed", String(active));
+    });
 
     try {
       await loadIndex();

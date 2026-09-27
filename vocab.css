@@ -495,3 +495,21 @@ html[data-vocab-embed="true"] .vocab-detail-panel {
     gap: 12px;
   }
 }
+
+/* 排序：默认词书顺序 / 高频（单元）顺序 / 字母序，三格等宽。 */
+.segmented-control.sort-control {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.segmented-control.sort-control .segment-button {
+  padding: 8px 6px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@media (max-width: 620px) {
+  .segmented-control.sort-control .segment-button {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+}
