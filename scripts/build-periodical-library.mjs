@@ -53,8 +53,22 @@ function safeJson(value) {
   return JSON.stringify(value).replace(/</g, "\\u003c").replace(/\u2028|\u2029/g, "");
 }
 
+// PDF 文本层会留下三种不能在页面上出现的字符：字体缺字造成的 NUL 撇号、
+// Wingdings 私用区项目符号、零宽连接符。原始 JSON 已经清洗过一轮，这里再兜底一次。
+const WINGDING_BULLETS = /[\uF075\uF077\uF0A7\uF0B7\uF0D8\uF0E0\uF0FC]/g;
+const PRIVATE_USE = /[\uE000-\uF8FF]/g;
+const ZERO_WIDTH = /[\u0000\u200b\u200c\u200d\ufeff]/g;
+
+function sanitizeText(text) {
+  return String(text || "")
+    .replace(/([A-Za-z0-9])[ \t]*\u0000+[ \t]*(?=s\b)/g, "$1’")
+    .replace(WINGDING_BULLETS, "•")
+    .replace(PRIVATE_USE, "")
+    .replace(ZERO_WIDTH, " ");
+}
+
 function compact(text) {
-  return String(text || "").replace(/\s+/g, " ").trim();
+  return sanitizeText(text).replace(/\s+/g, " ").trim();
 }
 
 // 提取脚本里同一个字段可能是字符串，也可能是分行数组，这里统一成一行文本。
@@ -440,7 +454,7 @@ function readingPayload(entry, magazineEntry) {
     paragraphs,
     vocab,
     vocabUnplaced: placed.unplaced,
-    sections: sectionPayload(entry),
+    sections: sectionPayload(entry, magazineEntry),
   };
 }
 
@@ -464,8 +478,25 @@ function magazineForReading(entry, magazines) {
 // 用它把每个小节挂回具体段落，页面就能在段落旁边直接显示语法与写作旁注。
 const SECTION_REF_PATTERN = /^\s*(?:\d+\s*[.、)]\s*)?[（(]?\s*para\s*\.?\s*(\d+)/i;
 
-function sectionPayload(entry) {
-  const sections = (entry.reading?.sections || [])
+function mergeSectionSources(entry, magazineEntry) {
+  const merged = [];
+  const seen = new Set();
+  [entry, magazineEntry].forEach((source) => {
+    (source?.reading?.sections || []).forEach((section) => {
+      const key = compact(section?.heading).replace(/\s+/g, "").toLowerCase();
+      if (!key || seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      merged.push(section);
+    });
+  });
+  return merged;
+}
+
+// 精读讲义优先；如果同一期只有杂志排版保留了额外讲解，再补进精读页。
+function sectionPayload(entry, magazineEntry = null) {
+  const sections = mergeSectionSources(entry, magazineEntry)
     .map((section) => {
       const lines = (section.lines || [])
         .map((line) => ({

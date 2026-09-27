@@ -15,6 +15,7 @@ import json
 import pathlib
 import re
 import sys
+import unicodedata
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -68,6 +69,8 @@ PROMO_LINE = (
     "本文档由我们自研",
     "本文档为【福利】",
     "训练营创办",
+    "下一页提供句子分析",
+    "下一页提供答案解析",
     "如果对答案解析有疑惑",
     "欢迎大家自行交流使用",
     "该模型基于近10年考研英语真题",
@@ -220,7 +223,12 @@ def docx_paragraphs(path: pathlib.Path) -> tuple[list[str], list[list[list[str]]
 def is_boilerplate(text: str) -> bool:
     if re.fullmatch(r"[0-9]{1,4}", text):
         return True
+    # 页脚页码「5 / 7」会整行混进正文和小节。
+    if re.fullmatch(r"[0-9]{1,3}\s*/\s*[0-9]{1,3}", text):
+        return True
     if any(text.startswith(mark) for mark in BOILERPLATE) or "版权所有" in text:
+        return True
+    if "公众号" in text and ("经济学人" in text or "考研英语" in text):
         return True
     return any(mark in text for mark in PROMO_LINE)
 
@@ -324,15 +332,117 @@ def split_vocab_head(text: str) -> tuple[str, str]:
 
 SECTION_LABELS = (
     "今日句子分析",
+    "今日翻译作业",
     "句子分析",
     "写作积累",
     "翻译作业",
     "参考译文",
     "拓展表达",
     "今日文章脉络",
+    "文章脉络",
+    "固定搭配",
+    "核心语法",
     "长难句",
     "语法",
 )
+
+# 讲解小节的标题在讲义 PDF 里有 5 种写法：`➢标题`、Wingdings 项目符号 + 标题、
+# 裸标题、`【标题】`，以及标题后紧接正文。部分 PDF 还会把汉字映射成康熙部首
+# （`今⽇`、`⼈`），需要先归一化才能匹配。
+SECTION_BULLET_CHARS = "➢\uf0d8\uf0a7\uf0e0\uf075\uf0fc\uf077\uf0b7•·●"
+SECTION_RADICAL_MAP = str.maketrans(
+    {
+        "⽇": "日",
+        "⽂": "文",
+        "⼈": "人",
+        "⼀": "一",
+        "⼤": "大",
+        "⼩": "小",
+        "⼼": "心",
+        "⼿": "手",
+        "⼝": "口",
+        "⼥": "女",
+        "⼦": "子",
+        "⼭": "山",
+        "⼯": "工",
+        "⼫": "尸",
+        "⼴": "广",
+        "⽣": "生",
+        "⽤": "用",
+        "⽅": "方",
+        "⾏": "行",
+        "⾯": "面",
+    }
+)
+
+
+def normalize_heading_text(text: str) -> str:
+    """去掉项目符号、零宽字符与全角空格，并还原被映射成康熙部首的汉字。"""
+    cleaned = (text or "").replace("\x00", "").translate(SECTION_RADICAL_MAP)
+    return cleaned.strip().lstrip(SECTION_BULLET_CHARS).replace("\u3000", " ").strip()
+
+
+def clean_pdf_text(text: str) -> str:
+    """修复 PDF 字体映射留下的 NUL、零宽字符与 Wingdings 私用区符号。"""
+    source = text or ""
+    # 字体缺字时撇号常被拆成 `Dolphin\0s`、`Dolphin \0 s`，先合并回英文所有格。
+    source = re.sub(r"(?<=[A-Za-z0-9])[ \t]*\x00+[ \t]*(?=s\b)", "’", source)
+    out: list[str] = []
+    for index, char in enumerate(source):
+        code = ord(char)
+        if char == "\x00":
+            previous = out[-1] if out else ""
+            following = source[index + 1] if index + 1 < len(source) else ""
+            after = source[index + 2] if index + 2 < len(source) else ""
+            if (
+                previous
+                and previous.isascii()
+                and previous.isalpha()
+                and following.lower() == "s"
+                and (not after or after.isspace() or after in ".,;:!?)]}\"'’”")
+            ):
+                out.append("’")
+            elif (previous and CJK_RE.search(previous)) or (following and CJK_RE.search(following)):
+                continue
+            else:
+                out.append(" ")
+            continue
+        if char in "\ufeff\u200b\u200c\u200d" or 0xE000 <= code <= 0xF8FF:
+            continue
+        # 康熙部首 / CJK 部首（`⼀`、`⼦`、`⻚`）在文本层里代替了正常汉字，
+        # 不还原会让页脚过滤、标题识别和正文搜索都失效。
+        if 0x2E80 <= code <= 0x2FDF:
+            out.append(unicodedata.normalize("NFKC", char))
+            continue
+        out.append(char)
+    return "".join(out)
+
+
+def detect_section_heading(text: str) -> tuple[str, str]:
+    """识别讲解小节标题，返回 (标题, 同一行剩余的正文)。"""
+    cleaned = normalize_heading_text(text)
+    if not cleaned:
+        return "", ""
+    bracket_match = re.match(r"^[【\[][️\s]*([^】\]]{1,24})[】\]]\s*(.*)$", cleaned)
+    if bracket_match:
+        candidate = bracket_match.group(1).strip()
+        remainder = bracket_match.group(2).strip()
+        for label in SECTION_LABELS:
+            if candidate == label:
+                return label, remainder
+        return "", ""
+    for label in SECTION_LABELS:
+        if cleaned == label:
+            return label, ""
+        if cleaned.startswith(label):
+            tail = cleaned[len(label) :]
+            rest = tail.strip()
+            if not rest:
+                return label, ""
+            # 标题与正文同一行时中间会有空格；没有空格说明是更长的句子（如“句子分析如下”）。
+            if tail[0].isspace() and len(rest) >= 2:
+                return label, rest
+    return "", ""
 
 
 def parse_reading_stream(
@@ -344,6 +454,7 @@ def parse_reading_stream(
     current_para: int | None = None
     current_vocab: dict | None = None
     current_section: dict | None = None
+    section_gap: dict | None = None
     order: list[int] = []
 
     def ensure_para(number: int) -> dict:
@@ -353,7 +464,7 @@ def parse_reading_stream(
         return paragraphs[number]
 
     for line in lines:
-        text = line["text"].strip()
+        text = clean_pdf_text(line["text"]).strip()
         if not text or is_boilerplate(text):
             continue
         kind = line["kind"]
@@ -363,7 +474,11 @@ def parse_reading_stream(
         if inline:
             current_para = int(inline.group(1))
             current_vocab = None
-            current_section = None
+            # 讲解小节正文里的 `Para. 4` 是引用标记，不是小节结束。
+            # 只清空一段（section_gap），遇到下一处标题再真正收尾。
+            if current_section is not None:
+                section_gap = current_section
+                current_section = None
             ensure_para(current_para)
             rest = inline.group(2).strip()
             if rest:
@@ -374,7 +489,9 @@ def parse_reading_stream(
         if marker:
             current_para = int(marker.group(1))
             current_vocab = None
-            current_section = None
+            if current_section is not None:
+                section_gap = current_section
+                current_section = None
             ensure_para(current_para)
             continue
 
@@ -393,27 +510,23 @@ def parse_reading_stream(
             current_vocab = entry_vocab
             current_para = None
             current_section = None
+            section_gap = None
             continue
 
-        heading = ""
-        if text.startswith("➢"):
-            heading = text.lstrip("➢ ").strip()
-        else:
-            label_match = re.match(r"^【[️\s]*([^】]{2,20})】", text)
-            if label_match and any(word in label_match.group(1) for word in SECTION_LABELS):
-                heading = label_match.group(1).strip()
+        heading, heading_tail = detect_section_heading(text)
         if heading:
             if collect_sections:
+                if section_gap is not None:
+                    section_gap = None
                 current_section = {"heading": heading, "lines": []}
                 sections.append(current_section)
+                if heading_tail:
+                    current_section["lines"].append({"kind": kind, "text": heading_tail})
             else:
                 current_section = None
+                section_gap = None
             current_para = None
             current_vocab = None
-            continue
-
-        if current_section is not None:
-            current_section["lines"].append({"kind": kind, "text": text})
             continue
 
         if current_vocab is not None:
@@ -432,6 +545,15 @@ def parse_reading_stream(
             for tag in ("考研大纲词汇", "六级", "四级"):
                 if tag in text and tag not in target["tags"]:
                     target["tags"].append(tag)
+            continue
+
+        # `Para. N` 引用标记会临时清空 current_section，这里把讲解小节接回来，
+        # 让同一小节的后续行继续归入原来的标题。
+        if current_section is None and section_gap is not None:
+            current_section = section_gap
+
+        if current_section is not None:
+            current_section["lines"].append({"kind": kind, "text": text})
             continue
 
         if current_para is not None:

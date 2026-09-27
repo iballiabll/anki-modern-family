@@ -40,13 +40,16 @@ RADICAL_MAP = {
     "\u2ec6": "角",
     "\u2ed3": "长",
     "\u2ed4": "门",
+    "\u2eda": "页",
     "\u2edb": "风",
     "\u2edc": "飞",
+    "\u2ee3": "骨",
 }
 
 # 公众号推广语、正文字数统计等非学习内容。
 PROMO = re.compile(
     r"关注微信公众号\s*【[^】]{0,20}】[^。\n]{0,90}。?"
+    r"|[（(]?\s*下一页提[供句子分析）)]*"
     r"|加入训练营[^。\n]{0,90}。?"
     r"|按照群公告[^。\n]{0,90}。?"
     r"|在\s*\[?资料禁言群\]?\s*中查看全文翻译[^。\n]{0,90}。?"
@@ -57,6 +60,21 @@ PROMO = re.compile(
 
 # 段落被 PDF 切分时，译文偶尔以半个右括号/顿号开头。
 LEADING_PUNCT = re.compile(r"^[）)】」』、,，;；:：]{1,3}\s*")
+
+# 页脚「5 / 7」会整行混进正文、生词卡和小节。
+PAGE_FOOTER = re.compile(r"^\d{1,3}\s*/\s*\d{1,3}$")
+
+# 「（下一页提供句子分析）」被 PDF 折行拆成两行时，尾行只剩「供句子分析）」。
+PROMO_TAIL = re.compile(r"^[供子分析]{1,8}[）)]$")
+
+# PDF 字体缺字时撇号会掉成 NUL：`Dolphin\0s`、`Dolphin \0 s`。
+APOSTROPHE_NUL = re.compile(r"(?<=[A-Za-z0-9])[ \t]*\x00+[ \t]*(?=s\b)")
+
+# Wingdings 项目符号在文本层里落在私用区，页面会渲染成方框。
+WINGDING_BULLET = str.maketrans(
+    {char: "•" for char in "\uf077\uf075\uf0d8\uf0a7\uf0e0\uf0fc\uf0b7"}
+)
+PRIVATE_USE = re.compile(r"[\uE000-\uF8FF]")
 
 # 解析里整条都是训练营招生话术的段落，直接丢弃（不含任何题解标记）。
 AD_BLOCK = re.compile(r"^训练营创办\d+年来[^【]{0,220}$")
@@ -106,7 +124,15 @@ def fold_char(char: str) -> str:
 def clean_text(value: str, path: str = "") -> str:
     if AD_BLOCK.match(value.strip()):
         return ""
+    if PAGE_FOOTER.match(value.strip()):
+        return ""
+    if PROMO_TAIL.match(value.strip()):
+        return ""
     text = "".join(fold_char(char) for char in value)
+    text = APOSTROPHE_NUL.sub("’", text)
+    text = text.translate(WINGDING_BULLET)
+    text = PRIVATE_USE.sub("", text)
+    text = text.replace("\x00", " ")
     text = NOISE_URL.sub(" ", text)
     text = WATERMARK.sub("", text)
     text = PROMO.sub(" ", text)
@@ -170,6 +196,10 @@ def main() -> int:
                 )
         for char in json.dumps(fixed, ensure_ascii=False):
             if 0x2E80 <= ord(char) <= 0x2FDF:
+                leftovers[char] = leftovers.get(char, 0) + 1
+            elif char in {"\x00"} or 0xE000 <= ord(char) <= 0xF8FF:
+                leftovers[char] = leftovers.get(char, 0) + 1
+            elif char in {"\u200b", "\u200c", "\u200d", "\ufeff"}:
                 leftovers[char] = leftovers.get(char, 0) + 1
 
     mode = "写入" if args.write else "预演"
