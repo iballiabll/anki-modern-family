@@ -2126,6 +2126,211 @@ function mathRoundStats(book, round = mathBookRound(book.key)) {
   };
 }
 
+/** 这本书在指定轮次里的全部成绩记录；轮次、书籍都互不混用。 */
+function mathBookRecords(book, round = mathBookRound(book.key)) {
+  const normalizedRound = cleanMathRound(round);
+  return STORE
+    ? STORE.records().filter((record) => mathRecordMatch(record, book) && cleanMathRound(record.round) === normalizedRound)
+    : [];
+}
+
+/** 把一组成绩折算成可比较的得分：满分/得分优先，其次题数/做对数。 */
+function mathRecordScore(records) {
+  const scored = records.filter((record) => Number(record.full) > 0);
+  if (scored.length) {
+    const score = scored.reduce((sum, record) => sum + Math.max(0, Number(record.score) || 0), 0);
+    const full = scored.reduce((sum, record) => sum + Math.max(0, Number(record.full) || 0), 0);
+    return {
+      kind: "score",
+      value: `${score}/${full}`,
+      rate: full ? Math.round((score / full) * 100) : 0,
+      records: records.length,
+    };
+  }
+  const counted = records.filter((record) => Number(record.count) > 0);
+  if (counted.length) {
+    const correct = counted.reduce((sum, record) => sum + Math.max(0, Number(record.correct) || 0), 0);
+    const count = counted.reduce((sum, record) => sum + Math.max(0, Number(record.count) || 0), 0);
+    return {
+      kind: "correct",
+      value: `${correct}/${count}`,
+      rate: count ? Math.round((correct / count) * 100) : 0,
+      records: records.length,
+    };
+  }
+  return { kind: "empty", value: "—", rate: 0, records: records.length };
+}
+
+/** 普通书按分册聚合，真题按数一 / 数二 / 数三聚合。 */
+function mathScoreSections(book) {
+  if (Array.isArray(book.sections) && book.sections.length) return book.sections;
+  if (book.kind === "zhenti" || book.group === "zhenti") {
+    return [
+      { name: "数学一", short: "数一", chapters: [] },
+      { name: "数学二", short: "数二", chapters: [] },
+      { name: "数学三", short: "数三", chapters: [] },
+    ];
+  }
+  return [];
+}
+
+/** 章节进度没有满分字段，用完成题数加权的正确率作为得分率的兜底。 */
+function mathProgressScore(book, sections, round) {
+  let done = 0;
+  let weighted = 0;
+  let entered = 0;
+  let chapters = 0;
+  let wrong = 0;
+  for (const section of sections) {
+    const stats = mathSectionStats(book, section, round);
+    done += stats.done;
+    weighted += stats.accuracy * (stats.done || 0);
+    entered += stats.entered;
+    chapters += stats.chapters;
+    wrong += stats.wrong;
+  }
+  return { done, entered, chapters, wrong, rate: done ? Math.round(weighted / done) : 0 };
+}
+
+function mathRoundScore(book, round) {
+  const normalizedRound = cleanMathRound(round);
+  const records = mathBookRecords(book, normalizedRound);
+  const recorded = mathRecordScore(records);
+  const progress = mathProgressScore(book, mathScoreSections(book), normalizedRound);
+  const hasRecorded = recorded.kind !== "empty";
+  return {
+    round: normalizedRound,
+    records,
+    recorded,
+    progress,
+    value: hasRecorded ? recorded.value : progress.done ? `${progress.rate}%` : "—",
+    rate: hasRecorded ? recorded.rate : progress.rate,
+    detail: hasRecorded
+      ? `${recorded.kind === "score" ? "加权得分率" : "正确率"} ${recorded.rate}% · ${recorded.records} 条记录`
+      : progress.done
+        ? `章节正确率 ${progress.rate}% · 已录 ${progress.entered}/${progress.chapters} 章`
+        : "还没有可汇总的得分",
+  };
+}
+
+function mathSectionAliases(section) {
+  const aliases = [section.name, section.short, ...(section.chapters || [])].filter(Boolean).map(String);
+  const shortToPaper = { 数一: "数学一", 数二: "数学二", 数三: "数学三" };
+  if (shortToPaper[section.short]) aliases.push(shortToPaper[section.short]);
+  return [...new Set(aliases)];
+}
+
+function mathRecordInSection(record, section) {
+  const haystack = `${record.module} ${record.paper} ${record.source} ${record.subject} ${record.question}`;
+  return mathSectionAliases(section).some((alias) => alias && haystack.includes(alias));
+}
+
+function mathSectionRoundScore(book, section, round) {
+  const records = mathBookRecords(book, round).filter((record) => mathRecordInSection(record, section));
+  const recorded = mathRecordScore(records);
+  if (recorded.kind !== "empty") {
+    return {
+      value: recorded.value,
+      rate: recorded.rate,
+      detail: `${recorded.rate}% · ${recorded.records} 条`,
+      kind: recorded.kind,
+    };
+  }
+  if (book.kind !== "zhenti" && book.group !== "zhenti") {
+    const progress = mathProgressScore(book, [section], round);
+    if (progress.done) {
+      return {
+        value: `${progress.rate}%`,
+        rate: progress.rate,
+        detail: `章节正确率 · ${progress.done} 题`,
+        kind: "progress",
+      };
+    }
+  }
+  return { value: "—", rate: 0, detail: "未录入", kind: "empty" };
+}
+
+function mathScoreCell(score) {
+  const tone = !score.rate ? "empty" : score.rate >= 80 ? "good" : score.rate >= 65 ? "warn" : "bad";
+  return `<td class="section-score-cell ${tone}"><strong>${escapeHtml(score.value)}</strong><span>${escapeHtml(score.detail)}</span></td>`;
+}
+
+function mathScoreBoard(book) {
+  const sections = mathScoreSections(book);
+  const tones = { 1: "blue", 2: "coral", 3: "violet", 4: "amber", 5: "cyan" };
+  const roundScores = MATH_ROUNDS.map((round) => ({ ...round, score: mathRoundScore(book, round.value) }));
+  const unassigned = MATH_ROUNDS.map((round) =>
+    mathBookRecords(book, round.value).filter((record) => !sections.some((section) => mathRecordInSection(record, section))),
+  );
+  const hasUnassigned = unassigned.some((records) => records.length);
+  return `
+    <section class="card card-pad score-board">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">各刷得分总览</h2>
+          <p class="card-note">一刷到五刷分开统计；有满分就按得分加权，没有满分就按做对数，最后回退到章节正确率。</p>
+        </div>
+        <span class="tag blue">一刷 → 五刷</span>
+      </div>
+      <div class="score-grid">
+        ${roundScores
+          .map(
+            (round) => `
+              <article class="round-score-card ${round.value === mathBookRound(book.key) ? "active" : ""}"
+                data-round-score="${round.value}">
+                <div class="round-score-head"><span>${round.label}得分</span><em>${round.plan}</em></div>
+                <strong>${escapeHtml(round.score.value)}</strong>
+                ${progressBar(round.score.rate, tones[round.value])}
+                <p>${escapeHtml(round.score.detail)}</p>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+      <div class="section-score-head">
+        <div>
+          <h3 class="card-title">分板块得分</h3>
+          <p class="card-note">按这本书自己的分册、数一数二数三拆开看，每格都是一刷到五刷的独立成绩。</p>
+        </div>
+        <span class="tag violet">${sections.length} 个板块</span>
+      </div>
+      ${
+        sections.length
+          ? `<div class="table-wrap section-score-wrap">
+              <table class="section-score-table">
+                <thead>
+                  <tr><th>板块</th>${MATH_ROUNDS.map((round) => `<th>${round.label}</th>`).join("")}</tr>
+                </thead>
+                <tbody>
+                  ${sections
+                    .map(
+                      (section) => `
+                        <tr>
+                          <th><strong>${escapeHtml(section.name)}</strong><span>${escapeHtml(section.short || "")}</span></th>
+                          ${MATH_ROUNDS.map((round) => mathScoreCell(mathSectionRoundScore(book, section, round.value))).join("")}
+                        </tr>
+                      `,
+                    )
+                    .join("")}
+                  ${
+                    hasUnassigned
+                      ? `<tr>
+                          <th><strong>未分板块</strong><span>未匹配到分册</span></th>
+                          ${MATH_ROUNDS.map((round, index) =>
+                            mathScoreCell(mathRecordScore(unassigned[index])),
+                          ).join("")}
+                        </tr>`
+                      : ""
+                  }
+                </tbody>
+              </table>
+            </div>`
+          : `<div class="empty-state compact">${icon("layout-grid")}<strong>这本书还没有可拆分板块</strong><span>录入成绩时会按数一 / 数二 / 数三归入对应板块。</span></div>`
+      }
+    </section>
+  `;
+}
+
 function mathRoundSwitcher(book) {
   const current = mathBookRound(book.key);
   const currentMeta = mathRoundMeta(current);
@@ -2179,7 +2384,7 @@ function bookRecordTable(book, records) {
     `;
   }
   return `
-    <div class="table-wrap">
+    <div class="table-wrap" data-record-table="1">
       <table>
         <thead>
           <tr><th>日期</th><th>轮次</th><th>来源</th><th>章节 / 卷面</th><th>得分</th><th>正确率</th><th>备注</th><th>操作</th></tr>
@@ -2251,6 +2456,7 @@ function mathBookPage(book) {
         </div>
       </section>
       ${mathRoundSwitcher(book)}
+      ${mathScoreBoard(book)}
       <div class="kpi-grid">
         ${kpiCard({ label: `${currentRoundMeta.label}真题`, value: records.length, unit: "套", sub: `共 ${book.years ? book.years.length : 0} 个年份可选`, iconName: "layers", accent: "blue" })}
         ${kpiCard({ label: "最近一次", value: records[0] && records[0].full ? records[0].score : "—", unit: records[0] && records[0].full ? `/${records[0].full}` : "", sub: records[0] ? `${records[0].date} · ${records[0].paper || records[0].subject}` : "还没有记录", iconName: "file-check-2", accent: "violet" })}
@@ -2306,6 +2512,7 @@ function mathBookPage(book) {
       </div>
     </section>
     ${mathRoundSwitcher(book)}
+    ${mathScoreBoard(book)}
 
     <div class="kpi-grid">
       ${kpiCard({ label: `${currentRoundMeta.label}进度`, value: stats.done, unit: `/${stats.total || "未设"} ${book.unit || "题"}`, sub: stats.total ? `完成 ${percent}%` : "按章节录入后会累计", iconName: "list-checks", accent: book.tone })}
