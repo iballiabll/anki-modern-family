@@ -2619,11 +2619,15 @@
 
   /* ------------------------------------------------- 本地词库优先（离线可用） */
 
-  const QUICK_INDEX_FILE = "./vocab-index/word-quick.json";
-  const QUICK_INDEX_KEY = "iball-periodical-quick-index-v1";
+  // 词表更新时同步改版本号：URL 和本地缓存键都跟着换，避免旧副本串味。
+  const VOCAB_DATA_VERSION = "20260927-867effa";
+  const QUICK_INDEX_FILE = `./vocab-index/word-quick.json?v=${VOCAB_DATA_VERSION}`;
+  const QUICK_INDEX_KEY = `iball-periodical-quick-index-${VOCAB_DATA_VERSION}`;
+  const LEGACY_QUICK_INDEX_KEYS = ["iball-periodical-quick-index-v1"];
 
   function readStoredQuickIndex() {
     try {
+      LEGACY_QUICK_INDEX_KEYS.forEach((key) => window.localStorage.removeItem(key));
       const raw = window.localStorage.getItem(QUICK_INDEX_KEY);
       if (!raw) {
         return null;
@@ -2649,7 +2653,7 @@
     }
     state.quickIndexPromise = (async () => {
       try {
-        const manifestResponse = await fetch("./vocab-index/lexemes.json", {
+        const manifestResponse = await fetch(`./vocab-index/lexemes.json?v=${VOCAB_DATA_VERSION}`, {
           credentials: "same-origin",
         });
         const manifest = await manifestResponse.json().catch(() => ({}));

@@ -1,5 +1,7 @@
 (function () {
-  const INDEX_PATH = "vocab-index.json";
+  // 词表更新时同步改版本号：force-cache 会一直吃旧副本，换 URL 才能拿到新词。
+  const DATA_VERSION = "20260927-cache1";
+  const INDEX_PATH = `vocab-index.json?v=${DATA_VERSION}`;
 
   let indexPromise = null;
   let entries = null;

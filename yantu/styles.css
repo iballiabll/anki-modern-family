@@ -263,6 +263,14 @@ button {
   font-weight: 700;
 }
 
+/* 窄屏侧边栏收起后，用顶栏这一行保留品牌名。 */
+.topbar-brand {
+  display: none;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .search {
   display: flex;
   width: min(380px, 30vw);
@@ -2477,6 +2485,35 @@ body.entry-edit .record-banner {
   resize: vertical;
 }
 
+.annotate-hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.annotate-field > label.annotate-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 0;
+  padding: 9px 10px;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.annotate-check input {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  accent-color: var(--blue);
+}
+
 .segmented.compact {
   flex-wrap: wrap;
 }
@@ -2561,6 +2598,10 @@ body.entry-edit .record-banner {
 @media (max-width: 920px) {
   .sidebar {
     display: none;
+  }
+
+  .topbar-brand {
+    display: block;
   }
 
   .shell {

@@ -13,9 +13,13 @@
 (function () {
   "use strict";
 
-  const INDEX_URL = "./vocab-index/lexemes.json";
-  const QUICK_URL = "./vocab-index/word-quick.json";
-  const SHARD_MAP_URL = "./vocab-index/shard-map.json";
+  // 词表文件不常改，但一旦更新就必须绕开旧 CDN 副本。
+  // 发布新词表时同步更新这个版本号，避免部分节点继续返回旧词数。
+  const DATA_VERSION = "20260927-867effa";
+  const versioned = (url) => `${url}?v=${DATA_VERSION}`;
+  const INDEX_URL = versioned("./vocab-index/lexemes.json");
+  const QUICK_URL = versioned("./vocab-index/word-quick.json");
+  const SHARD_MAP_URL = versioned("./vocab-index/shard-map.json");
   /** 排序方式：默认词书顺序 / 高频（单元）顺序 / 字母序。 */
   const SORT_MODES = ["default", "frequency", "alpha"];
 
@@ -228,7 +232,7 @@
     if (state.deckCache.has(cacheKey)) {
       return Promise.resolve(state.deckCache.get(cacheKey));
     }
-    return fetchJson(`./vocab-index/deck-${cacheKey}.json`).then((data) => {
+    return fetchJson(versioned(`./vocab-index/deck-${cacheKey}.json`)).then((data) => {
       const words = Array.isArray(data?.words) ? data.words : [];
       state.deckCache.set(cacheKey, words);
       return words;
@@ -247,7 +251,7 @@
       return null;
     }
     if (!state.shardCache.has(shard)) {
-      const payload = await fetchJson(`./vocab-index/lexemes-${shard}.json`);
+      const payload = await fetchJson(versioned(`./vocab-index/lexemes-${shard}.json`));
       const byWord = new Map();
       for (const entry of Array.isArray(payload?.words) ? payload.words : []) {
         byWord.set(normalize(entry.word), entry);

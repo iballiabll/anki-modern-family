@@ -16,6 +16,8 @@ const YM_GROUPS = Array.isArray(YM.groups) ? YM.groups : [];
 const YM_BOOKS = Array.isArray(YM.books) ? YM.books : [];
 const YM_BY_KEY = Object.fromEntries(YM_BOOKS.map((book) => [book.key, book]));
 const STORE = window.YANTU_STORE;
+/** 与 vocab.js 的 DATA_VERSION 对齐：词表更新时同步改这里。 */
+const VOCAB_DATA_VERSION = "20260927-867effa";
 
 const state = {
   screen: initialParams.get("screen") || "dashboard",
@@ -859,7 +861,8 @@ function heatmap() {
   return `<div class="heatmap">${cells}</div>`;
 }
 
-function reviewItem(index, title, meta, tone = "red") {
+/** action 传空时保留原来的箭头按钮，复盘队列会换成可点的「复盘」按钮。 */
+function reviewItem(index, title, meta, tone = "red", action = "") {
   return `
     <div class="review-item">
       <div class="review-index" style="color:var(--${tone});background:var(--${tone}-soft)">${index}</div>
@@ -867,7 +870,7 @@ function reviewItem(index, title, meta, tone = "red") {
         <p class="review-title">${title}</p>
         <p class="review-meta">${meta}</p>
       </div>
-      <button class="review-action" aria-label="查看">${icon("arrow-up-right")}</button>
+      ${action || `<button class="review-action" aria-label="查看">${icon("arrow-up-right")}</button>`}
     </div>
   `;
 }
@@ -1032,7 +1035,8 @@ function mountLlycPanel() {
 
 async function loadLlycDeckMeta() {
   try {
-    const response = await fetch("../vocab-index/lexemes.json", { cache: "force-cache" });
+    // 词表更新后旧 CDN 副本可能还在，用版本号强制取新清单。
+    const response = await fetch(`../vocab-index/lexemes.json?v=${VOCAB_DATA_VERSION}`, { cache: "no-cache" });
     if (!response.ok) {
       return;
     }
@@ -1207,7 +1211,7 @@ function renderDashboard() {
   return `
     <div class="page-head">
       <div>
-        <h1>封神之路 · 备考总览</h1>
+        <h1>XXRJ · 备考总览</h1>
         <p class="page-desc">${todayText} · 目标 ${targetTotal} 分 · 政治模块${profile?.showPolitics ? "已开启" : "默认关闭，可在目标设置里开启"}</p>
       </div>
       <div class="head-actions">
@@ -1430,8 +1434,9 @@ function renderDashboard() {
                     reviewItem(
                       String(index + 1).padStart(2, "0"),
                       escapeHtml(`${record.subject || ""} ${record.module || record.source || ""} ${record.question || ""}`.trim() || "错题"),
-                      escapeHtml(`${record.source || ""}${record.errorType ? ` · ${record.errorType}` : ""} · 复盘 ${record.reviewCount || 0} 次 · ${record.reviewDate ? `${record.reviewDate} 到期` : "未排期"}`),
+                      escapeHtml(`${record.source || ""}${record.errorType ? ` · ${record.errorType}` : ""} · ${nextReviewRoundText(record)} · ${record.reviewDate ? `${record.reviewDate} 到期` : "未排期"}`),
                       record.status === "一直不会的题" ? "red" : rateTone(recordRate(record)),
+                      reviewOpenButton(record),
                     ),
                   )
                   .join("")
@@ -1649,15 +1654,17 @@ function annotationPanelHTML(button) {
               <div class="segmented compact">
                 ${ANNOTATE_NEXT.map((next) => `<button class="${next === (data.annNext || "3 天后") ? "active" : ""}" type="button" data-annotate-next="${next}">${next}</button>`).join("")}
               </div>
+              <p class="annotate-hint" data-ann-next-hint>复盘日：${reviewDateFromNext(data.annNext || "3 天后")}</p>
             </div>
             <div class="annotate-field count-field">
-              <label>复盘次数</label>
+              <label>第几次复盘</label>
               <div class="count-stepper">
                 <button type="button" data-count-delta="-1" aria-label="减少复盘次数">-</button>
-                <input type="number" min="0" step="1" data-ann-review-count value="${escapeAttr(data.annReview || 1)}" aria-label="复盘次数">
+                <input type="number" min="0" step="1" data-ann-review-count value="${escapeAttr(data.annReview || 1)}" aria-label="第几次复盘">
                 <button type="button" data-count-delta="1" aria-label="增加复盘次数">+</button>
                 <span>次</span>
               </div>
+              <p class="annotate-hint">默认是下一次的编号，也可以自己改成任意第几次。</p>
             </div>
             <div class="annotate-field count-field">
               <label>错误次数</label>
@@ -1671,6 +1678,13 @@ function annotationPanelHTML(button) {
             <div class="annotate-field wide">
               <label>笔记 · 为什么错、卡在哪一步、下次怎么避免</label>
               <textarea class="annotate-note" rows="3">${escapeAttr(data.annNote || "")}</textarea>
+            </div>
+            <div class="annotate-field wide">
+              <label>本次复盘</label>
+              <label class="annotate-check">
+                <input type="checkbox" data-ann-done checked />
+                <span>今天完成这次复盘，记进「上次复盘」；下次日期看上面的选择</span>
+              </label>
             </div>
           </div>
         </div>
@@ -1828,7 +1842,7 @@ function analysisPanelHTML(button) {
               </div>
               <div class="freq-source">
                 <label>数据来源</label>
-                <span>封神之路 · 成绩录入（本地 + iball 账号同步）</span>
+                <span>XXRJ · 成绩录入（本地 + iball 账号同步）</span>
               </div>
             </section>
           </div>
@@ -1859,6 +1873,23 @@ function toggleAnnotation(button) {
   if (window.lucide) window.lucide.createIcons({ attrs: { "stroke-width": 1.8 } });
   const panel = document.querySelector(`[data-annotate-panel="${id}"]`);
   if (panel) panel.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+/** 复盘队列里的入口：不在错题本就先切过去，再展开这条记录的复盘面板。 */
+function openReviewPanel(id) {
+  if (!id) return;
+  const button = document.querySelector(`[data-annotate="${id}"]`);
+  if (button) {
+    toggleAnnotation(button);
+    return;
+  }
+  state.screen = "mistakes";
+  history.replaceState(null, "", `?screen=mistakes&subject=${state.subject}`);
+  render();
+  window.setTimeout(() => {
+    const target = document.querySelector(`[data-annotate="${id}"]`);
+    if (target) toggleAnnotation(target);
+  }, 0);
 }
 
 function toggleAnalysis(button) {
@@ -1905,11 +1936,11 @@ function reviewDateFromNext(next) {
   return dateKey(new Date(Date.parse(`${TODAY_KEY}T00:00:00`) + days * DAY_MS));
 }
 
-function countCellHTML(reviewCount, errorCount) {
+function countCellHTML(record) {
   return `
-    <div class="count-cell">
-      <span><strong>${reviewCount}</strong> 复盘</span>
-      <span><strong>${errorCount}</strong> 错误</span>
+    <div class="count-cell" title="${escapeAttr(reviewSummaryText(record))}">
+      <span><strong>${Math.max(0, Math.round(Number(record.reviewCount) || 0))}</strong> 复盘</span>
+      <span><strong>${Math.max(0, Math.round(Number(record.errorCount) || 0))}</strong> 错误</span>
     </div>
   `;
 }
@@ -1935,6 +1966,8 @@ function saveAnnotation(saveButton) {
     return Number.isFinite(value) ? Math.max(0, value) : fallback;
   };
   const noteInput = panelRow.querySelector(".annotate-note");
+  const doneInput = panelRow.querySelector("[data-ann-done]");
+  const doneToday = doneInput ? doneInput.checked : true;
   STORE.upsertRecord({
     id,
     errorType: types.join("、"),
@@ -1942,6 +1975,7 @@ function saveAnnotation(saveButton) {
     reviewCount: readCount("[data-ann-review-count]", record.reviewCount || 0),
     errorCount: readCount("[data-ann-error-count]", record.errorCount || 0),
     reviewDate: reviewDateFromNext(next),
+    lastReviewDate: doneToday ? TODAY_KEY : record.lastReviewDate || "",
     note: noteInput ? noteInput.value.slice(0, 2000) : record.note,
   });
   panelRow.remove();
@@ -2350,7 +2384,7 @@ function renderMath() {
   if (!book) {
     return `
       <div class="page-head">
-        <div><h1>封神之路 · 数学</h1><p class="page-desc">数学资料目录加载失败，请刷新页面重试。</p></div>
+        <div><h1>XXRJ · 数学</h1><p class="page-desc">数学资料目录加载失败，请刷新页面重试。</p></div>
       </div>
       <section class="card card-pad">${icon("triangle-alert")} 没有读到 math-books.js 里的资料目录。</section>
     `;
@@ -2362,7 +2396,7 @@ function renderMath() {
   return `
     <div class="page-head">
       <div>
-        <h1>封神之路 · 数学</h1>
+        <h1>XXRJ · 数学</h1>
         <p class="page-desc">22 本现有资料各自分类、各自章节导航；每本都能切一刷到五刷，进度、正确率、错题按轮次独立保存。</p>
       </div>
       <div class="head-actions">
@@ -2436,6 +2470,53 @@ function reviewNextText(record) {
   if (days <= 1) return "1 天后";
   if (days <= 3) return "3 天后";
   return "7 天后";
+}
+
+/** 下一次复盘的编号：已完成几次 + 1，面板里可以自己改。 */
+function nextReviewRound(record) {
+  return Math.max(1, Math.round(Number(record && record.reviewCount) || 0) + 1);
+}
+
+function nextReviewRoundText(record) {
+  return `第 ${nextReviewRound(record)} 次复盘`;
+}
+
+/** 复盘间隔：第 1 次后 1 天，第 2 次后 3 天，第 3 次起 7 天。 */
+function reviewRoundGap(round) {
+  const value = Math.max(1, Math.round(Number(round) || 1));
+  return value <= 1 ? 1 : value === 2 ? 3 : 7;
+}
+
+function reviewSummaryText(record) {
+  const done = Math.max(0, Math.round(Number(record.reviewCount) || 0));
+  const last = record.lastReviewDate ? ` · 上次 ${record.lastReviewDate}` : "";
+  return `已完成 ${done} 次${last}`;
+}
+
+/** 面板底部提示实际复盘日期，点了哪个间隔就跟着变。 */
+function syncReviewNextHint(panel) {
+  if (!panel) return;
+  const hint = panel.querySelector("[data-ann-next-hint]");
+  if (!hint) return;
+  const active = panel.querySelector("[data-annotate-next].active");
+  hint.textContent = `复盘日：${reviewDateFromNext(active ? active.dataset.annotateNext : "3 天后")}`;
+}
+
+/** 复盘编号变了就顺手把「下次复盘」调到对应间隔，用户仍然可以手动改。 */
+function syncReviewNextFromRound(panel) {
+  if (!panel) return;
+  const input = panel.querySelector("[data-ann-review-count]");
+  const label = `${reviewRoundGap(input ? input.value : 1)} 天后`;
+  const target = panel.querySelector(`[data-annotate-next="${label}"]`);
+  if (target) {
+    panel.querySelectorAll("[data-annotate-next]").forEach((button) => button.classList.toggle("active", button === target));
+  }
+  syncReviewNextHint(panel);
+}
+
+/** 复盘队列右侧的入口：打开这条记录的复盘面板，编号和笔记都能改。 */
+function reviewOpenButton(record) {
+  return `<button class="review-action" type="button" title="复盘并记笔记" aria-label="复盘并记笔记" data-review-open="${escapeAttr(record.id)}">${icon("notebook-pen")}</button>`;
 }
 
 function mistakeTagsOf(record) {
@@ -2530,7 +2611,7 @@ function renderMistakes() {
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>来源</th><th>题目</th><th>考点 / 模块</th><th>错误类型</th><th>掌握状态</th><th>下次复盘</th><th>复盘 / 错误</th><th>笔记摘要</th><th>操作</th></tr>
+              <tr><th>来源</th><th>题目</th><th>考点 / 模块</th><th>错误类型</th><th>掌握状态</th><th>下次复盘</th><th>复盘轮次 / 错误</th><th>笔记摘要</th><th>操作</th></tr>
             </thead>
             <tbody>
               ${rows
@@ -2549,7 +2630,7 @@ function renderMistakes() {
                   }</td>
                   <td><span class="tag ${annotateStatusTone(record)}">${escapeHtml(masteryTagText(record))}</span></td>
                   <td>${escapeHtml(record.reviewDate || "未排期")}</td>
-                  <td>${countCellHTML(record.reviewCount || 0, record.errorCount || 0)}</td>
+                  <td>${countCellHTML(record)}</td>
                   <td class="note-cell" title="${escapeAttr(record.note)}">${escapeHtml(record.note || "-")}</td>
                   <td><div class="row-actions">
                     ${analysisButton({ id: record.id, title })}
@@ -2561,7 +2642,7 @@ function renderMistakes() {
                       status: annotateStatusText(record),
                       next: reviewNextText(record),
                       note: record.note || "",
-                      reviewCount: record.reviewCount || 0,
+                      reviewCount: nextReviewRound(record),
                       errorCount: record.errorCount || 0,
                     })}
                     ${recordEditAction(record.id)}
@@ -2616,8 +2697,9 @@ function renderMistakes() {
                     reviewItem(
                       String(index + 1).padStart(2, "0"),
                       escapeHtml(`${record.source || record.subject || ""}${record.question ? ` · ${record.question}` : ""}`.trim() || "错题"),
-                      escapeHtml(`${record.errorType || "未标注错因"} · 错误 ${record.errorCount || 0} 次 · ${record.reviewDate ? `${record.reviewDate} 到期` : "未排期"}`),
+                      escapeHtml(`${record.errorType || "未标注错因"} · ${nextReviewRoundText(record)} · 错误 ${record.errorCount || 0} 次 · ${record.reviewDate ? `${record.reviewDate} 到期` : "未排期"}`),
                       reviewToneOf(record),
+                      reviewOpenButton(record),
                     ),
                   )
                   .join("")
@@ -3525,7 +3607,7 @@ function renderGoal() {
 
       <section class="card card-pad span-5">
         <div class="card-head">
-          <div><h2 class="card-title">怎么用</h2><p class="card-note">三步把封神之路跑起来。</p></div>
+          <div><h2 class="card-title">怎么用</h2><p class="card-note">三步把 XXRJ 跑起来。</p></div>
         </div>
         <div class="review-list">
           ${reviewItem("1", "数学页录入章节进度", "选书 → 选分册 → 点某一章 → 填完成题数、正确率、错题", "blue")}
@@ -3590,7 +3672,7 @@ function renderData() {
 }
 
 const GUIDE_LINKS = [
-  ["封神之路（当前页）", "/yantu/", "考研 11408 学习档案：数学章节进度、今日计划、成绩录入、目标与备份"],
+  ["XXRJ（封神之路，当前页）", "/yantu/", "考研 11408 学习档案：数学章节进度、今日计划、成绩录入、目标与备份"],
   ["词汇库", "/vocab.html", "恋练有词 2027 等词书：斩 / 已会、背词记录、默认词书顺序与字母序"],
   ["考研英语", "/kaoyan.html", "历年真题逐题精读、全文翻译和作文批改"],
   ["外刊精读", "/periodical.html", "经济学人等外刊的逐段精读与检验题"],
@@ -3613,14 +3695,14 @@ function renderGuide() {
     <div class="page-head">
       <div>
         <h1>使用说明与网址</h1>
-        <p class="page-desc">封神之路是 iball 小屋里的考研学习模块；下面是完整入口和最短上手指南。</p>
+        <p class="page-desc">XXRJ（封神之路）是 iball 小屋里的考研学习模块；下面是完整入口和最短上手指南。</p>
       </div>
     </div>
 
     <div class="grid">
       <section class="card card-pad span-7">
         <div class="card-head">
-          <div><h2 class="card-title">封神之路怎么用</h2><p class="card-note">四步就能每天用起来。</p></div>
+          <div><h2 class="card-title">XXRJ 怎么用</h2><p class="card-note">四步就能每天用起来。</p></div>
         </div>
         <div class="review-list">
           ${reviewItem("1", "数学：先选书，再选分册，点章节录入", "数学页顶部按「习题册 / 讲义 / 模拟卷 / 真题」分组；每本书有自己的章节导航，各自记进度，不会互相覆盖", "blue")}
@@ -3651,7 +3733,7 @@ function renderGuide() {
       <section class="card card-pad span-12">
         <div class="card-head">
           <div><h2 class="card-title">全部网址</h2><p class="card-note">直接在浏览器输入下面地址即可打开对应模块。</p></div>
-          <a class="primary-btn" href="${site}/yantu/" target="_blank" rel="noopener">${icon("external-link")} 打开封神之路</a>
+          <a class="primary-btn" href="${site}/yantu/" target="_blank" rel="noopener">${icon("external-link")} 打开 XXRJ</a>
         </div>
         <div class="table-wrap">
           <table>
@@ -4112,7 +4194,7 @@ function importData() {
 function resetData() {
   if (!STORE) return;
   if (!window.confirm("初始化全部数据？计划、成绩记录、章节进度和目标设置都会清空，且不能撤销。")) return;
-  if (!window.confirm("再确认一次：清空当前 iball 账号下的封神之路数据？")) return;
+  if (!window.confirm("再确认一次：清空当前 iball 账号下的 XXRJ 数据？")) return;
   STORE.reset();
   state.mathSection = 0;
   render();
@@ -4127,7 +4209,7 @@ async function readImportFile(file) {
     STORE.replace(parsed);
     render();
   } catch {
-    window.alert("这个文件不是有效的封神之路备份 JSON。");
+    window.alert("这个文件不是有效的 XXRJ 备份 JSON。");
   }
 }
 
@@ -4368,6 +4450,12 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const reviewOpen = event.target.closest("[data-review-open]");
+  if (reviewOpen) {
+    openReviewPanel(reviewOpen.dataset.reviewOpen);
+    return;
+  }
+
   const annotateOpen = event.target.closest("[data-annotate]");
   if (annotateOpen) {
     toggleAnnotation(annotateOpen);
@@ -4490,6 +4578,7 @@ document.addEventListener("click", (event) => {
   const annotateNext = event.target.closest("[data-annotate-next]");
   if (annotateNext) {
     setPanelOption(annotateNext, "data-annotate-next");
+    syncReviewNextHint(annotateNext.closest(".annotate-panel"));
     return;
   }
 
@@ -4500,6 +4589,7 @@ document.addEventListener("click", (event) => {
     if (input) {
       const delta = Number(countDelta.dataset.countDelta) || 0;
       input.value = Math.max(0, (Number(input.value) || 0) + delta);
+      if (input.hasAttribute("data-ann-review-count")) syncReviewNextFromRound(countDelta.closest(".annotate-panel"));
     }
     return;
   }
@@ -4569,6 +4659,14 @@ document.addEventListener("change", (event) => {
     const file = target.files && target.files[0];
     target.value = "";
     readImportFile(file);
+  }
+});
+
+/** 复盘编号输入框：手打数字也同步「下次复盘」的间隔和日期。 */
+document.addEventListener("input", (event) => {
+  const input = event.target;
+  if (input && input.hasAttribute && input.hasAttribute("data-ann-review-count")) {
+    syncReviewNextFromRound(input.closest(".annotate-panel"));
   }
 });
 
@@ -4670,7 +4768,7 @@ function paintAccountChrome() {
     if (banner) banner.hidden = false;
     if (bannerText) {
       bannerText.textContent = localMode
-        ? "当前是本地模式：登录 iball 账号后，封神之路的计划、成绩和章节进度会跟着账号同步。"
+        ? "当前是本地模式：登录 iball 账号后，XXRJ 的计划、成绩和章节进度会跟着账号同步。"
         : "还没有登录 iball 账号：现在录入的数据先存在这台设备，登录后自动同步到账号里。";
     }
     if (bannerAction) bannerAction.href = "https://www.iball.top/index.html?next=/yantu/";
