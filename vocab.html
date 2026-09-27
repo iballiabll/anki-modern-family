@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#0b2925" />
+    <meta name="theme-color" content="#17204f" />
     <meta
       name="description"
       content="词汇库：考研英语一/二、四级、六级、零基础核心词，音标、释义、例句、词根词缀与记忆法，支持收藏与生词本。"
@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./vocab.css" />
     <script src="./account-store.js" defer></script>
+    <script src="./vocab-recite-api.js" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./vocab.js" defer></script>
   </head>
@@ -51,8 +52,8 @@
             <p class="hero-eyebrow">WORD BANK</p>
             <h1 id="pageTitle">词汇库</h1>
             <p class="hero-description">
-              考研英语一/英语二、四级、六级、零基础核心词。每张词卡带音标、释义、例句、词根词缀与记忆法，
-              点词卡懒加载详情，收藏与生词本只存在本机浏览器，不上传任何记录。
+              恋练有词 2027 备考词库、考研英语一/英语二、四级、六级、零基础核心词。每张词卡带音标、释义、
+              例句、词根词缀与记忆法，可按「认识 / 模糊 / 不认识」记背词记录；记录随账号同步，未登录时只存本机。
             </p>
             <div id="heroStats" class="hero-stats" aria-label="词库统计"></div>
           </div>
@@ -63,6 +64,7 @@
               <select id="deckSelect" class="paper-select">
                 <option value="kaoyan1">考研英语一（核心词）</option>
                 <option value="kaoyan2">考研英语二（核心词）</option>
+                <option value="llyc2027">恋练有词 2027（备考词库）</option>
                 <option value="cet4">四级核心词</option>
                 <option value="cet6">六级核心词</option>
                 <option value="basic">零基础高频词</option>
@@ -140,6 +142,21 @@
               <button id="closeWordButton" class="compact-button" type="button">关闭</button>
             </div>
           </div>
+          <div id="reciteBar" class="vocab-recite" hidden>
+            <span class="vocab-recite-label">背词记录</span>
+            <div class="vocab-recite-actions" role="group" aria-label="背词记录">
+              <button class="compact-button recite-button" type="button" data-recite="known">
+                认识
+              </button>
+              <button class="compact-button recite-button" type="button" data-recite="fuzzy">
+                模糊
+              </button>
+              <button class="compact-button recite-button" type="button" data-recite="unknown">
+                不认识
+              </button>
+            </div>
+            <span id="reciteStatus" class="vocab-recite-status" role="status" aria-live="polite"></span>
+          </div>
           <div id="wordDetail" class="vocab-detail" role="status" aria-live="polite"></div>
         </aside>
       </section>
@@ -165,8 +182,14 @@
         </p>
         <ul>
           <li>
+            <a href="https://github.com/blueweiwei/wordbook-llyc" target="_blank" rel="noopener noreferrer">blueweiwei/wordbook-llyc</a>
+            （未标注许可证）：提供《恋练有词》词头与单元顺序，站点只取这份事实性列表，不复制其释义；
+            公开渠道暂无《恋练有词 2027》官方电子词表，本页词库以可获取的最新公开词头顺序作为备考基线，
+            释义由 ECDict 补齐，不代表官方 2027 版内容。
+          </li>
+          <li>
             <a href="https://github.com/lilinji/English" target="_blank" rel="noopener noreferrer">lilinji/English</a>
-            （MIT）：按考试类型分类的词汇数据结构与列表式展示思路。
+            （未标注许可证）：按考试类型分类的词汇数据结构与列表式展示思路。
           </li>
           <li>
             <a href="https://github.com/skywind3000/ECDict" target="_blank" rel="noopener noreferrer">skywind3000/ECDict</a>
@@ -174,7 +197,7 @@
           </li>
           <li>
             <a href="https://github.com/tangshimin/MuJing" target="_blank" rel="noopener noreferrer">tangshimin/MuJing</a>
-            （MIT）：点词查义的交互组织方式。
+            （GPL-3.0）：点词查义的交互组织方式，仅参考设计思路，未使用其代码。
           </li>
         </ul>
       </section>

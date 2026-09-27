@@ -6,7 +6,7 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.055);
+  box-shadow: 0 12px 36px rgba(14, 21, 49, 0.055);
 }
 
 .piece-section + .piece-section {
@@ -18,7 +18,7 @@
   margin-left: 8px;
   padding: 2px 8px;
   color: var(--forest);
-  background: #e7efe9;
+  background: #e7e9ef;
   border-radius: 999px;
   font-size: 10px;
   font-weight: 800;
@@ -29,7 +29,7 @@
   background: linear-gradient(180deg, #f7f8f3, #ffffff);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.05);
+  box-shadow: 0 12px 36px rgba(14, 21, 49, 0.05);
 }
 
 .reading-overview h2 {
@@ -54,7 +54,7 @@
 /* ------------------------------------------------------------ 级联导航 */
 
 .piece-navigation details {
-  border-bottom: 1px solid #e5ebe7;
+  border-bottom: 1px solid #e5e6eb;
 }
 
 .piece-navigation details:last-child {
@@ -67,7 +67,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: #3d5b52;
+  color: #3d435b;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
@@ -81,7 +81,7 @@
 .piece-navigation summary::before {
   content: "▸";
   margin-right: 6px;
-  color: #90a49c;
+  color: #9094a4;
   font-size: 10px;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .nav-count {
-  color: #83958e;
+  color: #838795;
   font-size: 10px;
   font-weight: 700;
   white-space: nowrap;
@@ -108,7 +108,7 @@
 
 .nav-set > summary {
   padding-left: 34px;
-  color: #55726a;
+  color: #555b72;
   font-weight: 700;
 }
 
@@ -122,21 +122,21 @@
   padding: 8px 10px;
   display: grid;
   gap: 3px;
-  color: #4d6a61;
-  background: #f6f8f5;
-  border: 1px solid #e4eae6;
+  color: #4d536a;
+  background: #f8f7f5;
+  border: 1px solid #e4e5ea;
   border-radius: 7px;
   text-decoration: none;
 }
 
 .nav-piece-link:hover {
-  border-color: #bcd0c6;
+  border-color: #bcc0d0;
 }
 
 .nav-piece-link.is-active {
   color: var(--forest-deep);
   background: var(--forest-soft);
-  border-color: #b4cabe;
+  border-color: #b4b8ca;
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
@@ -146,7 +146,7 @@
 }
 
 .nav-piece-range {
-  color: #85978f;
+  color: #858997;
   font-size: 10px;
 }
 
@@ -155,7 +155,7 @@
 .option-translation {
   grid-column: 1 / -1;
   margin: 3px 0 0;
-  color: #7c8d86;
+  color: #7c7f8d;
   font-size: 12px;
   line-height: 1.6;
 }
@@ -184,7 +184,7 @@
 }
 
 .question-feedback.is-revealed {
-  color: #7c8d86;
+  color: #7c7f8d;
 }
 
 /* ------------------------------------------------------------ 选词填空 */
@@ -211,13 +211,13 @@
 }
 
 .cloze-translation-toggle:hover {
-  border-color: #8eada0;
+  border-color: #8e94ad;
 }
 
 .cloze-practice {
   margin: 0 26px 22px;
   padding: 18px;
-  background: #f5f8f4;
+  background: #f8f7f4;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -239,7 +239,7 @@
 
 .cloze-practice-head span,
 .piece-replacement-head span {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11px;
 }
 
@@ -266,7 +266,7 @@
 }
 
 .word-bank-chip:hover {
-  border-color: #8eada0;
+  border-color: #8e94ad;
 }
 
 .word-bank-chip > i {
@@ -288,7 +288,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  color: #7f918a;
+  color: #7f8391;
   font-size: 10px;
 }
 
@@ -310,7 +310,7 @@
 }
 
 .blank-row.is-answered {
-  border-color: #b9cbc2;
+  border-color: #b9bdcb;
 }
 
 .blank-row.is-correct {
@@ -329,7 +329,7 @@
   display: grid;
   place-items: center;
   color: var(--forest);
-  background: #e7eee9;
+  background: #e7e8ee;
   border-radius: 7px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 12px;
@@ -341,7 +341,7 @@
   min-height: 40px;
   padding: 0 9px;
   color: var(--ink);
-  background: #fbfcfb;
+  background: #fbfbfc;
   border: 1px solid var(--line);
   border-radius: 7px;
   font-size: 12px;
@@ -349,13 +349,13 @@
 }
 
 .blank-select:focus {
-  border-color: #75a695;
-  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  border-color: #757fa6;
+  box-shadow: 0 0 0 3px rgba(77, 90, 143, 0.12);
   outline: 0;
 }
 
 .blank-status {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11px;
   font-weight: 700;
 }
@@ -372,8 +372,8 @@
   min-height: 36px;
   padding: 0 11px;
   color: var(--forest);
-  background: #eef3ef;
-  border: 1px solid #d6e2db;
+  background: #eeeff3;
+  border: 1px solid #d6d8e2;
   border-radius: 7px;
   font-size: 11px;
   font-weight: 800;
@@ -386,14 +386,14 @@
   padding: 12px;
   display: grid;
   gap: 8px;
-  background: #f7faf7;
-  border: 1px dashed #d2dfd7;
+  background: #f7f8fa;
+  border: 1px dashed #d2d5df;
   border-radius: 7px;
 }
 
 .blank-analysis p {
   margin: 0;
-  color: #51675f;
+  color: #515567;
   font-size: 12px;
   line-height: 1.75;
 }
@@ -420,7 +420,7 @@
   padding-left: 16px;
   display: grid;
   gap: 5px;
-  color: #66796f;
+  color: #666a79;
   font-size: 11px;
   line-height: 1.7;
 }
@@ -446,8 +446,8 @@
   gap: 5px;
   vertical-align: baseline;
   color: var(--forest-deep);
-  background: #eef3ef;
-  border: 1px solid #c9dcd2;
+  background: #eeeff3;
+  border: 1px solid #c9cddc;
   border-radius: 6px;
   font-family: inherit;
   font-size: 0.82em;
@@ -456,7 +456,7 @@
 }
 
 .blank-slot-number {
-  color: #82958d;
+  color: #828695;
   font-size: 0.82em;
 }
 
@@ -485,11 +485,11 @@
   padding-top: 10px;
   display: grid;
   gap: 9px;
-  border-top: 1px dashed #d2dfd7;
+  border-top: 1px dashed #d2d5df;
 }
 
 .blank-replacement-label {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -505,7 +505,7 @@
   display: grid;
   gap: 6px;
   background: var(--surface);
-  border: 1px solid #dde7e1;
+  border: 1px solid #dddfe7;
   border-radius: 8px;
 }
 
@@ -523,13 +523,13 @@
 }
 
 .blank-word-head span {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11px;
 }
 
 .blank-word-meaning {
   margin: 0;
-  color: #51675f;
+  color: #515567;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -546,8 +546,8 @@
   align-items: baseline;
   gap: 6px;
   color: var(--forest);
-  background: #f2f7f3;
-  border: 1px solid #d9e5de;
+  background: #f2f3f7;
+  border: 1px solid #d9dbe5;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
@@ -555,11 +555,11 @@
 }
 
 .blank-collocation-chip:hover {
-  border-color: #8eada0;
+  border-color: #8e94ad;
 }
 
 .blank-collocation-chip em {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 10px;
   font-style: normal;
   font-weight: 600;
@@ -567,7 +567,7 @@
 
 .blank-replacement-empty {
   margin: 0;
-  color: #8b9d95;
+  color: #8b8f9d;
   font-size: 11px;
 }
 
@@ -657,19 +657,19 @@
 }
 
 .synonym-phonetic {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11px;
 }
 
 .synonym-meaning {
   margin: 0;
-  color: #51675f;
+  color: #515567;
   font-size: 12px;
   line-height: 1.7;
 }
 
 .synonym-meaning.is-muted {
-  color: #93a49d;
+  color: #9396a4;
 }
 
 .synonym-candidates {
@@ -708,7 +708,7 @@
 }
 
 .synonym-chip em {
-  color: #8b9d95;
+  color: #8b8f9d;
   font-size: 10px;
   font-style: normal;
   font-weight: 600;
@@ -734,7 +734,7 @@
 
 .analysis-hint {
   margin-top: 7px;
-  color: #8b9d95;
+  color: #8b8f9d;
   font-size: 11.5px;
   line-height: 1.6;
 }
@@ -762,7 +762,7 @@
   }
 
   .piece-navigation details {
-    border-bottom: 1px solid #e5ebe7;
+    border-bottom: 1px solid #e5e6eb;
   }
 
   .cloze-practice,

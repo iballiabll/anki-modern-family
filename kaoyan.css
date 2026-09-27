@@ -13,7 +13,7 @@
   background: linear-gradient(180deg, #f7f8f3, #ffffff);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.05);
+  box-shadow: 0 12px 36px rgba(14, 21, 49, 0.05);
 }
 
 .kaoyan-overview h2 {
@@ -43,15 +43,15 @@
   display: grid;
   gap: 4px;
   color: var(--forest);
-  background: #f6f8f4;
+  background: #f8f7f4;
   border: 1px solid var(--line);
   border-radius: 8px;
   text-decoration: none;
 }
 
 .kaoyan-overview-card:hover {
-  border-color: #b4cabe;
-  background: #f1f6f2;
+  border-color: #b4b8ca;
+  background: #f1f2f6;
 }
 
 .kaoyan-overview-card strong {
@@ -60,7 +60,7 @@
 }
 
 .kaoyan-overview-card span {
-  color: #82958d;
+  color: #828695;
   font-size: 10.5px;
 }
 
@@ -73,9 +73,9 @@
 
 .kaoyan-badge {
   padding: 4px 9px;
-  color: #45615a;
-  background: #eef3ef;
-  border: 1px solid #d6e2db;
+  color: #454b61;
+  background: #eeeff3;
+  border: 1px solid #d6d8e2;
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
@@ -91,7 +91,7 @@
 .kaoyan-callout {
   margin: 0 26px 20px;
   padding: 12px 14px;
-  color: #5d6a52;
+  color: #6a6252;
   background: #f8f6ef;
   border: 1px solid #e6dfc9;
   border-radius: 8px;
@@ -118,8 +118,8 @@
   gap: 5px;
   vertical-align: baseline;
   color: var(--forest-deep);
-  background: #eef3ef;
-  border: 1px solid #c9dcd2;
+  background: #eeeff3;
+  border: 1px solid #c9cddc;
   border-radius: 6px;
   font-family: inherit;
   font-size: 0.84em;
@@ -128,11 +128,11 @@
 }
 
 .kaoyan-blank:hover {
-  border-color: #8eada0;
+  border-color: #8e94ad;
 }
 
 .kaoyan-blank-number {
-  color: #82958d;
+  color: #828695;
   font-size: 0.82em;
 }
 
@@ -180,7 +180,7 @@
   width: auto;
   height: auto;
   background: transparent;
-  color: #3d6d7f;
+  color: #3d4a7f;
   font-size: 14px;
 }
 
@@ -212,7 +212,7 @@
   display: grid;
   grid-template-columns: 26px minmax(0, 1fr);
   gap: 10px;
-  background: #f9faf7;
+  background: #faf9f7;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -232,7 +232,7 @@
 
 .kaoyan-pool-text {
   margin: 0;
-  color: #2b433c;
+  color: #2b3043;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14.5px;
   line-height: 1.7;
@@ -267,7 +267,7 @@
   display: grid;
   place-items: center;
   color: var(--forest);
-  background: #e7eee9;
+  background: #e7e8ee;
   border-radius: 7px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 12px;
@@ -275,7 +275,7 @@
 }
 
 .kaoyan-segment-head span:last-child {
-  color: #83958e;
+  color: #838795;
   font-size: 10.5px;
   font-weight: 700;
 }
@@ -283,8 +283,8 @@
 .kaoyan-reference {
   margin-top: 11px;
   padding: 11px 13px;
-  color: #54685f;
-  background: #f5f8f4;
+  color: #545868;
+  background: #f8f7f4;
   border-left: 3px solid var(--forest);
   border-radius: 0 8px 8px 0;
   font-size: 13px;
@@ -294,7 +294,7 @@
 .kaoyan-reference-label {
   display: block;
   margin-bottom: 4px;
-  color: #7f918a;
+  color: #7f8391;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.05em;
@@ -310,8 +310,8 @@ body.is-english-only .kaoyan-enrichment {
   padding: 15px 17px;
   display: grid;
   gap: 9px;
-  background: #f7faf7;
-  border: 1px dashed #cfdcd5;
+  background: #f7f8fa;
+  border: 1px dashed #cfd2dc;
   border-radius: 8px;
 }
 
@@ -324,7 +324,7 @@ body.is-english-only .kaoyan-enrichment {
 
 .kaoyan-enrichment p {
   margin: 0;
-  color: #51675f;
+  color: #515567;
   font-size: 12.5px;
   line-height: 1.8;
 }
@@ -339,7 +339,7 @@ body.is-english-only .kaoyan-enrichment {
   padding-left: 18px;
   display: grid;
   gap: 6px;
-  color: #51675f;
+  color: #515567;
   font-size: 12.5px;
   line-height: 1.75;
 }
@@ -376,7 +376,7 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-writing-head span {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11px;
   font-weight: 800;
 }
@@ -384,9 +384,9 @@ body.is-english-only .kaoyan-enrichment {
 .kaoyan-writing-prompt {
   margin: 0;
   padding: 13px 15px;
-  color: #2b433c;
-  background: #f7f9f6;
-  border: 1px solid #e3eae5;
+  color: #2b3043;
+  background: #f9f8f6;
+  border: 1px solid #e3e4ea;
   border-radius: 8px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14.5px;
@@ -404,7 +404,7 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-writing-block > span.kaoyan-writing-hint {
-  color: #8b9d95;
+  color: #8b8f9d;
   font-size: 11px;
 }
 
@@ -421,9 +421,9 @@ body.is-english-only .kaoyan-enrichment {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   gap: 9px;
-  color: #4c635b;
-  background: #f8faf7;
-  border: 1px solid #e4ebe6;
+  color: #4c5163;
+  background: #faf9f7;
+  border: 1px solid #e4e5eb;
   border-radius: 8px;
   font-size: 12.5px;
   line-height: 1.75;
@@ -452,7 +452,7 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-phrase-row strong {
-  color: #2b433c;
+  color: #2b3043;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13.5px;
   font-weight: 700;
@@ -460,7 +460,7 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-phrase-row span {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11.5px;
 }
 
@@ -484,8 +484,8 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-draft textarea:focus {
-  border-color: #75a695;
-  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  border-color: #757fa6;
+  box-shadow: 0 0 0 3px rgba(77, 90, 143, 0.12);
   outline: 0;
 }
 
@@ -498,7 +498,7 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-word-count {
-  color: #7f918a;
+  color: #7f8391;
   font-size: 11.5px;
   font-weight: 800;
 }
@@ -524,7 +524,7 @@ body.is-english-only .kaoyan-enrichment {
 .kaoyan-checklist li {
   position: relative;
   padding-left: 19px;
-  color: #5d6f68;
+  color: #5d616f;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -550,8 +550,8 @@ body.is-english-only .kaoyan-enrichment {
 .kaoyan-ref-chip {
   padding: 5px 10px;
   color: var(--forest);
-  background: #f1f6f2;
-  border: 1px solid #d9e5de;
+  background: #f1f2f6;
+  border: 1px solid #d9dbe5;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 800;
@@ -559,7 +559,7 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-ref-chip:hover {
-  border-color: #8eada0;
+  border-color: #8e94ad;
 }
 
 /* ------------------------------------------------------------ 署名与页脚 */
@@ -594,7 +594,7 @@ body.is-english-only .kaoyan-enrichment {
   padding-left: 18px;
   display: grid;
   gap: 7px;
-  color: #4c635b;
+  color: #4c5163;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -768,8 +768,8 @@ body.is-english-only .kaoyan-enrichment {
 
 .clause-badge {
   padding: 1px 6px;
-  color: #557169;
-  background: #edf3ef;
+  color: #555B71;
+  background: #edeef3;
   border-radius: 5px;
   font-size: 10px;
   font-weight: 800;
@@ -786,7 +786,7 @@ body.is-english-only .kaoyan-enrichment {
 .clause-text {
   flex: 1 1 300px;
   min-width: 0;
-  color: #203b34;
+  color: #20253b;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.92rem;
   overflow-wrap: anywhere;
@@ -809,7 +809,7 @@ body.is-english-only .kaoyan-enrichment {
 
 .phrase-digest {
   margin: 12px 16px;
-  background: #f7faf8;
+  background: #f7f8fa;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -858,7 +858,7 @@ body.is-english-only .kaoyan-enrichment {
   margin: 10px 16px 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f7faf8;
+  background: #f7f8fa;
   font-size: 0.92rem;
 }
 
@@ -973,8 +973,8 @@ body.is-english-only .kaoyan-enrichment {
 
 .translation-detail-tag {
   padding: 2px 7px;
-  color: #2f6b58;
-  background: #e7f1ec;
+  color: #2f3b6b;
+  background: #e7e9f1;
   border-radius: 5px;
   font-size: 10px;
   font-weight: 900;
@@ -983,7 +983,7 @@ body.is-english-only .kaoyan-enrichment {
 
 .translation-detail-meta {
   min-width: 0;
-  color: #8b9d95;
+  color: #8b8f9d;
   font-size: 10.5px;
   font-weight: 700;
 }
@@ -996,13 +996,13 @@ body.is-english-only .kaoyan-enrichment {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
-  background: #f5f8f4;
+  background: #f8f7f4;
   border-left: 3px solid var(--forest);
   border-radius: 0 6px 6px 0;
 }
 
 .translation-detail-label {
-  color: #6d837b;
+  color: #6d7183;
   font-size: 10.5px;
   font-weight: 900;
   white-space: nowrap;
@@ -1011,7 +1011,7 @@ body.is-english-only .kaoyan-enrichment {
 .translation-trunk-text {
   flex: 1 1 260px;
   min-width: 0;
-  color: #1f3a32;
+  color: #1f243a;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13.5px;
   line-height: 1.7;
@@ -1074,8 +1074,8 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 .kaoyan-translation-draft textarea:focus {
-  border-color: #75a695;
-  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  border-color: #757fa6;
+  box-shadow: 0 0 0 3px rgba(77, 90, 143, 0.12);
   outline: 0;
 }
 

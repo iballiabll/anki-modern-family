@@ -43,7 +43,7 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.055);
+  box-shadow: 0 12px 36px rgba(14, 21, 49, 0.055);
 }
 
 .movie-scene-head {
@@ -66,7 +66,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  color: #75877f;
+  color: #757987;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -110,7 +110,7 @@
 }
 
 .movie-scene-play:hover {
-  border-color: #9db7ac;
+  border-color: #9da2b7;
 }
 
 .movie-scene-play.is-playing {
@@ -128,7 +128,7 @@
 .movie-line {
   position: relative;
   padding: 22px 0 22px 46px;
-  border-bottom: 1px solid #e3e9e5;
+  border-bottom: 1px solid #e3e4e9;
   scroll-margin-top: 92px;
 }
 
@@ -143,7 +143,7 @@
   bottom: 27px;
   left: 38px;
   width: 2px;
-  background: #e2e9e5;
+  background: #e2e3e9;
 }
 
 .movie-line.is-highlighted::before {
@@ -155,7 +155,7 @@
   top: 25px;
   left: 0;
   width: 30px;
-  color: #93a29b;
+  color: #9396a2;
   font-size: 11px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -173,7 +173,7 @@
 
 .movie-dialogue-line {
   margin: 0;
-  color: #203b34;
+  color: #20253b;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 17px;
   line-height: 1.72;
@@ -192,7 +192,7 @@
 .movie-stage {
   display: block;
   margin: 1px 0 0;
-  color: #8d9b95;
+  color: #8d909b;
   font-size: 11px;
   font-style: italic;
 }
@@ -200,8 +200,8 @@
 .movie-translation {
   margin: 11px 0 0;
   padding-left: 12px;
-  color: #5f736c;
-  border-left: 3px solid #d3dfd8;
+  color: #5f6373;
+  border-left: 3px solid #d3d5df;
   font-size: 13px;
   line-height: 1.8;
 }
@@ -209,14 +209,14 @@
 .movie-grammar-notes {
   margin-top: 11px;
   padding: 10px 12px;
-  border-left: 3px solid #66806f;
+  border-left: 3px solid #666b80;
   border-radius: 0 6px 6px 0;
-  background: #f2f6f2;
+  background: #f2f3f6;
 }
 
 .movie-grammar-label {
   display: block;
-  color: #496558;
+  color: #494F65;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -225,7 +225,7 @@
 .movie-grammar-list {
   margin: 6px 0 0;
   padding-left: 16px;
-  color: #566861;
+  color: #565A68;
   font-size: 12px;
   line-height: 1.75;
 }
@@ -258,9 +258,9 @@
 }
 
 .movie-source-badge.is-card {
-  color: #2f5f76;
+  color: #2f3d76;
   background: #e8f1f6;
-  border-color: #c3dbe7;
+  border-color: #c3cae7;
 }
 
 .movie-source-badge.is-machine {
@@ -270,9 +270,9 @@
 }
 
 .movie-source-badge.is-missing {
-  color: #6b7a74;
-  background: #eef2f0;
-  border-color: #dbe3df;
+  color: #6b6e7a;
+  background: #eeeff2;
+  border-color: #dbdde3;
 }
 
 .movie-machine-hint {
@@ -283,9 +283,9 @@
 .movie-play-button {
   min-height: 30px;
   padding: 0 10px;
-  color: #48645b;
-  background: #f1f5f2;
-  border: 1px solid #d6e1db;
+  color: #484e64;
+  background: #f1f2f5;
+  border: 1px solid #d6d8e1;
   border-radius: 7px;
   font-size: 11px;
   font-weight: 800;
@@ -293,7 +293,7 @@
 }
 
 .movie-play-button:hover {
-  border-color: #9db7ac;
+  border-color: #9da2b7;
 }
 
 .movie-play-button.is-playing {
@@ -326,7 +326,7 @@
 
 /* 播放中的台词：整行留一道底色，具体那一句再加一条竖线。 */
 .movie-line.is-speaking {
-  background: linear-gradient(90deg, rgba(232, 244, 238, 0.9), rgba(232, 244, 238, 0));
+  background: linear-gradient(90deg, rgba(232, 234, 244, 0.9), rgba(232, 234, 244, 0));
   border-radius: 10px;
 }
 
@@ -355,14 +355,14 @@
 .movie-sentence-vocab {
   margin-top: 13px;
   padding: 11px 12px;
-  background: #f4f8f5;
-  border: 1px solid #dce8e1;
+  background: #f4f5f8;
+  border: 1px solid #dcdee8;
   border-radius: 8px;
 }
 
 .movie-sentence-vocab-label {
   display: block;
-  color: #6f857c;
+  color: #6f7385;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -383,9 +383,9 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 3px;
-  color: #355149;
+  color: #353B51;
   background: #ffffff;
-  border: 1px solid #d3e1da;
+  border: 1px solid #d3d6e1;
   border-radius: 7px;
   text-align: left;
   cursor: pointer;
@@ -393,8 +393,8 @@
 
 .sentence-vocab-chip:hover,
 .sentence-vocab-chip:focus-visible {
-  background: #eef6f1;
-  border-color: #9dbdaf;
+  background: #eef0f6;
+  border-color: #9da3bd;
   outline: none;
 }
 
@@ -407,7 +407,7 @@
 }
 
 .sentence-vocab-head > strong {
-  color: #26483e;
+  color: #262d48;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13px;
   line-height: 1.2;
@@ -415,14 +415,14 @@
 }
 
 .sentence-vocab-phonetic {
-  color: #71847d;
+  color: #717584;
   font-size: 10px;
   line-height: 1.2;
 }
 
 .sentence-vocab-meaning {
   max-width: min(320px, 72vw);
-  color: #5c7169;
+  color: #5c6071;
   font-size: 11px;
   line-height: 1.45;
 }
@@ -438,7 +438,7 @@
 }
 
 .movie-phrase-label {
-  color: #7b8e86;
+  color: #7b7f8e;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -448,13 +448,13 @@
   margin-top: 12px;
   padding: 11px 13px;
   background: #f7f8f3;
-  border: 1px solid #e3e9e5;
+  border: 1px solid #e3e4e9;
   border-radius: 8px;
 }
 
 .movie-alternatives-label {
   display: block;
-  color: #7b8e86;
+  color: #7b7f8e;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -465,14 +465,14 @@
   padding-left: 17px;
   display: grid;
   gap: 4px;
-  color: #4c6159;
+  color: #4c5061;
   font-size: 12.5px;
   line-height: 1.65;
 }
 
 .movie-alternative-list li > strong {
   margin-right: 6px;
-  color: #2b4a41;
+  color: #2b314a;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13.5px;
 }
@@ -484,7 +484,7 @@ body.marks-levels .word-token[data-levels~="四级"] {
 }
 
 body.marks-levels .word-token[data-levels~="六级"] {
-  border-bottom: 2px solid rgba(66, 109, 128, 0.85);
+  border-bottom: 2px solid rgba(66, 78, 128, 0.85);
 }
 
 body.marks-levels .word-token[data-levels~="考研"] {
@@ -523,7 +523,7 @@ body.marks-levels .word-token.is-known-token {
 }
 
 .movie-legend-line.is-cet6 {
-  border-top-color: rgba(66, 109, 128, 0.85);
+  border-top-color: rgba(66, 78, 128, 0.85);
 }
 
 .movie-legend-line.is-kaoyan {
@@ -557,7 +557,7 @@ body.hides-sentence-vocab .movie-sentence-vocab {
 body.hides-levels .word-token[data-levels] {
   border-bottom-width: 1px;
   border-bottom-style: dotted;
-  border-bottom-color: rgba(66, 109, 128, 0.46);
+  border-bottom-color: rgba(66, 78, 128, 0.46);
 }
 
 /* ------------------------------------------------------------ 开源说明 */
@@ -569,7 +569,7 @@ body.hides-levels .word-token[data-levels] {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 8px;
-  color: #3f554d;
+  color: #3f4355;
 }
 
 .movie-attribution h2 {

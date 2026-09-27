@@ -23,7 +23,7 @@
 
 .speaking-account {
   justify-self: end;
-  color: #cfe3db;
+  color: #cfd3e3;
   font-size: 12px;
   font-weight: 800;
 }
@@ -57,7 +57,7 @@
 .speaking-lead {
   max-width: 640px;
   margin: 14px 0 0;
-  color: #cfe3db;
+  color: #cfd3e3;
   font-size: 14px;
   line-height: 1.8;
 }
@@ -65,7 +65,7 @@
 .speaking-note {
   max-width: 640px;
   margin: 12px 0 0;
-  color: #9fbcb2;
+  color: #9fa5bc;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -79,7 +79,7 @@
 
 .speaking-link {
   padding: 7px 12px;
-  color: #e8f2ee;
+  color: #e8eaf2;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--speaking-radius);
@@ -214,7 +214,7 @@
 
 .persona-tagline {
   margin: 0;
-  color: #3d5a51;
+  color: #3d435a;
   font-size: 12.5px;
   line-height: 1.65;
 }
@@ -230,7 +230,7 @@
   justify-self: start;
   padding: 3px 8px;
   color: var(--forest);
-  background: rgba(21, 60, 53, 0.1);
+  background: rgba(21, 29, 60, 0.1);
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
@@ -284,8 +284,8 @@
 
 .call-status {
   padding: 4px 10px;
-  color: #4c635b;
-  background: #eef3ef;
+  color: #4c5163;
+  background: #eeeff3;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 800;
@@ -361,7 +361,7 @@
 
 .call-message.is-partner .call-bubble {
   color: var(--ink);
-  background: #eef3ef;
+  background: #eeeff3;
   border: 1px solid var(--line);
   border-top-left-radius: 4px;
 }
@@ -373,7 +373,7 @@
 }
 
 .call-message.is-pending .call-bubble {
-  color: #4c635b;
+  color: #4c5163;
   font-style: italic;
 }
 
@@ -391,7 +391,7 @@
 
 .call-tool {
   padding: 3px 9px;
-  color: #4c635b;
+  color: #4c5163;
   background: transparent;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
@@ -434,7 +434,7 @@
   align-items: center;
   justify-content: center;
   color: var(--forest);
-  background: #eef3ef;
+  background: #eeeff3;
   border: 1px solid var(--line-strong);
   border-radius: var(--speaking-radius);
   cursor: pointer;
@@ -494,7 +494,7 @@
 }
 
 .composer-field textarea:disabled {
-  background: #f2f5f2;
+  background: #f2f3f5;
 }
 
 .composer-send-button {
@@ -543,7 +543,7 @@
 
 .ghost-button {
   padding: 6px 12px;
-  color: #4c635b;
+  color: #4c5163;
   background: transparent;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
@@ -575,8 +575,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #3d5a51;
-  background: #f1f5f2;
+  color: #3d435a;
+  background: #f1f2f5;
   border: 1px solid var(--line);
   border-radius: var(--speaking-radius);
   font-size: 12.5px;
@@ -605,7 +605,7 @@
 }
 
 .api-field span {
-  color: #6e8179;
+  color: #6e7281;
   font-size: 11px;
   font-weight: 800;
 }
@@ -679,7 +679,7 @@
 
 .recap-item {
   padding: 10px 12px;
-  background: #f3f6f3;
+  background: #f3f4f6;
   border-left: 3px solid var(--gold);
   border-radius: 0 var(--speaking-radius) var(--speaking-radius) 0;
   font-size: 13px;
@@ -711,7 +711,7 @@
 
 .recap-stat {
   padding: 8px 12px;
-  color: #3d5a51;
+  color: #3d435a;
   background: var(--forest-soft);
   border-radius: var(--speaking-radius);
   font-size: 12px;
@@ -725,7 +725,7 @@
   padding-left: 18px;
   display: grid;
   gap: 8px;
-  color: #4c635b;
+  color: #4c5163;
   font-size: 12.5px;
   line-height: 1.75;
 }

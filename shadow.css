@@ -22,7 +22,7 @@
   background: var(--forest-deep);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--shadow-radius);
-  box-shadow: 0 12px 30px rgba(11, 41, 37, 0.24);
+  box-shadow: 0 12px 30px rgba(11, 17, 41, 0.24);
 }
 
 .shadow-player.is-recording {
@@ -38,7 +38,7 @@
 }
 
 .shadow-progress {
-  color: #cfe3dc;
+  color: #cfd3e3;
   font-size: 13px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -56,7 +56,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #e6f2ed;
+  color: #e6e8f2;
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.22);
   border-radius: var(--shadow-radius);
@@ -115,7 +115,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #cfe3dc;
+  color: #cfd3e3;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -135,7 +135,7 @@
   gap: 8px;
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  color: #a8c4bb;
+  color: #a8aec4;
   font-size: 12px;
 }
 
@@ -146,7 +146,7 @@
 
 .shadow-timer {
   flex: 0 0 auto;
-  color: #e6f2ed;
+  color: #e6e8f2;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -174,7 +174,7 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--shadow-radius);
-  box-shadow: 0 8px 24px rgba(12, 43, 37, 0.06);
+  box-shadow: 0 8px 24px rgba(12, 18, 43, 0.06);
 }
 
 .shadow-panel-head {
@@ -247,7 +247,7 @@
 .shadow-notes p {
   margin: 0;
   padding-left: 12px;
-  color: #4c635b;
+  color: #4c5163;
   border-left: 2px solid var(--line-strong);
   font-size: 12px;
   line-height: 1.7;
@@ -424,7 +424,7 @@
   margin: 0;
   padding: 10px 12px;
   color: var(--ink);
-  background: #eef5f1;
+  background: #eeeff5;
   border-left: 3px solid var(--forest);
   border-radius: var(--shadow-radius);
   font-size: 13px;
@@ -443,7 +443,7 @@
 }
 
 .shadow-note-field span {
-  color: #6e8179;
+  color: #6e7281;
   font-size: 12px;
   font-weight: 800;
 }
@@ -454,7 +454,7 @@
   padding: 10px 12px;
   resize: vertical;
   color: var(--ink);
-  background: #fbfcfb;
+  background: #fbfbfc;
   border: 1px solid var(--line);
   border-radius: var(--shadow-radius);
   font-family: inherit;
@@ -463,8 +463,8 @@
 }
 
 .shadow-note-field textarea:focus {
-  border-color: #75a695;
-  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  border-color: #757fa6;
+  box-shadow: 0 0 0 3px rgba(77, 90, 143, 0.12);
   outline: 0;
 }
 
@@ -476,14 +476,14 @@
   padding: 4px;
   display: grid;
   gap: 6px;
-  background: #fbfcfb;
+  background: #fbfbfc;
   border: 1px solid var(--line);
   border-radius: var(--shadow-radius);
   overscroll-behavior: contain;
 }
 
 .shadow-list:focus-visible {
-  border-color: #75a695;
+  border-color: #757fa6;
 }
 
 .shadow-line {
@@ -502,11 +502,11 @@
 }
 
 .shadow-line:hover {
-  border-color: #8eada0;
+  border-color: #8e94ad;
 }
 
 .shadow-line.is-current {
-  background: #f2f8f5;
+  background: #f2f3f8;
   border-color: var(--forest);
   box-shadow: inset 3px 0 0 var(--forest);
 }
@@ -529,7 +529,7 @@
 .shadow-line-badge {
   padding: 3px 8px;
   color: var(--muted);
-  background: #eef3f0;
+  background: #eeeff3;
   border-radius: var(--shadow-radius);
   font-size: 11px;
   font-weight: 800;
@@ -552,8 +552,8 @@
 }
 
 .shadow-line-badge[data-state="recorded"] {
-  color: #426d80;
-  background: #e6eff3;
+  color: #424e80;
+  background: #e6e9f3;
 }
 
 /* --------------------------------------------------------- 借鉴声明 */
@@ -588,7 +588,7 @@
   padding-left: 18px;
   display: grid;
   gap: 7px;
-  color: #4c635b;
+  color: #4c5163;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -600,7 +600,7 @@
 
 .shadow-page .kaoyan-attribution code {
   padding: 1px 5px;
-  background: #e7ede9;
+  background: #e7e8ed;
   border-radius: 5px;
   font-size: 11px;
 }

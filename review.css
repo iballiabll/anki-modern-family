@@ -1,17 +1,17 @@
 :root {
-  --forest: #153c35;
-  --forest-deep: #0b2925;
-  --mint: #dceae3;
-  --mint-soft: #f1f7f3;
-  --gold: #d5a83d;
-  --coral: #cf514c;
-  --coral-soft: #fff3f0;
-  --ink: #17312b;
-  --muted: #71817a;
-  --line: #d8e3dc;
+  --forest: #4056d6;
+  --forest-deep: #17204f;
+  --mint: #e8ecff;
+  --mint-soft: #f4f6ff;
+  --gold: #ffb000;
+  --coral: #f05263;
+  --coral-soft: #fff0f1;
+  --ink: #1b2140;
+  --muted: #5f6884;
+  --line: #dbe0f0;
   --surface: #ffffff;
-  --canvas: #edf3ef;
-  --shadow: 0 22px 60px rgba(12, 43, 37, 0.13);
+  --canvas: #f4f6fb;
+  --shadow: 0 22px 60px rgba(23, 32, 79, 0.13);
 }
 
 * {
@@ -30,8 +30,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(rgba(21, 60, 53, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21, 60, 53, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(21, 29, 60, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 29, 60, 0.035) 1px, transparent 1px),
     var(--canvas);
   background-size: 32px 32px;
   font-family:
@@ -55,7 +55,7 @@ button:focus-visible,
 a:focus-visible,
 select:focus-visible,
 .review-card:focus-visible {
-  outline: 3px solid rgba(77, 143, 122, 0.35);
+  outline: 3px solid rgba(77, 90, 143, 0.35);
   outline-offset: 2px;
 }
 
@@ -86,7 +86,7 @@ select:focus-visible,
 
 .back-link,
 .topbar-button {
-  color: #d9e8e2;
+  color: #d9dce8;
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
@@ -151,7 +151,7 @@ select:focus-visible,
 }
 
 .review-brand small {
-  color: #a9c3ba;
+  color: #a9aec3;
   font-size: 8px;
   line-height: 1.2;
 }
@@ -168,7 +168,7 @@ select:focus-visible,
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 10px 32px rgba(14, 49, 42, 0.055);
+  box-shadow: 0 10px 32px rgba(14, 21, 49, 0.055);
 }
 
 .scope-head {
@@ -183,7 +183,7 @@ select:focus-visible,
 .scope-label {
   display: block;
   margin-bottom: 2px;
-  color: #8a9891;
+  color: #8a8d98;
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
@@ -209,7 +209,7 @@ select:focus-visible,
   flex: 0 0 auto;
   color: var(--forest);
   background: var(--mint-soft);
-  border: 1px solid #c8dbd1;
+  border: 1px solid #c8ccdb;
   border-radius: 7px;
   font-size: 12px;
   font-weight: 800;
@@ -240,7 +240,7 @@ select:focus-visible,
 }
 
 .scope-field span {
-  color: #64766e;
+  color: #646876;
   font-size: 11px;
   font-weight: 800;
 }
@@ -251,15 +251,15 @@ select:focus-visible,
   min-height: 42px;
   padding: 0 34px 0 11px;
   color: var(--ink);
-  background: #f7faf8;
-  border: 1px solid #cfded6;
+  background: #f7f8fa;
+  border: 1px solid #cfd2de;
   border-radius: 7px;
   font-size: 12px;
 }
 
 .scope-field select:disabled {
-  color: #98a49f;
-  background: #f0f3f1;
+  color: #989aa4;
+  background: #f0f1f3;
 }
 
 .review-progress {
@@ -285,7 +285,7 @@ select:focus-visible,
 .review-progress-track {
   height: 4px;
   overflow: hidden;
-  background: #d8e4dd;
+  background: #d8dae4;
   border-radius: 4px;
 }
 
@@ -293,7 +293,7 @@ select:focus-visible,
   width: 0;
   height: 100%;
   display: block;
-  background: linear-gradient(90deg, var(--forest), #4f907d);
+  background: linear-gradient(90deg, var(--forest), #4f5c90);
   border-radius: inherit;
   transition: width 220ms ease;
 }
@@ -317,9 +317,9 @@ select:focus-visible,
   gap: 20px;
   overflow: hidden;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 249, 0.97)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 251, 0.97)),
     var(--surface);
-  border: 1px solid #ceddd5;
+  border: 1px solid #ced1dd;
   border-radius: 8px;
   box-shadow: var(--shadow);
   cursor: grab;
@@ -335,7 +335,7 @@ select:focus-visible,
     180deg,
     var(--gold),
     var(--coral) 54%,
-    #72ad99
+    #727ead
   );
 }
 
@@ -379,7 +379,7 @@ select:focus-visible,
   flex: 0 0 auto;
   color: var(--forest);
   background: var(--mint-soft);
-  border: 1px solid #c8dbd1;
+  border: 1px solid #c8ccdb;
   border-radius: 7px;
   font-size: 12px;
   font-weight: 800;
@@ -404,7 +404,7 @@ select:focus-visible,
 .card-phonetic {
   min-height: 20px;
   margin: 10px 0 0;
-  color: #6d8178;
+  color: #6d7181;
   font-size: 16px;
   line-height: 1.4;
 }
@@ -413,15 +413,15 @@ select:focus-visible,
   padding: 15px 16px;
   display: grid;
   gap: 12px;
-  background: #f4f8f5;
-  border: 1px solid #d7e5dd;
+  background: #f4f5f8;
+  border: 1px solid #d7dae5;
   border-radius: 8px;
   animation: answer-in 180ms ease both;
 }
 
 .card-meaning {
   margin: 0;
-  color: #29463d;
+  color: #292f46;
   font-size: 17px;
   font-weight: 700;
   line-height: 1.6;
@@ -439,13 +439,13 @@ select:focus-visible,
 }
 
 .card-sentence {
-  color: #405c52;
+  color: #40465c;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14px;
 }
 
 .card-translation {
-  color: #7a8982;
+  color: #7a7d89;
   font-size: 12px;
 }
 
@@ -483,13 +483,13 @@ select:focus-visible,
 }
 
 .direction-button {
-  color: #53665e;
+  color: #535766;
   background: #ffffff;
-  border: 1px solid #cfded6;
+  border: 1px solid #cfd2de;
 }
 
 .direction-button:hover {
-  border-color: #a8c1b7;
+  border-color: #a8adc1;
 }
 
 .mark-button.is-unknown {
@@ -499,16 +499,16 @@ select:focus-visible,
 }
 
 .mark-button.is-known {
-  color: #1d5c4d;
-  background: #eef8f3;
-  border: 1px solid #b8d8ca;
+  color: #1d2a5c;
+  background: #eef0f8;
+  border: 1px solid #b8bed8;
 }
 
 .mark-button.is-active {
   color: #ffffff;
   background: var(--forest);
   border-color: var(--forest);
-  box-shadow: 0 7px 18px rgba(13, 52, 45, 0.17);
+  box-shadow: 0 7px 18px rgba(13, 21, 52, 0.17);
 }
 
 .mark-button.is-unknown.is-active {
@@ -528,7 +528,7 @@ select:focus-visible,
 .review-message {
   min-height: 18px;
   margin: 0;
-  color: #59766a;
+  color: #595f76;
   font-size: 11px;
   text-align: center;
 }
@@ -544,7 +544,7 @@ select:focus-visible,
   gap: 12px;
   text-align: center;
   background: rgba(255, 255, 255, 0.96);
-  border: 1px solid #ceddd5;
+  border: 1px solid #ced1dd;
   border-radius: 8px;
   box-shadow: var(--shadow);
 }
@@ -602,9 +602,9 @@ select:focus-visible,
   max-width: min(86vw, 420px);
   padding: 10px 15px;
   color: #ffffff;
-  background: rgba(11, 41, 37, 0.94);
+  background: rgba(11, 17, 41, 0.94);
   border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(7, 28, 24, 0.22);
+  box-shadow: 0 12px 30px rgba(7, 11, 28, 0.22);
   font-size: 12px;
   font-weight: 700;
   opacity: 0;

@@ -10,9 +10,9 @@
   width: min(1240px, calc(100% - 44px));
   margin: 18px auto 0;
   background: #ffffff;
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius, 8px);
-  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.08);
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.08);
   overflow: hidden;
 }
 
@@ -31,8 +31,8 @@
   justify-content: space-between;
   gap: 10px;
   padding: 14px 16px;
-  background: #f6faf8;
-  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+  background: #f6f7fa;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
 }
 
 .writing-templates-head h2 {
@@ -44,13 +44,13 @@
 .writing-templates-intro {
   max-width: 78ch;
   margin: 0;
-  color: #4c635c;
+  color: #4c5163;
   font-size: 13px;
   line-height: 1.65;
 }
 
 .writing-templates-meta {
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   font-weight: 700;
 }
@@ -60,7 +60,7 @@
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: 10px;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(11, 41, 37, 0.08);
+  border-bottom: 1px solid rgba(11, 17, 41, 0.08);
 }
 
 .writing-templates-toolbar .segmented-control {
@@ -108,7 +108,7 @@
   color: inherit;
   font: inherit;
   background: #ffffff;
-  border: 1px solid rgba(11, 41, 37, 0.14);
+  border: 1px solid rgba(11, 17, 41, 0.14);
   border-radius: var(--writing-radius, 8px);
   cursor: pointer;
   transition:
@@ -118,7 +118,7 @@
 }
 
 .writing-template-card:hover {
-  border-color: rgba(21, 60, 53, 0.42);
+  border-color: rgba(21, 29, 60, 0.42);
   transform: translateY(-1px);
 }
 
@@ -142,7 +142,7 @@
 .writing-template-card span {
   font-size: 12px;
   line-height: 1.5;
-  color: #5d746c;
+  color: #5d6274;
 }
 
 .writing-template-tags {
@@ -154,8 +154,8 @@
 .writing-template-tag {
   padding: 2px 7px;
   border-radius: 999px;
-  background: #eef3f0;
-  color: #4a615a;
+  background: #eeeff3;
+  color: #4a4f61;
   font-size: 11px;
   font-weight: 700;
 }
@@ -173,9 +173,9 @@
 .writing-template-empty {
   margin: 0;
   padding: 14px;
-  color: #5d746c;
-  background: #f7faf8;
-  border: 1px dashed rgba(11, 41, 37, 0.18);
+  color: #5d6274;
+  background: #f7f8fa;
+  border: 1px dashed rgba(11, 17, 41, 0.18);
   border-radius: var(--writing-radius, 8px);
   font-size: 13px;
   line-height: 1.6;
@@ -202,7 +202,7 @@
 
 .writing-template-scenario {
   margin: 0;
-  color: #4c635c;
+  color: #4c5163;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -233,7 +233,7 @@
 }
 
 .writing-template-block > h4 span {
-  color: #6a7f77;
+  color: #6a6e7f;
   font-size: 11px;
   font-weight: 700;
 }
@@ -247,14 +247,14 @@
   display: grid;
   gap: 5px;
   padding: 10px 12px;
-  background: #fbfdfc;
-  border: 1px solid rgba(11, 41, 37, 0.1);
+  background: #fbfbfd;
+  border: 1px solid rgba(11, 17, 41, 0.1);
   border-left: 3px solid var(--forest);
   border-radius: 0 var(--writing-radius, 8px) var(--writing-radius, 8px) 0;
 }
 
 .writing-template-step-section {
-  color: #6a7f77;
+  color: #6a6e7f;
   font-size: 11px;
   font-weight: 800;
 }
@@ -277,13 +277,13 @@
 
 .writing-template-step-zh,
 .writing-template-step-note {
-  color: #4c635c;
+  color: #4c5163;
   font-size: 12px;
   line-height: 1.65;
 }
 
 .writing-template-step-note {
-  color: #77887f;
+  color: #777a88;
 }
 
 .writing-template-phrases {
@@ -298,7 +298,7 @@
   display: grid;
   gap: 3px;
   padding: 9px 12px;
-  background: #f4f8f6;
+  background: #f4f5f8;
   border-radius: var(--writing-radius, 8px);
 }
 
@@ -316,7 +316,7 @@
 }
 
 .writing-template-phrase span {
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   line-height: 1.6;
 }
@@ -328,7 +328,7 @@
 
 .writing-template-demo-topic {
   margin: 0;
-  color: #6a7f77;
+  color: #6a6e7f;
   font-size: 12px;
   font-weight: 700;
 }
@@ -352,7 +352,7 @@
 }
 
 .writing-template-demo-zh {
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12.5px;
 }
 
@@ -374,7 +374,7 @@
 
 .writing-template-note {
   padding: 12px;
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius, 8px);
   background: #ffffff;
 }
@@ -393,7 +393,7 @@
 }
 
 .writing-template-note li {
-  color: #4c635c;
+  color: #4c5163;
   font-size: 12.5px;
   line-height: 1.65;
 }
@@ -409,7 +409,7 @@
 
 .writing-template-foot {
   margin: 0;
-  color: #77887f;
+  color: #777a88;
   font-size: 12px;
   line-height: 1.7;
 }

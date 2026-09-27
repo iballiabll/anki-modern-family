@@ -26,9 +26,9 @@
 .vocab-detail-panel,
 .vocab-wordbook-panel {
   background: #ffffff;
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--vocab-radius);
-  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.08);
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.08);
 }
 
 .vocab-list-panel {
@@ -47,8 +47,8 @@
   justify-content: space-between;
   gap: 10px;
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
-  background: #f6faf8;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
   border-radius: var(--vocab-radius) var(--vocab-radius) 0 0;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .vocab-panel-hint {
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   font-weight: 700;
 }
@@ -84,8 +84,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: #fbfdfc;
-  border: 1px solid rgba(11, 41, 37, 0.1);
+  background: #fbfbfd;
+  border: 1px solid rgba(11, 17, 41, 0.1);
   border-radius: var(--vocab-radius);
   cursor: pointer;
   text-align: left;
@@ -93,18 +93,18 @@
 }
 
 .vocab-row:hover {
-  border-color: rgba(21, 60, 53, 0.42);
-  box-shadow: 0 6px 16px rgba(11, 41, 37, 0.1);
+  border-color: rgba(21, 29, 60, 0.42);
+  box-shadow: 0 6px 16px rgba(11, 17, 41, 0.1);
 }
 
 .vocab-row.is-active {
   border-color: var(--forest-deep);
-  background: #eef6f2;
+  background: #eef0f6;
 }
 
 .vocab-row-index {
   min-width: 34px;
-  color: #7d938c;
+  color: #7d8193;
   font-size: 12px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -128,13 +128,13 @@
 }
 
 .vocab-row-word small {
-  color: #7d938c;
+  color: #7d8193;
   font-size: 12px;
   font-weight: 600;
 }
 
 .vocab-row-meaning {
-  color: #4d625b;
+  color: #4d5162;
   font-size: 12px;
   line-height: 1.5;
   display: -webkit-box;
@@ -150,11 +150,28 @@
   gap: 4px;
   font-size: 11px;
   font-weight: 800;
-  color: #5d746c;
+  color: #5d6274;
 }
 
 .vocab-row-flags .is-marked {
   color: var(--coral);
+}
+
+.vocab-row-flags .is-recited {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.vocab-row-flags .is-recited.is-fuzzy {
+  background: rgba(255, 176, 0, 0.18);
+  color: #8a5300;
+}
+
+.vocab-row-flags .is-recited.is-unknown {
+  background: rgba(240, 82, 99, 0.16);
+  color: var(--coral-dark);
 }
 
 .vocab-list-foot {
@@ -164,13 +181,13 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 16px;
-  border-top: 1px solid rgba(11, 41, 37, 0.1);
-  background: #f6faf8;
+  border-top: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
   border-radius: 0 0 var(--vocab-radius) var(--vocab-radius);
 }
 
 .vocab-list-status {
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -182,8 +199,54 @@
   top: calc(var(--vocab-topbar) + 12px);
   max-height: calc(100vh - var(--vocab-topbar) - 40px);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   overflow: hidden;
+}
+
+.vocab-recite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
+}
+
+.vocab-recite-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #5d6274;
+}
+
+.vocab-recite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vocab-recite-status {
+  color: #5d6274;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.recite-button.is-known.is-active {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: #ffffff;
+}
+
+.recite-button.is-fuzzy.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #3a2600;
+}
+
+.recite-button.is-unknown.is-active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #ffffff;
 }
 
 .vocab-detail-actions,
@@ -223,15 +286,15 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  color: #5d746c;
+  color: #5d6274;
   font-size: 13px;
 }
 
 .vocab-tag {
   padding: 2px 8px;
   border-radius: 999px;
-  background: #eef6f2;
-  color: #2f5a4f;
+  background: #eef0f6;
+  color: #2f385a;
   font-size: 11px;
   font-weight: 800;
 }
@@ -245,7 +308,7 @@
   margin: 0;
   font-size: 12px;
   letter-spacing: 0.04em;
-  color: #7d938c;
+  color: #7d8193;
 }
 
 .vocab-block ul {
@@ -253,24 +316,24 @@
   padding-left: 18px;
   display: grid;
   gap: 4px;
-  color: #33463f;
+  color: #333746;
   font-size: 13px;
   line-height: 1.6;
 }
 
 .vocab-block p {
   margin: 0;
-  color: #33463f;
+  color: #333746;
   font-size: 13px;
   line-height: 1.7;
 }
 
 .vocab-example {
   padding: 10px 12px;
-  background: #f6faf8;
+  background: #f6f7fa;
   border-left: 3px solid var(--gold);
   border-radius: 0 var(--vocab-radius) var(--vocab-radius) 0;
-  color: #2f4640;
+  color: #2f3446;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -297,8 +360,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: #fbfdfc;
-  border: 1px solid rgba(11, 41, 37, 0.1);
+  background: #fbfbfd;
+  border: 1px solid rgba(11, 17, 41, 0.1);
   border-radius: var(--vocab-radius);
 }
 
@@ -310,7 +373,7 @@
 .vocab-wordbook-item span {
   display: block;
   margin-top: 3px;
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -319,7 +382,7 @@
   margin: 0;
   padding: 18px;
   text-align: center;
-  color: #7d938c;
+  color: #7d8193;
   font-size: 13px;
 }
 

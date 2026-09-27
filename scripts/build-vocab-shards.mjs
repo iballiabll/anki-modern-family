@@ -5,6 +5,7 @@
  *
  * 数据来源：
  *   vocab-index.json                  站内考试词表（决定“属于哪类考试”）
+ *   data/llyc-2027-words.json         《恋练有词》词头与单元顺序（见文件内 provenance）
  *   ECDict (skywind3000/ECDict)       音标、词性、英释、交换形式
  *   ECDict wordroot.txt / resemble.txt  词根词缀与形近词（记忆法）
  *
@@ -34,9 +35,11 @@ const ECDICT_EXTRAS_DIR =
   process.env.ECDICT_EXTRAS_DIR || path.join(root, "..", "refs", "ecdict");
 const OUT_DIR = path.join(root, "vocab-index");
 const VOCAB_INDEX = path.join(root, "vocab-index.json");
+const LLYC_SOURCE = path.join(root, "data", "llyc-2027-words.json");
 
 const DECKS = [
   { key: "kaoyan", label: "考研", title: "考研核心词库" },
+  { key: "llyc2027", label: "恋练有词", title: "恋练有词 2027 · 备考词库" },
   { key: "cet6", label: "六级", title: "六级核心词库" },
   { key: "cet4", label: "四级", title: "四级核心词库" },
   { key: "basic", label: "零基础", title: "零基础高频词库" },
@@ -182,10 +185,55 @@ const collected = new Map(DECKS.map((deck) => [deck.key, []]));
 
 const deckKeysByTag = new Map([
   ["考研", "kaoyan"],
+  ["恋练有词", "llyc2027"],
   ["六级", "cet6"],
   ["四级", "cet4"],
   ["零基础", "basic"],
 ]);
+
+/* -------------------------------------------------- 恋练有词 2027 词库 */
+
+/**
+ * data/llyc-2027-words.json 只含词头与单元顺序（来源与版本限制见文件内 provenance）。
+ * 这里把词头并入站内词表：已有词补一个「恋练有词」标签，缺词建一条空释义记录，
+ * 音标、释义、词形变化稍后统一由 ECDict 补齐。
+ */
+const llycSource = await readJson(LLYC_SOURCE, null);
+const llycWords = Array.isArray(llycSource?.words)
+  ? [...new Set(llycSource.words.map((word) => String(word || "").toLowerCase().trim()))].filter(
+      Boolean,
+    )
+  : [];
+const llycOrder = new Map(llycWords.map((word, index) => [word, index]));
+const llycTag = "恋练有词";
+let llycAdded = 0;
+let llycTagged = 0;
+
+for (const key of llycWords) {
+  const existing = vocabByWord.get(key) || vocabByPhrase.get(key);
+  if (existing) {
+    if (!existing.tags.includes(llycTag)) {
+      existing.tags.push(llycTag);
+      llycTagged += 1;
+    }
+    continue;
+  }
+  const record = {
+    word: key,
+    key,
+    phonetic: "",
+    meaning: "",
+    // 只挂「恋练有词」标签：站内考研词库的规模与构成不因导入词书而变化。
+    tags: [llycTag],
+    kind: key.includes(" ") ? "phrase" : "word",
+  };
+  if (record.kind === "word") {
+    vocabByWord.set(key, record);
+  } else {
+    vocabByPhrase.set(key, record);
+  }
+  llycAdded += 1;
+}
 
 await parseCsv(ECDICT_CSV, (header, row) => {
   const record = {};
@@ -358,6 +406,24 @@ for (const [, local] of vocabByWord) {
   }
 }
 
+// 短语（例如 according to、ice cream）过去只进点词索引；恋练有词把它们算作词条，
+// 因此只把带「恋练有词」标签的短语并入该词库，其他词库数量保持不变。
+for (const [, local] of vocabByPhrase) {
+  if (!local.tags.includes(llycTag)) {
+    continue;
+  }
+  collected.get("llyc2027").push(buildEntry(local, ecdict.get(local.key)));
+}
+
+// 恋练有词按教材原始单元顺序输出；界面上的“高频优先 / 字母序”排序在浏览器里完成。
+collected
+  .get("llyc2027")
+  .sort(
+    (left, right) =>
+      (llycOrder.get(left.word.toLowerCase()) ?? Number.MAX_SAFE_INTEGER) -
+      (llycOrder.get(right.word.toLowerCase()) ?? Number.MAX_SAFE_INTEGER),
+  );
+
 /* --------------------------------------------------- 轻量点词索引（全站） */
 
 const quickWords = {};
@@ -432,15 +498,33 @@ for (let index = 0; index < shardCount; index += 1) {
 // 每份考试词表额外导出词表清单，用于筛选与进度统计。
 for (const deck of DECKS) {
   const entries = collected.get(deck.key);
+  const words = entries.map((item) => item.word);
+  const payload = {
+    note: "由 scripts/build-vocab-shards.mjs 生成，请勿手工修改。",
+    deck: deck.key,
+    label: deck.label,
+    title: deck.title,
+    words,
+  };
+  if (deck.key === "llyc2027") {
+    payload.provenance = llycSource?.provenance || null;
+    payload.stats = { words: words.length, units: llycSource?.units?.length || 0 };
+    // groups 保留教材 Unit 顺序，供按单元背词与统计使用。
+    payload.groups = (llycSource?.units || [])
+      .map((unit) => ({
+        id: unit.id,
+        label: unit.label,
+        chapter: unit.chapter ?? null,
+        chapterTitle: unit.chapterTitle || "",
+        words: (unit.words || []).filter(
+          (word) => llycOrder.has(String(word || "").toLowerCase().trim()),
+        ),
+      }))
+      .filter((unit) => unit.words.length);
+  }
   outputs.push([
     `deck-${deck.key}.json`,
-    {
-      note: "由 scripts/build-vocab-shards.mjs 生成，请勿手工修改。",
-      deck: deck.key,
-      label: deck.label,
-      title: deck.title,
-      words: entries.map((item) => item.word),
-    },
+    payload,
   ]);
 }
 
@@ -532,6 +616,7 @@ console.log(
     {
       ecdictRows,
       ecdictMatched,
+      llyc: { words: llycWords.length, added: llycAdded, tagged: llycTagged },
       quickWords: Object.keys(quickWords).length,
       quickPhrases: Object.keys(quickPhrases).length,
       quickBytes: quickSize,

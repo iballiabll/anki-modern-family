@@ -9,8 +9,8 @@
   --writing-topbar: 64px;
   --writing-danger: #b4463b;
   --writing-danger-soft: #fdeceb;
-  --writing-ok: #2f7a5a;
-  --writing-ok-soft: #e6f3ec;
+  --writing-ok: #2f3e7a;
+  --writing-ok-soft: #e6e9f3;
 }
 
 .writing-board {
@@ -27,9 +27,9 @@
 .writing-editor,
 .writing-result {
   background: #ffffff;
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius);
-  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.08);
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.08);
 }
 
 .writing-side {
@@ -54,8 +54,8 @@
   justify-content: space-between;
   gap: 10px;
   padding: 13px 16px;
-  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
-  background: #f6faf8;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f6f7fa;
   border-radius: var(--writing-radius) var(--writing-radius) 0 0;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .writing-panel-hint {
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   font-weight: 700;
 }
@@ -92,7 +92,7 @@
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0;
-  color: #6a7f77;
+  color: #6a6e7f;
 }
 
 .writing-prompt-row {
@@ -102,7 +102,7 @@
   padding: 10px 12px;
   text-align: left;
   background: #ffffff;
-  border: 1px solid rgba(11, 41, 37, 0.14);
+  border: 1px solid rgba(11, 17, 41, 0.14);
   border-radius: var(--writing-radius);
   cursor: pointer;
   color: inherit;
@@ -114,7 +114,7 @@
 }
 
 .writing-prompt-row:hover {
-  border-color: rgba(21, 60, 53, 0.42);
+  border-color: rgba(21, 29, 60, 0.42);
   transform: translateY(-1px);
 }
 
@@ -141,7 +141,7 @@
 
 .writing-prompt-row span {
   font-size: 12px;
-  color: #5d746c;
+  color: #5d6274;
   line-height: 1.4;
 }
 
@@ -154,8 +154,8 @@
 .writing-tag {
   padding: 1px 7px;
   border-radius: 999px;
-  background: #eef4f1;
-  color: #45635b;
+  background: #eeeff4;
+  color: #454b63;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
@@ -178,7 +178,7 @@
 
 .writing-prompt-empty {
   padding: 18px 12px;
-  color: #6a7f77;
+  color: #6a6e7f;
   font-size: 13px;
   line-height: 1.6;
   text-align: center;
@@ -194,7 +194,7 @@
 
 .writing-empty {
   margin: 0;
-  color: #5d746c;
+  color: #5d6274;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -209,12 +209,12 @@
 .writing-directions {
   margin: 0;
   padding: 12px 14px;
-  background: #f8faf9;
+  background: #f8f8fa;
   border-left: 3px solid var(--gold);
   border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
   font-size: 14px;
   line-height: 1.75;
-  color: #223d37;
+  color: #22273d;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -235,7 +235,7 @@
   padding-left: 18px;
   display: grid;
   gap: 5px;
-  color: #38544d;
+  color: #383e54;
   font-size: 13px;
   line-height: 1.65;
 }
@@ -258,13 +258,13 @@
   min-height: 240px;
   padding: 16px;
   border: 0;
-  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
   border-radius: 0;
   resize: vertical;
   font-family: inherit;
   font-size: 15px;
   line-height: 1.8;
-  color: #1f3833;
+  color: #1f2438;
   background: #ffffff;
 }
 
@@ -286,7 +286,7 @@
   min-width: 120px;
   height: 6px;
   border-radius: 999px;
-  background: #e6ece9;
+  background: #e6e7ec;
   overflow: hidden;
 }
 
@@ -325,7 +325,7 @@
   margin: 0;
   padding: 0 16px 14px;
   min-height: 18px;
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   font-weight: 700;
 }
@@ -387,7 +387,7 @@
 
 .writing-score-copy span {
   font-size: 12px;
-  color: #5d746c;
+  color: #5d6274;
 }
 
 .writing-engine {
@@ -407,11 +407,11 @@
 
 .writing-dimension {
   padding: 10px 12px;
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius);
   display: grid;
   gap: 6px;
-  background: #fbfdfc;
+  background: #fbfbfd;
 }
 
 .writing-dimension-head {
@@ -426,7 +426,7 @@
 .writing-dimension-bar {
   height: 6px;
   border-radius: 999px;
-  background: #e6ece9;
+  background: #e6e7ec;
   overflow: hidden;
 }
 
@@ -440,7 +440,7 @@
 .writing-dimension p {
   margin: 0;
   font-size: 12px;
-  color: #5d746c;
+  color: #5d6274;
   line-height: 1.6;
 }
 
@@ -456,18 +456,18 @@
 .writing-section-title span {
   font-size: 11px;
   font-weight: 700;
-  color: #6a7f77;
+  color: #6a6e7f;
 }
 
 .writing-review {
   margin: 0;
   padding: 14px;
   border-radius: var(--writing-radius);
-  background: #f8faf9;
-  border: 1px solid rgba(11, 41, 37, 0.1);
+  background: #f8f8fa;
+  border: 1px solid rgba(11, 17, 41, 0.1);
   font-size: 14px;
   line-height: 2;
-  color: #223d37;
+  color: #22273d;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -516,14 +516,14 @@
   margin: 0;
   font-size: 13px;
   line-height: 1.65;
-  color: #38544d;
+  color: #383e54;
 }
 
 .writing-issue code {
   padding: 1px 5px;
   border-radius: 4px;
-  background: #f2f5f4;
-  color: #2d4a43;
+  background: #f2f3f5;
+  color: #2d334a;
   font-size: 12px;
 }
 
@@ -537,12 +537,12 @@
 }
 
 .writing-improvement {
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius);
   padding: 10px 12px;
   display: grid;
   gap: 6px;
-  background: #fbfdfc;
+  background: #fbfbfd;
 }
 
 .writing-improvement-head {
@@ -555,7 +555,7 @@
 }
 
 .writing-improvement-head s {
-  color: #97a8a2;
+  color: #979aa8;
   font-weight: 600;
 }
 
@@ -568,7 +568,7 @@
   margin: 0;
   font-size: 12px;
   line-height: 1.6;
-  color: #5d746c;
+  color: #5d6274;
 }
 
 /* ------------------------------------------------------- 作文讲解 */
@@ -577,9 +577,9 @@
   display: grid;
   gap: 11px;
   padding: 14px;
-  border: 1px solid rgba(21, 60, 53, 0.16);
+  border: 1px solid rgba(21, 29, 60, 0.16);
   border-radius: var(--writing-radius);
-  background: #fbfdfc;
+  background: #fbfbfd;
 }
 
 .writing-lesson-overview {
@@ -587,8 +587,8 @@
   padding: 12px 14px;
   border-left: 3px solid var(--forest);
   border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
-  background: #f3f8f6;
-  color: #223d37;
+  background: #f3f4f8;
+  color: #22273d;
   font-size: 14px;
   line-height: 1.8;
 }
@@ -609,7 +609,7 @@
 }
 
 .writing-lesson-block {
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius);
   background: #ffffff;
   overflow: hidden;
@@ -650,8 +650,8 @@
 }
 
 .writing-lesson-block[open] > summary {
-  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
-  background: #f7faf9;
+  border-bottom: 1px solid rgba(11, 17, 41, 0.1);
+  background: #f7f8fa;
 }
 
 .writing-lesson-block-title {
@@ -661,7 +661,7 @@
 }
 
 .writing-lesson-block-hint {
-  color: #6a7f77;
+  color: #6a6e7f;
   font-size: 11px;
   font-weight: 700;
 }
@@ -682,9 +682,9 @@
   display: grid;
   gap: 7px;
   padding: 10px 11px;
-  border: 1px solid rgba(11, 41, 37, 0.1);
+  border: 1px solid rgba(11, 17, 41, 0.1);
   border-radius: var(--writing-radius);
-  background: #fbfdfc;
+  background: #fbfbfd;
 }
 
 .writing-lesson-card-head {
@@ -702,7 +702,7 @@
 
 .writing-lesson-card p {
   margin: 0;
-  color: #4d6861;
+  color: #4d5268;
   font-size: 12px;
   line-height: 1.65;
 }
@@ -746,7 +746,7 @@
   display: grid;
   gap: 7px;
   padding: 11px 12px;
-  border: 1px solid rgba(11, 41, 37, 0.11);
+  border: 1px solid rgba(11, 17, 41, 0.11);
   border-left: 3px solid var(--gold);
   border-radius: 0 var(--writing-radius) var(--writing-radius) 0;
   background: #ffffff;
@@ -766,7 +766,7 @@
 }
 
 .writing-paragraph-head span {
-  color: #6a7f77;
+  color: #6a6e7f;
   font-size: 11px;
   line-height: 1.5;
 }
@@ -775,21 +775,21 @@
 .writing-sentence-item p,
 .writing-strategy-list p {
   margin: 0;
-  color: #38544d;
+  color: #383e54;
   font-size: 13px;
   line-height: 1.7;
 }
 
 .writing-paragraph-item p strong,
 .writing-sentence-item p strong {
-  color: #24453d;
+  color: #242b45;
 }
 
 .writing-sentence-original {
   padding: 9px 11px;
   border-radius: var(--writing-radius);
-  background: #f2f6f4;
-  color: #1f3833 !important;
+  background: #f2f3f6;
+  color: #1f2438 !important;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14px !important;
   line-height: 1.7 !important;
@@ -800,7 +800,7 @@
   padding: 9px 11px;
   border-radius: var(--writing-radius);
   background: var(--writing-ok-soft);
-  color: #235c45 !important;
+  color: #232e5c !important;
 }
 
 .writing-strategy-list > li {
@@ -839,9 +839,9 @@
   display: grid;
   gap: 7px;
   padding: 11px;
-  border: 1px solid rgba(11, 41, 37, 0.11);
+  border: 1px solid rgba(11, 17, 41, 0.11);
   border-radius: var(--writing-radius);
-  background: #fbfdfc;
+  background: #fbfbfd;
 }
 
 .writing-pattern-card code {
@@ -854,15 +854,15 @@
 
 .writing-pattern-card p {
   margin: 0;
-  color: #5d746c;
+  color: #5d6274;
   font-size: 12px;
   line-height: 1.65;
 }
 
 .writing-pattern-example {
   padding-top: 6px;
-  border-top: 1px dashed rgba(11, 41, 37, 0.14);
-  color: #38544d !important;
+  border-top: 1px dashed rgba(11, 17, 41, 0.14);
+  color: #383e54 !important;
 }
 
 .writing-checklist {
@@ -877,7 +877,7 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  color: #38544d;
+  color: #383e54;
   cursor: pointer;
   font-size: 13px;
   line-height: 1.65;
@@ -904,11 +904,11 @@
   margin: 0;
   padding: 14px;
   border-radius: var(--writing-radius);
-  background: #f6faf8;
-  border: 1px solid rgba(11, 41, 37, 0.1);
+  background: #f6f7fa;
+  border: 1px solid rgba(11, 17, 41, 0.1);
   font-size: 14px;
   line-height: 1.85;
-  color: #223d37;
+  color: #22273d;
   display: grid;
   gap: 10px;
 }
@@ -921,7 +921,7 @@
   margin: 0;
   font-size: 13px;
   line-height: 1.8;
-  color: #5d746c;
+  color: #5d6274;
   display: grid;
   gap: 8px;
 }
@@ -933,7 +933,7 @@
   gap: 5px;
   font-size: 13px;
   line-height: 1.65;
-  color: #38544d;
+  color: #383e54;
 }
 
 /* ------------------------------------------------------- 开源说明 */
@@ -943,16 +943,16 @@
   margin: 22px auto 44px;
   padding: 20px 22px;
   background: #ffffff;
-  border: 1px solid rgba(11, 41, 37, 0.12);
+  border: 1px solid rgba(11, 17, 41, 0.12);
   border-radius: var(--writing-radius);
-  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.06);
-  color: #38544d;
+  box-shadow: 0 10px 26px rgba(11, 17, 41, 0.06);
+  color: #383e54;
 }
 
 .writing-attribution h2 {
   margin: 0 0 9px;
   font-size: 16px;
-  color: #153c35;
+  color: #151d3c;
 }
 
 .writing-attribution ul {
@@ -968,7 +968,7 @@
 }
 
 .writing-attribution a {
-  color: #256a58;
+  color: #25336a;
   text-underline-offset: 3px;
 }
 

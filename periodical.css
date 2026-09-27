@@ -21,8 +21,8 @@
 
 .periodical-word-panel {
   background: #fcfbf7;
-  border-color: var(--line-strong, #c8d4ce);
-  box-shadow: 0 16px 40px rgba(14, 49, 42, 0.1);
+  border-color: var(--line-strong, #c8cad4);
+  box-shadow: 0 16px 40px rgba(14, 21, 49, 0.1);
   animation: periodical-panel-in 200ms ease-out;
 }
 
@@ -43,10 +43,10 @@
 
 .periodical-word-panel .word-example-item {
   padding: 9px 10px;
-  background: rgba(23, 84, 68, 0.05);
+  background: rgba(23, 35, 84, 0.05);
   border-left: 2px solid var(--gold, #c9a227);
   border-radius: 0 6px 6px 0;
-  color: var(--ink, #16302a);
+  color: var(--ink, #161b30);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -58,14 +58,14 @@
 .periodical-word-panel .word-example-zh {
   margin-top: 4px;
   display: block;
-  color: var(--muted, #5c6f6a);
+  color: var(--muted, #5c606f);
   font-size: 12px;
   line-height: 1.6;
 }
 
 /* 命中词高亮：查词时给被点击的单词加一圈动效。 */
 .word-token.is-active-token {
-  color: #0d3f34;
+  color: #0d173f;
   background: rgba(201, 162, 39, 0.22);
   border-radius: 3px;
   box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.28);
@@ -157,7 +157,7 @@
   background: rgba(251, 250, 245, 0.96);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 8px 22px rgba(14, 49, 42, 0.06);
+  box-shadow: 0 8px 22px rgba(14, 21, 49, 0.06);
   backdrop-filter: blur(6px);
 }
 
@@ -203,7 +203,7 @@
   background: linear-gradient(
     180deg,
     rgba(209, 165, 72, 0.75),
-    rgba(21, 60, 53, 0.18)
+    rgba(21, 29, 60, 0.18)
   );
   border-radius: 2px;
 }
@@ -257,14 +257,14 @@
 }
 
 .periodical-issue-button:hover {
-  border-color: #b4cabe;
-  background: #f5f9f6;
+  border-color: #b4b8ca;
+  background: #f5f6f9;
 }
 
 .periodical-issue-button.is-active {
   color: var(--forest-deep);
-  background: #eef5f0;
-  border-color: #9dbfae;
+  background: #eeeff5;
+  border-color: #9da4bf;
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
@@ -293,9 +293,9 @@
 
 .periodical-mini-tag {
   padding: 1px 6px;
-  color: #45615a;
-  background: #eef3ef;
-  border: 1px solid #dbe6e0;
+  color: #454b61;
+  background: #eeeff3;
+  border: 1px solid #dbdde6;
   border-radius: 999px;
   font-size: 9.5px;
   font-weight: 700;
@@ -325,7 +325,7 @@
     linear-gradient(180deg, #f7f8f3, #ffffff);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(14, 49, 42, 0.05);
+  box-shadow: 0 12px 36px rgba(14, 21, 49, 0.05);
 }
 
 .periodical-issue-head h2 {
@@ -365,9 +365,9 @@
 
 .periodical-chip {
   padding: 4px 10px;
-  color: #3f5b53;
-  background: #eef3ef;
-  border: 1px solid #d9e4de;
+  color: #3f455b;
+  background: #eeeff3;
+  border: 1px solid #d9dbe4;
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 700;
@@ -397,8 +397,8 @@
   padding: 10px 0 4px;
   background: linear-gradient(
     180deg,
-    rgba(237, 241, 236, 0.97) 62%,
-    rgba(237, 241, 236, 0)
+    rgba(241, 239, 236, 0.97) 62%,
+    rgba(241, 239, 236, 0)
   );
 }
 
@@ -414,7 +414,7 @@
 }
 
 .periodical-tab:hover {
-  border-color: #b4cabe;
+  border-color: #b4b8ca;
 }
 
 .periodical-tab.is-active {
@@ -443,7 +443,7 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(14, 49, 42, 0.045);
+  box-shadow: 0 10px 30px rgba(14, 21, 49, 0.045);
 }
 
 .periodical-card-head {
@@ -480,7 +480,7 @@
 .periodical-note {
   margin: 12px 0 0;
   padding: 10px 12px;
-  color: #5d6a52;
+  color: #6a6252;
   background: #f8f6ef;
   border: 1px solid #e6dfc9;
   border-radius: 6px;
@@ -509,7 +509,7 @@
 }
 
 .periodical-paragraph:hover {
-  border-color: #c3d5ca;
+  border-color: #c3c7d5;
 }
 
 .periodical-paragraph-index {
@@ -574,14 +574,14 @@
 .periodical-zh {
   margin: 8px 0 0;
   padding-top: 8px;
-  color: #4c615a;
+  color: #4c5061;
   border-top: 1px dashed var(--line);
   font-size: 13px;
   line-height: 1.8;
 }
 
 .periodical-zh.is-empty {
-  color: #9aa8a2;
+  color: #9a9da8;
   font-size: 11.5px;
 }
 
@@ -616,8 +616,8 @@
   align-content: start;
   min-width: 0;
   padding: 10px 12px;
-  background: #f5faf6;
-  border: 1px solid #dde9e0;
+  background: #f5f6fa;
+  border: 1px solid #dddfe9;
   border-radius: 8px;
 }
 
@@ -629,7 +629,7 @@
 
 .periodical-aside-label {
   display: block;
-  color: #6b7d72;
+  color: #6b6f7d;
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0;
@@ -668,7 +668,7 @@
 
 .periodical-note-zh {
   margin: 0 0 4px;
-  color: #4c615a;
+  color: #4c5061;
   font-size: 12px;
   line-height: 1.75;
   overflow-wrap: break-word;
@@ -760,7 +760,7 @@
 
 .periodical-test-instructions {
   margin: 12px 0 0;
-  color: #55665f;
+  color: #555866;
   font-size: 12px;
   line-height: 1.75;
 }
@@ -818,13 +818,13 @@
 }
 
 .periodical-option:hover {
-  border-color: #b4cabe;
-  background: #f6faf7;
+  border-color: #b4b8ca;
+  background: #f6f7fa;
 }
 
 .periodical-option.is-picked {
-  background: #eef3ef;
-  border-color: #9dbfae;
+  background: #eeeff3;
+  border-color: #9da4bf;
 }
 
 .periodical-option-key {
@@ -884,7 +884,7 @@
 .periodical-analysis {
   margin: 10px 0 0;
   padding: 12px;
-  color: #4d5d57;
+  color: #4d505d;
   background: #f7f8f3;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -913,8 +913,8 @@
   gap: 4px;
   vertical-align: baseline;
   color: var(--forest-deep);
-  background: #eef3ef;
-  border: 1px solid #c9dcd2;
+  background: #eeeff3;
+  border: 1px solid #c9cddc;
   border-radius: 5px;
   font-family: inherit;
   font-size: 0.82em;
@@ -943,7 +943,7 @@
 .periodical-candidates {
   margin: 12px 0 0;
   padding: 12px 14px;
-  background: #f6f8f4;
+  background: #f8f7f4;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -992,7 +992,7 @@
 
 .periodical-qa-body {
   margin: 0;
-  color: #4d5d57;
+  color: #4d505d;
   font-size: 12.5px;
   line-height: 1.8;
   white-space: pre-wrap;
@@ -1108,7 +1108,7 @@
 .periodical-credits code {
   padding: 1px 5px;
   color: var(--forest);
-  background: #eef3ef;
+  background: #eeeff3;
   border-radius: 4px;
   font-size: 11px;
 }
@@ -1200,7 +1200,7 @@
 }
 
 .periodical-mag-meta-value {
-  color: #3f544d;
+  color: #3f4354;
   font-size: 11.5px;
   overflow-wrap: anywhere;
 }
@@ -1224,7 +1224,7 @@
 
 .periodical-mag-level.is-quiet {
   color: var(--muted);
-  background: #f4f6f3;
+  background: #f6f5f3;
   border-color: var(--line);
   font-weight: 700;
 }
@@ -1305,7 +1305,7 @@
 }
 
 .periodical-outline-item {
-  color: #4c615a;
+  color: #4c5061;
   font-size: 12px;
   line-height: 1.7;
 }
@@ -1360,7 +1360,7 @@
   min-width: 0;
   padding: 9px 10px;
   background: #fff;
-  border: 1px solid #cfe0d5;
+  border: 1px solid #cfd2e0;
   border-left: 3px solid #2f855a;
   border-radius: 6px;
 }
@@ -1375,7 +1375,7 @@
 }
 
 .periodical-word-term {
-  color: #1b5e3f;
+  color: #1b285e;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 14.5px;
   font-weight: 800;
@@ -1434,7 +1434,7 @@
 
 .periodical-word-def-en {
   margin: 1px 0 0;
-  color: #2f4a42;
+  color: #2f344a;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 11.5px;
   line-height: 1.7;
@@ -1443,7 +1443,7 @@
 
 .periodical-word-def-zh {
   margin: 1px 0 0;
-  color: #17422f;
+  color: #172042;
   font-size: 12px;
   font-weight: 700;
   overflow-wrap: anywhere;
@@ -1452,8 +1452,8 @@
 .periodical-word-ex-en {
   margin: 4px 0 0;
   padding-left: 8px;
-  color: #4c615a;
-  border-left: 2px solid #dbe7df;
+  color: #4c5061;
+  border-left: 2px solid #dbdde7;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 11px;
   line-height: 1.7;
@@ -1464,7 +1464,7 @@
   margin: 2px 0 0;
   padding-left: 8px;
   color: var(--muted);
-  border-left: 2px solid #eef3ef;
+  border-left: 2px solid #eeeff3;
   font-size: 10.5px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -1478,7 +1478,7 @@
 
 .periodical-word-raw-line {
   margin: 0;
-  color: #4c615a;
+  color: #4c5061;
   font-size: 11px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -1500,8 +1500,8 @@
 .periodical-word-action {
   padding: 3px 10px;
   color: var(--forest);
-  background: #f2f7f3;
-  border: 1px solid #d5e3da;
+  background: #f2f3f7;
+  border: 1px solid #d5d8e3;
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
@@ -1509,7 +1509,7 @@
 }
 
 .periodical-word-action:hover {
-  background: #e6f0e9;
+  background: #e6e8f0;
 }
 
 /* ------------------------------------------- 句子成分色块（黄 / 绿 / 青） */
@@ -1517,7 +1517,7 @@
 .periodical-syntax-source {
   margin-bottom: 6px;
   padding: 8px 10px;
-  background: #f7f9f6;
+  background: #f9f8f6;
   border: 1px solid var(--line);
   border-radius: 6px;
 }
@@ -1533,7 +1533,7 @@
 
 .periodical-syntax-source-zh {
   margin: 4px 0 0;
-  color: #4c615a;
+  color: #4c5061;
   font-size: 11.5px;
   line-height: 1.7;
 }
@@ -1556,7 +1556,7 @@
   margin-bottom: 2px;
   padding: 1px 6px;
   color: #14532d;
-  background: #e6f3ea;
+  background: #e6e9f3;
   border-radius: 3px;
   font-size: 10px;
   font-weight: 800;
@@ -1601,26 +1601,26 @@
 
 .periodical-syntax-chip.is-clause {
   color: #14532d;
-  background: #e2f0e7;
-  border-color: #b6d8c3;
+  background: #e2e5f0;
+  border-color: #b6bdd8;
 }
 
 .periodical-syntax-chip.is-subject {
   color: #14532d;
-  background: #ddf0e3;
-  border-color: #a9d3b8;
+  background: #dde1f0;
+  border-color: #a9b1d3;
 }
 
 .periodical-syntax-chip.is-verb {
-  color: #0f4a3c;
-  background: #cfe9dd;
-  border-color: #9cccb4;
+  color: #0f1b4a;
+  background: #cfd4e9;
+  border-color: #9ca6cc;
 }
 
 .periodical-syntax-chip.is-object {
-  color: #134f5c;
-  background: #d8ecf1;
-  border-color: #a8cfd9;
+  color: #13225c;
+  background: #d8ddf1;
+  border-color: #a8b2d9;
 }
 
 .periodical-syntax-legend {
@@ -1735,7 +1735,7 @@
   }
 
   .periodical-paragraph.has-aside .periodical-aside::-webkit-scrollbar-thumb {
-    background: #cfded4;
+    background: #cfd2de;
     border-radius: 4px;
   }
 

@@ -27,6 +27,11 @@
   const DECKS = {
     kaoyan1: { deck: "kaoyan", label: "考研英语一", title: "考研英语一 · 核心词库" },
     kaoyan2: { deck: "kaoyan", label: "考研英语二", title: "考研英语二 · 核心词库" },
+    llyc2027: {
+      deck: "llyc2027",
+      label: "恋练有词",
+      title: "恋练有词 2027 · 备考词库",
+    },
     cet4: { deck: "cet4", label: "四级", title: "四级核心词库" },
     cet6: { deck: "cet6", label: "六级", title: "六级核心词库" },
     basic: { deck: "basic", label: "零基础", title: "零基础高频词库" },
@@ -50,6 +55,8 @@
     listStatus: document.getElementById("listStatus"),
     panel: document.getElementById("wordPanel"),
     detail: document.getElementById("wordDetail"),
+    reciteBar: document.getElementById("reciteBar"),
+    reciteStatus: document.getElementById("reciteStatus"),
     speakWord: document.getElementById("speakWordButton"),
     favoriteWord: document.getElementById("favoriteWordButton"),
     wordbookToggle: document.getElementById("wordbookToggleButton"),
@@ -68,6 +75,7 @@
     index: null,
     indexPromise: null,
     quick: null,
+    quickPhrases: null,
     quickPromise: null,
     quickLoadingStarted: false,
     shardMap: null,
@@ -82,6 +90,7 @@
     favoriteOnly: false,
     activeWord: "",
     detailToken: 0,
+    recite: new Map(),
     favorites: new Set(),
     wordbook: new Map(),
     prefs: { deckKey: "kaoyan1", sort: "frequency" },
@@ -165,12 +174,15 @@
       state.quickPromise = fetchJson(QUICK_URL)
         .then((data) => {
           state.quick = data?.words && typeof data.words === "object" ? data.words : {};
+          state.quickPhrases =
+            data?.phrases && typeof data.phrases === "object" ? data.phrases : {};
           renderList();
           renderStats();
           return state.quick;
         })
         .catch(() => {
           state.quick = {};
+          state.quickPhrases = {};
           return state.quick;
         });
     }
@@ -247,7 +259,9 @@
 
   /** 轻量释义：点词索引里的「音标 / 释义 / 标签」。 */
   function quickEntry(word) {
-    const raw = state.quick?.[normalize(word)];
+    const key = normalize(word);
+    // 固定搭配与短语存在 phrases 段（例如 according to、ice cream）。
+    const raw = state.quick?.[key] || state.quickPhrases?.[key];
     if (!raw) {
       return null;
     }
@@ -257,6 +271,78 @@
       meaning,
       tags: tags.split(/\s+/).filter(Boolean),
     };
+  }
+
+  /* ----------------------------------------------------------- 背词记录 */
+
+  /**
+   * 背词记录走 vocab-recite-api.js（window.IballVocabRecite）：
+   * account-store.js 已把 localStorage 按账号隔离并同步到 ./api/progress，
+   * 所以这里只读写这个接口，不再自己拼存储键。
+   */
+  function reciteApi() {
+    return window.IballVocabRecite || null;
+  }
+
+  function currentDeckId() {
+    return (DECKS[state.deckKey] || DECKS.kaoyan1).deck;
+  }
+
+  function reciteRecord(word) {
+    return state.recite.get(normalize(word)) || null;
+  }
+
+  function refreshRecite() {
+    const api = reciteApi();
+    const next = new Map();
+    if (api) {
+      for (const item of api.getRecords(currentDeckId())) {
+        next.set(normalize(item.word), item);
+      }
+    }
+    state.recite = next;
+  }
+
+  function syncReciteBar() {
+    if (!els.reciteBar) {
+      return;
+    }
+    const active = state.activeWord;
+    els.reciteBar.hidden = !active;
+    if (!active) {
+      return;
+    }
+    const record = reciteRecord(active);
+    els.reciteBar.querySelectorAll("[data-recite]").forEach((node) => {
+      const isActive = Boolean(record) && node.dataset.recite === record.status;
+      node.classList.toggle("is-active", isActive);
+      node.classList.toggle(`is-${node.dataset.recite}`, isActive);
+      node.setAttribute("aria-pressed", String(isActive));
+    });
+    if (els.reciteStatus) {
+      els.reciteStatus.textContent = record
+        ? `${reciteApi()?.statusLabel(record.status) || record.status} · 已记 ${
+            record.reviews
+          } 次`
+        : "点一个状态就会记下来";
+    }
+  }
+
+  function recordRecite(status) {
+    const api = reciteApi();
+    if (!api || !state.activeWord) {
+      showToast("背词记录接口还没就绪，稍后再试");
+      return;
+    }
+    const saved = api.record({
+      deck: currentDeckId(),
+      word: state.activeWord,
+      status,
+      source: `vocab:${state.deckKey}`,
+    });
+    if (saved) {
+      showToast(`已记为「${api.statusLabel(status)}」`);
+    }
   }
 
   /* --------------------------------------------------------------- 渲染 */
@@ -304,6 +390,7 @@
       { value: String(deck?.words ?? currentDeckWords().length), label: "词库词量" },
       { value: String(state.favorites.size), label: "已收藏" },
       { value: String(state.wordbook.size), label: "生词本" },
+      { value: String(state.recite.size), label: "已背词" },
       {
         value: state.quick ? "已就绪" : "加载中",
         label: "点词释义",
@@ -350,6 +437,14 @@
         }
         if (state.wordbook.has(key)) {
           marks.push('<span class="is-marked">生词本</span>');
+        }
+        const recited = reciteRecord(word);
+        if (recited) {
+          marks.push(
+            `<span class="is-recited is-${escapeHtml(recited.status)}">${escapeHtml(
+              reciteApi()?.statusLabel(recited.status) || recited.status,
+            )}</span>`,
+          );
         }
         return `
           <button class="vocab-row${
@@ -425,6 +520,12 @@
         <div class="vocab-block">
           <h4>释义</h4>
           <ul>${entry.translation.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+        </div>`);
+    } else if (!entry.definition?.length) {
+      blocks.push(`
+        <div class="vocab-block">
+          <h4>释义</h4>
+          <p>ECDict 暂未收录这个词，可以先记拼写与读音，再结合真题语境理解。</p>
         </div>`);
     }
     if (entry.example) {
@@ -521,6 +622,7 @@
         ? "移出生词本"
         : "加入生词本";
     }
+    syncReciteBar();
   }
 
   function setPanelOpen(open) {
@@ -660,11 +762,17 @@
     state.deckKey = config;
     state.prefs.deckKey = config;
     state.visibleCount = PAGE_SIZE;
+    refreshRecite();
     if (els.deckSelect) {
       els.deckSelect.value = config;
     }
     if (els.deckTitle) {
       els.deckTitle.textContent = DECKS[config].title;
+    }
+    const frequencyButton = els.sortGroup?.querySelector("[data-sort='frequency']");
+    if (frequencyButton) {
+      // 恋练有词按教材单元顺序输出，回退排序时提示成“单元顺序”更准确。
+      frequencyButton.textContent = config === "llyc2027" ? "单元顺序" : "高频优先";
     }
     if (els.deckMeta) {
       els.deckMeta.textContent = "正在取词表…";
@@ -691,13 +799,17 @@
   }
 
   function clearProgress() {
-    if (!window.confirm("清空收藏夹、生词本和排序偏好吗？这一步不能撤销。")) {
+    if (
+      !window.confirm("清空收藏夹、生词本、当前词库的背词记录和排序偏好吗？这一步不能撤销。")
+    ) {
       return;
     }
     state.favorites.clear();
     state.wordbook.clear();
     writeStore(FAVORITE_KEY, []);
     writeStore(WORDBOOK_KEY, []);
+    reciteApi()?.clear(currentDeckId());
+    refreshRecite();
     syncCounters();
     renderList();
     renderWordbook();
@@ -779,6 +891,13 @@
     els.favoriteWord?.addEventListener("click", () => toggleFavorite(state.activeWord));
     els.wordbookToggle?.addEventListener("click", () => toggleWordbook(state.activeWord));
 
+    els.reciteBar?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-recite]");
+      if (button) {
+        recordRecite(button.dataset.recite);
+      }
+    });
+
     els.wordbookButton?.addEventListener("click", () => {
       const open = els.wordbookPanel.hidden;
       els.wordbookPanel.hidden = !open;
@@ -845,6 +964,13 @@
     }
 
     bindEvents();
+    window.IballVocabRecite?.subscribe(() => {
+      refreshRecite();
+      renderList();
+      renderStats();
+      syncReciteBar();
+    });
+    refreshRecite();
     syncCounters();
     renderStats();
     scrollProgress();

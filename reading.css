@@ -1,18 +1,18 @@
 :root {
-  --forest: #153c35;
-  --forest-deep: #0b2925;
-  --forest-soft: #e1ebe5;
-  --paper: #fbfaf5;
-  --canvas: #edf1ec;
+  --forest: #4056d6;
+  --forest-deep: #17204f;
+  --forest-soft: #e8ecff;
+  --paper: #f8f9ff;
+  --canvas: #f4f6fb;
   --surface: #ffffff;
-  --ink: #17312b;
-  --muted: #6f7f78;
-  --line: #d4ded7;
-  --line-strong: #b9cbc2;
-  --gold: #d1a548;
-  --coral: #c95a4f;
-  --blue: #426d80;
-  --shadow: 0 18px 46px rgba(12, 43, 37, 0.1);
+  --ink: #1b2140;
+  --muted: #5f6884;
+  --line: #dbe0f0;
+  --line-strong: #c3cae4;
+  --gold: #ffb000;
+  --coral: #f05263;
+  --blue: #0b9fc4;
+  --shadow: 0 18px 46px rgba(23, 32, 79, 0.1);
 }
 
 * {
@@ -34,8 +34,8 @@ body {
   overflow-x: hidden;
   color: var(--ink);
   background:
-    linear-gradient(rgba(21, 60, 53, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21, 60, 53, 0.028) 1px, transparent 1px),
+    linear-gradient(rgba(21, 29, 60, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 29, 60, 0.028) 1px, transparent 1px),
     var(--canvas);
   background-size: 34px 34px;
   font-family:
@@ -63,7 +63,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 3px solid rgba(77, 143, 122, 0.34);
+  outline: 3px solid rgba(77, 90, 143, 0.34);
   outline-offset: 2px;
 }
 
@@ -92,7 +92,7 @@ a:focus-visible {
 
 .topbar-link {
   justify-self: start;
-  color: #d9e8e2;
+  color: #d9dce8;
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
@@ -142,7 +142,7 @@ a:focus-visible {
 }
 
 .reading-brand small {
-  color: #a9c3ba;
+  color: #a9aec3;
   font-size: 8px;
   line-height: 1.2;
 }
@@ -230,7 +230,7 @@ body.has-word-panel .reading-shell {
 }
 
 .compact-button:hover {
-  background: #1f5147;
+  background: #1f2951;
 }
 
 .reading-list {
@@ -265,8 +265,8 @@ body.has-word-panel .reading-shell {
 }
 
 .reading-list-item:hover {
-  background: rgba(21, 60, 53, 0.055);
-  border-color: rgba(21, 60, 53, 0.09);
+  background: rgba(21, 29, 60, 0.055);
+  border-color: rgba(21, 29, 60, 0.09);
 }
 
 .reading-list-item.is-active {
@@ -274,7 +274,7 @@ body.has-word-panel .reading-shell {
   border-color: var(--line-strong);
   box-shadow:
     inset 3px 0 0 var(--gold),
-    0 8px 20px rgba(12, 43, 37, 0.07);
+    0 8px 20px rgba(12, 18, 43, 0.07);
 }
 
 .reading-list-item strong {
@@ -378,7 +378,7 @@ body.has-word-panel .reading-shell {
 .word-note-field textarea {
   width: 100%;
   color: var(--ink);
-  background: #fbfcfb;
+  background: #fbfbfc;
   border: 1px solid var(--line);
   border-radius: 7px;
   transition:
@@ -403,8 +403,8 @@ body.has-word-panel .reading-shell {
 .field select:focus,
 .field textarea:focus,
 .word-note-field textarea:focus {
-  border-color: #75a695;
-  box-shadow: 0 0 0 3px rgba(77, 143, 122, 0.12);
+  border-color: #757fa6;
+  box-shadow: 0 0 0 3px rgba(77, 90, 143, 0.12);
   outline: 0;
 }
 
@@ -416,8 +416,8 @@ body.has-word-panel .reading-shell {
   place-items: center;
   gap: 4px;
   color: var(--forest);
-  background: #f5f9f6;
-  border: 1px dashed #96b8ab;
+  background: #f5f6f9;
+  border: 1px dashed #969db8;
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
@@ -428,8 +428,8 @@ body.has-word-panel .reading-shell {
 
 .file-drop-zone:hover,
 .file-drop-zone.is-dragging {
-  background: #eaf4ee;
-  border-color: #4d8f7a;
+  background: #eaecf4;
+  border-color: #4d5a8f;
 }
 
 .file-drop-zone input {
@@ -475,7 +475,7 @@ body.has-word-panel .reading-shell {
 }
 
 .primary-button:hover {
-  background: #1f5147;
+  background: #1f2951;
 }
 
 .secondary-button {
@@ -501,7 +501,7 @@ body.has-word-panel .reading-shell {
 .form-status {
   min-height: 18px;
   margin: 12px 0 0;
-  color: #397562;
+  color: #394575;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -561,14 +561,14 @@ body.has-word-panel .reading-shell {
 .segmented-control {
   display: inline-flex;
   padding: 3px;
-  background: #e5ede7;
+  background: #e5e7ed;
   border-radius: 7px;
 }
 
 .segment-button {
   min-height: 32px;
   padding: 5px 12px;
-  color: #4f625a;
+  color: #4f5362;
   background: transparent;
   border: 0;
   border-radius: 5px;
@@ -579,7 +579,7 @@ body.has-word-panel .reading-shell {
 .segment-button.is-active {
   color: var(--forest-deep);
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(12, 43, 37, 0.09);
+  box-shadow: 0 2px 8px rgba(12, 18, 43, 0.09);
 }
 
 .reader-tools {
@@ -619,7 +619,7 @@ body.has-word-panel .reading-shell {
 .translation-progress {
   height: 3px;
   overflow: hidden;
-  background: #dce6df;
+  background: #dcdee6;
 }
 
 .translation-progress span {
@@ -635,12 +635,12 @@ body.has-word-panel .reading-shell {
   border: 1px solid var(--line);
   border-top: 0;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 16px 38px rgba(12, 43, 37, 0.065);
+  box-shadow: 0 16px 38px rgba(12, 18, 43, 0.065);
 }
 
 .reader-paragraph {
   padding: 22px clamp(18px, 3.2vw, 36px) 24px;
-  border-bottom: 1px solid #e5ece7;
+  border-bottom: 1px solid #e5e6ec;
 }
 
 .reader-paragraph:last-child {
@@ -657,7 +657,7 @@ body.has-word-panel .reading-shell {
 }
 
 .reader-paragraph-number {
-  color: #9db0a8;
+  color: #9da1b0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 11px;
   font-weight: 800;
@@ -666,7 +666,7 @@ body.has-word-panel .reading-shell {
 .paragraph-read-button {
   min-height: 27px;
   padding: 3px 8px;
-  color: #567169;
+  color: #565B71;
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -683,7 +683,7 @@ body.has-word-panel .reading-shell {
 
 .reader-english {
   margin: 0;
-  color: #172822;
+  color: #171A28;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(17px, 1.52vw, 20px);
   line-height: 1.86;
@@ -693,9 +693,9 @@ body.has-word-panel .reading-shell {
 .reader-translation {
   margin: 17px 0 0;
   padding: 14px 16px;
-  color: #53665f;
-  background: #f4f8f5;
-  border-left: 3px solid #9bc4b5;
+  color: #535766;
+  background: #f4f5f8;
+  border-left: 3px solid #9ba3c4;
   border-radius: 0 6px 6px 0;
   font-size: 14px;
   line-height: 1.8;
@@ -703,7 +703,7 @@ body.has-word-panel .reading-shell {
 }
 
 .reader-translation.is-empty {
-  color: #9aa9a2;
+  color: #9a9da9;
   font-size: 12px;
 }
 
@@ -724,7 +724,7 @@ body.has-word-panel .reading-shell {
   color: inherit;
   background: transparent;
   border: 0;
-  border-bottom: 1px dotted rgba(66, 109, 128, 0.46);
+  border-bottom: 1px dotted rgba(66, 78, 128, 0.46);
   border-radius: 0;
   font: inherit;
   line-height: inherit;
@@ -732,7 +732,7 @@ body.has-word-panel .reading-shell {
 
 .word-token:hover {
   color: var(--forest-deep);
-  background: #edf6f1;
+  background: #edeff6;
   border-bottom-color: #2f725e;
 }
 
@@ -743,7 +743,7 @@ body.has-word-panel .reading-shell {
 }
 
 .word-token.is-known-token {
-  color: #316c59;
+  color: #313d6c;
   background: #edf7f1;
   border-bottom-color: #6cab92;
 }
@@ -757,7 +757,7 @@ body.has-word-panel .reading-shell {
   overflow: auto;
   background: #fbfaf5;
   border-left: 1px solid var(--line);
-  box-shadow: -18px 0 44px rgba(12, 43, 37, 0.055);
+  box-shadow: -18px 0 44px rgba(12, 18, 43, 0.055);
 }
 
 .word-panel-head {
@@ -834,7 +834,7 @@ body.has-word-panel .reading-shell {
 
 .word-meanings li {
   padding: 9px 10px;
-  color: #31473f;
+  color: #313547;
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -862,7 +862,7 @@ body.has-word-panel .reading-shell {
 }
 
 #wordContextSentence {
-  color: #2b4038;
+  color: #2b2f40;
   font-family: Georgia, "Times New Roman", serif;
 }
 
@@ -911,16 +911,16 @@ body.has-word-panel .reading-shell {
 }
 
 .mark-button.is-known {
-  color: #2f6c58;
+  color: #2f3b6c;
   background: #edf7f1;
-  border-color: #b9dccc;
+  border-color: #b9c0dc;
 }
 
 .mark-button.is-known:hover,
 .mark-button.is-known.is-active {
   color: #ffffff;
-  background: #3f8068;
-  border-color: #3f8068;
+  background: #3f4c80;
+  border-color: #3f4c80;
 }
 
 .toast {
@@ -934,7 +934,7 @@ body.has-word-panel .reading-shell {
   background: var(--forest-deep);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 7px;
-  box-shadow: 0 16px 38px rgba(6, 27, 23, 0.28);
+  box-shadow: 0 16px 38px rgba(6, 10, 27, 0.28);
   font-size: 12px;
   line-height: 1.5;
   opacity: 0;
@@ -1032,7 +1032,7 @@ body.has-word-panel .reading-shell {
     border-top: 1px solid var(--line-strong);
     border-left: 0;
     border-radius: 14px 14px 0 0;
-    box-shadow: 0 -24px 60px rgba(8, 34, 30, 0.24);
+    box-shadow: 0 -24px 60px rgba(8, 13, 34, 0.24);
     animation: word-panel-in 180ms ease-out;
   }
 
