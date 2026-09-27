@@ -1402,11 +1402,21 @@
     return head;
   }
 
-  /** 文章导读：杂志排版 PDF 原样机读整理，不做翻译或补写。 */
+  /**
+   * 文章导读：杂志排版 PDF 原样机读整理，不做翻译或补写。
+   * 原件没有中文导读时保留空位并写明原因，避免看起来像解析失败。
+   */
   function renderMagazineIntro(piece) {
     const intro = String(piece.magazineIntro || "").trim();
     if (!intro) {
-      return null;
+      const placeholder = el("p", "periodical-mag-intro is-missing");
+      placeholder.append(
+        el("strong", "", "文章导读 · "),
+        document.createTextNode(
+          "该期原件只提供英文正文，没有中文导读可整理；此处保留空位，不机翻、不补造。",
+        ),
+      );
+      return placeholder;
     }
     const details = el("details", "periodical-mag-intro");
     details.open = true;

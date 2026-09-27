@@ -1267,6 +1267,20 @@
   padding: 0 0 10px;
 }
 
+.periodical-mag-intro.is-missing {
+  padding: 9px 12px;
+  color: var(--muted);
+  background: #fbfaf4;
+  border-style: dashed;
+  border-left-style: solid;
+  font-size: 11.5px;
+  line-height: 1.8;
+}
+
+.periodical-mag-intro.is-missing strong {
+  color: #6a4d0b;
+}
+
 .periodical-outline {
   margin: 12px 0 0;
   background: #fbfaf4;
