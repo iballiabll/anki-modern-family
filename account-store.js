@@ -635,8 +635,12 @@
     }
   }
 
+  /**
+   * 心跳只在页面处于前台时跑：后台标签页不算在线，
+   * 管理台的「在线时长」因此贴近真实使用时间，而不是挂着网页的时间。
+   */
   function startHeartbeat() {
-    if (heartbeatTimer) {
+    if (heartbeatTimer || document.hidden) {
       return;
     }
     beat().catch(() => {});
@@ -657,9 +661,10 @@
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
+      stopHeartbeat();
       flushSync().catch(() => {});
     } else {
-      beat().catch(() => {});
+      startHeartbeat();
     }
   });
 

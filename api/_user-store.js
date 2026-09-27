@@ -87,6 +87,9 @@ function normalizeUser(user) {
     createdAt: user.createdAt || "",
     lastLoginAt: user.lastLoginAt || "",
     passwordUpdatedAt: user.passwordUpdatedAt || "",
+    disabled: Boolean(user.disabled),
+    disabledAt: user.disabledAt || "",
+    disabledReason: user.disabledReason || "",
     resetTokens: Array.isArray(user.resetTokens) ? user.resetTokens : [],
   };
 }
@@ -283,6 +286,9 @@ async function listUsers() {
       lastLoginAt: user.lastLoginAt || "",
       passwordUpdatedAt: user.passwordUpdatedAt || "",
       authVersion: Number(user.authVersion) || 1,
+      disabled: Boolean(user.disabled),
+      disabledAt: user.disabledAt || "",
+      disabledReason: user.disabledReason || "",
     }))
     .sort((left, right) =>
       String(left.createdAt).localeCompare(String(right.createdAt)),
@@ -367,7 +373,7 @@ async function createUser({ username, password, email = "" }) {
  */
 async function verifyCredentials(username, password) {
   const user = await findByLogin(username);
-  if (!user) {
+  if (!user || user.disabled) {
     return null;
   }
 
@@ -582,6 +588,77 @@ async function resetPasswordWithToken({ token, password }) {
   });
 }
 
+/**
+ * 停用 / 恢复一个账号。
+ *
+ * 停用时 authVersion +1，已发出去的 Cookie 立刻失效，等于当场踢下线；
+ * 顺手清掉未用的找回令牌，避免停用期间还能改密码。
+ */
+async function setUserDisabled({ userId, disabled, reason = "" }) {
+  const id = String(userId || "").trim();
+  if (!id) {
+    throw new StoreError("缺少账号标识", 400);
+  }
+  const existing = await findById(id);
+  if (!existing) {
+    throw new StoreError("账号不存在", 404);
+  }
+
+  let updated = null;
+  await updateStore((store) => {
+    const target = store.users.find((item) => item.id === id);
+    if (!target) {
+      throw new StoreError("账号不存在", 404);
+    }
+    if (disabled) {
+      target.authVersion = (Number(target.authVersion) || 1) + 1;
+      target.disabled = true;
+      target.disabledAt = new Date().toISOString();
+      target.disabledReason = String(reason || "").slice(0, 200);
+      target.resetTokens = [];
+    } else {
+      target.disabled = false;
+      target.disabledAt = "";
+      target.disabledReason = "";
+    }
+    updated = normalizeUser(target);
+    return store;
+  });
+
+  return {
+    id: updated.id,
+    username: updated.username,
+    disabled: Boolean(updated.disabled),
+    disabledAt: updated.disabledAt || "",
+    disabledReason: updated.disabledReason || "",
+  };
+}
+
+/**
+ * 彻底删除账号记录。进度文件、成绩和未处理的找回申请由调用方一起清，
+ * 这里只负责 users.json，保证一个模块只管一份数据。
+ */
+async function deleteUser(userId) {
+  const id = String(userId || "").trim();
+  if (!id) {
+    throw new StoreError("缺少账号标识", 400);
+  }
+  const existing = await findById(id);
+  if (!existing) {
+    throw new StoreError("账号不存在", 404);
+  }
+
+  await updateStore((store) => {
+    store.users = store.users.filter((item) => item.id !== id);
+    store.resetRequests = (store.resetRequests || []).filter(
+      (item) => item.userId !== id,
+    );
+    return store;
+  });
+
+  return { id, username: existing.username };
+}
+
 /** 把环境变量里的站长账号补进用户库，方便从旧版单账号登录平滑迁移。 */
 async function ensureUser({ username, password, email = "" }) {
   const existing = await findByUsername(username);
@@ -611,6 +688,7 @@ module.exports = {
   createUser,
   createResetToken,
   dataDir,
+  deleteUser,
   ensureUser,
   findById,
   findByEmail,
@@ -625,6 +703,7 @@ module.exports = {
   publicUser,
   requestPasswordReset,
   resetPasswordWithToken,
+  setUserDisabled,
   storageStatus,
   storePath,
   updatePassword,

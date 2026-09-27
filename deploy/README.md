@@ -250,6 +250,33 @@ chmod +x /etc/cron.daily/iball-cabin-backup
 > 密码散列摆在网上。`.gitignore` 已经把 `work/` 排除掉了，线上路径
 > `/var/lib/iball-cabin/data` 也在仓库之外。
 
+### 7.1 从管理台备份到私有仓库
+
+`/admin.html` 的「数据备份」卡片可以把整个 `DATA_DIR` 快照提交到一个
+**私有** GitHub 仓库：一次备份一个提交，按时间戳分目录，不覆盖历史快照。
+
+准备三件事：
+
+1. 新建一个私有仓库，默认约定叫 `iballiabll/iball-cabin-backup`；
+2. 建一个 fine-grained token，只授权这个仓库的 `Contents: Read and write`；
+3. 把变量写进 `/etc/iball-cabin.env`，然后 `systemctl restart iball-cabin`。
+
+```bash
+GITHUB_BACKUP_TOKEN=github_pat_xxx
+BACKUP_REPO=iballiabll/iball-cabin-backup
+BACKUP_BRANCH=main
+```
+
+程序上传前会先查目标仓库的可见性：**不是私有仓库就直接失败，什么都不传**。
+管理台只显示时间、文件数、字节数和提交链接，不显示任何数据正文；
+`backup-status.json` 也只存这些元数据。命令行同样可以手动跑：
+
+```bash
+cd /srv/iball-cabin/app
+DATA_DIR=/var/lib/iball-cabin/data node scripts/backup-data.mjs           # 立即备份
+DATA_DIR=/var/lib/iball-cabin/data node scripts/backup-data.mjs --status  # 只看状态
+```
+
 ---
 
 ## 8. GitHub 静态镜像（防封底牌）
@@ -324,6 +351,7 @@ curl -sI https://iballiabll.github.io/anki-modern-family/ | head -5
 | 存储 | `DATA_DIR` 是否可写，不可写时红字提示 |
 | 邀请码 | 当前邀请码（含环境变量兜底）、随机生成、清空 |
 | 接口调用 | 最近一小时各接口调用次数排行 |
+| 数据备份 | 上次备份时间、文件数、体积、提交链接；一键「立即备份」 |
 | 在线与活动 | 谁在线、最后活跃时间、当前页面 |
 | 用户 | 数据体积、错词数、三个榜最好成绩、签发重置令牌 |
 | 重置密码申请 | 待处理申请，签发令牌后可标记已处理 |

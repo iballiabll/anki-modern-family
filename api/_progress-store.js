@@ -277,6 +277,19 @@ function readEntryArray(store, key) {
   return [];
 }
 
+/** 管理端删除账号时用：整个进度文件一起删掉，不留孤儿数据。 */
+async function deleteProgress(userId) {
+  const file = progressPath(userId);
+  return withWriteLock(async () => {
+    try {
+      await fsp.rm(file, { force: true });
+      return true;
+    } catch {
+      return false;
+    }
+  });
+}
+
 /** 管理端用的汇总：只看体量、更新时间和错词数量，不把内容吐给前端。 */
 async function progressSummary(userId) {
   const store = await readProgressStore(userId).catch(() => emptyStore(userId));
@@ -301,6 +314,7 @@ async function progressSummary(userId) {
 module.exports = {
   MAX_ENTRIES,
   MAX_VALUE_BYTES,
+  deleteProgress,
   mergeProgress,
   progressDir,
   progressPath,

@@ -8,6 +8,9 @@
  *   POST { action: "invite-generate", prefix } 随机生成并保存一个邀请码
  *   POST { action: "reset-token", userId, ttlMinutes } 生成一次性重置令牌
  *   POST { action: "handle-reset", requestId }         标记找回申请已处理
+ *   POST { action: "user-disable", userId, reason }    停用一个账号（立刻踢下线）
+ *   POST { action: "user-enable", userId }             恢复账号
+ *   POST { action: "user-delete", userId, confirm:true } 删除账号连同进度与成绩
  *
  * 有意不返回：口令散列、进度正文、作文内容、用户自己填的 API Key。
  * 管理端只看到「谁在什么时候调了哪个接口、有多少数据、错词几条」。
@@ -17,17 +20,25 @@ const { isAdminUser, readJsonBody, resolveSessionUser, clientIp } = require("./_
 const {
   StoreError,
   createResetToken,
+  deleteUser,
   listResetRequests,
   listUsers,
   markResetRequestHandled,
+  setUserDisabled,
 } = require("./_user-store.js");
 const {
   generateInviteCode,
   inviteCodeStatus,
   setInviteCode,
 } = require("./_site-settings.js");
-const { SCOPES, allBests, quizStats, totalScoreFor } = require("./_quiz-store.js");
-const { progressSummary } = require("./_progress-store.js");
+const {
+  SCOPES,
+  allBests,
+  deleteUserData,
+  quizStats,
+  totalScoreFor,
+} = require("./_quiz-store.js");
+const { deleteProgress, progressSummary } = require("./_progress-store.js");
 const telemetryStore = require("./_telemetry.js");
 
 async function buildOverview() {
@@ -91,6 +102,7 @@ async function buildOverview() {
     users: users.map((user) => {
       const progress = progressById.get(user.id);
       const scopes = bests[user.id] || {};
+      const activity = activityById.get(user.id) || null;
       return {
         id: user.id,
         username: user.username,
@@ -98,13 +110,20 @@ async function buildOverview() {
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
         passwordUpdatedAt: user.passwordUpdatedAt,
+        disabled: Boolean(user.disabled) || Boolean(user.disabledAt),
+        disabledAt: user.disabledAt || "",
+        disabledReason: user.disabledReason || "",
         keys: progress?.keys || 0,
         bytes: progress?.bytes || 0,
         wrongWords: progress?.wrongWords || 0,
         progressUpdatedAt: progress?.updatedAt || "",
-        online: Boolean(activityById.get(user.id)?.online),
-        page: activityById.get(user.id)?.page || "",
-        lastSeenAt: activityById.get(user.id)?.lastSeenAt || "",
+        online: Boolean(activity?.online),
+        page: activity?.page || "",
+        lastSeenAt: activity?.lastSeenAt || "",
+        onlineMs: Number(activity?.onlineMs) || 0,
+        onlineMsToday: Number(activity?.onlineMsToday) || 0,
+        sessions: Number(activity?.sessions) || 0,
+        modules: activity?.modules || [],
         bests: Object.fromEntries(
           SCOPES.map((scope) => [scope, Number(scopes[scope]?.percent) || 0]),
         ),
@@ -121,6 +140,28 @@ async function buildOverview() {
       note: item.note || "",
     })),
   };
+}
+
+/**
+ * 停用 / 删除的目标账号：必须存在，且不能是操作者本人或管理员账号。
+ * 有这一层兜底，管理台不会把站长自己锁在门外。
+ */
+async function requireTargetUser(userId, actor) {
+  const id = String(userId || "").trim();
+  if (!id) {
+    throw new StoreError("缺少账号标识", 400);
+  }
+  if (actor?.id && id === actor.id) {
+    throw new StoreError("不能对自己执行这个操作", 400);
+  }
+  const target = (await listUsers()).find((item) => item.id === id);
+  if (!target) {
+    throw new StoreError("账号不存在", 404);
+  }
+  if (isAdminUser(target)) {
+    throw new StoreError("管理员账号不能停用或删除", 400);
+  }
+  return target;
 }
 
 async function handler(request, response) {
@@ -218,6 +259,54 @@ async function handler(request, response) {
         return;
       }
       response.status(200).json({ ok: true, ...result });
+      return;
+    }
+
+    if (body.action === "user-disable" || body.action === "user-enable") {
+      const target = await requireTargetUser(body.userId, user);
+      const disabled = body.action === "user-disable";
+      const result = await setUserDisabled({
+        userId: target.id,
+        disabled,
+        reason: body.reason,
+      });
+      telemetryStore.setMeta(response, {
+        userDisabled: disabled,
+        target: target.username,
+      });
+      response.status(200).json({
+        ok: true,
+        user: { ...result, username: target.username },
+        message: disabled
+          ? `${target.username} 已停用，旧会话已经立刻失效。`
+          : `${target.username} 已恢复，可以重新登录。`,
+      });
+      return;
+    }
+
+    if (body.action === "user-delete") {
+      const target = await requireTargetUser(body.userId, user);
+      if (body.confirm !== true) {
+        response.status(400).json({
+          ok: false,
+          message: "删除不可撤销，需要明确确认。",
+        });
+        return;
+      }
+      await deleteUser(target.id);
+      // 账号、进度、成绩、活动记录一起清，控制台里不留半个人。
+      const [progressGone, quizGone] = await Promise.all([
+        deleteProgress(target.id).catch(() => false),
+        deleteUserData(target.id).catch(() => false),
+      ]);
+      telemetryStore.forgetActivity(target.id);
+      telemetryStore.setMeta(response, { userDeleted: target.username });
+      response.status(200).json({
+        ok: true,
+        username: target.username,
+        cleaned: { progress: progressGone, quiz: quizGone },
+        message: `${target.username} 和这个账号的数据已删除。`,
+      });
       return;
     }
 

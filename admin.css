@@ -402,6 +402,10 @@
   font-size: 13px;
 }
 
+.admin-table-wide {
+  min-width: 940px;
+}
+
 .admin-table th {
   padding: 9px 10px;
   color: var(--muted);
@@ -492,6 +496,57 @@
   letter-spacing: 0.08em;
 }
 
+.admin-row-disabled td {
+  color: var(--muted);
+  background: #fafafc;
+}
+
+.admin-row-disabled .admin-account {
+  color: #5f6579;
+  text-decoration: line-through;
+}
+
+.admin-modules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 176px;
+  max-width: 260px;
+}
+
+.admin-module {
+  min-width: 0;
+  padding: 3px 8px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  background: #eef0f7;
+  border: 1px solid #dfe2ee;
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.admin-module b {
+  overflow: hidden;
+  max-width: 118px;
+  color: #262d4c;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.admin-module em {
+  color: var(--muted);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-module.more {
+  color: var(--muted);
+  background: #f6f7fa;
+  border-style: dashed;
+}
+
 .admin-row-actions {
   display: flex;
   flex-wrap: wrap;
@@ -512,6 +567,17 @@
 .admin-mini:hover:not(:disabled) {
   background: #e4e6ee;
   border-color: #9da3bb;
+}
+
+.admin-mini.danger {
+  color: #a8442f;
+  background: #fdf6f5;
+  border-color: #eccfc8;
+}
+
+.admin-mini.danger:hover:not(:disabled) {
+  background: #f8e6e1;
+  border-color: #d9a99e;
 }
 
 .admin-mini:disabled {
@@ -578,6 +644,52 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
   text-align: right;
+}
+
+.admin-backup {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-backup-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-backup-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 12px 18px;
+  margin: 0;
+}
+
+.admin-backup-meta div {
+  min-width: 0;
+}
+
+.admin-backup-meta dt {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.admin-backup-meta dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.admin-backup-meta a {
+  color: #2f3e7a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 @media (max-width: 720px) {

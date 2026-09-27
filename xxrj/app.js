@@ -31,6 +31,9 @@ const state = {
   planBoard: initialParams.get("plan") || "today",
   taskEditId: "",
   recordEditId: "",
+  knowledgeEditId: "",
+  reviewLogId: "",
+  reviewFilter: "all",
   progressChapter: null,
 };
 
@@ -138,6 +141,111 @@ function pendingReviewRecords(records) {
     if (record.status === "已消灭") return false;
     if (!record.reviewDate) return true;
     return record.reviewDate <= TODAY_KEY;
+  });
+}
+
+/* ------------------------------- 英语三分类：整套卷 / 单纯阅读 / 其他模块 */
+
+const ENGLISH_KINDS = [
+  { key: "paper", label: "整套卷" },
+  { key: "reading", label: "单纯阅读" },
+  { key: "other", label: "其他模块" },
+];
+const ENGLISH_KIND_LABEL = Object.fromEntries(ENGLISH_KINDS.map((item) => [item.key, item.label]));
+
+/**
+ * 英语记录分三类：
+ *   · 录入时明确选了类型 → 用选的那一类；
+ *   · 没选但有满分 → 整套卷；
+ *   · 模块 / 来源里带「阅读」→ 单纯阅读；
+ *   · 其余 → 其他模块。
+ */
+function englishKindOf(record) {
+  if (!record) return "other";
+  const explicit = String(record.kind || "");
+  if (ENGLISH_KIND_LABEL[explicit]) return explicit;
+  if (Number(record.full) > 0) return "paper";
+  if (`${record.module} ${record.source}`.includes("阅读")) return "reading";
+  return "other";
+}
+
+function englishKindLabel(record) {
+  return ENGLISH_KIND_LABEL[englishKindOf(record)] || "其他模块";
+}
+
+/** 英语三类各自一行汇总：条数、得分率、累计失分、待复盘。 */
+function englishKindRows(records) {
+  return ENGLISH_KINDS.map((kind) => {
+    const list = (records || []).filter((record) => englishKindOf(record) === kind.key);
+    return {
+      key: kind.key,
+      label: kind.label,
+      count: list.length,
+      rate: weightedRate(list),
+      lost: sumBy(list, (record) => Math.max(0, Number(record.full) - Number(record.score))),
+      pending: pendingReviewRecords(list).length,
+      latest: sortedByDate(list, -1)[0] || null,
+    };
+  });
+}
+
+/* ------------------------------------------------- 错题 / 知识点汇总 */
+
+/** 错题分组：条数、累计失分、得分率，失分多的排前面。 */
+function mistakeBuckets(records, keyFn) {
+  return [...groupBy(records || [], keyFn).entries()]
+    .map(([name, list]) => ({
+      name,
+      count: list.length,
+      lost: sumBy(list, (record) => Math.max(0, Number(record.full) - Number(record.score))),
+      rate: weightedRate(list),
+      pending: pendingReviewRecords(list).length,
+    }))
+    .sort((left, right) => right.lost - left.lost || right.count - left.count);
+}
+
+function mistakePaperKey(record) {
+  return `${summaryYearOf(record)} ${summaryPaperOf(record)}`.trim();
+}
+
+/** 真题（整套卷）成绩：一份卷一行，备注可直接在表里改。 */
+function wholePaperRows(records) {
+  const papers = (records || []).filter(
+    (record) => Number(record.full) > 0 && subjectKeyOf(record) !== "english",
+  );
+  const englishPapers = (records || []).filter(
+    (record) => subjectKeyOf(record) === "english" && englishKindOf(record) === "paper",
+  );
+  return [...papers, ...englishPapers]
+    .sort((left, right) => `${right.date}${right.createdAt}`.localeCompare(`${left.date}${left.createdAt}`))
+    .map((record) => ({
+      id: record.id,
+      date: record.date || "",
+      subject: record.subject || "",
+      label: `${summaryYearOf(record)} ${summaryPaperOf(record)}`.trim(),
+      module: record.module || "",
+      score: Number(record.score) || 0,
+      full: Number(record.full) || 0,
+      rate: recordRate(record),
+      note: record.note || "",
+      pending: pendingReviewRecords([record]).length > 0,
+    }));
+}
+
+function knowledgeAll() {
+  return STORE ? STORE.knowledge() : [];
+}
+
+function knowledgeOfDate(date) {
+  return knowledgeAll().filter((item) => item.date === date);
+}
+
+/** 待复盘知识点：还没排期，或者排期已经到今天。 */
+function pendingKnowledge(items) {
+  return (items || []).filter((item) => {
+    if (item.status !== "待复盘") return false;
+    if (!item.reviewDate) return true;
+    return item.reviewDate <= TODAY_KEY;
   });
 }
 
@@ -654,6 +762,7 @@ function summaryEmptyPage() {
 function renderSummary() {
   const data = buildSummaryData(state.subject);
   if (!data) return summaryEmptyPage();
+  const subjectRecords = recordsOfSubject(state.subject);
   const latestIndex = data.chart.labels.length - 1;
   const latestYear = data.chart.labels[latestIndex];
   const latestTotal = data.chart.series.reduce((sum, item) => sum + item.values[latestIndex], 0);
@@ -685,6 +794,9 @@ function renderSummary() {
     </div>
 
     <div class="grid">
+      ${mistakeSummaryHTML(subjectRecords)}
+      ${paperScoreHTML(subjectRecords, { title: "真题 / 整套卷成绩汇总" })}
+
       <section class="card card-pad span-7">
         <div class="card-head">
           <div>
@@ -1145,11 +1257,12 @@ function recordTableHTML(records, limit = 12) {
             .slice(0, limit)
             .map((record) => {
               const rate = recordRate(record);
+              const kindText = subjectKeyOf(record) === "english" ? englishKindLabel(record) : "";
               return `
                 <tr>
                   <td>${escapeHtml(record.date || "-")}</td>
                   <td>${escapeHtml(record.subject || "-")}</td>
-                  <td>${escapeHtml(record.source || "-")}</td>
+                  <td>${escapeHtml(record.source || "-")}${kindText ? `<span class="tag blue kind-chip">${escapeHtml(kindText)}</span>` : ""}</td>
                   <td>${escapeHtml(record.module || record.paper || "-")}</td>
                   <td>${escapeHtml(record.question || "-")}</td>
                   <td class="score ${scoreClass(rate)}">${recordScoreText(record)}</td>
@@ -1181,6 +1294,112 @@ function recordEmptyState({ title, note, subject = "", source = "" }) {
         <button class="secondary-btn" type="button" data-screen="plan">${icon("calendar-range")} 先去排今日计划</button>
       </div>
     </div>
+  `;
+}
+
+/** 表内可编辑备注：失焦或回车直接写回记录，不用弹窗。 */
+function noteInputHTML(record, placeholder = "点这里写备注") {
+  const label = `备注 ${record.subject || ""} ${record.module || ""}`.trim();
+  return `<input class="note-input" type="text" value="${escapeAttr(record.note || "")}" placeholder="${escapeAttr(placeholder)}" data-note-record="${escapeAttr(record.id)}" aria-label="${escapeAttr(label || "备注")}" />`;
+}
+
+/** 错题汇总：按模块和按真题各排一张榜，含条数、失分、得分率、待复盘。 */
+function mistakeSummaryHTML(records, { limit = 8 } = {}) {
+  const list = (records || []).filter(isMistakeRecord);
+  const byModule = mistakeBuckets(list, (record) => record.module || record.paper || record.source || "未填模块").slice(0, limit);
+  const byPaper = mistakeBuckets(list, mistakePaperKey).slice(0, limit);
+  const totalLost = sumBy(list, (record) => Math.max(0, Number(record.full) - Number(record.score)));
+  const rate = weightedRate(list);
+  const rowsHTML = (rows, emptyText) =>
+    rows.length
+      ? rows
+          .map(
+            (row) => `
+              <div class="data-row wide-status">
+                <span class="label">${escapeHtml(row.name)}</span>
+                ${progressBar(row.rate === null ? 0 : row.rate, rateTone(row.rate))}
+                <span class="value">${row.rate === null ? "—" : `${row.rate}%`}</span>
+                <span class="status tag ${rateTone(row.rate)}">${row.count} 条 · 失分 ${row.lost} · 待复盘 ${row.pending}</span>
+              </div>
+            `,
+          )
+          .join("")
+      : `<div class="empty-state compact">${icon("notebook-tabs")}<strong>${emptyText}</strong><span>录入错题时填上模块或年份，这里会自动分组。</span></div>`;
+
+  return `
+    <section class="card card-pad span-12">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">错题汇总</h2>
+          <p class="card-note">同一批错题按模块、按真题各排一遍；失分多的排前面，分成几块一目了然。</p>
+        </div>
+        <div class="head-actions">
+          <span class="tag red">${list.length} 条错题 · 累计失分 ${totalLost}</span>
+          <span class="tag ${rateTone(rate)}">整体得分率 ${rate === null ? "—" : `${rate}%`}</span>
+        </div>
+      </div>
+      <div class="split-2">
+        <div>
+          <div class="list-title">${icon("layers")} 按模块 / 考点</div>
+          <div class="data-list">${rowsHTML(byModule, "还没有带模块的错题")}</div>
+        </div>
+        <div>
+          <div class="list-title">${icon("file-text")} 按真题 / 试卷</div>
+          <div class="data-list">${rowsHTML(byPaper, "还没有带年份的错题")}</div>
+        </div>
+      </div>
+      <button class="secondary-btn full-btn" type="button" data-screen="mistakes">${icon("notebook-tabs")} 去错题本逐题复盘</button>
+    </section>
+  `;
+}
+
+/** 真题 / 整套卷成绩汇总：一份卷一行，备注直接在表里改。 */
+function paperScoreHTML(records, { limit = 12, title = "真题成绩汇总" } = {}) {
+  const rows = wholePaperRows(records).slice(0, limit);
+  const average = weightedRate(
+    (records || []).filter((record) => Number(record.full) > 0 && subjectKeyOf(record) !== "english"),
+  );
+  return `
+    <section class="card card-pad span-12">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">${escapeHtml(title)}</h2>
+          <p class="card-note">每一份真题 / 整套卷一行；备注栏点一下就能写，写完自动存进这条记录。</p>
+        </div>
+        <div class="head-actions">
+          <span class="tag blue">${rows.length} 份卷</span>
+          <span class="tag ${rateTone(average)}">卷面平均 ${average === null ? "—" : `${average}%`}</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="paper-table">
+          <thead>
+            <tr><th>日期</th><th>科目 / 试卷</th><th>得分</th><th>得分率</th><th>状态</th><th>备注（可直接改）</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            ${
+              rows.length
+                ? rows
+                    .map(
+                      (row) => `
+                        <tr>
+                          <td>${escapeHtml(row.date || "-")}</td>
+                          <td><span class="year-cell">${escapeHtml(row.label || row.subject || "-")}</span></td>
+                          <td class="score">${row.score}/${row.full}</td>
+                          <td>${row.rate === null ? "-" : `${row.rate}%`}</td>
+                          <td><span class="tag ${row.pending ? "amber" : "green"}">${row.pending ? "待复盘" : "已复盘"}</span></td>
+                          <td>${noteInputHTML({ id: row.id, note: row.note, subject: row.subject, module: row.module })}</td>
+                          <td>${recordEditAction(row.id)}</td>
+                        </tr>
+                      `,
+                    )
+                    .join("")
+                : `<tr><td colspan="7">还没有满分的整卷记录；录入时填上「满分」和「得分」，这里就按卷统计。</td></tr>`
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
   `;
 }
 
@@ -1268,6 +1487,10 @@ function renderDashboard() {
     </section>
 
     <div class="grid">
+      ${dailyReviewSummaryHTML()}
+      ${mistakeSummaryHTML(records)}
+      ${paperScoreHTML(records)}
+
       <section class="card card-pad span-5">
         <div class="card-head">
           <div>
@@ -1403,7 +1626,7 @@ function renderDashboard() {
               ? mastery
                   .map(
                     (item) => `
-                <div class="data-row">
+                <div class="data-row wide-status">
                   <span class="label">${escapeHtml(item.name)}</span>
                   ${progressBar(item.rate, rateTone(item.rate))}
                   <span class="value">${item.rate}%</span>
@@ -1468,6 +1691,7 @@ function renderEnglish() {
   const latestRate = latest ? recordRate(latest) : null;
   const average = weightedRate(records);
   const pending = pendingReviewRecords(records).length;
+  const kindRows = englishKindRows(records);
   const readBuckets = [...groupBy(
     records.filter((record) => `${record.module} ${record.source}`.includes("阅读") && record.year),
     (record) => String(record.year),
@@ -1498,6 +1722,31 @@ function renderEnglish() {
       records.length
         ? `
     <div class="grid">
+      <section class="card card-pad span-12">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">整套卷 / 单纯阅读 / 其他模块</h2>
+            <p class="card-note">三类分开算得分率，整套卷的分数不会把单篇阅读拉高。录入时选「英语类型」，没选的按满分和模块自动归类。</p>
+          </div>
+          <span class="tag blue">${records.length} 条英语记录</span>
+        </div>
+        <div class="data-list">
+          ${kindRows
+            .map(
+              (row) => `
+                <div class="data-row">
+                  <span class="label">${escapeHtml(row.label)}</span>
+                  ${progressBar(row.rate === null ? 0 : row.rate, rateTone(row.rate))}
+                  <span class="value">${row.rate === null ? "—" : `${row.rate}%`}</span>
+                  <span class="status tag ${rateTone(row.rate)}">${row.count} 条 · 失分 ${row.lost} · 待复盘 ${row.pending}</span>
+                </div>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="mini-note">${icon("info")} 「整套卷」按卷面满分算分；「单纯阅读」「其他模块」按题数或小分算，两者不混在一起。</div>
+      </section>
+
       <section class="card card-pad span-7">
         <div class="card-head">
           <div>
@@ -3869,7 +4118,7 @@ function renderData() {
           <div><h2 class="card-title">导出与初始化</h2><p class="card-note">导出的 JSON 就是当前账号的全部学习数据。</p></div>
         </div>
         <div class="plan-list">
-          <button class="list-action" type="button" data-export-json>${icon("download")}<span><strong>导出全部数据（JSON）</strong><em>包含计划、成绩记录、章节进度和目标设置</em></span></button>
+          <button class="list-action" type="button" data-export-json>${icon("download")}<span><strong>导出全部数据（JSON）</strong><em>包含计划、成绩记录、章节进度、知识点与复盘历史</em></span></button>
           <button class="list-action" type="button" data-import-json>${icon("upload")}<span><strong>导入备份</strong><em>用之前导出的 JSON 覆盖当前账号数据</em></span></button>
           <button class="list-action danger" type="button" data-reset-data>${icon("trash-2")}<span><strong>初始化全部数据</strong><em>清空测试数据回到全新状态，执行前会再确认一次</em></span></button>
         </div>
@@ -3964,6 +4213,247 @@ function renderGuide() {
   `;
 }
 
+/* --------------------------------------------------- 待复盘（知识点 + 错题） */
+
+const KNOWLEDGE_SUBJECTS = ["数学一", "英语一", "英语二", "408", "政治"];
+const KNOWLEDGE_STATUSES = ["待复盘", "已复盘", "已掌握"];
+
+function knowledgeTone(subject) {
+  const text = String(subject || "");
+  if (text.startsWith("数学")) return "blue";
+  if (text.startsWith("英语")) return "violet";
+  if (text.includes("408")) return "amber";
+  if (text.includes("政治")) return "coral";
+  return "cyan";
+}
+
+function knowledgeStatusTone(status) {
+  if (status === "已掌握") return "green";
+  if (status === "已复盘") return "blue";
+  return "amber";
+}
+
+/** 知识点排期状态：逾期、今天到期、已排期或未排期。 */
+function knowledgeDueText(item) {
+  if (item.status === "已掌握") return "已掌握";
+  if (!item.reviewDate) return "未排期";
+  if (item.reviewDate < TODAY_KEY) return `逾期 ${item.reviewDate}`;
+  if (item.reviewDate === TODAY_KEY) return "今天到期";
+  return `下次 ${item.reviewDate}`;
+}
+
+function knowledgeDueTone(item) {
+  if (item.status === "已掌握") return "green";
+  if (!item.reviewDate) return "amber";
+  if (item.reviewDate <= TODAY_KEY) return "red";
+  return "blue";
+}
+
+/** 一条知识点一张卡：状态、排期、复盘历史、写复盘和顺延都在卡上完成。 */
+function knowledgeCardHTML(item) {
+  return `
+    <article class="knowledge-card" data-knowledge-card="${escapeAttr(item.id)}">
+      <div class="knowledge-top">
+        <div class="knowledge-tags">
+          <span class="tag ${knowledgeTone(item.subject)}">${escapeHtml(item.subject || "未填科目")}</span>
+          <span class="tag ${knowledgeStatusTone(item.status)}">${escapeHtml(item.status)}</span>
+          <span class="tag ${knowledgeDueTone(item)}">${escapeHtml(knowledgeDueText(item))}</span>
+        </div>
+        <div class="row-actions">
+          <button class="ghost-btn" type="button" data-knowledge-edit="${escapeAttr(item.id)}">${icon("pencil")} 编辑</button>
+          <button class="ghost-btn danger" type="button" data-knowledge-remove="${escapeAttr(item.id)}">${icon("trash-2")} 删除</button>
+        </div>
+      </div>
+      <h3 class="knowledge-topic">${escapeHtml(item.topic || "未填知识点")}</h3>
+      ${item.detail ? `<p class="knowledge-detail">${escapeHtml(item.detail)}</p>` : ""}
+      <div class="knowledge-meta">
+        <span>${icon("calendar")} 记录 ${escapeHtml(item.date || "未填")}</span>
+        <span>${icon("repeat-2")} 已复盘 ${item.reviewCount} 次</span>
+        <span>${icon("history")} 最近 ${escapeHtml(item.lastReviewDate || "还没复盘")}</span>
+      </div>
+      ${reviewHistoryHTML(item)}
+      <div class="knowledge-foot">
+        <button class="primary-btn" type="button" data-knowledge-log="${escapeAttr(item.id)}">${icon("notebook-pen")} 写复盘</button>
+        <div class="snooze-group">
+          <span>顺延</span>
+          <button class="ghost-btn" type="button" data-knowledge-snooze="${escapeAttr(item.id)}" data-days="1">明天</button>
+          <button class="ghost-btn" type="button" data-knowledge-snooze="${escapeAttr(item.id)}" data-days="3">3 天</button>
+          <button class="ghost-btn" type="button" data-knowledge-snooze="${escapeAttr(item.id)}" data-days="7">一周</button>
+        </div>
+        <label class="status-select">
+          <span>状态</span>
+          <select data-knowledge-status="${escapeAttr(item.id)}" aria-label="知识点状态">
+            ${KNOWLEDGE_STATUSES.map(
+              (status) => `<option${status === item.status ? " selected" : ""}>${status}</option>`,
+            ).join("")}
+          </select>
+        </label>
+      </div>
+    </article>
+  `;
+}
+
+/** 总览用的一行待复盘汇总，和侧栏徽章口径一致。 */
+function dailyReviewSummaryHTML() {
+  const knowledge = knowledgeAll();
+  const dueKnowledge = pendingKnowledge(knowledge);
+  const mistakes = mistakeRecordsOf();
+  const dueMistakes = pendingReviewRecords(mistakes);
+  const total = dueKnowledge.length + dueMistakes.length;
+  return `
+    <section class="card card-pad span-12 review-summary-card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">待复盘</h2>
+          <p class="card-note">知识点和错题里今天该复盘的，都汇总在这里。</p>
+        </div>
+        <div class="head-actions">
+          <span class="tag ${total ? "amber" : "green"}">${total ? `今天待复盘 ${total} 条` : "今天没有到期的复盘"}</span>
+          <button class="primary-btn" type="button" data-screen="daily-review">${icon("notebook-pen")} 去复盘</button>
+        </div>
+      </div>
+      <div class="review-summary-grid">
+        <button class="review-summary-item" type="button" data-screen="daily-review">
+          <strong>${dueKnowledge.length}</strong>
+          <span>知识点待复盘</span>
+          <em>共 ${knowledge.length} 条 · 已掌握 ${knowledge.filter((item) => item.status === "已掌握").length} 条</em>
+        </button>
+        <button class="review-summary-item" type="button" data-screen="mistakes">
+          <strong>${dueMistakes.length}</strong>
+          <span>错题待复盘</span>
+          <em>错题本共 ${mistakes.length} 题</em>
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function pendingMistakeTableHTML(records, limit = 12) {
+  const rows = records.slice(0, limit);
+  if (!rows.length) {
+    return `
+      <div class="empty-state compact">
+        ${icon("check-check")}
+        <strong>没有到期的错题</strong>
+        <span>错题本里排了期的题，到期后会出现在这里。</span>
+      </div>
+    `;
+  }
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>日期</th><th>科目</th><th>题目</th><th>模块 / 考点</th><th>下次复盘</th><th>状态</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          ${rows
+            .map(
+              (record) => `
+                <tr>
+                  <td>${escapeHtml(record.date || "-")}</td>
+                  <td>${escapeHtml(record.subject || "-")}</td>
+                  <td><span class="question-no">${escapeHtml(record.question || record.source || "整卷记录")}</span></td>
+                  <td>${escapeHtml(record.module || record.paper || "-")}</td>
+                  <td>${escapeHtml(record.reviewDate || "未排期")}</td>
+                  <td><span class="tag ${annotateStatusTone(record)}">${escapeHtml(masteryTagText(record))}</span></td>
+                  <td><button class="ghost-btn" type="button" data-screen="mistakes">${icon("notebook-tabs")} 去错题本</button></td>
+                </tr>
+              `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>
+    ${records.length > limit ? `<div class="mini-note">${icon("info")} 还有 ${records.length - limit} 题，去错题本看完整列表。</div>` : ""}
+  `;
+}
+
+function renderDailyReview() {
+  const knowledge = knowledgeAll();
+  const pending = knowledge.filter((item) => item.status === "待复盘");
+  const due = pendingKnowledge(knowledge);
+  const reviewed = knowledge.filter((item) => item.status === "已复盘");
+  const mastered = knowledge.filter((item) => item.status === "已掌握");
+  const mistakes = sortedByDate(mistakeRecordsOf(), -1);
+  const dueMistakes = sortedByDate(pendingReviewRecords(mistakes), -1);
+  const filters = {
+    all: knowledge,
+    pending,
+    due,
+    reviewed,
+    mastered,
+  };
+  const activeFilter = filters[state.reviewFilter] ? state.reviewFilter : "all";
+  const visible = filters[activeFilter];
+  const filterChips = [
+    ["all", "全部", knowledge.length],
+    ["pending", "待复盘", pending.length],
+    ["due", "今天到期", due.length],
+    ["reviewed", "已复盘", reviewed.length],
+    ["mastered", "已掌握", mastered.length],
+  ];
+
+  return `
+    <div class="page-head">
+      <div>
+        <h1>待复盘</h1>
+        <p class="page-desc">知识点按排期进入复盘队列；每次复盘追加一条历史，不覆盖之前写过的内容，和错题本共享同一天的复盘节奏。</p>
+      </div>
+      <div class="head-actions">
+        <button class="secondary-btn" type="button" data-screen="mistakes">${icon("notebook-tabs")} 错题本</button>
+        <button class="primary-btn" type="button" data-knowledge-new>${icon("plus")} 新增知识点</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      ${kpiCard({ label: "待复盘知识点", value: pending.length, unit: "条", sub: due.length ? `今天到期 / 未排期 ${due.length} 条` : "没有到期的知识点", iconName: "notebook-pen", accent: "amber" })}
+      ${kpiCard({ label: "错题待复盘", value: dueMistakes.length, unit: "题", sub: `错题本共 ${mistakes.length} 题`, iconName: "notebook-tabs", accent: "red" })}
+      ${kpiCard({ label: "已复盘", value: reviewed.length, unit: "条", sub: reviewed.length ? "已经写过复盘、等待下次排期" : "还没有写过复盘", iconName: "history", accent: "blue" })}
+      ${kpiCard({ label: "已掌握", value: mastered.length, unit: "条", sub: mastered.length ? "不再进入待复盘队列" : "还没有标记已掌握的知识点", iconName: "check-check", accent: "green" })}
+    </div>
+
+    <div class="filter-row">
+      ${filterChips
+        .map(
+          ([key, label, count]) =>
+            `<button class="filter-chip${key === activeFilter ? " active" : ""}" type="button" data-review-filter="${key}">${label} ${count}</button>`,
+        )
+        .join("")}
+    </div>
+
+    ${
+      visible.length
+        ? `<div class="grid knowledge-grid">${visible.map((item) => knowledgeCardHTML(item)).join("")}</div>`
+        : `
+          <section class="card card-pad span-12">
+            <div class="empty-state">
+              ${icon("notebook-pen")}
+              <strong>${knowledge.length ? "这个筛选下没有知识点" : "还没有待复盘的知识点"}</strong>
+              <span>${knowledge.length ? "换一个筛选看看。" : "把今天卡住的概念、公式或题型记下来，排好下次复盘的时间。"}</span>
+              <button class="primary-btn" type="button" data-knowledge-new>${icon("plus")} 新增知识点</button>
+            </div>
+          </section>
+        `
+    }
+
+    <div class="grid">
+      <section class="card card-pad span-12">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">错题待复盘</h2>
+            <p class="card-note">已到排期或还没排期的错题；在错题本里标注错因、复盘次数和下次时间。</p>
+          </div>
+          <div class="head-actions">
+            <span class="tag ${dueMistakes.length ? "red" : "green"}">${dueMistakes.length} 题</span>
+            <button class="secondary-btn" type="button" data-screen="mistakes">${icon("external-link")} 打开错题本</button>
+          </div>
+        </div>
+        ${pendingMistakeTableHTML(dueMistakes)}
+      </section>
+    </div>
+  `;
+}
+
 const screens = {
   dashboard: { title: "总览", render: renderDashboard },
   summary: { title: "成绩汇总", render: renderSummary },
@@ -3972,6 +4462,7 @@ const screens = {
   math: { title: "数学一", render: renderMath },
   cs408: { title: "408", render: render408 },
   mistakes: { title: "不会题 / 错题本", render: renderMistakes },
+  "daily-review": { title: "待复盘", render: renderDailyReview },
   goal: { title: "目标与倒计时", render: renderGoal },
   guide: { title: "使用说明与网址", render: renderGuide },
   data: { title: "数据与备份", render: renderData },
@@ -3979,6 +4470,8 @@ const screens = {
 
 function render() {
   const screen = screens[state.screen] || screens.dashboard;
+  // 标题跟着页面走：浏览器标签页好认，管理台的模块使用也靠它区分小屋内的页面。
+  document.title = `${screen.title} · 小屋`;
   document.getElementById("crumb-current").textContent = screen.title;
   document.getElementById("app").innerHTML = screen.render();
   document.querySelectorAll("[data-screen]").forEach((button) => {
@@ -3989,6 +4482,23 @@ function render() {
     const todayCount = STORE.tasksOf(TODAY_KEY).length;
     planBadge.textContent = String(todayCount);
     planBadge.hidden = todayCount === 0;
+  }
+  const reviewBadge = document.getElementById("review-badge");
+  const mistakesBadge = document.getElementById("mistakes-badge");
+  if (STORE && (reviewBadge || mistakesBadge)) {
+    const dueKnowledge = pendingKnowledge(knowledgeAll()).length;
+    const dueMistakes = pendingReviewRecords(mistakeRecordsOf()).length;
+    if (reviewBadge) {
+      const total = dueKnowledge + dueMistakes;
+      reviewBadge.textContent = String(total);
+      reviewBadge.hidden = total === 0;
+      reviewBadge.title = `今天待复盘：知识点 ${dueKnowledge} 条 · 错题 ${dueMistakes} 题`;
+    }
+    if (mistakesBadge) {
+      mistakesBadge.textContent = String(dueMistakes);
+      mistakesBadge.hidden = dueMistakes === 0;
+      mistakesBadge.title = `待复盘错题 ${dueMistakes} 题`;
+    }
   }
   if (window.lucide) {
     window.lucide.createIcons({ attrs: { "stroke-width": 1.8 } });
@@ -4006,6 +4516,8 @@ const saveEntryLabel = document.querySelector("#save-entry span");
 const entrySubject = document.getElementById("entry-subject");
 const entrySource = document.getElementById("entry-source");
 const entryPaperType = document.getElementById("entry-paper-type");
+const entryKindField = document.getElementById("entry-kind-field");
+const entryKind = document.getElementById("entry-kind");
 const entryModule = document.getElementById("entry-module");
 const entryQuestion = document.getElementById("entry-question");
 const entryFull = document.getElementById("entry-full");
@@ -4057,6 +4569,10 @@ function syncEntryOptions() {
   setSelectOptions(entrySource, entrySources(entrySubject.value, options), entrySource.value);
   setSelectOptions(entryPaperType, options.papers, entryPaperType.value);
   setSelectOptions(entryModule, options.modules, entryModule.value);
+  // 「英语类型」只对英语一 / 英语二有意义，其它科目录进来的 kind 一律清空。
+  const english = entrySubject.value.startsWith("英语");
+  if (entryKindField) entryKindField.hidden = !english;
+  if (!english && entryKind) entryKind.value = "";
 }
 
 /** 数学一的来源里带上全部资料名，录成绩时能直接对上封神之路里的书。 */
@@ -4122,6 +4638,25 @@ const progressRoundOptions = document.getElementById("progress-round-options");
 const clearProgressButton = document.getElementById("clear-progress");
 const PROGRESS_NOTE_DEFAULT = "只影响这一本书这一章；错题请到「录入成绩」里逐题标注。";
 
+const knowledgeModal = document.getElementById("knowledge-modal");
+const knowledgeModalTitle = document.getElementById("knowledge-title");
+const knowledgeModalNote = document.getElementById("knowledge-modal-note");
+const knowledgeDate = document.getElementById("knowledge-date");
+const knowledgeSubject = document.getElementById("knowledge-subject");
+const knowledgeTopic = document.getElementById("knowledge-topic");
+const knowledgeStatus = document.getElementById("knowledge-status");
+const knowledgeReview = document.getElementById("knowledge-review");
+const knowledgeDetail = document.getElementById("knowledge-detail");
+const KNOWLEDGE_NOTE_DEFAULT = "保存后按状态进入待复盘队列；复盘笔记在卡片上一条条追加。";
+
+const reviewLogModal = document.getElementById("review-log-modal");
+const reviewLogSub = document.getElementById("review-log-sub");
+const reviewLogText = document.getElementById("review-log-text");
+const reviewLogNext = document.getElementById("review-log-next");
+const reviewLogHistory = document.getElementById("review-log-history");
+const reviewLogNote = document.getElementById("review-log-note");
+const REVIEW_LOG_NOTE_DEFAULT = "这条笔记会追加到历史里，不会覆盖之前写过的内容。";
+
 function modalNote(element, text, isWarning = false) {
   if (!element) return;
   element.textContent = text;
@@ -4155,6 +4690,7 @@ function resetEntryForm() {
   entryNote.value = "";
   entryLost.value = "";
   if (entryRound) entryRound.value = "1";
+  if (entryKind) entryKind.value = "";
   modalNote(entryModalNote, ENTRY_NOTE_DEFAULT);
 }
 
@@ -4179,6 +4715,7 @@ function fillEntryForm(record) {
   setSelectValue(entryModule, record.module);
   setSelectValue(entryStatus, record.status);
   setSelectValue(entryErrorType, record.errorType);
+  setSelectValue(entryKind, record.kind || "");
 }
 
 function entryRecordFromForm(existing) {
@@ -4199,6 +4736,7 @@ function entryRecordFromForm(existing) {
     minutes: Number(entryTime.value) || 0,
     errorType: entryErrorType.value,
     reviewDate: entryReview.value,
+    kind: entrySubject.value.startsWith("英语") && entryKind ? entryKind.value : "",
     round: cleanMathRound(entryRound ? entryRound.value : existing?.round),
     reviewCount: existing ? existing.reviewCount : 0,
     note: entryNote.value.trim(),
@@ -4378,6 +4916,140 @@ function clearProgress() {
   render();
 }
 
+/* -------------------------------------------- 待复盘：知识点弹窗与复盘记录 */
+
+function openKnowledgeModal(id = "") {
+  if (!STORE) return;
+  const item = id ? STORE.getKnowledge(id) : null;
+  state.knowledgeEditId = item ? item.id : "";
+  knowledgeModalTitle.textContent = item ? "编辑知识点" : "新增知识点";
+  knowledgeDate.value = item ? item.date || TODAY_KEY : TODAY_KEY;
+  setSelectValue(knowledgeSubject, item && item.subject ? item.subject : "数学一");
+  knowledgeTopic.value = item ? item.topic : "";
+  setSelectValue(knowledgeStatus, item && item.status ? item.status : "待复盘");
+  knowledgeReview.value = item ? item.reviewDate || "" : "";
+  knowledgeDetail.value = item ? item.detail : "";
+  modalNote(knowledgeModalNote, item ? "改完保存，状态和下次复盘时间立刻更新。" : KNOWLEDGE_NOTE_DEFAULT);
+  document.body.classList.add("knowledge-open");
+  knowledgeTopic.focus();
+}
+
+function closeKnowledgeModal() {
+  document.body.classList.remove("knowledge-open");
+  state.knowledgeEditId = "";
+  modalNote(knowledgeModalNote, KNOWLEDGE_NOTE_DEFAULT);
+}
+
+function saveKnowledge() {
+  if (!STORE) return;
+  const topic = knowledgeTopic.value.trim();
+  if (!topic) {
+    modalNote(knowledgeModalNote, "知识点不能为空。", true);
+    knowledgeTopic.focus();
+    return;
+  }
+  const payload = {
+    date: knowledgeDate.value || TODAY_KEY,
+    subject: knowledgeSubject.value,
+    topic,
+    detail: knowledgeDetail.value.trim(),
+    reviewDate: knowledgeReview.value,
+    status: knowledgeStatus.value,
+  };
+  if (state.knowledgeEditId) {
+    STORE.updateKnowledge(state.knowledgeEditId, payload);
+  } else {
+    STORE.addKnowledge(payload);
+  }
+  closeKnowledgeModal();
+  render();
+}
+
+function reviewHistoryHTML(item, { full = false } = {}) {
+  const logs = [...(item.logs || [])].reverse();
+  if (!logs.length) {
+    return `<div class="knowledge-empty-log">还没有复盘记录，第一条会出现在这里。</div>`;
+  }
+  const visible = full ? logs : logs.slice(0, 3);
+  return `
+    <ol class="knowledge-logs${full ? " full" : ""}">
+      ${visible
+        .map(
+          (log) => `
+            <li>
+              <time>${escapeHtml(String(log.at || "").slice(0, 10))}</time>
+              <p>${escapeHtml(log.text)}</p>
+            </li>
+          `,
+        )
+        .join("")}
+    </ol>
+  `;
+}
+
+function openReviewLogModal(id) {
+  if (!STORE) return;
+  const item = STORE.getKnowledge(id);
+  if (!item) return;
+  state.reviewLogId = item.id;
+  reviewLogSub.textContent = `${item.subject || "未填科目"} · ${item.topic || "未填知识点"} · 已复盘 ${item.reviewCount} 次`;
+  reviewLogText.value = "";
+  reviewLogNext.value = "";
+  reviewLogHistory.innerHTML = reviewHistoryHTML(item, { full: true });
+  // 留空＝这次复盘收尾；要重排期就在下面填新日期，旧日期只作提示。
+  modalNote(
+    reviewLogNote,
+    item.reviewDate
+      ? `留空表示这条复盘收尾、不再挂在待复盘队列；现在排的下次是 ${item.reviewDate}，要重排就填新日期。`
+      : REVIEW_LOG_NOTE_DEFAULT,
+  );
+  document.body.classList.add("review-log-open");
+  reviewLogText.focus();
+}
+
+function closeReviewLogModal() {
+  document.body.classList.remove("review-log-open");
+  state.reviewLogId = "";
+  reviewLogText.value = "";
+  modalNote(reviewLogNote, REVIEW_LOG_NOTE_DEFAULT);
+}
+
+function saveReviewLog() {
+  if (!STORE || !state.reviewLogId) return;
+  const text = reviewLogText.value.trim();
+  if (!text) {
+    modalNote(reviewLogNote, "这次复盘写了什么？至少写一句。", true);
+    reviewLogText.focus();
+    return;
+  }
+  const updated = STORE.appendKnowledgeLog(state.reviewLogId, text);
+  if (!updated) {
+    modalNote(reviewLogNote, "这条知识点已经不在了。", true);
+    return;
+  }
+  // 填了下次时间就重新排队；下次到期时它会再回到「今天待复盘」。
+  if (reviewLogNext.value) {
+    STORE.updateKnowledge(updated.id, { reviewDate: reviewLogNext.value, status: "待复盘" });
+  } else if (updated.reviewDate) {
+    // 没填新日期＝收尾：顺手清掉旧的排期，卡片不再显示逾期。
+    STORE.updateKnowledge(updated.id, { reviewDate: "" });
+  }
+  closeReviewLogModal();
+  render();
+}
+
+/** 表内备注：失焦或回车直接写回记录，不弹窗。 */
+function saveInlineNote(input) {
+  if (!STORE || !input) return;
+  const record = STORE.getRecord(input.dataset.noteRecord);
+  if (!record) return;
+  const value = input.value.trim().slice(0, 2000);
+  if (value === (record.note || "")) return;
+  STORE.upsertRecord({ id: record.id, note: value });
+  input.classList.add("note-saved");
+  window.setTimeout(() => input.classList.remove("note-saved"), 1200);
+}
+
 /* ------------------------------------------------- 导出 / 导入 / 初始化 */
 
 function exportData() {
@@ -4400,7 +5072,7 @@ function importData() {
 
 function resetData() {
   if (!STORE) return;
-  if (!window.confirm("初始化全部数据？计划、成绩记录、章节进度和目标设置都会清空，且不能撤销。")) return;
+  if (!window.confirm("初始化全部数据？计划、成绩记录、章节进度、知识点与复盘历史都会清空，且不能撤销。")) return;
   if (!window.confirm("再确认一次：清空当前 iball 账号下的 XXRJ 数据？")) return;
   STORE.reset();
   state.mathSection = 0;
@@ -4412,7 +5084,7 @@ async function readImportFile(file) {
   try {
     const text = await file.text();
     const parsed = JSON.parse(text);
-    if (!window.confirm("导入备份会覆盖当前账号的计划、成绩和章节进度，继续吗？")) return;
+    if (!window.confirm("导入备份会覆盖当前账号的计划、成绩、章节进度和知识点记录，继续吗？")) return;
     STORE.replace(parsed);
     render();
   } catch {
@@ -4821,6 +5493,55 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const knowledgeNewButton = event.target.closest("[data-knowledge-new]");
+  if (knowledgeNewButton) {
+    openKnowledgeModal();
+    return;
+  }
+
+  const knowledgeEditButton = event.target.closest("[data-knowledge-edit]");
+  if (knowledgeEditButton) {
+    openKnowledgeModal(knowledgeEditButton.dataset.knowledgeEdit);
+    return;
+  }
+
+  const knowledgeLogButton = event.target.closest("[data-knowledge-log]");
+  if (knowledgeLogButton) {
+    openReviewLogModal(knowledgeLogButton.dataset.knowledgeLog);
+    return;
+  }
+
+  const knowledgeRemoveButton = event.target.closest("[data-knowledge-remove]");
+  if (knowledgeRemoveButton && STORE) {
+    const item = STORE.getKnowledge(knowledgeRemoveButton.dataset.knowledgeRemove);
+    if (item && window.confirm(`删除知识点「${item.topic || "未填"}」？复盘历史会一起删掉。`)) {
+      STORE.removeKnowledge(item.id);
+      render();
+    }
+    return;
+  }
+
+  const knowledgeSnoozeButton = event.target.closest("[data-knowledge-snooze]");
+  if (knowledgeSnoozeButton && STORE) {
+    const item = STORE.getKnowledge(knowledgeSnoozeButton.dataset.knowledgeSnooze);
+    const days = Number(knowledgeSnoozeButton.dataset.days) || 1;
+    if (item) {
+      STORE.updateKnowledge(item.id, {
+        reviewDate: dateKey(shiftDate(days)),
+        status: item.status === "已掌握" ? "已掌握" : "待复盘",
+      });
+      render();
+    }
+    return;
+  }
+
+  const reviewFilterButton = event.target.closest("[data-review-filter]");
+  if (reviewFilterButton) {
+    state.reviewFilter = reviewFilterButton.dataset.reviewFilter || "all";
+    render();
+    return;
+  }
+
   const modeButton = event.target.closest("[data-entry-mode]");
   if (modeButton) {
     setEntryMode(modeButton.dataset.entryMode);
@@ -4860,6 +5581,23 @@ progressModal.addEventListener("click", (event) => {
   if (event.target === progressModal) closeProgressModal();
 });
 
+document.getElementById("close-knowledge").addEventListener("click", closeKnowledgeModal);
+document.getElementById("cancel-knowledge").addEventListener("click", closeKnowledgeModal);
+document.getElementById("save-knowledge").addEventListener("click", saveKnowledge);
+knowledgeModal.addEventListener("click", (event) => {
+  if (event.target === knowledgeModal) closeKnowledgeModal();
+});
+knowledgeTopic.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") saveKnowledge();
+});
+
+document.getElementById("close-review-log").addEventListener("click", closeReviewLogModal);
+document.getElementById("cancel-review-log").addEventListener("click", closeReviewLogModal);
+document.getElementById("save-review-log").addEventListener("click", saveReviewLog);
+reviewLogModal.addEventListener("click", (event) => {
+  if (event.target === reviewLogModal) closeReviewLogModal();
+});
+
 document.addEventListener("change", (event) => {
   const target = event.target;
   if (target && target.id === "import-json-file") {
@@ -4867,6 +5605,20 @@ document.addEventListener("change", (event) => {
     target.value = "";
     readImportFile(file);
   }
+  if (target && target.hasAttribute && target.hasAttribute("data-knowledge-status") && STORE) {
+    const nextStatus = target.value;
+    const item = STORE.updateKnowledge(target.dataset.knowledgeStatus, {
+      status: nextStatus,
+      ...(nextStatus === "已掌握" ? { reviewDate: "" } : {}),
+    });
+    if (item) render();
+  }
+});
+
+/** 表内备注失焦即保存，不需要再点保存按钮。 */
+document.addEventListener("focusout", (event) => {
+  const input = event.target;
+  if (input && input.matches && input.matches("[data-note-record]")) saveInlineNote(input);
 });
 
 /** 复盘编号输入框：手打数字也同步「下次复盘」的间隔和日期。 */
@@ -4878,9 +5630,18 @@ document.addEventListener("input", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  const target = event.target;
+  if (event.key === "Enter" && target && target.matches && target.matches("[data-note-record]")) {
+    event.preventDefault();
+    saveInlineNote(target);
+    target.blur();
+    return;
+  }
   if (event.key !== "Escape") return;
   closeProgressModal();
   closeTaskModal();
+  closeKnowledgeModal();
+  closeReviewLogModal();
   closeEntry();
 });
 
@@ -5010,9 +5771,9 @@ function paintAccountChrome() {
     }
     if (bannerAction) {
       bannerAction.textContent = "去主站登录";
-      // 主站的静态目录要重新构建后才会带 /xxrj/，这里先落到主站首页，
-      // 避免登录回跳时撞上还没发布的子目录。
-      bannerAction.href = `${MAIN_SITE_URL}/`;
+      // 带上 next：主站登录页认这个参数，登录成功后会直接跳回 /xxrj/，
+      // 不会再停在小屋首页让用户自己找回来。
+      bannerAction.href = `${MAIN_SITE_URL}/index.html?next=/xxrj/`;
     }
     if (syncNote) {
       syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：只读镜像，数据只在本机；需要账号同步请到主站 ${MAIN_SITE_URL}。`;

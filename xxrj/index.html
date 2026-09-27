@@ -50,7 +50,12 @@
           <button class="nav-item" data-screen="mistakes">
             <i data-lucide="notebook-tabs"></i>
             <span>不会题 / 错题本</span>
-            <span class="nav-badge">31</span>
+            <span class="nav-badge" id="mistakes-badge" hidden></span>
+          </button>
+          <button class="nav-item" data-screen="daily-review">
+            <i data-lucide="notebook-pen"></i>
+            <span>待复盘</span>
+            <span class="nav-badge" id="review-badge" hidden></span>
           </button>
         </nav>
 
@@ -142,6 +147,10 @@
         <i data-lucide="cpu"></i>
         <span>408</span>
       </button>
+      <button data-screen="daily-review">
+        <i data-lucide="notebook-pen"></i>
+        <span>复盘</span>
+      </button>
     </nav>
 
     <div class="modal-backdrop" id="entry-modal">
@@ -226,6 +235,15 @@
                 <option>英语一</option>
                 <option>英语二</option>
                 <option>408</option>
+              </select>
+            </div>
+            <div class="field" id="entry-kind-field" hidden>
+              <label for="entry-kind">英语类型</label>
+              <select id="entry-kind">
+                <option value="">自动判断</option>
+                <option value="paper">整套卷</option>
+                <option value="reading">单纯阅读</option>
+                <option value="other">其他模块</option>
               </select>
             </div>
             <div class="field">
@@ -452,6 +470,105 @@
             <button class="primary-btn" id="save-progress">
               <i data-lucide="check"></i>
               <span>保存进度</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="knowledge-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="knowledge-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="knowledge-title">新增知识点</h2>
+            <p class="modal-sub">记下今天卡住的概念、公式或题型，并排好下次复盘的时间。</p>
+          </div>
+          <button class="icon-btn" id="close-knowledge" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="knowledge-date">学习日期</label>
+              <input id="knowledge-date" type="date" />
+            </div>
+            <div class="field">
+              <label for="knowledge-subject">科目</label>
+              <select id="knowledge-subject">
+                <option>数学一</option>
+                <option>英语一</option>
+                <option>英语二</option>
+                <option>408</option>
+                <option>政治</option>
+              </select>
+            </div>
+            <div class="field span-12">
+              <label for="knowledge-topic">知识点</label>
+              <input id="knowledge-topic" type="text" placeholder="例如 无穷级数敛散性判定" />
+            </div>
+            <div class="field">
+              <label for="knowledge-status">状态</label>
+              <select id="knowledge-status">
+                <option>待复盘</option>
+                <option>已复盘</option>
+                <option>已掌握</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="knowledge-review">下次复盘</label>
+              <input id="knowledge-review" type="date" />
+            </div>
+            <div class="field span-12">
+              <label for="knowledge-detail">卡点 / 备注</label>
+              <textarea id="knowledge-detail" placeholder="当时卡在哪一步、错在哪个概念"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="knowledge-modal-note">保存后按状态进入待复盘队列；复盘笔记在卡片上一条条追加。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-knowledge">取消</button>
+            <button class="primary-btn" id="save-knowledge">
+              <i data-lucide="check"></i>
+              <span>保存知识点</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="review-log-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="review-log-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="review-log-title">写复盘</h2>
+            <p class="modal-sub" id="review-log-sub">这次能独立做对了吗？还卡在哪一步？</p>
+          </div>
+          <button class="icon-btn" id="close-review-log" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field span-12">
+              <label for="review-log-text">这次复盘</label>
+              <textarea id="review-log-text" placeholder="例如 这次先自己推了一遍判定步骤，比值法没再忘开 n 次方；下次练交错级数"></textarea>
+            </div>
+            <div class="field span-12">
+              <label for="review-log-next">下次复盘（可选）</label>
+              <input id="review-log-next" type="date" />
+            </div>
+          </div>
+          <div class="review-log-history" id="review-log-history"></div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="review-log-note">这条笔记会追加到历史里，不会覆盖之前写过的内容。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-review-log">取消</button>
+            <button class="primary-btn" id="save-review-log">
+              <i data-lucide="check"></i>
+              <span>追加复盘</span>
             </button>
           </div>
         </div>

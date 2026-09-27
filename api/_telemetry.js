@@ -18,6 +18,10 @@ const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const ONLINE_WINDOW_MS = 3 * 60 * 1000;
 const FLUSH_DELAY_MS = 2500;
 const MAX_ACTIVITY_USERS = 200;
+const MAX_MODULES = 24;
+const MAX_DAYS = 14;
+// 学生都在国内，按 UTC+8 切天，避免 VPS 用 UTC 时「今天」少 8 小时。
+const DAY_OFFSET_MS = 8 * 60 * 60 * 1000;
 
 const annotations = new WeakMap();
 let memory = null;
@@ -143,6 +147,55 @@ function short(value, max = 80) {
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
+/** UTC+8 的 YYYY-MM-DD，用来按「国内今天」汇总在线时长。 */
+function dayKey(timestamp = Date.now()) {
+  return new Date(Number(timestamp) + DAY_OFFSET_MS)
+    .toISOString()
+    .slice(0, 10);
+}
+
+/**
+ * 心跳只带页面路径和标题，模块名在服务端推。
+ * 小屋是单页应用，用页面标题区分站内的计划 / 错题本 / 待复盘等页面。
+ */
+function moduleForPage(page, title = "") {
+  const path = String(page || "")
+    .trim()
+    .toLowerCase();
+  if (path.startsWith("/xxrj")) {
+    const label = String(title || "")
+      .split(/[·|｜|,，:：\-—]/)[0]
+      .trim()
+      .slice(0, 20);
+    return label ? `小屋 · ${label}` : "小屋";
+  }
+  const rules = [
+    ["/vocab", "词汇库"],
+    ["/review", "错词复习"],
+    ["/quiz", "单词测试"],
+    ["/leaderboard", "排行榜"],
+    ["/listen", "听力"],
+    ["/shadow", "跟读"],
+    ["/speaking", "口语"],
+    ["/intensive", "精读"],
+    ["/periodical", "外刊"],
+    ["/reading", "阅读"],
+    ["/movie", "影视"],
+    ["/writing", "写作"],
+    ["/kaoyan", "考研"],
+    ["/admin", "控制台"],
+  ];
+  for (const [prefix, label] of rules) {
+    if (path.startsWith(prefix)) {
+      return label;
+    }
+  }
+  if (!path || path === "/" || path.endsWith("/index.html")) {
+    return "首页";
+  }
+  return "其他";
+}
+
 async function record(event) {
   const store = await load();
   store.events.push({
@@ -165,41 +218,105 @@ async function record(event) {
   scheduleFlush();
 }
 
+/**
+ * 记一次页面心跳，并顺手算出在线时长和模块使用。
+ *
+ * 在线时长按相邻两次心跳的间隔累加，间隔超过 ONLINE_WINDOW_MS 的那段不算
+ * （合盖、关网页或长时间挂后台都会自然断开），并记成新的一次会话。这一段
+ * 时间算在「上一次心跳所在模块」头上，更接近实际待在哪。
+ */
 async function recordActivity({ userId, username, page, title, ua, ip }) {
   if (!userId) {
     return null;
   }
   const store = await load();
   const key = String(userId);
-  const now = new Date().toISOString();
+  const nowMs = Date.now();
+  const now = new Date(nowMs).toISOString();
   const current = store.activity[key] || {
     userId: key,
     username: "",
     page: "",
     title: "",
     beats: 0,
+    sessions: 0,
+    onlineMs: 0,
+    modules: {},
+    days: {},
     firstSeenAt: now,
     lastSeenAt: now,
     pages: {},
   };
   const pageKey = short(page, 60) || "/";
+  const module = short(moduleForPage(pageKey, title), 40) || "其他";
+  const previousSeenMs = Date.parse(current.lastSeenAt || "");
+  const gapMs = Number.isFinite(previousSeenMs) ? nowMs - previousSeenMs : 0;
+  const countedMs = gapMs > 0 && gapMs <= ONLINE_WINDOW_MS ? gapMs : 0;
+
   current.username = short(username, 32) || current.username;
   current.page = pageKey;
   current.title = short(title, 60);
   current.beats = Number(current.beats || 0) + 1;
+  current.sessions = Number(current.sessions || 0) + (gapMs > ONLINE_WINDOW_MS ? 1 : 0);
+  current.modules =
+    current.modules && typeof current.modules === "object" ? current.modules : {};
+  const bucket = current.modules[module] || { beats: 0, ms: 0 };
+  bucket.beats = Number(bucket.beats || 0) + 1;
+  current.modules[module] = bucket;
+
+  if (countedMs > 0) {
+    current.onlineMs = Number(current.onlineMs || 0) + countedMs;
+    // 间隔算给上一次心跳所在的模块，代表这段时间实际待在哪。
+    const spentOn = current.lastModule && current.modules[current.lastModule]
+      ? current.lastModule
+      : module;
+    current.modules[spentOn].ms = Number(current.modules[spentOn].ms || 0) + countedMs;
+    current.days = current.days && typeof current.days === "object" ? current.days : {};
+    const day = dayKey(nowMs);
+    current.days[day] = Number(current.days[day] || 0) + countedMs;
+  }
+  current.lastModule = module;
   current.lastSeenAt = now;
   current.lastIp = short(privacyIp(ip), 16);
   current.ua = short(ua, 60);
   current.pages = current.pages && typeof current.pages === "object" ? current.pages : {};
   current.pages[pageKey] = Number(current.pages[pageKey] || 0) + 1;
-  // 页面计数最多保留 40 个，防止长年累月把文件撑大。
+  // 页面、模块、按天时长都有上限，防止长年累月把文件撑大。
   const pages = Object.entries(current.pages).sort(
     (left, right) => right[1] - left[1],
   );
   current.pages = Object.fromEntries(pages.slice(0, 40));
+  const modules = Object.entries(current.modules)
+    .sort(
+      (left, right) =>
+        Number(right[1]?.ms || 0) - Number(left[1]?.ms || 0) ||
+        Number(right[1]?.beats || 0) - Number(left[1]?.beats || 0),
+    )
+    .slice(0, MAX_MODULES);
+  current.modules = Object.fromEntries(modules);
+  const days = Object.entries(current.days)
+    .sort((left, right) => String(right[0]).localeCompare(String(left[0])))
+    .slice(0, MAX_DAYS);
+  current.days = Object.fromEntries(days);
+
   store.activity[key] = current;
   scheduleFlush();
   return current;
+}
+
+/** 删除账号时一起忘掉这个人的活动记录，控制台里不留半个人。 */
+async function forgetActivity(userId) {
+  const key = String(userId || "").trim();
+  if (!key) {
+    return false;
+  }
+  const store = await load();
+  if (!store.activity || !store.activity[key]) {
+    return false;
+  }
+  delete store.activity[key];
+  scheduleFlush();
+  return true;
 }
 
 /** 处理函数里调用 telemetry.annotate(response, {...}) 给这次请求打标签。 */
@@ -296,15 +413,38 @@ function summarize(events) {
 async function summary() {
   const store = await load();
   const now = Date.now();
+  const today = dayKey(now);
   const activity = Object.values(store.activity || {})
-    .map((entry) => ({
-      ...entry,
-      online: now - Date.parse(entry.lastSeenAt || 0) < ONLINE_WINDOW_MS,
-      minutesAgo: Math.max(
-        0,
-        Math.round((now - Date.parse(entry.lastSeenAt || 0)) / 60000),
-      ),
-    }))
+    .map((entry) => {
+      const days = Object.entries(entry.days || {})
+        .map(([date, ms]) => ({ date, ms: Math.round(Number(ms) || 0) }))
+        .sort((left, right) => String(right.date).localeCompare(String(left.date)))
+        .slice(0, 7);
+      const modules = Object.entries(entry.modules || {})
+        .map(([name, stats]) => ({
+          name,
+          beats: Number(stats?.beats) || 0,
+          ms: Math.round(Number(stats?.ms) || 0),
+        }))
+        .sort(
+          (left, right) =>
+            right.ms - left.ms || right.beats - left.beats || left.name.localeCompare(right.name),
+        )
+        .slice(0, 8);
+      return {
+        ...entry,
+        online: now - Date.parse(entry.lastSeenAt || 0) < ONLINE_WINDOW_MS,
+        minutesAgo: Math.max(
+          0,
+          Math.round((now - Date.parse(entry.lastSeenAt || 0)) / 60000),
+        ),
+        onlineMs: Math.round(Number(entry.onlineMs) || 0),
+        onlineMsToday: Math.round(Number((entry.days || {})[today]) || 0),
+        sessions: Math.max(1, Number(entry.sessions) || 0),
+        modules,
+        days,
+      };
+    })
     .sort(
       (left, right) =>
         Date.parse(right.lastSeenAt || 0) - Date.parse(left.lastSeenAt || 0),
@@ -321,9 +461,12 @@ module.exports = {
   MAX_EVENTS,
   ONLINE_WINDOW_MS,
   annotate,
+  dayKey,
   flush,
+  forgetActivity,
   hashIp,
   load,
+  moduleForPage,
   recent,
   record,
   recordActivity,

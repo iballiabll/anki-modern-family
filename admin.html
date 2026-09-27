@@ -11,7 +11,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta
       name="description"
-      content="站长控制台：账号、在线情况、接口调用、密码找回申请、邀请码与单词测试规模。"
+      content="站长控制台：账号、在线情况、接口调用、密码找回申请、邀请码、数据备份与单词测试规模。"
     />
     <title>控制台 · iball的小屋</title>
     <link
@@ -116,23 +116,48 @@
 
         <section class="admin-card">
           <header class="admin-card-head">
+            <h2>数据备份</h2>
+            <p>
+              把服务器数据目录快照提交到私有备份仓库。这里只显示时间、数量和提交链接，
+              不显示任何数据正文。
+            </p>
+          </header>
+          <div class="admin-backup">
+            <div class="admin-backup-head">
+              <span id="backupBadge" class="admin-badge">备份状态未知</span>
+              <button id="backupRun" class="admin-button primary" type="button">
+                立即备份
+              </button>
+            </div>
+            <dl id="backupMeta" class="admin-backup-meta"></dl>
+            <p id="backupMessage" class="admin-message" role="status" hidden></p>
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <header class="admin-card-head">
             <h2>在线与活动</h2>
-            <p>3 分钟内有心跳算在线；只记录页面路径和标题，不记录内容。</p>
+            <p>
+              3 分钟内有心跳算在线，页面切到后台就停止计时。在线时长按心跳间隔累加，
+              模块名从页面路径推出来；只记录路径、标题和时长，不记录内容。
+            </p>
           </header>
           <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table admin-table-wide">
               <thead>
                 <tr>
                   <th>账号</th>
                   <th>状态</th>
                   <th>当前页面</th>
                   <th>心跳</th>
+                  <th>在线时长</th>
+                  <th>模块使用</th>
                   <th>最近活动</th>
                 </tr>
               </thead>
               <tbody id="activityBody">
                 <tr class="admin-empty-row">
-                  <td colspan="5">暂无活动记录。</td>
+                  <td colspan="7">暂无活动记录。</td>
                 </tr>
               </tbody>
             </table>
@@ -142,13 +167,17 @@
         <section class="admin-card">
           <header class="admin-card-head">
             <h2>账号</h2>
-            <p>只看得到数据规模（条目数、字节、错词条数），看不到正文。</p>
+            <p>
+              只看得到数据规模（条目数、字节、错词条数），看不到正文。停用会立刻把对方
+              踢下线并禁止再登录；删除会连进度、成绩和活动记录一起清掉，不可撤销。
+            </p>
           </header>
           <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table admin-table-wide">
               <thead>
                 <tr>
                   <th>账号</th>
+                  <th>状态</th>
                   <th>邮箱</th>
                   <th>注册时间</th>
                   <th>数据量</th>
@@ -159,11 +188,12 @@
               </thead>
               <tbody id="userBody">
                 <tr class="admin-empty-row">
-                  <td colspan="7">还没有账号数据。</td>
+                  <td colspan="8">还没有账号数据。</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p id="userMessage" class="admin-message" role="status" hidden></p>
         </section>
 
         <section class="admin-card">

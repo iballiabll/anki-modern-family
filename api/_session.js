@@ -216,7 +216,7 @@ async function resolveSessionUser(request) {
 
   if (session.userId) {
     const user = await findById(session.userId).catch(() => null);
-    if (!user) {
+    if (!user || user.disabled) {
       return null;
     }
     if ((Number(user.authVersion) || 1) !== (Number(session.authVersion) || 1)) {
@@ -227,7 +227,7 @@ async function resolveSessionUser(request) {
 
   // 旧版 Cookie：没有 userId，改过密码的账号一律不接受。
   const legacy = await findByUsername(session.username).catch(() => null);
-  if (!legacy || legacy.passwordUpdatedAt) {
+  if (!legacy || legacy.disabled || legacy.passwordUpdatedAt) {
     return null;
   }
   return legacy;

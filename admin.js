@@ -11,10 +11,14 @@
   "use strict";
 
   const POLL_MS = 15000;
+  const BACKUP_POLL_MS = 4000;
 
   const state = {
     loading: false,
     pollTimer: null,
+    backupTimer: null,
+    backupStarting: false,
+    backup: null,
     tokens: new Map(),
     resets: [],
     users: [],
@@ -45,8 +49,13 @@
       "inviteStatus",
       "inviteMessage",
       "endpointList",
+      "backupBadge",
+      "backupRun",
+      "backupMeta",
+      "backupMessage",
       "activityBody",
       "userBody",
+      "userMessage",
       "resetBody",
       "resetMessage",
       "requestList",
@@ -136,6 +145,42 @@
     return `${(size / 1024 / 1024).toFixed(2)} MB`;
   }
 
+  function formatDuration(ms) {
+    const total = Math.max(0, Math.round(Number(ms) || 0));
+    if (total < 60000) {
+      return total > 0 ? "不到 1 分钟" : "0 分钟";
+    }
+    const minutes = Math.round(total / 60000);
+    if (minutes < 60) {
+      return `${minutes} 分钟`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
+    return rest ? `${hours} 小时 ${rest} 分` : `${hours} 小时`;
+  }
+
+  /** 模块使用：按停留时长排序，只展示前几个，剩下的收成 +N。 */
+  function moduleUsageHTML(modules, limit = 3) {
+    const rows = (Array.isArray(modules) ? modules : []).filter(
+      (item) => item && item.name,
+    );
+    if (rows.length === 0) {
+      return '<span class="admin-sub">还没有模块记录</span>';
+    }
+    const chips = rows.slice(0, limit).map((item) => {
+      const ms = Number(item.ms) || 0;
+      const beats = Number(item.beats) || 0;
+      const amount = ms > 0 ? formatDuration(ms) : `${beats} 次`;
+      return `<span class="admin-module" title="心跳 ${beats} 次 · 累计 ${formatDuration(
+        ms,
+      )}"><b>${escapeHtml(item.name)}</b><em>${escapeHtml(amount)}</em></span>`;
+    });
+    if (rows.length > limit) {
+      chips.push(`<span class="admin-module more">+${rows.length - limit}</span>`);
+    }
+    return `<div class="admin-modules">${chips.join("")}</div>`;
+  }
+
   function setMessage(element, message, tone = "") {
     if (!element) {
       return;
@@ -183,10 +228,18 @@
     const calls = Number(monitor?.callsLastHour) || 0;
     const errors = Number(monitor?.errorsLastHour) || 0;
     const avg = Number(monitor?.avgMsLastHour) || 0;
+    const onlineTodayMs = (
+      Array.isArray(monitor?.activity) ? monitor.activity : []
+    ).reduce((sum, row) => sum + (Number(row.onlineMsToday) || 0), 0);
     const { accounts, scored, playsToday, active } = state.stats;
 
     elements.statCards.innerHTML = [
-      statCard("当前在线", `${online} 人`, "3 分钟内有心跳", "gold"),
+      statCard(
+        "当前在线",
+        `${online} 人`,
+        `3 分钟内有心跳 · 今日累计 ${formatDuration(onlineTodayMs)}`,
+        "gold",
+      ),
       statCard("近一小时调用", `${calls} 次`, "含所有接口", "blue"),
       statCard(
         "近一小时错误",
@@ -258,7 +311,7 @@
     const rows = Array.isArray(activity) ? activity : [];
     if (rows.length === 0) {
       elements.activityBody.innerHTML =
-        '<tr class="admin-empty-row"><td colspan="5">还没有页面心跳。学生打开任意页面后会出现在这里。</td></tr>';
+        '<tr class="admin-empty-row"><td colspan="7">还没有页面心跳。学生打开任意页面后会出现在这里。</td></tr>';
       return;
     }
     elements.activityBody.innerHTML = rows
@@ -272,7 +325,15 @@
           <td>${escapeHtml(row.title || "—")}<span class="admin-sub">${escapeHtml(
             row.page || "",
           )}</span></td>
-          <td>${Number(row.beats) || 0} 次</td>
+          <td>${Number(row.beats) || 0} 次<span class="admin-sub">${
+            Math.max(1, Number(row.sessions) || 0)
+          } 次会话</span></td>
+          <td>今天 ${escapeHtml(
+            formatDuration(row.onlineMsToday),
+          )}<span class="admin-sub">累计 ${escapeHtml(
+            formatDuration(row.onlineMs),
+          )}</span></td>
+          <td>${moduleUsageHTML(row.modules)}</td>
           <td>${escapeHtml(String(row.minutesAgo ?? 0))} 分钟前<span class="admin-sub">${formatDateTime(
             row.lastSeenAt,
           )}</span></td>
@@ -285,7 +346,7 @@
     state.users = Array.isArray(users) ? users : [];
     if (state.users.length === 0) {
       elements.userBody.innerHTML =
-        '<tr class="admin-empty-row"><td colspan="7">还没有注册账号。</td></tr>';
+        '<tr class="admin-empty-row"><td colspan="8">还没有注册账号。</td></tr>';
       return;
     }
     elements.userBody.innerHTML = state.users
@@ -296,12 +357,34 @@
               token.expiresAt,
             )}</span></div>`
           : '<span class="admin-sub">未生成</span>';
-        return `<tr>
+        const disabled = Boolean(user.disabled);
+        const statusCell = disabled
+          ? `<span class="admin-pill" data-tone="muted">已停用</span><span class="admin-sub">${formatDateTime(
+              user.disabledAt,
+            )}${
+              user.disabledReason ? ` · ${escapeHtml(user.disabledReason)}` : ""
+            }</span>`
+          : `<span class="admin-pill" data-tone="live">正常</span>${
+              user.online ? '<span class="admin-sub">此刻在线</span>' : ""
+            }`;
+        const toggleCell = disabled
+          ? `<button class="admin-mini" type="button" data-user-enable="${escapeHtml(
+              user.id,
+            )}" data-user-name="${escapeHtml(user.username)}">恢复</button>`
+          : `<button class="admin-mini" type="button" data-user-disable="${escapeHtml(
+              user.id,
+            )}" data-user-name="${escapeHtml(user.username)}">停用</button>`;
+        return `<tr${disabled ? ' class="admin-row-disabled"' : ""}>
           <td><span class="admin-account">${escapeHtml(user.username)}</span>${
             user.online
               ? '<span class="admin-pill" data-tone="live">在线</span>'
               : ""
-          }<span class="admin-sub">最近登录 ${formatDateTime(user.lastLoginAt)}</span></td>
+          }<span class="admin-sub">最近登录 ${formatDateTime(
+            user.lastLoginAt,
+          )}</span><span class="admin-sub">今天在线 ${escapeHtml(
+            formatDuration(user.onlineMsToday),
+          )} · 累计 ${escapeHtml(formatDuration(user.onlineMs))}</span></td>
+          <td>${statusCell}</td>
           <td>${escapeHtml(user.email || "—")}</td>
           <td>${formatDateTime(user.createdAt)}</td>
           <td>${Number(user.keys) || 0} 条 · ${formatBytes(user.bytes)}</td>
@@ -317,6 +400,10 @@
             <button class="admin-mini" type="button" data-reset-token="${escapeHtml(
               user.id,
             )}">生成重置码</button>
+            ${toggleCell}
+            <button class="admin-mini danger" type="button" data-user-delete="${escapeHtml(
+              user.id,
+            )}" data-user-name="${escapeHtml(user.username)}">删除</button>
           </div>${tokenCell}</td>
         </tr>`;
       })
@@ -389,6 +476,171 @@
       .join("");
   }
 
+  function backupMetaRow(label, value) {
+    const row = document.createElement("div");
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const detail = document.createElement("dd");
+    if (value instanceof Node) {
+      detail.appendChild(value);
+    } else {
+      detail.textContent = String(value);
+    }
+    row.append(term, detail);
+    return row;
+  }
+
+  function renderBackup(backup) {
+    if (!elements.backupBadge || !elements.backupMeta) {
+      return;
+    }
+    state.backup = backup || null;
+    const configured = Boolean(backup?.configured);
+    const running = Boolean(backup?.running);
+    const status = backup?.status || {};
+    const lastStatus = String(status.lastStatus || "never");
+    const badge = elements.backupBadge;
+
+    if (running) {
+      badge.textContent = "正在备份…";
+      badge.dataset.tone = "warn";
+    } else if (!configured) {
+      badge.textContent = "未配置备份 token";
+      badge.dataset.tone = "error";
+    } else if (lastStatus === "ok") {
+      badge.textContent = `上次备份成功 · ${formatDateTime(status.lastRunAt)}`;
+      delete badge.dataset.tone;
+    } else if (lastStatus === "error") {
+      badge.textContent = `上次备份失败 · ${formatDateTime(status.lastRunAt)}`;
+      badge.dataset.tone = "error";
+    } else {
+      badge.textContent = "还没有备份记录";
+      badge.dataset.tone = "warn";
+    }
+
+    elements.backupMeta.textContent = "";
+    elements.backupMeta.appendChild(
+      backupMetaRow(
+        "备份仓库",
+        `${backup?.repo || "—"} · ${backup?.branch || "—"}`,
+      ),
+    );
+    if (lastStatus !== "never") {
+      const seconds = Math.max(1, Math.round((Number(status.durationMs) || 0) / 1000));
+      elements.backupMeta.appendChild(
+        backupMetaRow(
+          "最近一次",
+          `${formatDateTime(status.lastRunAt)} · 耗时 ${seconds} 秒${
+            status.trigger ? ` · 触发方式 ${status.trigger}` : ""
+          }`,
+        ),
+      );
+      elements.backupMeta.appendChild(
+        backupMetaRow(
+          "数据规模",
+          `${Number(status.fileCount) || 0} 个文件 · ${formatBytes(status.bytes)}`,
+        ),
+      );
+    }
+    if (status.snapshot) {
+      elements.backupMeta.appendChild(backupMetaRow("快照目录", status.snapshot));
+    }
+    const commitUrl = String(status.commitUrl || "");
+    if (/^https:\/\/github\.com\//.test(commitUrl)) {
+      const link = document.createElement("a");
+      link.href = commitUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = String(status.commitSha || "").slice(0, 12) || "查看提交";
+      elements.backupMeta.appendChild(backupMetaRow("GitHub 提交", link));
+    }
+
+    if (elements.backupRun) {
+      elements.backupRun.disabled = running || !configured || state.backupStarting;
+      elements.backupRun.textContent = running ? "备份中…" : "立即备份";
+    }
+    if (lastStatus === "error" && status.message) {
+      setMessage(elements.backupMessage, status.message, "error");
+    } else if (!configured) {
+      setMessage(
+        elements.backupMessage,
+        "服务器缺少 GITHUB_BACKUP_TOKEN，配置好环境变量后刷新本页。",
+        "warn",
+      );
+    } else {
+      setMessage(elements.backupMessage, "");
+    }
+  }
+
+  async function loadBackupStatus({ silent = false } = {}) {
+    try {
+      const data = await requestJson("./api/backup");
+      renderBackup(data.backup);
+      if (data.backup?.running) {
+        startBackupPolling();
+      } else {
+        stopBackupPolling();
+      }
+    } catch (error) {
+      if (error?.status === 403 || error?.status === 401) {
+        return;
+      }
+      stopBackupPolling();
+      if (!silent) {
+        setMessage(
+          elements.backupMessage,
+          error?.message || "读取备份状态失败",
+          "error",
+        );
+      }
+    }
+  }
+
+  function startBackupPolling() {
+    if (state.backupTimer) {
+      return;
+    }
+    state.backupTimer = setInterval(() => {
+      loadBackupStatus({ silent: true });
+    }, BACKUP_POLL_MS);
+  }
+
+  function stopBackupPolling() {
+    if (state.backupTimer) {
+      clearInterval(state.backupTimer);
+      state.backupTimer = null;
+    }
+  }
+
+  async function startBackup() {
+    if (state.backupStarting) {
+      return;
+    }
+    state.backupStarting = true;
+    if (elements.backupRun) {
+      elements.backupRun.disabled = true;
+    }
+    setMessage(elements.backupMessage, "");
+    try {
+      const data = await requestJson("./api/backup", {
+        method: "POST",
+        body: JSON.stringify({ action: "backup" }),
+      });
+      renderBackup({ ...(state.backup || {}), ...(data.backup || {}), running: true });
+      setMessage(elements.backupMessage, data.message || "备份已开始。");
+      startBackupPolling();
+    } catch (error) {
+      setMessage(elements.backupMessage, error?.message || "备份失败", "error");
+      renderBackup(state.backup);
+    } finally {
+      state.backupStarting = false;
+      if (elements.backupRun) {
+        elements.backupRun.disabled =
+          Boolean(state.backup?.running) || !state.backup?.configured;
+      }
+    }
+  }
+
   async function loadOverview({ silent = false } = {}) {
     if (state.loading) {
       return;
@@ -419,6 +671,7 @@
       renderActivity(data.monitor?.activity);
       renderUsers(data.users);
       renderResets(data.resets);
+      await loadBackupStatus({ silent: true });
       setLiveState("live", `实时同步中 · ${formatClock(data.serverTime)}`);
     } catch (error) {
       if (error.status === 403 || error.status === 401) {
@@ -550,6 +803,57 @@
     }
   }
 
+  async function toggleUser(userId, name, disabled) {
+    if (
+      disabled &&
+      !window.confirm(
+        `停用 ${name}？对方会立刻被踢下线，并且不能用这个账号登录。`,
+      )
+    ) {
+      return;
+    }
+    setMessage(elements.userMessage, "");
+    try {
+      const data = await requestJson("./api/admin", {
+        method: "POST",
+        body: JSON.stringify({
+          action: disabled ? "user-disable" : "user-enable",
+          userId,
+        }),
+      });
+      setMessage(
+        elements.userMessage,
+        data.message || (disabled ? "已停用。" : "已恢复。"),
+        disabled ? "warn" : "",
+      );
+      await loadOverview({ silent: true });
+    } catch (error) {
+      setMessage(elements.userMessage, error?.message || "操作失败", "error");
+    }
+  }
+
+  async function deleteAccount(userId, name) {
+    if (
+      !window.confirm(
+        `删除 ${name}？这个账号的进度、成绩和活动记录会一起清掉，无法恢复。`,
+      )
+    ) {
+      return;
+    }
+    setMessage(elements.userMessage, "");
+    try {
+      const data = await requestJson("./api/admin", {
+        method: "POST",
+        body: JSON.stringify({ action: "user-delete", userId, confirm: true }),
+      });
+      state.tokens.delete(userId);
+      setMessage(elements.userMessage, data.message || "账号已删除。", "warn");
+      await loadOverview({ silent: true });
+    } catch (error) {
+      setMessage(elements.userMessage, error?.message || "删除失败", "error");
+    }
+  }
+
   function startPolling() {
     stopPolling();
     state.pollTimer = setInterval(() => {
@@ -562,6 +866,7 @@
       clearInterval(state.pollTimer);
       state.pollTimer = null;
     }
+    stopBackupPolling();
   }
 
   function bindEvents() {
@@ -578,9 +883,36 @@
       elements.inviteInput.value = "";
       saveInvite("");
     });
+    elements.backupRun.addEventListener("click", startBackup);
 
     for (const body of [elements.userBody, elements.resetBody]) {
       body.addEventListener("click", (event) => {
+        const disableButton = event.target.closest("[data-user-disable]");
+        if (disableButton) {
+          toggleUser(
+            disableButton.dataset.userDisable,
+            disableButton.dataset.userName || "该账号",
+            true,
+          );
+          return;
+        }
+        const enableButton = event.target.closest("[data-user-enable]");
+        if (enableButton) {
+          toggleUser(
+            enableButton.dataset.userEnable,
+            enableButton.dataset.userName || "该账号",
+            false,
+          );
+          return;
+        }
+        const deleteButton = event.target.closest("[data-user-delete]");
+        if (deleteButton) {
+          deleteAccount(
+            deleteButton.dataset.userDelete,
+            deleteButton.dataset.userName || "该账号",
+          );
+          return;
+        }
         const tokenButton = event.target.closest("[data-reset-token]");
         if (tokenButton) {
           issueResetToken(tokenButton.dataset.resetToken);
@@ -596,6 +928,7 @@
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
         pollActivity();
+        loadBackupStatus({ silent: true });
       }
     });
   }

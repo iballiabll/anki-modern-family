@@ -435,6 +435,35 @@ function totalScoreFor(bests = {}) {
   return totalEntryFor(bests)?.percent ?? null;
 }
 
+/** 管理端删除账号时用：清掉这个人的最好成绩和没交卷的测试会话。 */
+async function deleteUserData(userId) {
+  const id = String(userId || "").trim();
+  if (!id) {
+    return false;
+  }
+  return withWriteLock(async () => {
+    const [bests, sessions] = await Promise.all([readBestsStore(), readSessions()]);
+    const hadBests = Boolean(bests.bests && bests.bests[id]);
+    if (bests.bests) {
+      delete bests.bests[id];
+    }
+    const keptSessions = Object.entries(sessions.sessions || {}).filter(
+      ([, session]) => String(session?.userId || "") !== id,
+    );
+    const hadSessions = keptSessions.length !== Object.keys(sessions.sessions || {}).length;
+    if (hadBests) {
+      await writeJsonFile(dataFile("quiz.json"), bests);
+    }
+    if (hadSessions) {
+      await writeJsonFile(dataFile("quiz-sessions.json"), {
+        version: 1,
+        sessions: Object.fromEntries(keptSessions),
+      });
+    }
+    return hadBests || hadSessions;
+  });
+}
+
 async function allBests() {
   const store = await readBestsStore();
   return store.bests || {};
@@ -474,6 +503,7 @@ module.exports = {
   cleanMeaning,
   createSession,
   consumeSession,
+  deleteUserData,
   loadPools,
   normalizeScope,
   poolSummary,

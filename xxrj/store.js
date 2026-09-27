@@ -10,12 +10,19 @@
   "use strict";
 
   const KEY = "yantu:v1";
-  const VERSION = 2;
+  const VERSION = 3;
   const MIN_ROUND = 1;
   const MAX_ROUND = 5;
+  const KNOWLEDGE_STATUS = ["待复盘", "已复盘", "已掌握"];
 
   function nowISO() {
     return new Date().toISOString();
+  }
+
+  /** 本地日期（YYYY-MM-DD），和 app.js 的 dateKey 保持一致，避免跨时区偏一天。 */
+  function todayKey(date = new Date()) {
+    const pad = (value) => String(value).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   }
 
   function defaultProfile() {
@@ -34,6 +41,7 @@
       profile: defaultProfile(),
       tasks: [],
       records: [],
+      knowledge: [],
       progress: {},
       bookRounds: {},
       meta: { createdAt: nowISO(), updatedAt: "" },
@@ -103,6 +111,7 @@
         year: String(record.year || ""),
         paper: String(record.paper || ""),
         module: String(record.module || ""),
+        kind: String(record.kind || ""),
         question: String(record.question || ""),
         status: String(record.status || "套卷成绩"),
         full: Math.max(0, Number(record.full) || 0),
@@ -121,6 +130,22 @@
         createdAt: String(record.createdAt || nowISO()),
         updatedAt: String(record.updatedAt || record.createdAt || nowISO()),
       })),
+      knowledge: (Array.isArray(raw.knowledge) ? raw.knowledge : [])
+        .filter(isObject)
+        .map((item) => ({
+          id: String(item.id || uid()),
+          date: String(item.date || ""),
+          subject: String(item.subject || ""),
+          topic: String(item.topic || "").slice(0, 200),
+          detail: String(item.detail || "").slice(0, 4000),
+          reviewDate: String(item.reviewDate || ""),
+          status: KNOWLEDGE_STATUS.includes(item.status) ? item.status : "待复盘",
+          reviewCount: Math.max(0, Number(item.reviewCount) || 0),
+          lastReviewDate: String(item.lastReviewDate || ""),
+          logs: cleanKnowledgeLogs(item.logs),
+          createdAt: String(item.createdAt || nowISO()),
+          updatedAt: String(item.updatedAt || item.createdAt || nowISO()),
+        })),
       progress: progress(),
       bookRounds: cleanBookRounds(raw.bookRounds),
       meta: {
@@ -146,6 +171,19 @@
       }
       return out;
     }
+  }
+
+  /** 复盘笔记只追加不覆盖，每条带自己的时间戳，最多留最近 200 条。 */
+  function cleanKnowledgeLogs(value) {
+    const list = Array.isArray(value) ? value : [];
+    return list
+      .filter(isObject)
+      .map((item) => ({
+        at: String(item.at || nowISO()),
+        text: String(item.text || "").slice(0, 2000),
+      }))
+      .filter((item) => item.text)
+      .slice(-200);
   }
 
   function cleanProgress(value) {
@@ -193,6 +231,7 @@
       year: String(pick("year") || ""),
       paper: String(pick("paper") || ""),
       module: String(pick("module") || ""),
+      kind: String(pick("kind") || ""),
       question: String(pick("question") || ""),
       status: String(pick("status") || "套卷成绩"),
       full: Math.max(0, Number(pick("full")) || 0),
@@ -208,6 +247,27 @@
       explanation: String(pick("explanation") || "").slice(0, 6000),
       note: String(pick("note") || "").slice(0, 2000),
       round: cleanRound(pick("round"), cleanRound(previous.round)),
+      createdAt: String(source.createdAt || previous.createdAt || nowISO()),
+      updatedAt: nowISO(),
+    };
+  }
+
+  function cleanKnowledge(input, base) {
+    const source = isObject(input) ? input : {};
+    const previous = isObject(base) ? base : {};
+    const pick = (key) => (source[key] === undefined ? previous[key] : source[key]);
+    const status = pick("status");
+    return {
+      id: String(source.id || previous.id || uid()),
+      date: String(pick("date") || ""),
+      subject: String(pick("subject") || ""),
+      topic: String(pick("topic") || "").slice(0, 200),
+      detail: String(pick("detail") || "").slice(0, 4000),
+      reviewDate: String(pick("reviewDate") || ""),
+      status: KNOWLEDGE_STATUS.includes(status) ? status : "待复盘",
+      reviewCount: Math.max(0, Number(pick("reviewCount")) || 0),
+      lastReviewDate: String(pick("lastReviewDate") || ""),
+      logs: cleanKnowledgeLogs(pick("logs")),
       createdAt: String(source.createdAt || previous.createdAt || nowISO()),
       updatedAt: nowISO(),
     };
@@ -342,6 +402,59 @@
       state.records = state.records.filter((record) => record.id !== id);
       if (state.records.length === before) return false;
       persist("records");
+      return true;
+    },
+    knowledge() {
+      return [...state.knowledge].sort((left, right) =>
+        `${right.date}${right.createdAt}`.localeCompare(`${left.date}${left.createdAt}`),
+      );
+    },
+    knowledgeOf(date) {
+      return state.knowledge
+        .filter((item) => item.date === date)
+        .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+    },
+    getKnowledge(id) {
+      return state.knowledge.find((item) => item.id === id) || null;
+    },
+    addKnowledge(input) {
+      const item = cleanKnowledge(input);
+      state.knowledge.push(item);
+      persist("knowledge");
+      return item;
+    },
+    updateKnowledge(id, patch) {
+      const index = state.knowledge.findIndex((item) => item.id === id);
+      if (index < 0) return null;
+      state.knowledge[index] = cleanKnowledge({ ...patch, id }, state.knowledge[index]);
+      persist("knowledge");
+      return state.knowledge[index];
+    },
+    /** 复盘笔记按时间戳追加，历史一条都不覆盖。 */
+    appendKnowledgeLog(id, text) {
+      const index = state.knowledge.findIndex((item) => item.id === id);
+      if (index < 0) return null;
+      const line = String(text || "").trim().slice(0, 2000);
+      if (!line) return state.knowledge[index];
+      const current = state.knowledge[index];
+      state.knowledge[index] = cleanKnowledge(
+        {
+          id,
+          logs: [...current.logs, { at: nowISO(), text: line }],
+          reviewCount: (Number(current.reviewCount) || 0) + 1,
+          lastReviewDate: todayKey(),
+          status: current.status === "待复盘" ? "已复盘" : current.status,
+        },
+        current,
+      );
+      persist("knowledge");
+      return state.knowledge[index];
+    },
+    removeKnowledge(id) {
+      const before = state.knowledge.length;
+      state.knowledge = state.knowledge.filter((item) => item.id !== id);
+      if (state.knowledge.length === before) return false;
+      persist("knowledge");
       return true;
     },
     progressOf(key) {
