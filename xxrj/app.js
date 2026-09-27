@@ -4996,7 +4996,7 @@ function paintAccountChrome() {
     setSyncLine("本机记录 · 云端同步不可用", false);
     if (banner) banner.hidden = true;
     if (syncNote) {
-      syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：已登录 ${escapeHtml(who)}，但这台服务器没有可写的账号目录，计划与成绩只保存在本机。需要跨设备同步时到主站 ${MAIN_SITE_URL} 打开本页。`;
+      syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：已登录 ${escapeHtml(who)}，但这台服务器没有可写的账号目录，计划与成绩只保存在本机。需要跨设备同步时到主站 ${MAIN_SITE_URL} 用同一个账号登录使用。`;
     }
   } else if (mirror) {
     // 未登录的只读镜像：登录也写不进账号库，直接把用户引到可写的主站。
@@ -5010,7 +5010,9 @@ function paintAccountChrome() {
     }
     if (bannerAction) {
       bannerAction.textContent = "去主站登录";
-      bannerAction.href = `${MAIN_SITE_URL}/index.html?next=/xxrj/`;
+      // 主站的静态目录要重新构建后才会带 /xxrj/，这里先落到主站首页，
+      // 避免登录回跳时撞上还没发布的子目录。
+      bannerAction.href = `${MAIN_SITE_URL}/`;
     }
     if (syncNote) {
       syncNote.innerHTML = `${icon("triangle-alert")} 当前状态：只读镜像，数据只在本机；需要账号同步请到主站 ${MAIN_SITE_URL}。`;
