@@ -105,7 +105,11 @@ async function prepareContext(browser, viewport, base, out, name) {
   const errors = [];
   // 未登录时这几个接口回 401 是正常的会话探测，favicon 404 与功能无关。
   const SILENT_401 = /\/api\/(auth|progress|telemetry)/;
-  const isExpected = (url = "") => SILENT_401.test(url) || url.endsWith("/favicon.ico");
+  // 主站过 Cloudflare，注入的 insights beacon 在无头浏览器里经常直接失败，不算站点错误。
+  const isExpected = (url = "") =>
+    SILENT_401.test(url) ||
+    url.endsWith("/favicon.ico") ||
+    url.includes("static.cloudflareinsights.com");
   const isExpectedResponse = (status, url = "") =>
     (status === 401 && SILENT_401.test(url)) || url.endsWith("/favicon.ico");
   page.on("console", (message) => {
@@ -125,10 +129,13 @@ async function prepareContext(browser, viewport, base, out, name) {
       errors.push(`requestfailed: ${request.url()} ${failure.errorText}`);
     }
   });
-  await page.goto(`${base}/xxrj/`, { waitUntil: "load", timeout: 30000 });
+  // 主站挂在 Cloudflare 后面，注入的 beacon.min.js 会一直挂着，把 load 甚至
+  // DOMContentLoaded 一起拖住；导航只等导航提交，之后按元素等待。
+  await page.goto(`${base}/xxrj/`, { waitUntil: "commit", timeout: 30000 });
+  await page.waitForSelector(".review-summary-card", { timeout: 20000 });
   // 每次验收都从空白数据开始，避免上一次的浏览器数据影响断言。
   await page.evaluate(() => localStorage.clear());
-  await page.reload({ waitUntil: "load" });
+  await page.reload({ waitUntil: "commit" });
   await page.waitForSelector(".review-summary-card", { timeout: 15000 });
   return { context, page, errors, out, name };
 }
@@ -494,6 +501,8 @@ async function dashboardHeatmapFlow(page, out, summaryId) {
   await detailAnnotate.click();
   const detailPanel = page.locator(`[data-annotate-panel="${summaryId}-q3"]`);
   await detailPanel.waitFor({ timeout: 10000 });
+  // 面板贴着 sticky 顶栏时会被挡住，先把保存键滚到视口中间，跟真人操作一致。
+  await detailPanel.locator("[data-annotate-save]").evaluate((node) => node.scrollIntoView({ block: "center" }));
   await detailPanel.locator("[data-annotate-save]").click();
   await detailPanel.waitFor({ state: "detached", timeout: 10000 });
 
@@ -502,6 +511,7 @@ async function dashboardHeatmapFlow(page, out, summaryId) {
   await summaryAnnotate.click();
   const summaryPanel = page.locator(`[data-annotate-panel="${summaryId}"]`);
   await summaryPanel.waitFor({ timeout: 10000 });
+  await summaryPanel.locator("[data-annotate-save]").evaluate((node) => node.scrollIntoView({ block: "center" }));
   await summaryPanel.locator("[data-annotate-save]").click();
   await summaryPanel.waitFor({ state: "detached", timeout: 10000 });
 
