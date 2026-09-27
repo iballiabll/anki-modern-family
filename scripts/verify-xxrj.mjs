@@ -239,7 +239,7 @@ async function planTaskFlow(page, out) {
   await page.screenshot({ path: path.join(out, "xxrj-desktop-plan.png"), fullPage: false });
 }
 
-/** 成绩弹窗：科目点选、错因多选、套卷错题题号热力图与逐题详情。 */
+/** 成绩弹窗：科目点选、做对 / 做错分开标记、套卷题号热力图与逐题详情。 */
 async function entryHeatmapFlow(page, out) {
   await page.locator("#open-entry").click();
   await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
@@ -264,13 +264,68 @@ async function entryHeatmapFlow(page, out) {
     (await page.locator("#entry-wrong-grid").getAttribute("data-range")) === "23",
   );
 
+  check(
+    "题号默认按做错模式标记",
+    (await page
+      .locator("#entry-mark-modes [data-entry-mark='wrong']")
+      .getAttribute("aria-pressed")) === "true" &&
+      (await page
+        .locator("#entry-mark-modes [data-entry-mark='correct']")
+        .getAttribute("aria-pressed")) === "false",
+  );
+
   await page.fill("#entry-full", "150");
   await page.fill("#entry-score", "118");
+  await page.selectOption("#entry-round", "2");
   for (const number of [3, 7, 12]) {
     await page.click(`#entry-wrong-grid .question-cell[data-question="${number}"]`);
   }
-  check("题号格可以连续多选", (await page.locator("#entry-wrong-count").innerText()) === "已选 3 题");
-  check("选中的题号高亮", (await page.locator("#entry-wrong-grid .question-cell.active").count()) === 3);
+  check(
+    "做错题号单独计数",
+    (await page.locator("#entry-wrong-count").innerText()) === "做对 0 · 做错 3",
+    await page.locator("#entry-wrong-count").innerText(),
+  );
+  check(
+    "做错的题号用红色状态",
+    (await page.locator("#entry-wrong-grid .question-cell.is-wrong").count()) === 3,
+  );
+  check(
+    "做错提示自动进待复盘",
+    /做错 3 道/.test(await page.locator("#entry-mark-summary").innerText()),
+    (await page.locator("#entry-mark-summary").innerText()).slice(0, 60),
+  );
+
+  await page.click("#entry-mark-modes [data-entry-mark='correct']");
+  check(
+    "标记模式可以切到做对",
+    (await page
+      .locator("#entry-mark-modes [data-entry-mark='correct']")
+      .getAttribute("aria-pressed")) === "true",
+  );
+  for (const number of [2, 5]) {
+    await page.click(`#entry-wrong-grid .question-cell[data-question="${number}"]`);
+  }
+  check(
+    "做对与做错分开计数",
+    (await page.locator("#entry-wrong-count").innerText()) === "做对 2 · 做错 3",
+    await page.locator("#entry-wrong-count").innerText(),
+  );
+  check(
+    "做对的题号用绿色状态",
+    (await page.locator("#entry-wrong-grid .question-cell.is-correct").count()) === 2,
+  );
+  await page.click("#entry-wrong-grid .question-cell[data-question='2']");
+  check(
+    "同一模式再点一次取消标记",
+    (await page.locator("#entry-wrong-count").innerText()) === "做对 1 · 做错 3",
+    await page.locator("#entry-wrong-count").innerText(),
+  );
+  await page.click("#entry-wrong-grid .question-cell[data-question='2']");
+  check(
+    "取消后可以重新标记",
+    (await page.locator("#entry-wrong-count").innerText()) === "做对 2 · 做错 3",
+    await page.locator("#entry-wrong-count").innerText(),
+  );
 
   const errorGrid = page.locator("#entry-modal .choice-grid[data-choice-for='entry-error-type']");
   await clickChoice(page, "#entry-modal", "entry-error-type", "概念不清");
@@ -289,12 +344,22 @@ async function entryHeatmapFlow(page, out) {
       : [];
     return {
       summary: summary
-        ? { id: summary.id, errorType: summary.errorType, subject: summary.subject }
+        ? {
+            id: summary.id,
+            errorType: summary.errorType,
+            subject: summary.subject,
+            count: summary.count,
+            correct: summary.correct,
+            round: summary.round,
+          }
         : null,
       details: details.map((record) => ({
         id: record.id,
         question: record.question,
         status: record.status,
+        count: record.count,
+        correct: record.correct,
+        reviewDate: record.reviewDate,
         full: record.full,
         score: record.score,
         errorType: record.errorType,
@@ -303,28 +368,66 @@ async function entryHeatmapFlow(page, out) {
     };
   });
 
+  const wrongDetails = saved.details.filter((item) => item.status === "错题复盘");
+  const rightDetails = saved.details.filter((item) => item.status === "已复盘");
+
   check("主记录保存为套卷成绩", Boolean(saved.summary) && saved.summary.subject === "数学一");
   check(
     "错因多选按顿号保存",
     saved.summary && saved.summary.errorType === "计算错误、概念不清",
     saved.summary ? saved.summary.errorType : "没有主记录",
   );
-  check("选中题号逐题生成错题", saved.details.length === 3, `${saved.details.length} 条`);
   check(
-    "逐题错题题号正确",
-    saved.details.map((item) => item.question).join(" ") === "第 3 题 第 7 题 第 12 题",
-    saved.details.map((item) => item.question).join(" | "),
+    "主记录题数与刷题轮次分开",
+    Boolean(saved.summary) &&
+      saved.summary.count === 5 &&
+      saved.summary.correct === 2 &&
+      saved.summary.round === 2,
+    saved.summary
+      ? `count=${saved.summary.count} correct=${saved.summary.correct} round=${saved.summary.round}`
+      : "没有主记录",
+  );
+  check("做对做错各生成逐题记录", saved.details.length === 5, `${saved.details.length} 条`);
+  check(
+    "做错详情题号正确",
+    wrongDetails.length === 3 &&
+      wrongDetails.map((item) => item.question).join(" ") === "第 3 题 第 7 题 第 12 题",
+    wrongDetails.map((item) => item.question).join(" | "),
   );
   check(
-    "逐题错题不重复计分",
-    saved.details.every((item) => item.status === "错题复盘" && item.full === 0 && item.score === 0),
+    "做对详情题号正确",
+    rightDetails.length === 2 &&
+      rightDetails.map((item) => item.question).join(" ") === "第 2 题 第 5 题",
+    rightDetails.map((item) => item.question).join(" | "),
+  );
+  check(
+    "做错详情进待复盘",
+    wrongDetails.length === 3 &&
+      wrongDetails.every(
+        (item) => item.status === "错题复盘" && item.count === 1 && item.correct === 0,
+      ),
+    wrongDetails.map((item) => `${item.question}:${item.status}/${item.count}/${item.correct}`).join(" "),
+  );
+  check(
+    "做对详情只算完成不进复盘",
+    rightDetails.length === 2 &&
+      rightDetails.every(
+        (item) => item.status === "已复盘" && item.count === 1 && item.correct === 1 && !item.reviewDate,
+      ),
+    rightDetails.map((item) => `${item.question}:${item.status}/${item.count}/${item.correct}`).join(" "),
+  );
+  check(
+    "逐题详情不重复计分",
+    saved.details.every((item) => item.full === 0 && item.score === 0),
   );
   check(
     "逐题错题继承错因",
-    saved.details.every((item) => item.errorType === "计算错误、概念不清"),
+    wrongDetails.length === 3 &&
+      wrongDetails.every((item) => item.errorType === "计算错误、概念不清") &&
+      rightDetails.every((item) => !item.errorType),
   );
 
-  if (!saved.summary) return;
+  if (!saved.summary) return "";
 
   // 回到错题本用真实 id 编辑主记录：题号要回填，取消勾选要删掉对应详情。
   await page.locator(".sidebar .nav-item[data-screen='mistakes']").click();
@@ -333,10 +436,17 @@ async function entryHeatmapFlow(page, out) {
   await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
   check(
     "编辑时回填已选错题",
-    (await page.locator("#entry-wrong-grid .question-cell.active").count()) === 3,
+    (await page.locator("#entry-wrong-grid .question-cell.active").count()) === 5 &&
+      (await page.locator("#entry-wrong-grid .question-cell.is-wrong").count()) === 3 &&
+      (await page.locator("#entry-wrong-grid .question-cell.is-correct").count()) === 2,
   );
+  await page.click("#entry-mark-modes [data-entry-mark='wrong']");
   await page.click("#entry-wrong-grid .question-cell[data-question='7']");
-  check("取消勾选后计数跟着减", (await page.locator("#entry-wrong-count").innerText()) === "已选 2 题");
+  check(
+    "取消勾选后计数跟着减",
+    (await page.locator("#entry-wrong-count").innerText()) === "做对 2 · 做错 2",
+    await page.locator("#entry-wrong-count").innerText(),
+  );
   await page.click("#save-entry");
   await page.waitForSelector("#entry-modal", { state: "hidden", timeout: 10000 });
 
@@ -352,16 +462,155 @@ async function entryHeatmapFlow(page, out) {
   }, saved.summary.id);
   check(
     "取消勾选会删掉对应错题详情",
-    afterEdit.details.join(" ") === "第 3 题 第 12 题",
+    afterEdit.details.join(" ") === "第 2 题 第 3 题 第 5 题 第 12 题",
     afterEdit.details.join(" | "),
   );
   check("重新保存不会重复生成主记录", afterEdit.summaryCount === 1, `${afterEdit.summaryCount} 条`);
-  check("重新保存不会留下多余记录", afterEdit.total === 3, `${afterEdit.total} 条`);
+  check("重新保存不会留下多余记录", afterEdit.total === 5, `${afterEdit.total} 条`);
 
   // 刷新后详情仍在，说明写进了 localStorage 而不是内存临时态。
   await page.reload({ waitUntil: "load" });
   const afterReload = await page.evaluate(() => window.YANTU_STORE.records().length);
-  check("刷新后逐题错题记录仍在", afterReload === 3, `${afterReload} 条`);
+  check("刷新后逐题错题记录仍在", afterReload === 5, `${afterReload} 条`);
+
+  return saved.summary.id;
+}
+
+/**
+ * 总览热力图：四门分行、格内完成 / 复盘，以及「详情已复盘、主记录不再重复计数」的口径。
+ * 依赖 entryHeatmapFlow 留下的数据：今天数学完成 4 道（二刷），英语没有记录。
+ */
+async function dashboardHeatmapFlow(page, out, summaryId) {
+  if (!summaryId) {
+    check("录入记录后才能验收总览热力图", false, "没有主记录 id");
+    return;
+  }
+
+  // 先给第 3 题详情标注复盘，再标注整卷主记录，两条都写「上次复盘 = 今天」。
+  const today = localDateKey();
+  await page.locator(".sidebar .nav-item[data-screen='mistakes']").click();
+  const detailAnnotate = page.locator(`[data-annotate="${summaryId}-q3"]`);
+  await detailAnnotate.waitFor({ timeout: 10000 });
+  await detailAnnotate.click();
+  const detailPanel = page.locator(`[data-annotate-panel="${summaryId}-q3"]`);
+  await detailPanel.waitFor({ timeout: 10000 });
+  await detailPanel.locator("[data-annotate-save]").click();
+  await detailPanel.waitFor({ state: "detached", timeout: 10000 });
+
+  const summaryAnnotate = page.locator(`[data-annotate="${summaryId}"]`);
+  await summaryAnnotate.waitFor({ timeout: 10000 });
+  await summaryAnnotate.click();
+  const summaryPanel = page.locator(`[data-annotate-panel="${summaryId}"]`);
+  await summaryPanel.waitFor({ timeout: 10000 });
+  await summaryPanel.locator("[data-annotate-save]").click();
+  await summaryPanel.waitFor({ state: "detached", timeout: 10000 });
+
+  const reviewed = await page.evaluate((id) => {
+    const records = window.YANTU_STORE.records();
+    const pick = (record) =>
+      record
+        ? { reviewCount: record.reviewCount, lastReviewDate: record.lastReviewDate }
+        : null;
+    return {
+      detail: pick(records.find((record) => record.id === `${id}-q3`)),
+      summary: pick(records.find((record) => record.id === id)),
+    };
+  }, summaryId);
+  check(
+    "逐题详情标注后写上次复盘日",
+    Boolean(reviewed.detail) && reviewed.detail.lastReviewDate === today && reviewed.detail.reviewCount >= 1,
+    JSON.stringify(reviewed.detail),
+  );
+  check(
+    "整卷主记录也能标注复盘",
+    Boolean(reviewed.summary) && reviewed.summary.lastReviewDate === today && reviewed.summary.reviewCount >= 1,
+    JSON.stringify(reviewed.summary),
+  );
+
+  await page.locator(".sidebar .nav-item[data-screen='dashboard']").click();
+  await page.waitForSelector(".heatmap-grid .heat-cell", { timeout: 10000 });
+
+  const subjects = await page.locator(".heatmap-subjects .heat-subject b").allInnerTexts();
+  check("热力图按四门科目分行", subjects.join("/") === "数学/英语/408/政治", subjects.join(" / "));
+  const cellCount = await page.locator(".heatmap-grid .heat-cell").count();
+  check("热力图覆盖近 12 周每天", cellCount === 84 * 4, `${cellCount} 格`);
+
+  const legend = (await page.locator(".heat-legend").innerText()).replace(/\s+/g, " ");
+  check(
+    "图例说明上下两行含义",
+    /上\s*完成题数/.test(legend) && /下\s*复盘题数/.test(legend) && /只复盘/.test(legend),
+    legend.slice(0, 80),
+  );
+  const note = await page.locator(".heat-note").innerText();
+  check("热力图注明统计口径", /复盘按错题/.test(note), note.slice(0, 60));
+
+  const mathCell = page.locator(
+    `.heatmap-grid .heat-cell[data-subject="math"][data-date="${today}"]`,
+  );
+  check("今日数学格已渲染", (await mathCell.count()) === 1);
+  const mathDone = await mathCell.getAttribute("data-done");
+  check("今日数学完成题数按标记算", mathDone === "4", `done=${mathDone}`);
+  const mathTitle = await mathCell.getAttribute("title");
+  check("格子提示带轮次拆解", /二刷 4/.test(mathTitle), mathTitle);
+  const mathReview = await mathCell.getAttribute("data-review");
+  check("详情与主记录复盘只算一次", mathReview === "1", `review=${mathReview}`);
+
+  const englishCell = page.locator(
+    `.heatmap-grid .heat-cell[data-subject="english"][data-date="${today}"]`,
+  );
+  check(
+    "今日英语没有记录",
+    (await englishCell.getAttribute("data-done")) === "0" &&
+      (await englishCell.getAttribute("data-review")) === "0",
+  );
+
+  const mathTotal = await page.locator(".heatmap-subjects .heat-subject").first().innerText();
+  check("科目行标注近 12 周合计", mathTotal.replace(/\s+/g, " ").trim() === "数学 4 / 1", mathTotal.replace(/\s+/g, " "));
+
+  const boardBox = await page.evaluate(() => {
+    const board = document.querySelector(".heatmap-board");
+    const card = board.closest(".card");
+    const scroll = board.querySelector(".heatmap-scroll");
+    return {
+      boardLeft: board.getBoundingClientRect().left,
+      boardRight: board.getBoundingClientRect().right,
+      cardLeft: card.getBoundingClientRect().left,
+      cardRight: card.getBoundingClientRect().right,
+      scrollWidth: scroll.scrollWidth,
+      scrollClient: scroll.clientWidth,
+    };
+  });
+  check(
+    "热力图留在卡片里不撑破版面",
+    boardBox.boardRight <= boardBox.cardRight + 1 && boardBox.boardLeft >= boardBox.cardLeft - 1,
+    `board=${Math.round(boardBox.boardRight)}px card=${Math.round(boardBox.cardRight)}px`,
+  );
+  check(
+    "日期太多时在卡片内横向滚动",
+    boardBox.scrollWidth > boardBox.scrollClient,
+    `scroll=${boardBox.scrollWidth - boardBox.scrollClient}px`,
+  );
+
+  const todayBox = await page.evaluate((date) => {
+    const scroll = document.querySelector(".heatmap-scroll");
+    const cell = document.querySelector(
+      `.heatmap-grid .heat-cell[data-subject="math"][data-date="${date}"]`,
+    );
+    return {
+      scrollLeft: Math.round(scroll.scrollLeft),
+      maxLeft: Math.round(scroll.scrollWidth - scroll.clientWidth),
+      cellRight: cell.getBoundingClientRect().right,
+      scrollRight: scroll.getBoundingClientRect().right,
+    };
+  }, today);
+  check(
+    "热力图默认停在最近几天",
+    todayBox.scrollLeft >= todayBox.maxLeft - 1 && todayBox.cellRight <= todayBox.scrollRight + 1,
+    `left=${todayBox.scrollLeft}/${todayBox.maxLeft}`,
+  );
+
+  await page.locator(".heatmap-board").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: path.join(out, "xxrj-desktop-heatmap.png"), fullPage: false });
 }
 
 async function desktopFlow(browser, base, out) {
@@ -476,7 +725,8 @@ async function desktopFlow(browser, base, out) {
     await page.waitForTimeout(500);
     check("删除后卡片消失", (await page.locator(".knowledge-card").count()) === 0);
 
-    await entryHeatmapFlow(page, out);
+    const entrySummaryId = await entryHeatmapFlow(page, out);
+    await dashboardHeatmapFlow(page, out, entrySummaryId);
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -538,7 +788,11 @@ async function mobileFlow(browser, base, out) {
     await page.waitForSelector("#entry-modal:not([hidden])", { timeout: 10000 });
     await page.click("#entry-wrong-grid .question-cell[data-question='5']");
     await page.click("#entry-wrong-grid .question-cell[data-question='9']");
-    check("手机端题号格可多选", (await page.locator("#entry-wrong-count").innerText()) === "已选 2 题");
+    check(
+      "手机端题号格可多选",
+      (await page.locator("#entry-wrong-count").innerText()) === "做对 0 · 做错 2",
+      await page.locator("#entry-wrong-count").innerText(),
+    );
     const heatmapBox = await page.evaluate(() => {
       const grid = document.querySelector("#entry-wrong-grid");
       const modal = document.querySelector("#entry-modal .modal");
@@ -549,12 +803,62 @@ async function mobileFlow(browser, base, out) {
       };
     });
     check(
-      "手机端热力图不溢出弹窗",
+      "手机端题号格不溢出弹窗",
       heatmapBox.overflow <= 1 && heatmapBox.gridRight <= heatmapBox.modalRight + 1,
       `overflow=${heatmapBox.overflow}px`,
     );
     await page.click("#cancel-entry");
     await page.waitForSelector("#entry-modal", { state: "hidden", timeout: 10000 });
+
+    // 手机端总览热力图：四行拼起来很宽，只能在卡片里横向滚动。
+    await page.locator(".mobile-nav button[data-screen='dashboard']").click();
+    await page.waitForSelector(".heatmap-grid .heat-cell", { timeout: 10000 });
+    const mobileHeatBox = await page.evaluate(() => {
+      const board = document.querySelector(".heatmap-board");
+      const card = board.closest(".card");
+      const scroll = board.querySelector(".heatmap-scroll");
+      return {
+        boardLeft: board.getBoundingClientRect().left,
+        boardRight: board.getBoundingClientRect().right,
+        cardLeft: card.getBoundingClientRect().left,
+        cardRight: card.getBoundingClientRect().right,
+        scrollWidth: scroll.scrollWidth,
+        scrollClient: scroll.clientWidth,
+      };
+    });
+    check(
+      "手机端热力图留在卡片里",
+      mobileHeatBox.boardRight <= mobileHeatBox.cardRight + 1 &&
+        mobileHeatBox.boardLeft >= mobileHeatBox.cardLeft - 1,
+      `board=${Math.round(mobileHeatBox.boardRight)}px card=${Math.round(mobileHeatBox.cardRight)}px`,
+    );
+    check(
+      "手机端热力图在卡片内横向滚动",
+      mobileHeatBox.scrollWidth > mobileHeatBox.scrollClient,
+      `scroll=${mobileHeatBox.scrollWidth - mobileHeatBox.scrollClient}px`,
+    );
+    const mobileTodayBox = await page.evaluate((date) => {
+      const scroll = document.querySelector(".heatmap-scroll");
+      const cell = document.querySelector(
+        `.heatmap-grid .heat-cell[data-subject="math"][data-date="${date}"]`,
+      );
+      return {
+        scrollLeft: Math.round(scroll.scrollLeft),
+        maxLeft: Math.round(scroll.scrollWidth - scroll.clientWidth),
+        cellRight: cell.getBoundingClientRect().right,
+        scrollRight: scroll.getBoundingClientRect().right,
+      };
+    }, localDateKey());
+    check(
+      "手机端热力图默认停在最近几天",
+      mobileTodayBox.scrollLeft >= mobileTodayBox.maxLeft - 1 &&
+        mobileTodayBox.cellRight <= mobileTodayBox.scrollRight + 1,
+      `left=${mobileTodayBox.scrollLeft}/${mobileTodayBox.maxLeft}`,
+    );
+    const mobileHeatCells = await page.locator(".heatmap-grid .heat-cell").count();
+    check("手机端热力图格子完整", mobileHeatCells === 84 * 4, `${mobileHeatCells} 格`);
+    await page.locator(".heatmap-board").scrollIntoViewIfNeeded();
+    await page.screenshot({ path: path.join(out, "xxrj-mobile-heatmap.png"), fullPage: false });
 
     await page.locator(".mobile-nav button[data-screen='daily-review']").click();
     await page.waitForSelector("h1:text-is('待复盘')", { timeout: 10000 });

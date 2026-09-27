@@ -23,7 +23,17 @@
   /** 排序方式：默认词书顺序 / 高频（单元）顺序 / 字母序。 */
   const SORT_MODES = ["default", "frequency", "alpha"];
   const DRAW_ORDERS = ["sequential", "random"];
-  const DRAW_SCOPES = ["all", "learned", "favorites", "known"];
+  const DRAW_SCOPES = ["all", "unlearned", "known", "fuzzy", "unknown", "favorites"];
+  // 0 = 不限时间，其余是「近 N 天（含今天）有背词记录」。
+  const DRAW_DAY_RANGES = [0, 1, 3, 7, 30];
+  const DRAW_SCOPE_LABELS = {
+    all: "所有",
+    unlearned: "未斩",
+    known: "已斩",
+    fuzzy: "模糊",
+    unknown: "不会",
+    favorites: "收藏",
+  };
 
   const FAVORITE_KEY = "iball_vocab_favorites_v1";
   const WORDBOOK_KEY = "iball_vocab_wordbook_v1";
@@ -119,6 +129,7 @@
     drawSeen: new Set(),
     drawOrder: "random",
     drawScope: "all",
+    drawDays: 0,
     activeWord: "",
     detailToken: 0,
     recite: new Map(),
@@ -130,6 +141,7 @@
       hideKnown: false,
       drawOrder: "random",
       drawScope: "all",
+      drawDays: 0,
     },
   };
 
@@ -609,16 +621,88 @@
   }
 
   function drawScopeLabel() {
-    if (state.drawScope === "learned") {
-      return "已经会的";
+    return DRAW_SCOPE_LABELS[state.drawScope] || DRAW_SCOPE_LABELS.all;
+  }
+
+  function drawDaysLabel() {
+    if (state.drawDays === 1) {
+      return "今天";
     }
-    if (state.drawScope === "favorites") {
-      return "收藏的";
+    if (state.drawDays > 1) {
+      return `近 ${state.drawDays} 天`;
     }
-    if (state.drawScope === "known") {
-      return "斩的";
+    return "不限时间";
+  }
+
+  /** 背词时间戳统一按本地日期读，ISO 里的 UTC 日期在早上会差一天。 */
+  function reciteDayKey(value) {
+    const text = String(value || "");
+    if (!text) {
+      return "";
     }
-    return "所有";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      return text;
+    }
+    const date = new Date(text);
+    if (Number.isNaN(date.getTime())) {
+      return text.slice(0, 10);
+    }
+    const pad = (number) => String(number).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  /** 某个词有背词记录的日期集合：history 为主，记录的 firstAt / lastAt 兜底。 */
+  function drawDayKeys(word) {
+    const key = normalize(word);
+    const days = new Set();
+    if (!key) {
+      return days;
+    }
+    const snapshot = reciteApi()?.getSnapshot?.();
+    const deckId = currentDeckId();
+    const history = Array.isArray(snapshot?.history) ? snapshot.history : [];
+    history.forEach((item) => {
+      if (!item || normalize(item.word) !== key) {
+        return;
+      }
+      if (deckId && item.deck && item.deck !== deckId) {
+        return;
+      }
+      const day = reciteDayKey(item.at);
+      if (day) {
+        days.add(day);
+      }
+    });
+    const record = reciteRecord(word);
+    if (record) {
+      [record.firstAt, record.lastAt].forEach((stamp) => {
+        const day = reciteDayKey(stamp);
+        if (day) {
+          days.add(day);
+        }
+      });
+    }
+    return days;
+  }
+
+  function drawDaysMatch(word) {
+    if (!state.drawDays) {
+      return true;
+    }
+    const now = new Date();
+    const from = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - (state.drawDays - 1),
+    );
+    const pad = (number) => String(number).padStart(2, "0");
+    const fromKey = `${from.getFullYear()}-${pad(from.getMonth() + 1)}-${pad(from.getDate())}`;
+    for (const day of drawDayKeys(word)) {
+      if (day >= fromKey) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function drawOrderLabel() {
@@ -629,16 +713,36 @@
     if (!state.deckWords.length) {
       return "词表还在加载，稍后再试。";
     }
+    const dayText = state.drawDays ? drawDaysLabel() : "";
     if (state.drawScope === "favorites") {
-      return "收藏夹里还没有词，打开词卡点「收藏」后再来。";
+      return dayText
+        ? `收藏夹里${dayText}还没有背词记录，把「记录时间」改成不限再试。`
+        : "收藏夹里还没有词，打开词卡点「收藏」后再来。";
     }
-    if (state.drawScope === "learned") {
-      return "当前范围还没有背词记录，先在列表点「斩 / 模糊 / 不会」。";
+    if (state.drawScope === "unlearned") {
+      return dayText
+        ? `${dayText}背过的词都已经斩了，换个时间范围再试。`
+        : "当前范围里的词都已经斩了，没有未斩的词可抽。";
     }
     if (state.drawScope === "known") {
       return state.hideKnown
         ? "当前开着「只看未背」，关掉它才能抽斩过的词。"
-        : "还没有斩过的词，先在列表点「斩」。";
+        : dayText
+          ? `${dayText}没有斩过的词，换个时间范围再试。`
+          : "还没有斩过的词，先在列表点「斩」。";
+    }
+    if (state.drawScope === "fuzzy") {
+      return dayText
+        ? `${dayText}没有标记「模糊」的词，换个时间范围再试。`
+        : "还没有标记「模糊」的词，先在列表点「模糊」。";
+    }
+    if (state.drawScope === "unknown") {
+      return dayText
+        ? `${dayText}没有标记「不会」的词，换个时间范围再试。`
+        : "还没有标记「不会」的词，先在列表点「不会」。";
+    }
+    if (dayText) {
+      return `${dayText}没有背词记录，换个时间范围，或把「记录时间」改成不限。`;
     }
     if (state.hideKnown) {
       return "当前开着「只看未背」，可以关掉后再抽全部词。";
@@ -652,16 +756,27 @@
     return "换个词库或调整筛选后再试。";
   }
 
-  function drawCandidates() {
-    let words = filteredWords();
-    if (state.drawScope === "learned") {
-      words = words.filter((word) => Boolean(reciteRecord(word)));
-    } else if (state.drawScope === "favorites") {
-      words = words.filter((word) => state.favorites.has(normalize(word)));
-    } else if (state.drawScope === "known") {
-      words = words.filter((word) => isSlain(word));
+  /** 范围只看状态（未斩 / 已斩 / 模糊 / 不会 / 收藏），没背过的词算未斩。 */
+  function drawScopeMatch(word) {
+    const status = reciteRecord(word)?.status || "";
+    switch (state.drawScope) {
+      case "unlearned":
+        return status !== "known";
+      case "known":
+        return status === "known";
+      case "fuzzy":
+        return status === "fuzzy";
+      case "unknown":
+        return status === "unknown";
+      case "favorites":
+        return state.favorites.has(normalize(word));
+      default:
+        return true;
     }
-    return words;
+  }
+
+  function drawCandidates() {
+    return filteredWords().filter((word) => drawScopeMatch(word) && drawDaysMatch(word));
   }
 
   function pickDrawWord(candidates) {
@@ -712,6 +827,11 @@
       node.classList.toggle("is-active", active);
       node.setAttribute("aria-pressed", String(active));
     });
+    els.drawControls?.querySelectorAll("[data-draw-days]").forEach((node) => {
+      const active = Number(node.dataset.drawDays) === state.drawDays;
+      node.classList.toggle("is-active", active);
+      node.setAttribute("aria-pressed", String(active));
+    });
   }
 
   function renderDrawCard() {
@@ -729,7 +849,7 @@
         state.drawOrder === "sequential" ? "SEQUENTIAL CARD" : "RANDOM CARD";
     }
     if (els.drawStatus) {
-      const pool = `${drawOrderLabel()} · ${drawScopeLabel()} · 共 ${candidates.length} 词`;
+      const pool = `${drawOrderLabel()} · ${drawScopeLabel()} · ${drawDaysLabel()} · 共 ${candidates.length} 词`;
       els.drawStatus.textContent = state.drawWord
         ? `${pool} · 本轮已抽 ${Math.min(state.drawSeen.size, candidates.length)} 张`
         : `${pool}${candidates.length ? " · 点「下一张」开始" : " · 暂无可抽词"}`;
@@ -1321,6 +1441,19 @@
           syncDrawControls();
           resetDrawRound();
         }
+        return;
+      }
+      const days = event.target.closest("[data-draw-days]");
+      if (days) {
+        const parsed = Number(days.dataset.drawDays);
+        const nextDays = DRAW_DAY_RANGES.includes(parsed) ? parsed : 0;
+        if (nextDays !== state.drawDays) {
+          state.drawDays = nextDays;
+          state.prefs.drawDays = nextDays;
+          writeStore(PREFS_KEY, state.prefs);
+          syncDrawControls();
+          resetDrawRound();
+        }
       }
     });
 
@@ -1438,6 +1571,8 @@
       state.drawScope = DRAW_SCOPES.includes(state.prefs.drawScope)
         ? state.prefs.drawScope
         : "all";
+      const prefDays = Number(state.prefs.drawDays);
+      state.drawDays = DRAW_DAY_RANGES.includes(prefDays) ? prefDays : 0;
     }
 
     // 封神之路等页面用 ?deck=llyc2027&word=xxx 直接跳到某张词卡。

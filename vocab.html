@@ -25,11 +25,11 @@
     </script>
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
-    <link rel="stylesheet" href="./vocab.css?v=20260927-drawscope1" />
-    <script src="./account-store.js?v=20260927-drawscope1" defer></script>
-    <script src="./vocab-recite-api.js?v=20260927-drawscope1" defer></script>
-    <script src="./speech-transport.js?v=20260927-drawscope1" defer></script>
-    <script src="./vocab.js?v=20260927-drawscope1" defer></script>
+    <link rel="stylesheet" href="./vocab.css?v=20260927-drawscope3" />
+    <script src="./account-store.js?v=20260927-drawscope3" defer></script>
+    <script src="./vocab-recite-api.js?v=20260927-drawscope3" defer></script>
+    <script src="./speech-transport.js?v=20260927-drawscope3" defer></script>
+    <script src="./vocab.js?v=20260927-drawscope3" defer></script>
   </head>
   <body class="vocab-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
@@ -285,20 +285,11 @@
               <button
                 class="segment-button"
                 type="button"
-                data-draw-scope="learned"
+                data-draw-scope="unlearned"
                 aria-pressed="false"
-                title="只抽有背词记录的词，斩、模糊、不会都算"
+                title="跳过已经斩掉的词，模糊、不会和没背过的都算"
               >
-                已经会的
-              </button>
-              <button
-                class="segment-button"
-                type="button"
-                data-draw-scope="favorites"
-                aria-pressed="false"
-                title="只抽收藏夹里的单词"
-              >
-                收藏的
+                未斩
               </button>
               <button
                 class="segment-button"
@@ -307,7 +298,84 @@
                 aria-pressed="false"
                 title="只抽已经斩掉的单词"
               >
-                斩的
+                已斩
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="fuzzy"
+                aria-pressed="false"
+                title="只抽标记为「模糊」的单词"
+              >
+                模糊
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="unknown"
+                aria-pressed="false"
+                title="只抽标记为「不会」的单词"
+              >
+                不会
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-scope="favorites"
+                aria-pressed="false"
+                title="只抽收藏夹里的单词"
+              >
+                收藏
+              </button>
+            </div>
+          </div>
+          <div class="vocab-draw-control-group">
+            <span class="setting-label">记录时间</span>
+            <div class="segmented-control vocab-draw-days" role="group" aria-label="按背词记录时间抽卡">
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="1"
+                aria-pressed="false"
+                title="只抽今天背过的词"
+              >
+                今天
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="3"
+                aria-pressed="false"
+                title="只抽近 3 天背过的词"
+              >
+                近 3 天
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="7"
+                aria-pressed="false"
+                title="只抽近 7 天背过的词"
+              >
+                近 7 天
+              </button>
+              <button
+                class="segment-button"
+                type="button"
+                data-draw-days="30"
+                aria-pressed="false"
+                title="只抽近 30 天背过的词"
+              >
+                近 30 天
+              </button>
+              <button
+                class="segment-button is-active"
+                type="button"
+                data-draw-days="0"
+                aria-pressed="true"
+                title="不按时间过滤，有背词记录的词都能抽到"
+              >
+                不限
               </button>
             </div>
           </div>

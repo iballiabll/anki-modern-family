@@ -941,36 +941,145 @@ function renderSummary() {
   `;
 }
 
+const HEATMAP_WEEKS = 12;
+const HEATMAP_SUBJECTS = [
+  { key: "math", label: "数学" },
+  { key: "english", label: "英语" },
+  { key: "cs408", label: "408" },
+  { key: "politics", label: "政治" },
+];
+
+/** 逐题详情（主记录-q题号）已经算进主记录的题数，热力图跳过它避免双算。 */
+function isEntryDetailRecord(record) {
+  return /-q\d+$/.test(String((record && record.id) || ""));
+}
+
+/** 复盘日志是 ISO 时间戳，按本地时区还原成 YYYY-MM-DD，纯日期串直接取前 10 位。 */
+function localDateKeyOf(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  if (/^\d{4}-\d{2}-\d{2}/.test(text) && !text.includes("T")) return text.slice(0, 10);
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? text.slice(0, 10) : dateKey(parsed);
+}
+
+/**
+ * 近 84 天、按科目聚合每天的学习量：
+ *   · 完成题数 = 当天主记录 count 之和，轮次只做拆分；
+ *   · 复盘题数 = 错题「上次复盘日」＋知识点复盘日志，历史多次复盘只能还原最近一次。
+ */
+function heatmapDayStats() {
+  const stats = new Map();
+  const bucketOf = (date, subject) => {
+    const key = `${date}|${subject}`;
+    if (!stats.has(key)) stats.set(key, { done: 0, review: 0, rounds: new Map() });
+    return stats.get(key);
+  };
+  const addReview = (date, subject) => {
+    if (!date || !subject) return;
+    bucketOf(date, subject).review += 1;
+  };
+
+  const all = recordsAll();
+  // 有逐题详情时，复盘按每道题统计；主记录只在详情还没记复盘日时兜底一次，避免同一组题被算两遍。
+  const detailReviewIds = new Set();
+  all.forEach((record) => {
+    if (!isEntryDetailRecord(record)) return;
+    if (!isMistakeRecord(record) || !record.lastReviewDate) return;
+    detailReviewIds.add(String(record.id).replace(/-q\d+$/, ""));
+  });
+
+  for (const record of all) {
+    const subject = subjectKeyOf(record);
+    if (!subject) continue;
+    if (!isEntryDetailRecord(record) && record.date) {
+      const done = Number(record.count) || 0;
+      if (done > 0) {
+        const entry = bucketOf(record.date, subject);
+        const round = mathRoundMeta(record.round).label;
+        entry.done += done;
+        entry.rounds.set(round, (entry.rounds.get(round) || 0) + done);
+      }
+    }
+    if (!isMistakeRecord(record) || !record.lastReviewDate) continue;
+    if (!isEntryDetailRecord(record) && detailReviewIds.has(String(record.id))) continue;
+    addReview(localDateKeyOf(record.lastReviewDate), subject);
+  }
+
+  for (const item of knowledgeAll()) {
+    const subject = subjectKeyOf({ subject: item.subject });
+    if (!subject) continue;
+    const logs = Array.isArray(item.logs) ? item.logs : [];
+    logs.forEach((log) => addReview(localDateKeyOf(log && log.at), subject));
+    // 早期知识点没有日志，只能拿最近一次复盘日顶一下。
+    if (!logs.length && item.lastReviewDate) addReview(localDateKeyOf(item.lastReviewDate), subject);
+  }
+  return stats;
+}
+
+function heatCellTitle(date, subjectLabel, entry) {
+  const done = entry ? entry.done : 0;
+  const review = entry ? entry.review : 0;
+  if (!done && !review) return `${date} · ${subjectLabel} · 没有记录`;
+  const rounds = entry && entry.rounds.size
+    ? `（${[...entry.rounds.entries()].map(([label, value]) => `${label} ${value}`).join(" / ")}）`
+    : "";
+  return `${date} · ${subjectLabel} · 完成 ${done} 道${rounds} · 复盘 ${review} 道`;
+}
+
 function heatmap() {
-  const tasks = STORE ? STORE.tasks() : [];
-  const records = recordsAll();
-  const perDay = new Map();
-  for (const task of tasks) {
-    if (!task.date || !task.done) continue;
-    const entry = perDay.get(task.date) || { minutes: 0, count: 0 };
-    entry.minutes += Number(task.minutes) || 0;
-    entry.count += 1;
-    perDay.set(task.date, entry);
-  }
-  for (const record of records) {
-    if (!record.date) continue;
-    const entry = perDay.get(record.date) || { minutes: 0, count: 0 };
-    entry.minutes += Number(record.minutes) || 0;
-    entry.count += 1;
-    perDay.set(record.date, entry);
-  }
-  const maxMinutes = Math.max(1, ...[...perDay.values()].map((item) => item.minutes + item.count * 20));
-  const cells = Array.from({ length: 84 }, (_, index) => {
-    const key = dateKey(shiftDate(index - 83));
-    const entry = perDay.get(key) || { minutes: 0, count: 0 };
-    const signal = (entry.minutes + entry.count * 20) / maxMinutes;
-    const level = signal > 0.75 ? 4 : signal > 0.5 ? 3 : signal > 0.25 ? 2 : signal > 0 ? 1 : 0;
-    const label = entry.count
-      ? `${key} · 完成 ${entry.count} 项 · ${entry.minutes ? minutesText(entry.minutes) : "未填用时"}`
-      : `${key} · 没有记录`;
-    return `<span class="heat-cell l${level}" title="${escapeAttr(label)}"></span>`;
+  const stats = heatmapDayStats();
+  const dayCount = HEATMAP_WEEKS * 7;
+  const days = Array.from({ length: dayCount }, (_, index) => dateKey(shiftDate(index - (dayCount - 1))));
+  const doneMax = Math.max(0, ...[...stats.values()].map((item) => item.done));
+  const totals = new Map(HEATMAP_SUBJECTS.map((item) => [item.key, { done: 0, review: 0 }]));
+
+  const cells = days
+    .flatMap((date) =>
+      HEATMAP_SUBJECTS.map((subject) => {
+        const entry = stats.get(`${date}|${subject.key}`);
+        const done = entry ? entry.done : 0;
+        const review = entry ? entry.review : 0;
+        const total = totals.get(subject.key);
+        total.done += done;
+        total.review += review;
+        const signal = doneMax > 0 ? done / doneMax : 0;
+        const level = !done ? 0 : signal > 0.75 ? 4 : signal > 0.5 ? 3 : signal > 0.25 ? 2 : 1;
+        const classes = ["heat-cell", `l${level}`];
+        if (!done && review) classes.push("is-review");
+        return `<span class="${classes.join(" ")}" data-date="${date}" data-subject="${subject.key}" data-done="${done}" data-review="${review}" title="${escapeAttr(heatCellTitle(date, subject.label, entry))}">${done ? `<b>${done}</b>` : ""}${review ? `<i>${review}</i>` : ""}</span>`;
+      }),
+    )
+    .join("");
+
+  const labels = HEATMAP_SUBJECTS.map((subject) => {
+    const total = totals.get(subject.key);
+    return `<span class="heat-subject" title="${escapeAttr(`${subject.label}：近 ${HEATMAP_WEEKS} 周完成 ${total.done} 道，复盘 ${total.review} 道`)}"><b>${subject.label}</b><i>${total.done} / ${total.review}</i></span>`;
   }).join("");
-  return `<div class="heatmap">${cells}</div>`;
+
+  return `
+    <div class="heatmap-board">
+      <div class="heatmap-subjects" aria-hidden="true">${labels}</div>
+      <div class="heatmap-scroll" tabindex="0" role="group" aria-label="近 ${HEATMAP_WEEKS} 周每日刷题热力图，可横向滚动查看更早的日期">
+        <div class="heatmap-grid">${cells}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* 热力图默认停在最右边（今天），用户自己滚过之后按原位置还原。 */
+let heatmapScrollLeft = null;
+
+function syncHeatmapScroll() {
+  const scroll = document.querySelector(".heatmap-scroll");
+  if (!scroll) {
+    heatmapScrollLeft = null;
+    return;
+  }
+  scroll.scrollLeft = heatmapScrollLeft === null ? scroll.scrollWidth : heatmapScrollLeft;
+  scroll.addEventListener("scroll", () => {
+    heatmapScrollLeft = scroll.scrollLeft;
+  });
 }
 
 /** action 传空时保留原来的箭头按钮，复盘队列会换成可点的「复盘」按钮。 */
@@ -1672,12 +1781,18 @@ function renderDashboard() {
       <section class="card card-pad span-12">
         <div class="card-head">
           <div>
-            <h2 class="card-title">学习活跃度</h2>
-            <p class="card-note">最近 12 周 · 颜色越深代表当日有效学习时间越长。</p>
+            <h2 class="card-title">每日刷题热力图</h2>
+            <p class="card-note">最近 12 周 · 每一门一行，格内上面是完成题数、下面是复盘题数；颜色越深当天完成越多。</p>
           </div>
-          <div class="heat-legend">少 <i></i><i></i><i></i><i></i> 多</div>
+          <div class="heat-legend">
+            <span class="heat-legend-item"><b>上</b> 完成题数</span>
+            <span class="heat-legend-item"><b>下</b> 复盘题数</span>
+            <span class="heat-legend-item">少 <i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> 多</span>
+            <span class="heat-legend-item"><i class="is-review"></i> 只复盘</span>
+          </div>
         </div>
         ${heatmap()}
+        <p class="heat-note">复盘按错题「上次复盘日」和知识点复盘日志统计，同一道题更早的复盘记录无法还原；鼠标停在格子上可看当天轮次拆解。</p>
       </section>
     </div>
   `;
@@ -4474,6 +4589,7 @@ function render() {
   document.title = `${screen.title} · 小屋`;
   document.getElementById("crumb-current").textContent = screen.title;
   document.getElementById("app").innerHTML = screen.render();
+  syncHeatmapScroll();
   document.querySelectorAll("[data-screen]").forEach((button) => {
     button.classList.toggle("active", button.dataset.screen === state.screen);
   });
@@ -4617,30 +4733,72 @@ const entryNote = document.getElementById("entry-note");
 const entryModalNote = document.getElementById("entry-modal-note");
 const ENTRY_NOTE_DEFAULT = "失分自动计算；保存后写进当前 iball 账号的数据档案。";
 
-/* ------------------------------------------- 套卷错题题号热力图 */
+/* ------------------------------------------- 逐题标记：做对 / 做错分开多选 */
 
 const entryWrongField = document.getElementById("entry-wrong-field");
 const entryWrongLabel = document.getElementById("entry-wrong-label");
 const entryWrongGrid = document.getElementById("entry-wrong-grid");
 const entryWrongCount = document.getElementById("entry-wrong-count");
+const entryMarkModes = document.getElementById("entry-mark-modes");
+const entryMarkSummary = document.getElementById("entry-mark-summary");
 
-/** 题号范围按科目给一套够用的默认值，点一下就是「这题错了」。 */
+/** 题号范围按科目给一套够用的默认值。 */
 const WRONG_QUESTION_RANGES = [
   { key: "math", match: (subject) => subject.startsWith("数学"), max: 23, label: "数学真题" },
   { key: "english", match: (subject) => subject.startsWith("英语"), max: 48, label: "英语真题" },
   { key: "cs408", match: (subject) => subject === "408" || subject.includes("408"), max: 47, label: "408 真题" },
 ];
 
+/** wrong 进复盘，correct 只算完成题数。 */
+const ENTRY_MARKS = ["wrong", "correct"];
+const ENTRY_MARK_HINT =
+  "先选「做错」或「做对」，再点题号；同一个题号再点一次取消。做对和做错分开统计，做错的自动进入待复盘。";
+let entryMarkMode = "wrong";
+
 function wrongRangeFor(subject) {
   const key = String(subject || "");
   return WRONG_QUESTION_RANGES.find((item) => item.match(key)) || WRONG_QUESTION_RANGES[0];
 }
 
+function setEntryMarkMode(mode) {
+  entryMarkMode = ENTRY_MARKS.includes(mode) ? mode : "wrong";
+  entryMarkModes?.querySelectorAll("[data-entry-mark]").forEach((node) => {
+    const active = node.dataset.entryMark === entryMarkMode;
+    node.classList.toggle("active", active);
+    node.setAttribute("aria-pressed", String(active));
+  });
+}
+
+/** 题号格当前状态：题号 -> wrong / correct。 */
+function selectedEntryMarks() {
+  const marks = new Map();
+  if (!entryWrongGrid) return marks;
+  entryWrongGrid.querySelectorAll(".question-cell").forEach((cell) => {
+    const number = Number(cell.dataset.question);
+    const mark = String(cell.dataset.mark || "");
+    if (Number.isFinite(number) && number > 0 && ENTRY_MARKS.includes(mark)) {
+      marks.set(number, mark);
+    }
+  });
+  return marks;
+}
+
+/** 旧口径：只关心做错的题号。 */
 function selectedWrongNumbers() {
-  if (!entryWrongGrid) return [];
-  return [...entryWrongGrid.querySelectorAll(".question-cell.active")]
-    .map((cell) => Number(cell.dataset.question))
-    .filter((number) => Number.isFinite(number) && number > 0);
+  return [...selectedEntryMarks().entries()]
+    .filter(([, mark]) => mark === "wrong")
+    .map(([number]) => number)
+    .sort((left, right) => left - right);
+}
+
+function entryMarkCounts(marks = selectedEntryMarks()) {
+  let wrong = 0;
+  let correct = 0;
+  marks.forEach((mark) => {
+    if (mark === "wrong") wrong += 1;
+    else if (mark === "correct") correct += 1;
+  });
+  return { wrong, correct, total: wrong + correct };
 }
 
 function syncWrongFieldVisibility() {
@@ -4649,29 +4807,64 @@ function syncWrongFieldVisibility() {
   entryWrongField.hidden = status === "学习进度";
 }
 
+/** 学习题数和刷题轮次分开显示：题数只看标记，轮次只做标签。 */
+function syncEntryMarkSummary(counts = entryMarkCounts()) {
+  if (!entryMarkSummary) return;
+  if (!counts.total) {
+    entryMarkSummary.textContent = ENTRY_MARK_HINT;
+    return;
+  }
+  const round = mathRoundMeta(entryRound ? entryRound.value : 1);
+  entryMarkSummary.textContent = `本次学习 ${counts.total} 道 · ${round.label}：做对 ${counts.correct} 道，做错 ${counts.wrong} 道（做错的自动进入待复盘）。`;
+}
+
 function syncWrongGridState() {
-  const numbers = selectedWrongNumbers();
+  const counts = entryMarkCounts();
   if (entryWrongCount) {
-    entryWrongCount.textContent = numbers.length ? `已选 ${numbers.length} 题` : "未选择";
+    entryWrongCount.textContent = counts.total
+      ? `做对 ${counts.correct} · 做错 ${counts.wrong}`
+      : "未选择";
   }
   if (entryWrongLabel) {
     const range = wrongRangeFor(entrySubject.value);
     entryWrongLabel.textContent = `${range.label} · 第 1-${range.max} 题，点哪个算哪个`;
   }
+  syncEntryMarkSummary(counts);
 }
 
-/** 重画题号格；不传参数时保留当前已选中的题号。 */
-function renderWrongGrid(numbers = selectedWrongNumbers()) {
+/** 重画题号格；Map 是题号到标记，数组 / Set 按旧口径当成「全做错」。 */
+function renderWrongGrid(marks = selectedEntryMarks()) {
   if (!entryWrongGrid) return;
   const range = wrongRangeFor(entrySubject.value);
-  const selected = new Set((numbers || []).map((number) => Number(number)));
+  const source =
+    marks instanceof Map
+      ? marks
+      : new Map(
+          (Array.isArray(marks) ? marks : [...(marks || [])]).map((number) => [Number(number), "wrong"]),
+        );
   entryWrongGrid.dataset.range = String(range.max);
   entryWrongGrid.innerHTML = Array.from({ length: range.max }, (_, index) => index + 1)
     .map((number) => {
-      const active = selected.has(number);
-      return `<button class="question-cell${active ? " active" : ""}" type="button" data-question="${number}" aria-pressed="${active ? "true" : "false"}">${number}</button>`;
+      const mark = ENTRY_MARKS.includes(source.get(number)) ? source.get(number) : "";
+      const classes = ["question-cell"];
+      if (mark) classes.push("active");
+      if (mark === "wrong") classes.push("is-wrong");
+      if (mark === "correct") classes.push("is-correct");
+      return `<button class="${classes.join(" ")}" type="button" data-question="${number}" data-mark="${mark}" aria-pressed="${mark ? "true" : "false"}">${number}</button>`;
     })
     .join("");
+  syncWrongGridState();
+}
+
+/** 点一下按当前模式打标记，点同一个再取消。 */
+function toggleQuestionMark(cell) {
+  if (!cell) return;
+  const next = String(cell.dataset.mark || "") === entryMarkMode ? "" : entryMarkMode;
+  cell.dataset.mark = next;
+  cell.classList.toggle("active", Boolean(next));
+  cell.classList.toggle("is-wrong", next === "wrong");
+  cell.classList.toggle("is-correct", next === "correct");
+  cell.setAttribute("aria-pressed", String(Boolean(next)));
   syncWrongGridState();
 }
 
@@ -4685,22 +4878,47 @@ function entryDetailRecordsOf(summaryId) {
   return STORE.records().filter((record) => record.id.startsWith(`${summaryId}-q`));
 }
 
-function entryDetailNumbersOf(summaryId) {
-  return entryDetailRecordsOf(summaryId)
-    .map((record) => Number(String(record.question || "").replace(/[^\d]/g, "")))
-    .filter((number) => Number.isFinite(number) && number > 0);
+function entryDetailNumber(record) {
+  return Number(String((record && record.question) || "").replace(/[^\d]/g, ""));
 }
 
-/** 保存主记录时同步逐题错题：选了就生成，取消勾选就把对应详情删掉。 */
-function syncEntryDetails(summary, numbers) {
+/** 旧口径：只返回做错的题号。 */
+function entryDetailNumbersOf(summaryId) {
+  return [...entryDetailMarksOf(summaryId).entries()]
+    .filter(([, mark]) => mark === "wrong")
+    .map(([number]) => number)
+    .sort((left, right) => left - right);
+}
+
+/** 编辑回填：逐题详情还原成题号 -> wrong / correct。 */
+function entryDetailMarksOf(summaryId) {
+  const marks = new Map();
+  entryDetailRecordsOf(summaryId).forEach((record) => {
+    const number = entryDetailNumber(record);
+    if (!Number.isFinite(number) || number <= 0) return;
+    const wrong =
+      record.status === "错题复盘" ||
+      record.status === "一直不会的题" ||
+      Boolean(String(record.errorType || "").trim()) ||
+      Boolean(record.reviewDate) ||
+      (Number(record.count) > 0 && Number(record.correct) < Number(record.count));
+    marks.set(number, wrong ? "wrong" : "correct");
+  });
+  return marks;
+}
+
+/** 保存主记录时同步逐题详情：做错生成待复盘错题，做对只留一条已完成记录。 */
+function syncEntryDetails(summary, marks) {
   if (!STORE || !summary || !summary.id) return 0;
+  const source = marks instanceof Map ? marks : new Map();
   const existing = entryDetailRecordsOf(summary.id);
-  if (!numbers.length && !existing.length) return 0;
-  const keep = new Set(numbers.map((number) => entryDetailId(summary.id, number)));
+  if (!source.size && !existing.length) return 0;
+  const keep = new Set([...source.keys()].map((number) => entryDetailId(summary.id, number)));
   existing.forEach((record) => {
     if (!keep.has(record.id)) STORE.removeRecord(record.id);
   });
-  numbers.forEach((number) => {
+  source.forEach((mark, number) => {
+    const wrong = mark === "wrong";
     STORE.upsertRecord({
       id: entryDetailId(summary.id, number),
       date: summary.date,
@@ -4711,14 +4929,18 @@ function syncEntryDetails(summary, numbers) {
       module: summary.module,
       kind: summary.kind,
       round: summary.round,
-      status: "错题复盘",
+      status: wrong ? "错题复盘" : "已复盘",
       question: `第 ${number} 题`,
-      errorType: summary.errorType,
-      reviewDate: summary.reviewDate,
+      count: 1,
+      correct: wrong ? 0 : 1,
+      errorType: wrong ? summary.errorType : "",
+      errorCount: wrong ? 1 : 0,
+      reviewDate: wrong ? summary.reviewDate : "",
+      reviewCount: 0,
       note: summary.note,
     });
   });
-  return numbers.length;
+  return source.size;
 }
 
 const taskModal = document.getElementById("task-modal");
@@ -4932,7 +5154,7 @@ function openEntry(mode = "create", description = "", record = null) {
     resetEntryForm();
   }
   syncEntryOptions();
-  renderWrongGrid(record ? entryDetailNumbersOf(record.id) : []);
+  renderWrongGrid(record ? entryDetailMarksOf(record.id) : []);
   syncWrongFieldVisibility();
   updateLostScore();
   document.body.classList.add("entry-open");
@@ -4948,7 +5170,14 @@ function closeEntry() {
 function saveEntry() {
   if (!STORE) return false;
   const existing = state.recordEditId ? STORE.getRecord(state.recordEditId) : null;
+  const marks = selectedEntryMarks();
+  const markCounts = entryMarkCounts(marks);
   const record = entryRecordFromForm(existing);
+  // 逐题标记就是本次学习题数；一刷 / 二刷只留在 round 里，不参与题数。
+  if (marks.size) {
+    record.count = markCounts.total;
+    record.correct = markCounts.correct;
+  }
   if (!record.full && !record.score && !record.count && !record.correct) {
     modalNote(entryModalNote, "至少填一项：满分 / 得分，或者本次题数 / 做对题数。", true);
     return false;
@@ -4961,9 +5190,8 @@ function saveEntry() {
     modalNote(entryModalNote, "得分不能大于满分。", true);
     return false;
   }
-  const wrongNumbers = selectedWrongNumbers();
   const saved = STORE.upsertRecord(record);
-  syncEntryDetails(saved, wrongNumbers);
+  syncEntryDetails(saved, marks);
   closeEntry();
   setEntryMode("create");
   render();
@@ -5339,11 +5567,15 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const markModeButton = event.target.closest("#entry-mark-modes [data-entry-mark]");
+  if (markModeButton) {
+    setEntryMarkMode(markModeButton.dataset.entryMark);
+    return;
+  }
+
   const questionCell = event.target.closest("#entry-wrong-grid .question-cell");
   if (questionCell) {
-    const active = questionCell.classList.toggle("active");
-    questionCell.setAttribute("aria-pressed", active ? "true" : "false");
-    syncWrongGridState();
+    toggleQuestionMark(questionCell);
     return;
   }
 
@@ -5782,6 +6014,7 @@ document.getElementById("cancel-edit").addEventListener("click", () => {
 document.getElementById("save-entry").addEventListener("click", saveEntry);
 entrySubject.addEventListener("change", syncEntryOptions);
 entryStatus.addEventListener("change", syncWrongFieldVisibility);
+entryRound?.addEventListener("change", syncWrongGridState);
 entryFull.addEventListener("input", updateLostScore);
 entryScore.addEventListener("input", updateLostScore);
 entryModal.addEventListener("click", (event) => {

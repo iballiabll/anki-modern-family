@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#17204f" />
     <title>XXRJ · 考研 11408 学习档案</title>
-    <link rel="stylesheet" href="./styles.css?v=20260927-heatselect1" />
+    <link rel="stylesheet" href="./styles.css?v=20260927-heatselect3" />
   </head>
   <body>
     <div class="app">
@@ -265,12 +265,33 @@
             </div>
             <div class="field span-12" id="entry-wrong-field">
               <div class="field-head">
-                <label id="entry-wrong-label">套卷错题 · 可多选</label>
+                <label id="entry-wrong-label">逐题标记 · 可多选</label>
                 <span class="field-counter" id="entry-wrong-count">未选择</span>
                 <button class="text-btn" id="clear-entry-wrong" type="button">清空</button>
               </div>
+              <div class="segmented entry-mark-modes" id="entry-mark-modes" role="group" aria-label="题号标记方式">
+                <button
+                  class="active"
+                  type="button"
+                  data-entry-mark="wrong"
+                  aria-pressed="true"
+                  title="先选这个，再点题号就是做错了；做错的题会生成逐题错题并进入待复盘"
+                >
+                  做错 · 进复盘
+                </button>
+                <button
+                  type="button"
+                  data-entry-mark="correct"
+                  aria-pressed="false"
+                  title="先选这个，再点题号就是做对了；只算完成题数，不进复盘"
+                >
+                  做对
+                </button>
+              </div>
               <div class="question-heatmap" id="entry-wrong-grid" role="group" aria-labelledby="entry-wrong-label"></div>
-              <p class="field-hint">点题号即选中，可连续点多个；保存后每个题号自动生成一条逐题错题记录。</p>
+              <p class="field-hint" id="entry-mark-summary">
+                先选「做错」或「做对」，再点题号；同一个题号再点一次取消。做对和做错分开统计，做错的自动进入待复盘。
+              </p>
             </div>
             <div class="field">
               <label for="entry-status">记录类型</label>
@@ -593,6 +614,6 @@
     <script src="./vendor/lucide.min.js"></script>
     <script src="./math-books.js?v=20260927-cache1"></script>
     <script src="./store.js?v=20260927-cache1"></script>
-    <script src="./app.js?v=20260927-heatselect1"></script>
+    <script src="./app.js?v=20260927-heatselect3"></script>
   </body>
 </html>

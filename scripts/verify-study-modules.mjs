@@ -417,10 +417,17 @@ async function verifyVocab(browser, base, out) {
   const drawControls = await page.evaluate(() => ({
     orders: document.querySelectorAll("#drawControls [data-draw-order]").length,
     scopes: document.querySelectorAll("#drawControls [data-draw-scope]").length,
+    scopeKeys: Array.from(
+      document.querySelectorAll("#drawControls [data-draw-scope]"),
+      (node) => node.dataset.drawScope,
+    ),
+    days: document.querySelectorAll("#drawControls [data-draw-days]").length,
     activeOrder: document.querySelector("#drawControls [data-draw-order].is-active")
       ?.dataset.drawOrder,
     activeScope: document.querySelector("#drawControls [data-draw-scope].is-active")
       ?.dataset.drawScope,
+    activeDays: document.querySelector("#drawControls [data-draw-days].is-active")
+      ?.dataset.drawDays,
   }));
   check(
     "抽卡有顺序版与非顺序版",
@@ -428,10 +435,21 @@ async function verifyVocab(browser, base, out) {
     `${drawControls.orders} 个顺序 · 当前 ${drawControls.activeOrder}`,
   );
   check(
-    "抽卡有四种范围",
-    drawControls.scopes === 4 && drawControls.activeScope === "all",
+    "抽卡有六种范围",
+    drawControls.scopes === 6 &&
+      ["all", "unlearned", "known", "fuzzy", "unknown", "favorites"].every((key) =>
+        drawControls.scopeKeys.includes(key),
+      ) &&
+      drawControls.activeScope === "all",
     `${drawControls.scopes} 个范围 · 当前 ${drawControls.activeScope}`,
   );
+  check(
+    "抽卡时间范围有五档且默认不限",
+    drawControls.days === 5 && drawControls.activeDays === "0",
+    `${drawControls.days} 档 · 默认 ${drawControls.activeDays}`,
+  );
+  const defaultDrawStatus = (await page.locator("#drawStatus").innerText()).trim();
+  check("默认不按时间过滤", /不限时间/.test(defaultDrawStatus), defaultDrawStatus);
   const drawFirst = await page.evaluate(() => ({
     word: document.getElementById("drawWord")?.textContent?.trim() || "",
     answerHidden: document.getElementById("drawAnswer")?.hidden,
@@ -533,18 +551,69 @@ async function verifyVocab(browser, base, out) {
     `${knownDraw} · ${knownDrawStatus}`,
   );
 
-  await page.click('#drawControls [data-draw-scope="learned"]');
+  await page.click('#drawControls [data-draw-scope="unlearned"]');
   await page.waitForTimeout(180);
-  const learnedDraw = (await page.locator("#drawWord").innerText()).trim();
-  const learnedHasRecord = await page.evaluate(
-    (word) => Boolean(window.IballVocabRecite?.getRecord("kaoyan", word)),
-    learnedDraw,
+  const unlearnedDraw = (await page.locator("#drawWord").innerText()).trim();
+  const unlearnedStatus = await page.evaluate(
+    (word) => window.IballVocabRecite?.getRecord("kaoyan", word)?.status || "",
+    unlearnedDraw,
   );
   check(
-    "已经会的范围只抽有背词记录的词",
-    learnedHasRecord,
-    `${learnedDraw} · record=${learnedHasRecord}`,
+    "未斩范围跳过已斩词",
+    unlearnedStatus !== "known" && unlearnedDraw !== orderedWords[2],
+    `${unlearnedDraw} · status=${unlearnedStatus || "(没有记录)"}`,
   );
+  await page.click('#drawControls [data-draw-days="1"]');
+  await page.waitForTimeout(180);
+  const todayUnlearnedStatus = (await page.locator("#drawStatus").innerText()).trim();
+  check(
+    "今天 + 未斩按背词日期过滤",
+    todayUnlearnedStatus.includes("今天") && /共 \d+ 词/.test(todayUnlearnedStatus),
+    todayUnlearnedStatus,
+  );
+
+  await page.click('#drawControls [data-draw-scope="known"]');
+  await page.waitForTimeout(180);
+  const todayKnownDraw = (await page.locator("#drawWord").innerText()).trim();
+  const todayKnownStatus = (await page.locator("#drawStatus").innerText()).trim();
+  check(
+    "今天 + 已斩只抽今天斩过的词",
+    todayKnownDraw === orderedWords[2] &&
+      todayKnownStatus.includes("今天") &&
+      todayKnownStatus.includes("共 1 词"),
+    `${todayKnownDraw} · ${todayKnownStatus}`,
+  );
+
+  await page.click('#drawControls [data-draw-scope="unknown"]');
+  await page.waitForTimeout(180);
+  const todayUnknownDraw = (await page.locator("#drawWord").innerText()).trim();
+  check(
+    "今天 + 不会抽到刚标记的词",
+    todayUnknownDraw === drawWord,
+    `${drawWord} -> ${todayUnknownDraw}`,
+  );
+
+  await page.click('#drawControls [data-draw-scope="fuzzy"]');
+  await page.click('#drawControls [data-draw-days="3"]');
+  await page.waitForTimeout(180);
+  const threeDayFuzzyDraw = (await page.locator("#drawWord").innerText()).trim();
+  const threeDayFuzzyStatus = (await page.locator("#drawStatus").innerText()).trim();
+  check(
+    "近 3 天 + 模糊命中今天标记的模糊词",
+    threeDayFuzzyDraw === orderedWords[1] && threeDayFuzzyStatus.includes("近 3 天"),
+    `${orderedWords[1]} -> ${threeDayFuzzyDraw} · ${threeDayFuzzyStatus}`,
+  );
+
+  await page.click('#drawControls [data-draw-scope="favorites"]');
+  await page.waitForTimeout(180);
+  const favoriteTodayHint = (await page.locator("#drawPhonetic").innerText()).trim();
+  const favoriteTodayStatus = (await page.locator("#drawStatus").innerText()).trim();
+  check(
+    "状态与日期组合无结果时给出空提示",
+    /共 0 词/.test(favoriteTodayStatus) && /不限/.test(favoriteTodayHint),
+    `${favoriteTodayStatus} · ${favoriteTodayHint}`,
+  );
+  await page.click('#drawControls [data-draw-days="0"]');
 
   await page.click('#drawControls [data-draw-scope="all"]');
   await page.waitForTimeout(180);
@@ -625,7 +694,7 @@ async function verifyVocab(browser, base, out) {
   });
   check(
     "移动端抽卡设置完整且不横向溢出",
-    mobileDrawControls.buttons === 6 &&
+    mobileDrawControls.buttons === 13 &&
       mobileDrawControls.scrollWidth <= mobileDrawControls.clientWidth + 1,
     `${mobileDrawControls.buttons} 个设置按钮 · scrollWidth=${mobileDrawControls.scrollWidth} clientWidth=${mobileDrawControls.clientWidth}`,
   );
