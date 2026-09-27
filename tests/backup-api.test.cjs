@@ -187,3 +187,78 @@ test("状态文件损坏时按“从未备份”展示，而不是 500", async (
   assert.equal(read.statusCode, 200);
   assert.equal(read.body.backup.status.lastStatus, "never");
 });
+
+test("空仓库首次备份会在 main 上创建第一个提交", async () => {
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "iball-backup-empty-"));
+  fs.writeFileSync(path.join(dataDir, "users.json"), '{"users":[]}', "utf8");
+  const previous = {
+    DATA_DIR: process.env.DATA_DIR,
+    GITHUB_BACKUP_TOKEN: process.env.GITHUB_BACKUP_TOKEN,
+    BACKUP_REPO: process.env.BACKUP_REPO,
+    BACKUP_BRANCH: process.env.BACKUP_BRANCH,
+  };
+  process.env.DATA_DIR = dataDir;
+  process.env.GITHUB_BACKUP_TOKEN = "test-token";
+  process.env.BACKUP_REPO = "iballiabll/iball-cabin-backup";
+  process.env.BACKUP_BRANCH = "main";
+
+  const calls = [];
+  const originalFetch = global.fetch;
+  global.fetch = async (url, options = {}) => {
+    const method = options.method || "GET";
+    const parsed = new URL(String(url));
+    calls.push(`${method} ${parsed.pathname}`);
+    if (parsed.pathname === "/repos/iballiabll/iball-cabin-backup") {
+      return new Response(
+        JSON.stringify({
+          full_name: "iballiabll/iball-cabin-backup",
+          private: true,
+          archived: false,
+        }),
+        { status: 200 },
+      );
+    }
+    if (parsed.pathname.endsWith("/git/ref/heads/main")) {
+      // GitHub 对没有任何提交的空仓库返回 409，而不是 404。
+      return new Response(JSON.stringify({ message: "Git Repository is empty." }), {
+        status: 409,
+      });
+    }
+    if (parsed.pathname.endsWith("/git/blobs")) {
+      return new Response(JSON.stringify({ sha: "blob-sha" }), { status: 201 });
+    }
+    if (parsed.pathname.endsWith("/git/trees")) {
+      return new Response(JSON.stringify({ sha: "tree-sha" }), { status: 201 });
+    }
+    if (parsed.pathname.endsWith("/git/commits")) {
+      return new Response(JSON.stringify({ sha: "commit-sha" }), { status: 201 });
+    }
+    if (parsed.pathname.endsWith("/git/refs")) {
+      return new Response(JSON.stringify({ ref: "refs/heads/main" }), { status: 201 });
+    }
+    throw new Error(`unexpected fetch: ${method} ${parsed.pathname}`);
+  };
+
+  try {
+    const { runBackup } = await import("../scripts/backup-data.mjs");
+    const result = await runBackup({ trigger: "cli" });
+    assert.equal(result.ok, true, result.message);
+    assert.equal(result.commitSha, "commit-sha");
+    assert.ok(
+      calls.includes("POST /repos/iballiabll/iball-cabin-backup/git/refs"),
+      "空仓库应该直接创建 refs/heads/main",
+    );
+    assert.equal(
+      calls.some((entry) => entry.startsWith("PATCH ")),
+      false,
+      "空仓库没有旧 HEAD，不应该走 PATCH",
+    );
+  } finally {
+    global.fetch = originalFetch;
+    for (const [name, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  }
+});

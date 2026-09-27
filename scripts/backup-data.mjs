@@ -129,7 +129,9 @@ async function githubRequest(config, url, { method = "GET", body } = {}) {
   }
   if (!response.ok) {
     const detail = data && data.message ? data.message : `HTTP ${response.status}`;
-    throw new BackupError(`GitHub API ${method} ${url} 失败：${detail}`, response.status === 404 ? 404 : 502);
+    // 保留 4xx，让调用方能区分“空仓库 / 不存在 / 无权限”等可预期状态。
+    const statusCode = response.status >= 400 && response.status < 500 ? response.status : 502;
+    throw new BackupError(`GitHub API ${method} ${url} 失败：${detail}`, statusCode);
   }
   return data;
 }
@@ -218,6 +220,8 @@ async function resolveHead(config) {
     return { commitSha, treeSha: commit && commit.tree ? commit.tree.sha : "" };
   } catch (error) {
     if (error.statusCode === 404) return null;
+    // 空仓库还没有任何提交，GitHub 对读取 HEAD 会返回 409 Git Repository is empty。
+    if (error.statusCode === 409 && /empty/i.test(error.message)) return null;
     throw error;
   }
 }
