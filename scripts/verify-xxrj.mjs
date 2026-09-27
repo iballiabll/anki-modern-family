@@ -8,6 +8,17 @@
  * 在线时长 / 模块使用列，以及停用、恢复、删除账号的完整流程；
  * 不传就跳过管理端那一段（备份接口本身由 tests/backup-api.test.cjs 覆盖）。
  *
+ * 可选：--session-file <文件> 时用一份现成的站长会话 Cookie 打开 /admin.html，
+ * 做只读检查（在线时长 / 模块使用 / 账号状态 / 备份卡片）。
+ * 加上 --trigger-backup 会点一次「立即备份」并等它变成成功，用于线上验收。
+ * 只读模式不注册账号、不点击停用或删除，也不写学习数据。
+ *
+ * 只读模式的收紧项，按环境取舍：
+ *   --require-backup-token   要求备份已配置 token（线上验收用）
+ *   --require-user-actions   要求账号行有停用/恢复/删除按钮（线上验收用）
+ *   --skip-redirect-check    跳过「带会话打开登录页回跳」检查（线上无口令时用）
+ *   --skip-entry-link-check  跳过小屋入口链接检查
+ *
  * 只在本地测试服务上跑，用的是浏览器自带的 localStorage，不碰生产数据。
  */
 
@@ -15,6 +26,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 const RUNTIME_MODULES =
   process.env.CODEX_PLAYWRIGHT_MODULES ||
@@ -30,6 +42,17 @@ const CHROME_CANDIDATES = [
 function arg(name, fallback = "") {
   const index = process.argv.indexOf(`--${name}`);
   return index >= 0 && process.argv[index + 1] ? process.argv[index + 1] : fallback;
+}
+
+function flag(name, fallback = false) {
+  const exact = process.argv.includes(`--${name}`);
+  const negated = process.argv.includes(`--no-${name}`);
+  if (exact && negated) {
+    throw new Error(`同时给了 --${name} 和 --no-${name}`);
+  }
+  if (exact) return true;
+  if (negated) return false;
+  return fallback;
 }
 
 async function findBrowser() {
@@ -59,6 +82,22 @@ function localDateKey(date = new Date()) {
 
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
+
+/** 备份状态徽章的四种文案，服务端状态和它一一对应。 */
+const BACKUP_BADGE = /未配置备份 token|还没有备份记录|上次备份成功|上次备份失败/;
+
+/** 把一份现成的站长会话拼成浏览器 Cookie。 */
+function sessionCookie(base, token) {
+  return {
+    name: "iball_cabin_session",
+    value: token,
+    domain: new URL(base).hostname,
+    path: "/",
+    httpOnly: true,
+    secure: base.startsWith("https://"),
+    sameSite: "Lax",
+  };
+}
 
 async function prepareContext(browser, viewport, base, out, name) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
@@ -325,9 +364,35 @@ async function adminFlow(browser, base, out, password) {
     await badge.waitFor({ timeout: 10000 });
     const badgeText = await badge.innerText();
     const metaText = await page.locator("#backupMeta").innerText();
-    check("备份卡片渲染状态徽章", /未配置|从未|从未备份/.test(badgeText), badgeText);
-    check("备份卡片显示仓库与上次备份", /iball-cabin-backup/.test(metaText), metaText.replace(/\s+/g, " ").slice(0, 90));
-    check("未配置时立即备份按钮禁用", await page.locator("#backupRun").isDisabled());
+    const backupInfo = (
+      await (await page.request.get(`${base}/api/backup`)).json()
+    ).backup;
+    check("备份卡片渲染状态徽章", BACKUP_BADGE.test(badgeText), badgeText);
+    check(
+      "备份卡片显示仓库与分支",
+      /iball-cabin-backup/.test(metaText),
+      metaText.replace(/\s+/g, " ").slice(0, 90),
+    );
+    if (backupInfo?.configured) {
+      check("已配置 token 时立即备份按钮可用", !(await page.locator("#backupRun").isDisabled()));
+      check(
+        "立即备份按钮文案正常",
+        (await page.locator("#backupRun").innerText()).includes("立即备份"),
+      );
+      if (backupInfo.status?.lastStatus === "ok") {
+        check("上次备份成功时徽章带时间", /上次备份成功 · \S/.test(badgeText), badgeText);
+        check("备份卡片显示快照目录", /snapshots\//.test(metaText), metaText.replace(/\s+/g, " ").slice(0, 120));
+        const commitLink = page.locator('#backupMeta a[href^="https://github.com/"]');
+        check(
+          "备份卡片显示 GitHub 提交链接",
+          (await commitLink.count()) >= 1 &&
+            /\/commit\/[0-9a-f]{7,}/.test(await commitLink.first().getAttribute("href")),
+          await commitLink.first().getAttribute("href").catch(() => ""),
+        );
+      }
+    } else {
+      check("未配置时立即备份按钮禁用", await page.locator("#backupRun").isDisabled());
+    }
 
     await page.locator("#backupBadge").scrollIntoViewIfNeeded();
     await page.screenshot({ path: path.join(out, "xxrj-admin-backup.png"), fullPage: false });
@@ -474,10 +539,270 @@ async function adminFlow(browser, base, out, password) {
   }
 }
 
+/** 轮询备份接口，等这次备份真正结束（成功或失败）。 */
+async function waitForBackupFinish(page, base, beforeRunAt, timeoutMs = 150000) {
+  const deadline = Date.now() + timeoutMs;
+  let last = {};
+  while (Date.now() < deadline) {
+    const body = await page.request
+      .get(`${base}/api/backup`)
+      .then((response) => response.json())
+      .catch(() => ({}));
+    last = body.backup || {};
+    const status = last.status || {};
+    if (!last.running && status.lastRunAt && status.lastRunAt !== beforeRunAt) {
+      return {
+        ok: status.lastStatus === "ok",
+        detail: `status=${status.lastStatus} 文件=${status.fileCount} 字节=${status.bytes} ${
+          status.message || ""
+        }`.trim(),
+        commitSha: String(status.commitSha || ""),
+      };
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+  return { ok: false, detail: `超时：${JSON.stringify(last).slice(0, 140)}` };
+}
+
+/**
+ * 只读管理台检查：用一份现成的站长会话 Cookie 打开 /admin.html。
+ * 不注册账号、不停用、不删除；只有显式 --trigger-backup 时才会点一次备份。
+ */
+async function adminReadonlyFlow(
+  browser,
+  base,
+  out,
+  token,
+  { triggerBackup = false, requireBackupToken = true, requireUserActions = true } = {},
+) {
+  const cookie = sessionCookie(base, token);
+  const context = await browser.newContext({ viewport: DESKTOP, deviceScaleFactor: 1 });
+  await context.addCookies([cookie]);
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
+  try {
+    await page.goto(`${base}/admin.html`, { waitUntil: "load", timeout: 30000 });
+    await page.waitForSelector("#adminBody:not([hidden])", { timeout: 20000 });
+    check("只读站长会话可以打开管理台", true);
+
+    const backupInfo = (
+      await (await page.request.get(`${base}/api/backup`)).json()
+    ).backup;
+    const badge = page.locator("#backupBadge");
+    await badge.waitFor({ timeout: 10000 });
+    const badgeText = await badge.innerText();
+    const metaText = (await page.locator("#backupMeta").innerText()).replace(/\s+/g, " ");
+    if (requireBackupToken) {
+      check(
+        "线上备份已配置 token",
+        backupInfo?.configured === true,
+        `configured=${backupInfo?.configured} repo=${backupInfo?.repo}`,
+      );
+    } else {
+      console.log(
+        `[SKIP] 备份 token 配置检查 — configured=${backupInfo?.configured} repo=${backupInfo?.repo}`,
+      );
+    }
+    check("备份卡片渲染状态徽章", BACKUP_BADGE.test(badgeText), badgeText);
+    check(
+      "备份卡片显示仓库与分支",
+      metaText.includes(String(backupInfo?.repo || "")) &&
+        metaText.includes(String(backupInfo?.branch || "")),
+      metaText.slice(0, 110),
+    );
+    if (backupInfo?.status?.lastStatus === "ok") {
+      check("备份卡片显示数据规模", /个文件/.test(metaText), metaText.slice(0, 140));
+      check("备份卡片显示快照目录", /snapshots\//.test(metaText), metaText.slice(0, 140));
+      const commitLink = page.locator('#backupMeta a[href^="https://github.com/"]');
+      const commitHref = await commitLink.first().getAttribute("href").catch(() => "");
+      check(
+        "备份卡片显示 GitHub 提交链接",
+        (await commitLink.count()) >= 1 && /\/commit\/[0-9a-f]{7,}/.test(String(commitHref)),
+        String(commitHref),
+      );
+    }
+    check(
+      backupInfo?.configured ? "已配置时立即备份按钮可用" : "未配置时立即备份按钮禁用",
+      backupInfo?.configured
+        ? await page.locator("#backupRun").isEnabled()
+        : await page.locator("#backupRun").isDisabled(),
+    );
+    await badge.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: path.join(out, "xxrj-admin-online.png"), fullPage: false });
+
+    const activityHead = await page
+      .locator("#activityBody")
+      .locator("xpath=ancestor::table")
+      .locator("thead th")
+      .allInnerTexts();
+    check(
+      "活动表有在线时长与模块使用列",
+      activityHead.includes("在线时长") && activityHead.includes("模块使用"),
+      activityHead.join(" / "),
+    );
+    const userHead = await page
+      .locator("#userBody")
+      .locator("xpath=ancestor::table")
+      .locator("thead th")
+      .allInnerTexts();
+    check("账号表有状态列", userHead.includes("状态"), userHead.join(" / "));
+
+    const userRows = await page.locator("#userBody tr").count();
+    if (requireUserActions) {
+      check("账号表渲染出真实账号", userRows >= 1, `${userRows} 行`);
+      const userActions = await page
+        .locator(
+          "#userBody [data-user-disable], #userBody [data-user-enable], #userBody [data-user-delete]",
+        )
+        .count();
+      check("账号行带停用 / 恢复 / 删除按钮", userActions >= 3, `${userActions} 个按钮`);
+    } else {
+      console.log(`[SKIP] 账号行操作按钮检查 — ${userRows} 行`);
+    }
+
+    const activityRows = await page.locator("#activityBody tr").count();
+    check("活动表渲染出真实记录", activityRows >= 1, `${activityRows} 行`);
+    if (activityRows >= 1) {
+      const rowText = (await page.locator("#activityBody tr").first().innerText()).replace(
+        /\s+/g,
+        " ",
+      );
+      check("活动行显示今天与累计在线时长", /今天/.test(rowText) && /累计/.test(rowText), rowText.slice(0, 90));
+      check(
+        "活动行渲染模块胶囊",
+        (await page.locator("#activityBody .admin-module").count()) >= 1,
+        await page
+          .locator("#activityBody .admin-module")
+          .first()
+          .innerText()
+          .catch(() => ""),
+      );
+    }
+    await page.locator("#userBody").scrollIntoViewIfNeeded();
+    await page.screenshot({ path: path.join(out, "xxrj-admin-online-users.png"), fullPage: false });
+    check("管理台无脚本错误", errors.length === 0, errors.slice(0, 3).join(" | "));
+
+    if (triggerBackup && !backupInfo?.configured) {
+      check("立即备份可点击（需要已配置 token）", false, "未配置 token，无法触发备份");
+    } else if (triggerBackup) {
+      const beforeRunAt = String(backupInfo?.status?.lastRunAt || "");
+      await page.locator("#backupRun").click();
+      const entered = await Promise.race([
+        page
+          .waitForFunction(
+            () =>
+              /正在备份|备份中/.test(
+                document.querySelector("#backupBadge")?.textContent || "",
+              ),
+            null,
+            { timeout: 20000 },
+          )
+          .then(() => true)
+          .catch(() => false),
+      ]);
+      check("点击立即备份后进入备份中状态", entered);
+      const finished = await waitForBackupFinish(page, base, beforeRunAt);
+      check("线上立即备份执行成功", finished.ok, finished.detail);
+      await page.reload({ waitUntil: "load" });
+      await page.waitForSelector("#adminBody:not([hidden])", { timeout: 15000 });
+      const afterBadge = await page.locator("#backupBadge").innerText();
+      const afterMeta = (await page.locator("#backupMeta").innerText()).replace(/\s+/g, " ");
+      check("备份成功后徽章显示成功", /上次备份成功/.test(afterBadge), afterBadge);
+      check(
+        "备份成功后卡片记录新提交",
+        finished.commitSha
+          ? afterMeta.includes(finished.commitSha.slice(0, 12))
+          : false,
+        afterMeta.slice(0, 170),
+      );
+      await page.locator("#backupBadge").scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(out, "xxrj-admin-online-backup.png"), fullPage: false });
+    }
+  } finally {
+    await context.close();
+  }
+
+  const mobileContext = await browser.newContext({ viewport: MOBILE, deviceScaleFactor: 1 });
+  await mobileContext.addCookies([cookie]);
+  try {
+    const mobilePage = await mobileContext.newPage();
+    await mobilePage.goto(`${base}/admin.html`, { waitUntil: "load", timeout: 30000 });
+    await mobilePage.waitForSelector("#adminBody:not([hidden])", { timeout: 20000 });
+    const overflow = await mobilePage.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    check("线上手机端管理台无横向溢出", overflow <= 0, `${overflow}px`);
+    await mobilePage.locator("#backupBadge").scrollIntoViewIfNeeded();
+    await mobilePage.screenshot({ path: path.join(out, "xxrj-admin-online-mobile.png"), fullPage: false });
+  } finally {
+    await mobileContext.close();
+  }
+}
+
+/**
+ * 登录回跳检查：带会话打开 /index.html?next=/xxrj/，应该落到小屋页面。
+ * 只读，不提交任何表单。
+ */
+async function redirectFlow(browser, base, out, token, { skip = false, entryLink = true } = {}) {
+  if (entryLink) {
+    // 直接读仓库里的静态入口文件：入口链接属于前端产物，和运行中的服务无关。
+    const entryHtml = await fs.readFile(
+      path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "xxrj", "index.html"),
+      "utf8",
+    );
+    check(
+      "小屋入口链接带回跳目标",
+      entryHtml.includes('href="/index.html?next=/xxrj/"'),
+      "未找到 /index.html?next=/xxrj/ 入口链接",
+    );
+  } else {
+    console.log("[SKIP] 小屋入口链接检查");
+  }
+  if (skip) {
+    console.log("[SKIP] 登录页回跳检查 — 未提供站长口令，只确认入口链接");
+    return;
+  }
+  const context = await browser.newContext({ viewport: DESKTOP, deviceScaleFactor: 1 });
+  await context.addCookies([sessionCookie(base, token)]);
+  const page = await context.newPage();
+  try {
+    await page.goto(`${base}/index.html?next=/xxrj/`, { waitUntil: "load", timeout: 30000 });
+    // 已登录时页面会先探一次会话、切账号命名空间并重载，再回跳；
+    // 用轮询代替 waitForURL，避免它和中间的那次重载抢跑。
+    await page
+      .waitForFunction(() => /^\/xxrj\/?$/.test(location.pathname), null, {
+        timeout: 25000,
+        polling: 250,
+      })
+      .catch(() => null);
+    const target = new URL(page.url());
+    check(
+      "带会话打开登录页回跳到小屋",
+      /^\/xxrj\/?$/.test(target.pathname),
+      `${target.pathname}${target.search}`,
+    );
+    await page.waitForSelector(".review-summary-card", { timeout: 20000 }).catch(() => null);
+    check(
+      "回跳后小屋页面渲染完成",
+      (await page.locator(".review-summary-card").count()) >= 1,
+    );
+    await page.screenshot({ path: path.join(out, "xxrj-online-redirect.png"), fullPage: false });
+  } finally {
+    await context.close();
+  }
+}
+
 async function main() {
   const base = arg("base", "http://127.0.0.1:4175").replace(/\/$/, "");
   const out = path.resolve(arg("out", "../verify-shots"));
   const password = arg("password");
+  const sessionFile = arg("session-file");
+  const triggerBackup = flag("trigger-backup");
+  const requireBackupToken = flag("require-backup-token");
+  const requireUserActions = flag("require-user-actions");
+  const skipRedirectCheck = flag("skip-redirect-check");
+  const skipEntryLinkCheck = flag("skip-entry-link-check");
   await fs.mkdir(out, { recursive: true });
 
   const executablePath = await findBrowser();
@@ -487,8 +812,23 @@ async function main() {
     await mobileFlow(browser, base, out);
     if (password) {
       await adminFlow(browser, base, out, password);
+    } else if (sessionFile) {
+      // 只读会话：不注册账号、不停用、不删除，只有显式 --trigger-backup 才点备份。
+      const token = (await fs.readFile(sessionFile, "utf8")).trim();
+      if (!token) {
+        throw new Error(`会话文件是空的：${sessionFile}`);
+      }
+      await redirectFlow(browser, base, out, token, {
+        skip: skipRedirectCheck,
+        entryLink: !skipEntryLinkCheck,
+      });
+      await adminReadonlyFlow(browser, base, out, token, {
+        triggerBackup,
+        requireBackupToken,
+        requireUserActions,
+      });
     } else {
-      console.log("[SKIP] 管理端备份与账号治理 — 未提供 --password");
+      console.log("[SKIP] 管理端备份与账号治理 — 未提供 --password 或 --session-file");
     }
   } finally {
     await browser.close();
