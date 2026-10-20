@@ -1,0 +1,153 @@
+{
+  "id": "english-ii-2020",
+  "track": "english-ii",
+  "year": 2020,
+  "provider": "transmart",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.194Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2020 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "eb3ac3b851ed658c",
+          "en": "Rats and other animals need to be highly attuned to social signals from others so they can identify friends to cooperate with and enemies to avoid. To find out if this extends to non-living beings, Laleh Quinn at the University of California, San Diego, and her colleagues tested whether rats can detect social signals from robotic rats.",
+          "zh": "老鼠和其他动物需要高度适应来自他人的社交信号，这样它们才能识别出需要合作的朋友和需要避开的敌人。为了弄清楚这是否适用于非生物，加州大学圣地亚哥分校的Laleh Quinn和她的同事测试了老鼠是否可以检测到来自机器老鼠的社交信号。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "ffb28379f4592ace",
+          "en": "They housed eight adult rats with two types of robotic rat—one social and one asocial—for four days. The robot rats were quite minimalist, resembling a chunkier version of a computer mouse with wheels to move around and colorful markings.",
+          "zh": "他们将八只成年老鼠与两种机器鼠（一种是社交型，一种是非社交型）一起饲养了四天，机器鼠非常简约，就像一个电脑鼠标的矮胖版本，有轮子可以四处移动，还有五颜六色的标记。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "48c3c856b0a8130d",
+          "en": "During the experiment, the social robot rat followed the living rats around, played with the same toys, and opened cage doors to let trapped rats escape. Meanwhile, the asocial robot simply moved forwards and backwards and side to side.",
+          "zh": "在实验过程中，社交机器鼠跟随着活着的老鼠，玩同样的玩具，打开笼子的门让被困的老鼠逃跑。与此同时，不社交的机器人只是向前、向后和左右移动。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "e6804e5f001db00f",
+          "en": "Next, the researchers trapped the robots in cages and gave the rats the opportunity to release them by pressing a lever. Across 18 trials each, the living rats were 52 per cent more likely on average to set the social robot free than the asocial one. This suggests that the rats perceived the social robot as a genuine social being. They may have bonded more with the social robot because it displayed behaviors like communal exploring and playing. This could lead to the rats better remembering having freed it earlier, and wanting the robot to return the favour when they get trapped, says Quinn.",
+          "zh": "接下来，研究人员将机器人困在笼子里，让老鼠有机会按下杠杆释放机器人。在18次试验中，平均而言，活老鼠释放社交机器人的可能性比不社交机器人高出52%。这表明，老鼠将社交机器人视为真正的社会存在。它们可能与社交机器人建立了更多的联系，因为它表现出以下行为：奎因说，这可能会让老鼠更好地记住早些时候释放了它，并希望机器人在它们被困时回报。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "e7a7cfbe6dbe855f",
+          "en": "“Rats have been shown to engage in multiple forms of reciprocal help and cooperation, including what is referred to as direct reciprocity—where a rat will help another rat that has previously helped them,” says Quinn. The readiness of the rats to befriend the social robot was surprising given its minimal design. The robot was the same size as a regular rat but resembled a simple plastic box on wheels. “We’d assumed we’d have to give it a moving head and tail, facial features, and put a scent on it to make it smell like a real rat, but that wasn’t necessary,” says Janet Wiles at the University of Queensland in Australia, who helped with the research.",
+          "zh": "“研究表明，老鼠会进行多种形式的互惠帮助和合作，包括所谓的直接互惠--一只老鼠会帮助另一只曾经帮助过它们的老鼠，奎因说。考虑到这个社交机器人的最小设计，老鼠愿意和它交朋友是令人惊讶的。这个机器人和普通老鼠一样大，但就像一个带轮子的简单塑料盒。澳大利亚昆士兰州大学的珍妮特·怀尔斯（Janet Wiles）帮助进行了这项研究，她说：“我们认为我们必须给它一个活动的头和尾巴，面部特征，并在它身上涂上气味，使它闻起来像真实的老鼠，但这是没有必要的。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "6704bfc173739ef3",
+          "en": "The finding shows how sensitive rats are to social cues, even when they come from basic robots. Similarly, children tend to treat robots as if they are fellow beings, even when they display only simple social signals. “We humans seem to be fascinated by robots, and it turns out other animals are too,” says Wiles.",
+          "zh": "这一发现表明，老鼠对社交信号非常敏感，即使它们来自基本的机器人。同样，孩子们倾向于把机器人当作同伴，即使它们只显示简单的社交信号。怀尔斯说：“我们人类似乎对机器人很着迷，事实证明其他动物也是如此。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2020 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "b893f939c47ebcae",
+          "en": "It is true that CEO pay has gone up—top ones may make 300 times the pay of typical workers on average, and since the mid-1970s, CEO pay for large publicly traded American corporations has, by varying estimates, gone up by about 500%. The typical CEO of a top American corporation now makes about $18.9 million a year.",
+          "zh": "的确，CEO的薪酬已经上涨了--顶级CEO的平均薪酬可能是普通员工的300倍。自20世纪70年代中期以来，美国大型上市公司CEO的薪酬根据不同的估计已经上涨了约500%，现在美国顶级公司CEO的平均年薪约为1890万美元。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "06e34cbf187e0d3b",
+          "en": "The best model for understanding the growth of CEO pay is that of limited CEO talent in a world where business opportunities for the top firms are growing rapidly. The efforts of America’s highest-earning 1% have been one of the more dynamic elements of the global economy. It’s not popular to say, but one reason their pay has gone up so much is that CEOs really have upped their game relative to many other workers in the U.S. economy.",
+          "zh": "理解CEO薪酬增长的最佳模型是，在顶级公司的商业机会迅速增长的世界里，有限的CEO人才。美国收入最高的1%的人的努力一直是全球经济中更具活力的因素之一。但他们的工资上涨如此之多的一个原因是，相对于美国经济中的许多其他工人，首席执行官们真的提高了他们的水平。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "28a58ae2a3e6d74a",
+          "en": "Today’s CEO, at least for major American firms, must have many more skills than simply being able to “run the company.” CEOs must have a good sense of financial markets and maybe even how the company should trade in them. They also need better public relations skills than their predecessors, as the costs of even a minor slipup can be significant. Then there’s the fact that large American companies are much more globalized than ever before, with supply chains spread across a larger number of countries. To lead in that system requires knowledge that is fairly mind-boggling. Plus, virtually all major American companies are becoming tech companies, often with their own research and development. And beyond this, major CEOs still have to do all the day-to-day work they have always done.",
+          "zh": "今天的首席执行官，至少对美国的大公司来说，必须拥有比简单地“经营公司”更多的技能。首席执行官必须对金融市场有很好的了解，甚至知道公司应该如何在金融市场上进行交易。他们还需要比前任更好的公关技能，因为即使是一个小失误的成本也可能是巨大的。还有一个事实是，美国大公司比以往任何时候都更加全球化，随着供应链遍布更多的国家。在这个系统中领先需要相当令人难以置信的知识。此外，几乎所有的美国大公司都在成为科技公司，通常都有自己的研发。除此之外，主要的首席执行官仍然必须做他们一直在做的所有日常工作。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "6e1f77492cbf7595",
+          "en": "The common idea that high CEO pay is mainly about ripping people off doesn’t explain history very well. By most measures, corporate governance has become a lot tighter and more rigorous since the 1970s. Yet it is principally during this period of stronger governance that CEO pay has been high and rising. That suggests it is in the broader corporate interest to recruit top candidates for increasingly tough jobs.",
+          "zh": "人们普遍认为，CEO的高薪主要是为了剥削员工，这种观点并不能很好地解释历史。从大多数指标来看，自上世纪70年代以来，公司治理变得更加严格和严格。然而，主要是在治理加强的这段时期，CEO的薪酬一直很高，而且还在上升。这表明，为越来越坚韧的工作招聘优秀的候选人符合更广泛的公司利益。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "da3602097e4edf62",
+          "en": "Furthermore, the highest CEO salaries are paid to outside candidates, not to the cozy insider picks, another sign that high CEO pay is not some kind of depredation at the expense of the rest of the company. And the stock market reacts positively when companies tie CEO pay to, say, stock prices, a sign that those practices build up corporate value not just for the CEO.",
+          "zh": "此外，最高的CEO薪酬是支付给外部候选人的，而不是支付给内部挑选出来的人，这再次表明，CEO的高薪并不是以牺牲公司其他人为代价的某种掠夺。当公司将CEO薪酬与股价挂钩时，股市会做出积极反应，这表明这些做法不仅为CEO创造了公司价值。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2020 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "d555722199b76572",
+          "en": "Madrid was hailed as a public health guiding light last November when it rolled out ambitious restrictions on the most polluting cars. Seven months and one election day later, a new conservative city council suspended enforcement of the clean air zone, a first step toward its possible termination. Mayor José Luis Martínez-Almeida made opposition to the zone a centrepiece of his election campaign, despite its success in improving air quality. A judge has now overruled the city’s decision to stop levying fines, ordering them restored. But with legal battles ahead, the zone’s future looks uncertain at best. Madrid’s back and forth on clean air is a pointed reminder of the limits to the patchwork, city-by-city approach that characterises efforts on air pollution across Europe, Britain very much included.",
+          "zh": "去年11月，马德里对污染最严重的汽车推出了雄心勃勃的限制措施，被誉为公共卫生的指路明灯。七个月零一个选举日之后，一个新的保守派市理事会暂停了清洁空气区的执行，这是朝着可能终止清洁空气区迈出的第一步。市长何塞·路易斯·马丁内斯-阿尔梅达（José Luis Martínez-Almeida）将反对清洁空气区作为其竞选活动的核心内容，尽管它在改善空气质量方面取得了成功。一名法官现在驳回了该市停止征收罚款的决定，命令恢复罚款。但随着法律的斗争的到来，该区域的未来看起来充其量也就是不确定。马德里在清洁空气问题上的反复提醒人们，拼凑起来的地方是有局限性的，一个城市接一个城市的方法，这是整个欧洲，包括英国在内的空气污染努力的特点。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b6476c2336ddb858",
+          "en": "Among other weaknesses, the measures cities must employ when left to tackle dirty air on their own are politically controversial, and therefore vulnerable. That’s because they inevitably put the costs of cleaning the air on to individual drivers—who must pay fees or buy better vehicles—rather than on to the car manufacturers whose cheating is the real cause of our toxic pollution. It’s not hard to imagine a similar reversal happening in London. The new ultra-low emission zone (Ulez) is likely to be a big issue in next year’s mayoral election. And if Sadiq Khan wins and extends it to the North and South Circular roads in 2021 as he intends, it is sure to spark intense opposition from the far larger number of motorists who will then be affected.",
+          "zh": "除其他弱点外，城市在独自解决空气污染问题时必须采取的措施在政治上是有争议的，这是因为他们不可避免地将清洁空气的成本转嫁给了司机个人--他们必须支付费用或购买更好的车辆--而不是指责汽车制造商，他们的欺骗行为是造成我们有毒污染的真实的原因。不难想象，伦敦。新的超低排放区（Ulez）可能会成为明年市长选举的一个重要议题。如果萨迪克·汗（Sadiq Khan）获胜，并按照他的计划在2021年将其扩展到南北环路，那么肯定会引发更多驾车者的强烈反对，届时他们将受到影响。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "3398169019a6c639",
+          "en": "It’s not that measures such as London’s Ulez are useless. Far from it. Local officials are using the levers that are available to them to safeguard residents’ health in the face of a serious threat. The zones do deliver some improvements to air quality, and the science tells us that means real health benefits. But mayors and councilors can only do so much about a problem that is far bigger than any one city or town. They are acting because national governments—Britain’s and others across Europe—have failed to do so. Restrictions that keep highly polluting cars out of certain areas—city centres, “school streets”, even individual roads—are a response to the absence of a larger effort to properly enforce existing regulations and require auto companies to bring their vehicles into compliance. Wales has introduced special low speed limits to minimise pollution. We’re doing everything but insist that manufacturers clean up their cars.",
+          "zh": "这并不是说像伦敦的乌列兹这样的措施是无用的。远非如此。面对严重的威胁，当地官员正在使用他们可以使用的杠杆来保护居民的健康。这些区域确实改善了空气质量，科学告诉我们这意味着真实的健康益处。但是市长和议员们对一个比任何一个城市或城镇都要大得多的问题所能做的也就这么多了。他们之所以采取行动，是因为英国和欧洲其他国家的政府没有这样做，限制高污染汽车进入某些地区，如市中心、“学校街道”、甚至个别道路-是对缺乏更大力度来正确执行现有法规和要求汽车公司使其车辆符合规定的回应。威尔士已经引入了特殊的低速限制来最大限度地减少污染。除了坚持要求制造商清理他们的汽车，我们什么都做。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2020 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "4398316c60d18e4c",
+          "en": "Now that members of Generation Z are graduating college this spring—the most commonly-accepted definition says this generation was born after 1995, give or take a year—the attention has been rising steadily in recent weeks. Gen Zs are about to hit the streets looking for work in a labor market that’s tighter than it’s been in decades. And employers are planning on hiring about 17 percent more new graduates for jobs in the U.S. this year than last, according to a survey conducted by the National Association of Colleges and Employers. Everybody wants to know how the people who will soon inhabit those empty office cubicles will differ from those who came before them.",
+          "zh": "现在，Z世代的成员将于今年春天大学毕业-最普遍接受的定义是这一代人出生于1995年以后，差不多一年-近几周来，人们的关注度一直在稳步上升。Z世代即将走上街头，在劳动力市场上寻找工作，这是几十年来最紧张的。雇主们计划招聘约17%的新毕业生根据美国大学和雇主协会的一项调查，今年美国人比去年要多。每个人都想知道，即将住进那些空荡荡的办公室的人与以前的人会有什么不同。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "04e6dcbafed72cb5",
+          "en": "If “entitled” is the most common adjective, fairly or not, applied to millennials (those born between 1981 and 1995), the catchwords for Generation Z are practical and cautious. According to the career counselors and experts who study them, Generation Zs are clear-eyed, economic pragmatists. Despite graduating into the best economy in the past 50 years, Gen Zs know what an economic train wreck looks like. They were impressionable kids during the crash of 2008, when many of their parents lost their jobs or their life savings or both. They aren’t interested in taking any chances. The booming economy seems to have done little to assuage this underlying generational sense of anxious urgency, especially for those who have college debt. College loan balances in the U.S. now stand at a record $1.5 trillion, according to the Federal Reserve. One survey from Accenture found that 88 percent of graduating seniors this year chose their major with a job in mind. In a 2019 survey of University of Georgia students, meanwhile, the career office found the most desirable trait in a future employer was the ability to offer secure employment (followed by professional development and training, and then inspiring purpose). Job security or stability was the second most important career goal (work-life balance was number one), followed by a sense of being dedicated to a cause or to feel good about serving the greater good.",
+          "zh": "如果“有资格”是最常见的形容词，公平与否，适用于千禧一代Z世代（1981年至1995年出生的人）的流行语是务实和谨慎。根据研究他们的职业顾问和专家的说法，Z世代是头脑清醒的经济实用主义者。尽管毕业时经济状况是过去50年来最好的，Z世代知道经济火车失事是什么样子。在2008年的经济危机中，他们是易受影响的孩子，当他们的父母失去了工作或毕生的积蓄，或者两者兼而有之时，他们不想冒险。繁荣的经济似乎并没有减轻这一代人潜在的焦虑感紧迫性，特别是对那些有大学债务的人来说。根据联邦的数据，美国的大学贷款余额目前达到创纪录的1.5万亿美元。埃森哲的一项调查发现，今年88%的毕业生在选择专业时考虑到了工作。与此同时，在2019年对格鲁吉亚大学学生的调查中，就业办公室发现，未来雇主最理想的特质是提供稳定就业的能力（其次是职业发展和培训，然后是鼓舞人心的目标）。工作保障或稳定是第二个最重要的职业目标（工作与生活的平衡是第一位的），其次是献身于一项事业的感觉，或者为更大的利益服务的感觉良好。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "f1111d0c773f7915",
+          "en": "That’s a big change from the previous generation. “Millennials wanted more flexibility in their lives,” notes Tanya Michelsen, Associate Director of YouthSight, a UK-based brand manager that conducts regular 60-day surveys of British youth, in findings that might just as well apply to American youth. “Generation Zs are looking for more certainty and stability, because of the rise of the gig economy. They have troubles seeing a financial future and they are quite risk averse.”",
+          "zh": "这与上一代人相比是一个很大的变化。“千禧一代希望他们的生活更灵活，”YouthSight的副总监坦尼娅·米切尔森（Tanya Michelsen）指出。YouthSight是一家总部位于英国的品牌经理，对英国年轻人进行为期60天的定期调查，调查结果可能也适用于美国年轻人。“Z一代正在寻找更多的确定性和稳定性，因为零工经济的兴起。他们很难看到金融未来，他们非常厌恶风险。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    }
+  }
+}

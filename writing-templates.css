@@ -414,10 +414,474 @@
   line-height: 1.7;
 }
 
+/* ------------------------------------------------------------ 老师视角（模板详情内） */
+
+.writing-template-teacher-block {
+  background: #f4faf7;
+  border-color: rgba(21, 92, 74, 0.2);
+}
+
+.writing-teacher-section {
+  margin-bottom: 12px;
+}
+
+.writing-teacher-section:last-of-type {
+  margin-bottom: 6px;
+}
+
+.writing-teacher-section h5 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-teacher-section ul,
+.writing-teacher-section ol {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 5px;
+}
+
+.writing-teacher-section li {
+  color: #3f5a52;
+  font-size: 12.5px;
+  line-height: 1.68;
+}
+
+.writing-teacher-section.is-scoring h5::before {
+  content: "◎ ";
+  color: var(--forest);
+}
+
+.writing-teacher-section.is-steps h5::before {
+  content: "➊ ";
+  color: var(--forest);
+}
+
+.writing-teacher-section.is-warning {
+  background: #fefaf3;
+  border-left: 3px solid var(--gold);
+  padding: 8px 10px;
+  border-radius: 0 var(--writing-radius, 8px) var(--writing-radius, 8px) 0;
+}
+
+.writing-teacher-section.is-warning h5 {
+  color: #8a6420;
+}
+
+.writing-teacher-section.is-warning h5::before {
+  content: "⚠ ";
+}
+
+.writing-teacher-time {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(21, 92, 74, 0.2);
+  color: #5d746c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------ 考研写作方法论 */
+
+.writing-method {
+  width: min(1240px, calc(100% - 44px));
+  margin: 18px auto 0;
+  background: #ffffff;
+  border: 1px solid rgba(11, 41, 37, 0.12);
+  border-radius: var(--writing-radius, 8px);
+  box-shadow: 0 10px 26px rgba(11, 41, 37, 0.08);
+  overflow: hidden;
+}
+
+.writing-method-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #f6faf8;
+  border-bottom: 1px solid rgba(11, 41, 37, 0.1);
+}
+
+.writing-method-head h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--forest-deep);
+}
+
+.writing-method-intro {
+  max-width: 78ch;
+  margin: 0;
+  color: #4c635c;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.writing-method-meta {
+  color: #5d746c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.writing-method-body {
+  padding: 16px;
+  display: grid;
+  gap: 18px;
+}
+
+.writing-method-body .writing-template-block {
+  margin: 0;
+}
+
+.writing-method-reason-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.writing-method-reason {
+  background: #fbfdfc;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  border-radius: var(--writing-radius, 8px);
+  padding: 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.writing-method-reason-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.writing-method-reason-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--forest);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.writing-method-reason-head strong {
+  font-size: 13.5px;
+  color: var(--forest-deep);
+}
+
+.writing-method-reason-fit {
+  margin: 0;
+  color: #6a7d76;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.writing-method-reason-en {
+  margin: 0;
+  padding: 8px 10px;
+  background: #f6faf8;
+  border-left: 3px solid var(--forest);
+  border-radius: 0 6px 6px 0;
+  color: #23352f;
+  font-size: 12.5px;
+  line-height: 1.7;
+  font-family: inherit;
+}
+
+.writing-method-reason-zh {
+  margin: 0;
+  color: #4c635c;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.writing-method-reason-usage {
+  margin: 0;
+  color: #8a6420;
+  font-size: 12px;
+  line-height: 1.65;
+  background: #fefaf3;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.writing-method-structure-group {
+  margin-bottom: 14px;
+}
+
+.writing-method-structure-group:last-child {
+  margin-bottom: 0;
+}
+
+.writing-method-structure-group > h5 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-method-structure-item {
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  border-radius: var(--writing-radius, 8px);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #fbfdfc;
+}
+
+.writing-method-structure-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.writing-method-structure-no {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--forest-soft, #e3f0eb);
+  color: var(--forest-deep);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.writing-method-structure-top strong {
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-method-structure-top em {
+  color: #77887f;
+  font-size: 11.5px;
+  font-style: normal;
+}
+
+.writing-method-structure-item ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.writing-method-structure-item li {
+  color: #4c635c;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.writing-method-logic-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.writing-method-logic-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fbfdfc;
+  border: 1px solid rgba(11, 41, 37, 0.08);
+  border-radius: 6px;
+}
+
+.writing-method-logic-list strong {
+  flex: 0 0 92px;
+  color: var(--forest);
+  font-size: 12.5px;
+}
+
+.writing-method-logic-list span {
+  color: #3f5a52;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.writing-method-topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.writing-method-topic {
+  background: #fbfdfc;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  border-radius: var(--writing-radius, 8px);
+  padding: 12px;
+}
+
+.writing-method-topic h5 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-method-topic ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 5px;
+}
+
+.writing-method-topic li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.writing-method-topic code {
+  background: #eef6f2;
+  color: #17594a;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.writing-method-topic span {
+  color: #5d746c;
+}
+
+.writing-method-check-item {
+  border-left: 3px solid var(--forest);
+  background: #fbfdfc;
+  border-radius: 0 var(--writing-radius, 8px) var(--writing-radius, 8px) 0;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.writing-method-check-item:last-child {
+  margin-bottom: 0;
+}
+
+.writing-method-check-item h5 {
+  margin: 0 0 5px;
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-method-check-detail {
+  margin: 0 0 6px;
+  color: #4c635c;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.writing-method-check-item ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.writing-method-check-item li {
+  color: #3f5a52;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.writing-method-phrase-note {
+  margin: 0 0 10px;
+  color: #5d746c;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.writing-method-phrase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.writing-method-phrase-group {
+  background: #fbfdfc;
+  border: 1px solid rgba(11, 41, 37, 0.1);
+  border-radius: var(--writing-radius, 8px);
+  padding: 12px;
+}
+
+.writing-method-phrase-group h5 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--forest-deep);
+}
+
+.writing-method-phrase-intro {
+  margin: 0 0 8px;
+  color: #5d746c;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.writing-method-phrase-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.writing-method-phrase-group li {
+  border-top: 1px dashed rgba(11, 41, 37, 0.12);
+  padding-top: 8px;
+}
+
+.writing-method-phrase-group li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.writing-method-phrase-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.writing-method-phrase-top .word-token {
+  color: #17594a;
+  font-weight: 700;
+  border-bottom: 1px dashed rgba(23, 89, 74, 0.4);
+}
+
+.writing-method-phrase-tag {
+  background: #eef6f2;
+  color: #4c635c;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.writing-method-phrase-zh {
+  margin: 4px 0 0;
+  color: #3f5a52;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.writing-method-phrase-example {
+  margin: 4px 0 0;
+  color: #6b7d78;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 /* ------------------------------------------------------------ 响应式 */
 
 @media (max-width: 900px) {
-  .writing-templates {
+  .writing-templates,
+  .writing-method {
     width: min(100% - 28px, 820px);
   }
 
@@ -428,6 +892,12 @@
 
   .writing-template-list {
     max-height: none;
+  }
+
+  .writing-method-reason-grid,
+  .writing-method-topic-grid,
+  .writing-method-phrase-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -441,5 +911,75 @@
 
   .writing-template-actions .tool-button {
     flex: 1 1 140px;
+  }
+}
+
+/* ------------------------------------------------------- 模板点词查义 */
+
+.writing-page .word-token {
+  cursor: pointer;
+}
+
+.writing-teacher-section.is-keyphrases h5::before {
+  content: "◆";
+}
+
+.writing-teacher-phrases {
+  display: grid;
+  gap: 10px;
+}
+
+.writing-teacher-phrase {
+  padding: 10px 12px;
+  border: 1px solid rgba(47, 114, 94, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.writing-teacher-phrase-slot {
+  display: block;
+  margin-bottom: 4px;
+  color: #6b7d78;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.writing-teacher-phrase-en {
+  margin: 0;
+  color: #1f3b34;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.writing-teacher-phrase-zh {
+  margin: 4px 0 0;
+  color: #556a63;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.writing-word-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  top: auto;
+  z-index: 70;
+  width: min(392px, calc(100vw - 24px));
+  max-height: min(72dvh, 640px);
+  box-shadow: 0 22px 48px rgba(12, 40, 34, 0.22);
+}
+
+.word-phrases li strong.word-token {
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .writing-word-panel {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-height: 62dvh;
   }
 }

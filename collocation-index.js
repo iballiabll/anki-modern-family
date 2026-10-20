@@ -236,6 +236,62 @@
     return item ? toPublicItem(item) : null;
   }
 
+  // 找出"包含某个词"的所有固定搭配，按级别权重 + 词长排序。
+  // 供词面板在点击题干/选项里的单词时，即时列出相关搭配。
+  function containing(value, limit = 12) {
+    if (!entriesByKey || !entries) {
+      return [];
+    }
+    const tokens = tokenize(value);
+    if (!tokens.length) {
+      return [];
+    }
+    const wanted = new Set();
+    tokens.forEach((token) => {
+      wanted.add(token);
+      // 顺带覆盖常见变形，保证 clicked 的变形词也能匹配到原形条目。
+      formsFor(token).forEach((form) => wanted.add(form));
+    });
+
+    const out = [];
+    const seen = new Set();
+    for (const [key, entry] of Object.entries(entries)) {
+      const itemTokens = key.split(" ").filter(Boolean);
+      if (itemTokens.length < 2) {
+        continue;
+      }
+      if (!itemTokens.some((token) => wanted.has(token))) {
+        continue;
+      }
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      const mask = Number(entry?.[0]) || 0;
+      out.push({
+        phrase: entry?.[0] ? String(key) : key,
+        levels: levelsForMask(mask),
+        mask,
+        meaning: String(entry?.[1] || "").trim(),
+        phonetic: "",
+        tokens: itemTokens.length,
+      });
+    }
+
+    const LEVEL_WEIGHT = { 四级: 4, 六级: 2, 考研: 1 };
+    return out
+      .sort((left, right) => {
+        const weight =
+          right.levels.reduce((t, l) => t + (LEVEL_WEIGHT[l] || 0), 0) -
+          left.levels.reduce((t, l) => t + (LEVEL_WEIGHT[l] || 0), 0);
+        if (weight !== 0) return weight;
+        if (left.tokens !== right.tokens) return left.tokens - right.tokens;
+        return left.phrase.localeCompare(right.phrase);
+      })
+      .slice(0, limit)
+      .map(({ tokens: _tokens, mask: _mask, ...rest }) => rest);
+  }
+
   function findInText(value) {
     if (!firstWordMap) {
       return [];
@@ -299,6 +355,7 @@
   window.CollocationIndex = {
     load,
     lookup,
+    containing,
     findInText,
     formsFor,
     tokenize,

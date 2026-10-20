@@ -1,0 +1,153 @@
+{
+  "id": "english-ii-2023",
+  "track": "english-ii",
+  "year": 2023,
+  "provider": "transmart",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.197Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2023 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "e3b75959f327e631",
+          "en": "In the quest for the perfect lawn, homeowners across the country are taking a shortcut—and it is the environment that is paying the price. About eight million square metres of plastic grass is sold each year but opposition has now spread to the highest gardening circles. The Chelsea Flower Show has banned fake grass from this year’s event, declaring it to be not part of its ethos. The Royal Horticultural Society (RHS), which runs the annual show in west London, says it has introduced the ban because of the damage plastic grass does to the environment and biodiversity.",
+          "zh": "为了寻找完美的草坪，全国各地的房主都在走捷径--而环境却为此付出了代价。每年大约有800万平方米的塑料草坪被售出，但反对声音现在已经蔓延到了最高的园艺界。切尔西花展已经禁止在今年的活动中使用假草，并宣布这不是其精神的一部分。皇家园艺协会（RHS），在西伦敦举办一年一度的展览会，该公司表示，由于塑料草对环境和生物多样性的破坏，他们已经提出了禁令。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "87d778ed3c86ae42",
+          "en": "Ed Horne, of the RHS, said: “We launched our sustainability strategy last year and fake grass is just not in line with our ethos and views on plastic. We recommend using real grass because of its environmental benefits, which include supporting wildlife, alleviating flooding and cooling the environment.” The RHS’s decision comes as campaigners try to raise awareness of the problems fake grass causes. A Twitter account, which claims to “cut through the greenwash” of artificial grass, already has more than 20,000 followers. It is trying to encourage people to sign two petitions, one calling for a ban on the sale of plastic grass and another calling for an “ecological damage” tax on such lawns. They have gathered 7,276 and 11,282 signatures.",
+          "zh": "RHS的艾德霍恩说：“我们去年启动了可持续发展战略，假草不符合我们的精神和对塑料的看法。我们建议使用真实的草，因为它对环境有好处，包括支持野生动物，减轻洪水和冷却环境。”RHS的决定是在活动家试图提高对假草造成的问题的认识时做出的。一个Twitter账户，该组织声称要“彻底清除人造草坪的”绿化”，目前已经有2万多名追随者。该组织正试图鼓励人们签署两份请愿书，一份呼吁禁止销售塑料草坪，另一份呼吁对这种草坪征收“生态破坏”税。他们分别收集了7,276和11,282个签名。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "139f63d11e3536b7",
+          "en": "However, supporters of fake grass point out that there is also an environmental impact with natural lawns, which need mowing and therefore usually consume electricity or petrol. The industry also points out that real grass requires considerable amounts of water, weed killer or other treatments and that people who lay fake grass tend to use their garden more. The industry also claims that people who lay fake grass spend an average of £500 on trees or shrubs for their garden, which provides habitat for insects.",
+          "zh": "然而，假草的支持者指出，天然草坪也有环境影响，需要修剪，因此通常会消耗电力或汽油。该行业还指出，真实的草需要相当多的水，种植假草的人往往会更多地使用他们的花园。该行业还声称，种植假草的人平均花费500英镑的树木或灌木为他们的花园，这为昆虫提供了栖息地。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "4eab6781d6cf6e8d",
+          "en": "In response to another petition last year about banning fake lawns, which gathered 30,000 signatures, the government responded that it has “no plans to ban the use of artificial grass.”",
+          "zh": "去年，针对另一份收集了3万个签名的关于禁止人造草坪的请愿书，政府回应说，它“没有禁止使用人造草坪的计划”。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "fdaf49762bd700ac",
+          "en": "It added: “We prefer to help people and organizations make the right choice rather than legislating on such matters. However, the use of artificial grass must comply with the legal and policy safeguards in place to protect biodiversity and ensure sustainable drainage, while measures such as the strengthened biodiversity duty should serve to encourage public authorities to consider sustainable alternatives.”",
+          "zh": "它补充说：“我们更愿意帮助人们和组织做出正确的选择，而不是就这些问题立法。然而，人造草的使用必须遵守现有的法律的和政策保障措施，以保护生物多样性并确保可持续的排水，而加强生物多样性责任等措施应有助于鼓励公共当局考虑可持续的替代品。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2023 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "d9fa3603048fb831",
+          "en": "It’s easy to dismiss as absurd the federal government’s ideas for plugging the chronic funding gap of our national parks. Can anyone really think it’s a good idea to allow Amazon deliveries to your tent in Yosemite or food trucks to line up under the redwood trees at Sequoia National Park?",
+          "zh": "联邦政府为填补国家公园长期资金缺口而提出的想法很容易被斥为荒谬。有人真的认为允许亚马逊送货到你在约塞米蒂的帐篷里，或者允许食品卡车在红杉国家公园的红木树下排队是个好主意吗？",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "c0278fd84a10378c",
+          "en": "But the government is right about one thing: U.S. national parks are in crisis. Collectively, they have a maintenance backlog of more than $12 billion. Roads, trails, restrooms, visitor centers and other infrastructure are crumbling. But privatizing and commercializing the campgrounds would not be a cure-all. Campgrounds are a tiny portion of the overall infrastructure backlog, and businesses in the parks hand over, on average, only about 5% of their revenues to the National Park Service.",
+          "zh": "但政府在一件事上是对的：美国国家公园正处于危机之中。这些国家公园的维护积压总额超过120亿美元。道路、小径、洗手间、游客中心和其他基础设施正在崩溃。但将露营地私有化和商业化并不是万能药。露营地只占整体基础设施积压的一小部分，公园内的企业将移交给，平均来说，只有大约5%的收入给了国家公园管理局。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "07c9c45e6718fb04",
+          "en": "Moreover, increased privatization would certainly undercut one of the major reasons why 300 million visitors come to the parks each year: to enjoy nature and get a break from the commercial drumbeat that overwhelms daily life. The real problem is that the parks have been chronically starved of funding. An economic survey of 700 U.S. taxpayers found that people would be willing to pay a significant amount of money to make sure the parks and their programs are kept intact. Some 81% of respondents said they would be willing to pay additional taxes for the next 10 years to avoid any cuts to the national parks. The national parks provide great value to U.S. residents both as places to escape and as symbols of nature. On top of this, they produce value from their extensive educational programs, their positive impact on the climate through carbon sequestration, their contribution to our cultural and artistic life, and of course through tourism. The parks also help keep America’s past alive, working with thousands of local jurisdictions around the country to protect historical sites and to bring the stories of these places to life.",
+          "zh": "此外，增加私有化肯定会削弱每年3亿游客来公园的主要原因之一：享受大自然，从充斥日常生活的商业鼓点中休息一下。真实的问题是，这些公园长期缺乏资金。一项对700名美国纳税人进行的经济调查发现，人们愿意花一大笔钱去公园。确保国家公园及其项目的完整性。约81%的受访者表示，他们愿意在未来10年内支付额外的税收，以避免国家公园的任何削减。国家公园为美国居民提供了巨大的价值，既可以作为逃避的地方，也可以作为自然的象征。除此之外，它们还从广泛的教育项目中产生价值，这些公园通过固碳作用对气候产生积极影响，对我们的文化和艺术生活做出贡献，当然还有通过旅游业。这些公园还有助于保持美国的历史活力，与全国各地数千个地方司法管辖区合作，保护历史遗迹，并将这些地方的故事变为现实。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "fa93e4ff64d1b25e",
+          "en": "The parks do all this on a shoestring. Congress allocates only $3 billion a year to the national park system—an amount that has been flat since 2001 (in inflation-adjusted dollars) with the exception of a onetime boost in 2009. Meanwhile, the number of annual visitors has increased by more than 50% since 1980, and now stands at 330 million visitors per year.",
+          "zh": "这些国家公园都是以小本经营，国会每年只给国家公园系统拨款30亿美元，这个数额自2001年以来一直持平（按通货膨胀调整后的美元计算），除了2009年的一次性增加。与此同时，自1980年以来，每年的游客人数增加了50%以上，现在每年有3.3亿游客。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2023 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "a90c7dbd07a3947c",
+          "en": "The Internet may be changing merely what we remember, not our capacity to do so, suggests Columbia University psychology professor Betsy Sparrow. In 2011, Sparrow led a study in which participants were asked to record 40 factoids in a computer (“an ostrich’s eye is bigger than its brain,” for example). Half of the participants were told the information would be erased, while the other half were told it would be saved. Guess what? The latter group made no effort to recall the information when quizzed on it later, because they knew they could find it on their computers. In the same study, a group was asked to remember both the information and the folders it was stored in. They didn’t remember the information, but they remembered how to find the folders. In other words, human memory is not deteriorating but “adapting to new communications technology,” Sparrow says.",
+          "zh": "哥伦比亚大学心理学教授贝特西·斯派洛认为，互联网可能只是改变了我们的记忆，而不是我们的记忆能力。2011年，斯派洛领导了一项研究，参与者被要求在电脑中记录40个事实（例如，“鸵鸟的眼睛比它的大脑大”）。一半的参与者被告知这些信息将被删除，而另一半则被告知它会被保存，你猜怎么着后一组在后来被问及这些信息时，没有努力回忆这些信息，因为他们知道他们可以在自己的电脑上找到这些信息。在同一项研究中，一组被要求记住这些信息和存储这些信息的文件夹。他们没有记住这些信息，但他们记得如何找到文件夹。换句话说，人类的记忆不是在退化，而是在“适应新的通信技术”，斯派洛说。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "ee42a1823235b6d6",
+          "en": "In a very practical way, the Internet is becoming an external hard drive for our memories, a process known as “cognitive offloading.” Traditionally, this role was fulfilled by data banks, libraries, and other humans. Your father may never remember birthdays because your mother does, for instance. Some worry that this is having a destructive effect on society, but Sparrow sees an upside. Perhaps, she suggests, the trend will change our approach to learning from a focus on individual facts and memorization to an emphasis on more conceptual thinking— something that is not available on the Internet. “I personally have never seen all that much intellectual value in memorizing things,” Sparrow says, adding that we haven’t lost our ability to do it.",
+          "zh": "互联网正在以一种非常实际的方式成为我们记忆的外部硬盘驱动器，这一过程被称为“认知卸载”。传统上，这一角色是由数据库、图书馆和其他人类完成的。例如，你的父亲可能永远不会记得生日，因为你的母亲会。有些人担心这会对社会产生破坏性影响，但斯派洛看到了一个积极的方面。也许，她建议，这一趋势将改变我们的学习方式，从关注单个事实和记忆，转向强调更多的概念性思维--这是互联网上无法实现的。斯派洛说：“我个人从来没有看到记忆东西有那么大的智力价值。”他补充说，我们并没有失去记忆的能力。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "afc709370621e86c",
+          "en": "Still other experts say it’s too soon to understand how the Internet affects our brains. There is no experimental evidence showing that it interferes with our ability to focus, for instance, wrote psychologists Christopher Chabris and Daniel J. Simons. And surfing the web exercised the brain more than reading did among computer-savvy older adults in a 2008 study involving 24 participants at the Semel Institute for Neuroscience and Human Behavior at the University of California, Los Angeles.",
+          "zh": "还有一些专家说，现在就了解互联网如何影响我们的大脑还为时过早。例如，没有实验证据表明互联网会干扰我们的注意力，心理学家克里斯托弗·查布里斯和丹尼尔·J·西蒙斯写道，上网比在电脑上阅读更能锻炼大脑，2008年，洛杉矶加州大学塞梅尔神经科学与人类行为研究所的24名参与者参与了一项研究。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "28836362d318c0a5",
+          "en": "“There may be costs associated with our increased reliance on the Internet, but I’d have to imagine that overall the benefits are going to outweigh those costs,” observes psychology professor Benjamin Storm. “It seems pretty clear that memory is changing, but is it changing for the better? At this point, we don’t know.”",
+          "zh": "心理学教授本杰明·斯托姆说：“我们越来越依赖互联网，这可能会带来一些代价，但我不得不想象，总体而言，好处将超过这些代价。很明显，记忆正在发生变化，但它是否正在变得更好？在这一点上，我们还不知道。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2023 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "f1900b811b1ed8b5",
+          "en": "Teenagers are paradoxical. That’s a mild and detached way of saying something that parents often express with considerably stronger language. But the paradox is scientific as well as personal. In adolescence, helpless and dependent children who have relied on grown-ups for just about everything become independent people who can take care of themselves and help each other. At the same time, once cheerful and compliant children become rebellious teenage risk-takers. A new study published in the journal Child Development, by Eveline Crone of the University of Leiden and colleagues, suggests that the positive and negative sides of teenagers go hand in hand. The study is part of a new wave of thinking about adolescence. For a long time, scientists and policy makers concentrated on the idea that teenagers were a problem that needed to be solved. The new work emphasizes that adolescence is a time of opportunity as well as risk. The researchers studied “prosocial” and rebellious traits in more than 200 children and young adults, ranging from 11 to 28 years old. The participants filled out questionnaires about how often they did things that were altruistic and positive, like sacrificing their own interests to help a friend, or rebellious and negative, like getting drunk or staying out late.",
+          "zh": "青少年是矛盾的。这是一种温和而超然的说法，父母经常用相当强烈的语言来表达某种东西。但这种矛盾既有科学性，也有个人性。在青春期，无助和依赖的孩子几乎一切都依赖成年人，成为独立的人，能够照顾自己，互相帮助。与此同时，莱顿大学的伊芙琳·克龙和同事们在《儿童发展》杂志上发表了一项新的研究，表明青少年的积极面和消极面是密切相关的。这项研究是对青春期新一轮思考的一部分。长期以来，科学家和政策制定者集中注意力于青少年是一个需要解决的问题。这项新的研究强调，青春期是一个充满机遇和风险的时期。研究人员研究了200多名儿童和年轻人的\"亲社会\"和叛逆特征，参与者的年龄从11岁到28岁不等。他们填写了一份问卷，内容是他们做利他和积极的事情的频率，比如牺牲自己的利益来帮助朋友，或者叛逆和消极的事情，比如喝醉酒或在外面呆到很晚。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "136170af9ebb21ad",
+          "en": "Other studies have shown that rebellious behavior increases as you become a teenager and then fades away as you grow older. But the new study shows that, interestingly, the same pattern holds for prosocial behavior. Teenagers were more likely than younger children or adults to report that they did things like unselfishly helping a friend.",
+          "zh": "其他研究表明，叛逆行为会随着青少年的成长而增加，然后随着年龄的增长而逐渐消失。但有趣的是，这项新研究表明，亲社会行为也存在同样的模式。青少年比年幼的儿童或成年人更有可能报告自己做过无私帮助朋友之类的事情。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "0bc764fffb33bf9c",
+          "en": "Most significantly, there was a positive correlation between prosociality and rebelliousness. The teenagers who were more rebellious were also more likely to help others. The good and bad sides of adolescence seem to develop together. Is there some common factor that underlies these apparently contradictory developments? One idea is that teenage behavior is related to what researchers call “reward sensitivity.” Decision-making always involves balancing rewards and risks, benefits and costs. “Reward sensitivity” measures how much reward it takes to outweigh risk.",
+          "zh": "最值得注意的是，亲社会性和叛逆性之间存在正相关。叛逆性更强的青少年也更有可能帮助他人。青春期的好的一面和坏的一面似乎是一起发展的。在这些明显矛盾的发展背后，是否存在某种共同的因素？一种观点认为，青少年的行为与研究人员所说的\"奖励敏感性\"有关。决策总是涉及平衡奖励和风险，收益和成本。\"回报敏感度\"衡量的是需要多少回报才能超过风险。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "dadd8f23b07ffcd8",
+          "en": "Teenagers are particularly sensitive to social rewards—winning the game, impressing a new friend, getting that boy to notice you. Reward sensitivity, like prosocial behavior and risk-taking, seems to go up in adolescence and then down again as we age. Somehow, when you hit 30, the chance that something exciting and new will happen at that party just doesn’t seem to outweigh the effort of getting up off the couch.",
+          "zh": "青少年对社会奖励特别敏感--赢得游戏、给新朋友留下深刻印象、让那个男孩注意到你。奖励敏感性，就像亲社会行为和冒险行为一样，似乎在青春期上升，然后随着年龄的增长再次下降。不知何故，当你30岁时，聚会上发生令人兴奋的新事情的可能性似乎并没有超过从沙发上站起来的努力。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    }
+  }
+}

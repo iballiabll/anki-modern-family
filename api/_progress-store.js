@@ -23,6 +23,9 @@ const MAX_ENTRIES = 400;
 const MAX_TOMBSTONES = 400;
 const MAX_VALUE_BYTES = 256 * 1024;
 const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+// 清单型键的逐词条删除记录：数量小、语义强，单独存一张表。
+const MAX_REMOVED_PER_KEY = 200;
+const REMOVED_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 // 这些键里可能塞着用户自己的大模型 API Key，落盘前一律删掉。
 const SENSITIVE_KEY_PATTERN =
@@ -61,6 +64,7 @@ function emptyStore(userId) {
     updatedAt: "",
     entries: {},
     tombstones: {},
+    removed: {},
   };
 }
 
@@ -135,6 +139,10 @@ async function readProgressStore(userId) {
         parsed?.tombstones && typeof parsed.tombstones === "object"
           ? parsed.tombstones
           : {},
+      removed:
+        parsed?.removed && typeof parsed.removed === "object"
+          ? parsed.removed
+          : {},
     };
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -163,6 +171,30 @@ function pruneTombstones(tombstones, now = Date.now()) {
   return Object.fromEntries(kept);
 }
 
+/**
+ * 逐词条删除记录：{ "<localStorage 键>": { "<词>": 删除时间 } }。
+ * 只保留 30 天内的、每个键最多 200 条，防止长年累积。
+ */
+function pruneRemoved(removed, now = Date.now()) {
+  const result = {};
+  for (const [key, items] of Object.entries(removed || {})) {
+    if (!items || typeof items !== "object") {
+      continue;
+    }
+    const kept = Object.entries(items)
+      .filter(([, time]) => {
+        const value = Number(time || 0);
+        return value > 0 && now - value < REMOVED_TTL_MS;
+      })
+      .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))
+      .slice(0, MAX_REMOVED_PER_KEY);
+    if (kept.length) {
+      result[key] = Object.fromEntries(kept);
+    }
+  }
+  return result;
+}
+
 /** 客户端拉取：只回传值和时间戳，不含任何服务端内部字段。 */
 async function readProgress(userId) {
   const store = await readProgressStore(userId);
@@ -170,6 +202,7 @@ async function readProgress(userId) {
     updatedAt: store.updatedAt,
     entries: store.entries,
     tombstones: store.tombstones,
+    removed: pruneRemoved(store.removed),
   };
 }
 
@@ -185,6 +218,10 @@ async function mergeProgress(userId, snapshot = {}) {
   const incomingTombstones =
     snapshot.tombstones && typeof snapshot.tombstones === "object"
       ? snapshot.tombstones
+      : {};
+  const incomingRemoved =
+    snapshot.removed && typeof snapshot.removed === "object"
+      ? snapshot.removed
       : {};
 
   return withWriteLock(async () => {
@@ -230,6 +267,28 @@ async function mergeProgress(userId, snapshot = {}) {
         written += 1;
       }
     }
+
+    // 逐词条删除记录：同一词条取较新的删除时间，其余按 TTL / 条数收敛。
+    // 客户端拉取后会拿它和清单时间戳比对，避免旧设备把删掉的词并回来。
+    store.removed = pruneRemoved(store.removed, now);
+    for (const [rawKey, items] of Object.entries(incomingRemoved)) {
+      const key = sanitizeKey(rawKey);
+      if (!key || !items || typeof items !== "object") {
+        continue;
+      }
+      const target = store.removed[key] || (store.removed[key] = {});
+      for (const [rawId, time] of Object.entries(items)) {
+        const id = String(rawId || "").slice(0, 120);
+        const value = Number(time || 0);
+        if (!id || !Number.isFinite(value) || value <= 0) {
+          continue;
+        }
+        if (Number(target[id] || 0) < value) {
+          target[id] = value;
+        }
+      }
+    }
+    store.removed = pruneRemoved(store.removed, now);
 
     const entryKeys = Object.keys(store.entries);
     if (entryKeys.length > MAX_ENTRIES) {

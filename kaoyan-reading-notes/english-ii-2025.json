@@ -1,0 +1,153 @@
+{
+  "id": "english-ii-2025",
+  "track": "english-ii",
+  "year": 2025,
+  "provider": "transmart",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.199Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2025 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "7abce80aa7b942f6",
+          "en": "U.S. customers historically tipped people they assumed were earning most of their income via tips, such as restaurant servers earning less than the minimum wage. In the early 2010s, a wide range of businesses started processing purchases with iPads and other digital payment systems. These systems often prompted customers to tip for services that were not previously tipped. Today’s tip requests are often not connected to the salary and service norms that used to determine when and how people tip. Customers in the past nearly always paid tips after receiving a service, such as at the conclusion of a restaurant meal, after getting a haircut or once a pizza was delivered. That timing could reward high-quality service and give workers an incentive to provide it. It’s becoming more common for tips to be requested beforehand. And new tipping technology may even automatically add tips.",
+          "zh": "美国顾客历来会给那些他们认为大部分收入来自小费的人小费，比如收入低于最低工资标准的餐厅服务员。许多企业开始使用iPad和其他数字支付系统处理购物。这些系统通常会提示客户为以前没有小费的服务支付小费。今天的小费请求通常与工资无关以及决定人们何时以及如何给小费的服务规范。过去，顾客几乎总是在接受服务后支付小费，比如在餐馆用餐结束时，在理发或送披萨之后。这个时机可以奖励高-高质量的服务，并给予工人提供服务的激励。提前要求小费变得越来越普遍。新的小费技术可能甚至自动添加提示。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "3da9587ec5687f5b",
+          "en": "The prevalence of digital payment devices has made it easier to ask customers for a tip. That helps explain why tip requests are creeping into new kinds of services. Customers now routinely see menus of suggested default options—often well above 20% of what they owe. The amounts have risen from 10% or less in the 1950s to 15% around the year 2000 to 20% or higher today. This increase is sometimes called tipflation—the expectation of ever-higher tip amounts.",
+          "zh": "数字支付设备的普及使得向顾客索要小费变得更加容易。这有助于解释为什么小费要求正在悄悄进入新的服务类型。顾客现在经常会看到建议默认选项的菜单--通常远高于他们所欠金额的20%。金额从20世纪50年代的10%或更少上升到2000年前后的15%，再到20%这种增长有时被称为小费膨胀--对更高小费数额的期望。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "5704c4e398615afa",
+          "en": "Tipping has always been a vital source of income for worker in historically tipped services, like restaurants, where the tipped minimum wage can be as low as US $ 2.13 an hour. Tip creep and tipflation are now further supplementing the income of many low-wage service workers.",
+          "zh": "在传统的小费服务行业，如餐馆，小费一直是工人的重要收入来源，餐馆的小费最低工资可低至每小时2.13美元，小费上涨和小费膨胀现在进一步补充了许多低工资服务工人的收入。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "3e3959d1b53da9e7",
+          "en": "Notably, tipping primarily benefits some of these workers, such as waiters, but not others, such as cooks and dishwashers. To ensure that all employees were paid fair wages, some restaurants banned tipping and increased prices, but the movement towards no-tipping services has largely fizzled out. So to increase employee wages without raising prices, more employers are succumbing to the temptations of tip creep and tipflation. However, many customers are frustrated because they feel they are being asked for a tip too often. And, as our research emphasizes, tipping now seems to be more coercive, less generous, and often completely dissociated from service quality.",
+          "zh": "值得注意的是，给小费主要是让一些员工受益，比如服务员，而不是其他人，比如厨师和洗碗工。为了确保所有员工都能得到公平的工资，一些餐馆禁止给小费，并提高了价格，但无小费服务的运动基本上已经失败了。因此，为了在不提高价格的情况下提高员工工资，越来越多的雇主屈服于小费蠕变和小费通胀的诱惑。然而，许多顾客感到沮丧，因为他们觉得他们被要求付小费的次数太多了。而且，正如我们的研究所强调的那样，小费现在似乎更强制，更不慷慨，而且往往与服务质量完全无关。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2025 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "3e399a357cd0312e",
+          "en": "When it was established, the National Health Service (NHS) was visionary: offering high-quality, timely care to meet the dominant needs of the population it served. Nearly 75 years on, with the UK facing very different health challenges, it is clear that the model is out of date.",
+          "zh": "英国国家医疗服务体系（NHS）成立之初就具有远见卓识：提供高质量、及时的医疗服务，以满足其服务人群的主要需求。近75年过去了，英国面临着截然不同的健康挑战，很明显，这种模式已经过时。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "f1bce2cac96604f1",
+          "en": "From life expectancy to cancer and infant mortality rates, we are lagging behind many of our peers. With more than 6.8 million on waitlists, healthcare is becoming increasingly inaccessible for those who cannot opt to pay for private treatment; and the cost of providing healthcare is increasingly squeezing our investment in other public services. As demand for healthcare continues to grow, pressures on the workforce—which is already near breaking point—will only become more acute.",
+          "zh": "从预期寿命到癌症和婴儿死亡率，我们都落后于许多同龄人。有680多万人在等待名单上，对于那些无法选择支付私人治疗费用的人来说，医疗保健越来越难以获得;而医疗保健的成本正日益挤压我们在其他公共服务方面的投资。随着医疗保健需求的持续增长，劳动力的压力已经接近崩溃，只会变得更加严重。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "61ae6bcb453be86c",
+          "en": "Many of the answers to the crisis in health and care are well rehearsed. We need to be much better at reducing and diverting demand on health services, rather than simply managing it. Much more needs to be invested in communities and primary care to reduce our reliance on hospitals. And capacity in social care needs to be greater, to support the growing number of people living with long-term conditions.",
+          "zh": "应对医疗和保健危机的许多办法都是经过反复演练的。我们需要更好地减少和转移对医疗服务的需求，而不是简单地管理需求。我们需要在社区和初级保健方面投入更多资金，以减少我们对医院的依赖。社会保健的能力需要增强，以支持越来越多的长期患病者。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "d5582545dfa99852",
+          "en": "Yet despite two decades of strategies and a number of major health reforms, we have failed to make meaningful progress on any of these aims. That is why the Reform think tank is launching a new programme of work entitled “Reimagining health”, supported by ten former health ministers. Together, we are calling for a much more open and honest conversation about the future of health in the UK, and an “urgent rethink” of the hospital-centric model we retain. This must begin with the question of how we maximise the health of the nation, rather than “fix” the NHS. It is estimated, for example, that healthcare accounts for only about 20% of health outcomes. Much more important are the places we live, work and socialise—yet there is no clear cross-government strategy for improving these social determinants of health. Worse, when policies like the national obesity strategy are scrapped, taxpayers are left with the hefty price tag of treating the illnesses, like diabetes, that result. Reform wants to ask how power and resources should be distributed in our health system. What health functions should remain at the centre, and what should be given to local leaders, often responsible for services that create health, and with a much better understanding of the needs of their populations?",
+          "zh": "然而，尽管有20年的战略和一系列重大的医疗改革，我们未能在这些目标上取得任何有意义的进展。这就是为什么改革智库正在启动一项名为“重塑健康”的新工作计划，该计划得到了10位前卫生部长的支持。我们共同呼吁，就英国健康的未来进行更加开放和诚实的对话，以及对我们所保留的以医院为中心的模式的“紧急反思”。这必须从我们如何最大限度地提高国民健康的问题开始，而不是“修复”NHS。例如，据估计，医疗保健只占健康结果的20%左右。更重要的是我们居住的地方，工作和社交--然而，没有明确的跨政府战略来改善这些健康的社会决定因素。更糟糕的是，当像国家肥胖战略这样的政策被废除时，纳税人就得承担治疗糖尿病等疾病的高昂代价，改革想问的是，在我们的卫生系统中，权力和资源应该如何分配。哪些卫生职能应该保持在中心地位，哪些应该交给地方领导人，他们通常负责创造健康的服务，更好地了解他们的人民的需求？",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2025 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "ff142d81ff98d1b0",
+          "en": "Heat action plans, or HAPs, have been proliferating in India in the past few years. In general, an HAP spells out when and how officials should issue heat warnings and alert hospitals and other institutions. Nagpur’s plan, for instance, calls for hospitals to set aside “cold wards” in the summer for treating heatstroke patients, and advises builders to give construction laborers a break from work on very hot days.",
+          "zh": "过去几年里，印度的高温行动计划（Heat Action Plan，简称HAP）越来越多。一般来说，HAP会详细说明官员应该在何时以及如何发布高温警告，并提醒医院和其他机构注意。例如，纳格布尔的计划呼吁医院在夏天留出“冷病房”，用于治疗中暑患者，并建议建筑商在非常炎热的日子里让建筑工人休息。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "72ad3c4804d4d715",
+          "en": "But implementation of existing HAPs has been uneven, according to a March report from the center for Policy Research. Many lack adequate funding, it found. And their triggering thresholds often are not customized to the local climate. In some areas, high daytime temperatures alone might serve as an adequate trigger for alerts. But in other places, nighttime temperatures or humidity might be as important a gauge of risk as daytime highs.",
+          "zh": "但政策研究中心（Center for Policy Research）3月份的一份报告显示，现有HAP的实施情况并不均衡。该报告发现，许多HAP缺乏足够的资金。而且它们的触发阈值往往不适合当地气候。在某些地区，仅白天的高温就可能足以触发警报。但在其他地方，夜间的温度或湿度可能与白天的最高温度一样重要。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "4731ae488e6fa891",
+          "en": "Mumbai’s April heat stroke deaths highlighted the need for more nuanced and localized warnings, researchers say. That day’s high temperature of roughly 36°C was 1°C shy of the heat wave alert threshold for coastal cities set by national meteorological authorities. But the effects of the heat were amplified by humidity— an often neglected factor in heat alert systems—and the lack of shade at the late-morning outdoor ceremony.",
+          "zh": "研究人员称，孟买4月的中暑死亡事件凸显出，需要更细致、更局部化的警告。当天的高温约为36摄氏度，比国家气象部门为沿海城市设定的热浪警报阈值低1摄氏度。但湿度--这是高温警报系统中经常被忽视的因素--以及上午晚些时候的户外仪式缺乏阴凉，放大了高温的影响。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b74fd1675a9feda0",
+          "en": "To help improve HAPs, urban planner Kotharkar’s team is working on a model plan that outlines best practices and could be adapted to local conditions. Among other things, she says, all cities should create a vulnerability map to help focus responses on the populations most at risk.",
+          "zh": "为了帮助改善HAPs，城市规划师Kotharkar的团队正在制定一个模型计划，概述最佳实践，并可以根据当地情况进行调整。除此之外，她说，所有城市都应该创建一个脆弱性地图，以帮助集中应对风险最大的人群。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "0f5019d558afcd1e",
+          "en": "Such mapping doesn’t need to be complex, Kotharkar says. “A useful map can be created by looking at even a few key parameters.” For example, neighborhoods with a large elderly population or informal dwellings that cope poorly with heat could get special warnings or be bolstered with cooling centers. The Nagpur project has already created a risk and vulnerability map, which enabled Kotharkar to tell officials which neighborhoods to focus on in the event of a heat wave this summer. HAPs shouldn’t just include short-term emergency responses, researchers say, but also recommend medium- to long-term measures that could make communities cooler. In Nagpur, for example, Kotharkar’s team has been able to advise city officials about where to plant trees to provide shade. HAPs could also guide efforts to retrofit homes or modify building regulations. “Reducing deaths in an emergency is a good target to have, but it’s the lowest target,” says Climate researcher Chandni Singh.",
+          "zh": "Kotharkar说，这样的地图绘制并不需要很复杂。“只要查看几个关键参数，就可以绘制出一张有用的地图。”例如，有大量老年人口或非正规住宅的社区可以得到特别警告，或者建立冷却中心。纳格布尔项目已经绘制了一张风险和脆弱性地图，这使得科塔卡能够告诉官员，在今年夏天发生热浪时，应该重点关注哪些社区。研究人员说，HAP不应该只包括短期的应急响应，还应该推荐中长期措施，让社区变得更凉爽。在纳格布尔，例如，Kotharkar的团队已经能够建议城市官员在哪里种树以提供阴凉。HAP还可以指导改造房屋或修改建筑法规的努力。“减少紧急情况下的死亡是一个很好的目标，但这是最低的目标，”气候研究员Alfreni Singh说。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2025 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "d66bb0aba8f78aee",
+          "en": "Navigating beyond the organised pavements and parks of our urban spaces, desire paths are the unofficial footprints of a community, revealing the unspoken preferences, shared shortcuts and collective choices of humans. Often appearing as trodden dirt tracks through otherwise neat green spaces, these routes of collective disobedience cut corners, bisect lawns and cross hills, representing the natural capability of people (and animals) to go from point A to point B most effectively. Urban planners interpret desire paths as more than just convenient shortcuts; they offer valuable insights into the dynamics between planning and behaviour. Ohio State University allowed its students to navigate the Oval, a lawn in the centre of campus, freely, then proceeded to pave the desire paths, creating a web of effective routes students had established.",
+          "zh": "在我们城市空间有组织的人行道和公园之外，欲望之路是一个社区的非正式足迹，揭示了人类潜意识的偏好、共享的捷径和集体选择。这些集体不服从的路线通常看起来像是在整洁的绿色空间中踩过的土路，它们抄近路、平分草坪和穿越山丘，代表人类的自然能力（和动物）最有效地从A点到B点。城市规划者将欲望路径解释为不仅仅是方便的捷径;它们为规划和行为之间的动态关系提供了有价值的见解。俄亥俄州州立大学允许学生自由地在校园中心的草坪椭圆形草坪上行走，然后开始铺设理想的路径，建立一个有效的路线网学生已经建立。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "4005a4e00ad14e51",
+          "en": "Yet, reluctance persists among other planners to integrate desire paths into formal plans, citing concerns about safety, environmental impact, or primarily, aesthetics. A Reddit webpage devoted to the phenomenon, boasting nearly 50,000 members, showcases images of local desire paths adorned with signs instructing pedestrians to adhere to designated walkways, underscoring the rebellious nature inherent in these human-made tracks. This clash highlights an ongoing struggle between the organic, user-driven evolution of public spaces and the desire for a visually curated and controlled urban environment.",
+          "zh": "然而，其他规划者仍然不愿将理想路径纳入正式规划，理由是担心安全、环境影响，或者主要是美学问题。Reddit上有一个专门讨论这一现象的网页，拥有近5万名会员，展示了当地理想路径的图片，上面装饰着指示行人遵守指定人行道的标志，这种冲突凸显了公共空间的有机、用户驱动的演变与对视觉策划和控制的城市环境的渴望之间的持续斗争。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "e443f9aa2643313c",
+          "en": "The Wickguasgeck Trail is an example of a historical desire path, created by Native Americans to traverse the forests of Manhattan and move between settlements quickly. This trail, when Dutch colonists arrived, was widened and made into one of the main trade roads across the island, known at the time as de Heere Straat, or Gentlemen’s Street. Following the British assumption of control in New York, the street was renamed Broadway. Notably, Broadway stands out as one of the few areas in NYC that defies the grid-based system applied to the rest of the city, cutting a diagonal across parts of the city.",
+          "zh": "维克瓜斯盖克小径是一条历史上的欲望之路，由美洲原住民创建，用于穿越曼哈顿的森林，并在定居点之间快速移动。荷兰殖民者抵达后，这条小径被拓宽，成为全岛的主要贸易道路之一，当时被称为德黑尔街（de Heere Straat）或绅士街（Gentlemen's Street）。英国假设纽约后，这条街道被重新命名为百老汇。值得注意的是，百老汇是纽约市为数不多的几个地区之一，它违背了应用于城市其他地区的基于网格的系统，在城市的部分地区切割成对角线。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b147057c7bfef1fe",
+          "en": "In online spaces, desire paths have sparked a fascination that can approach obsession, with the Reddit page serving as a hub. Contributors offer a wide array of stories, from little-known new shortcuts to long-established alternate routes. Animal desire paths, such as ducks forging trails through frozen ponds or dogs carving direct routes in gardens, highlight the adaptability of these trails in both human and animal experiences. As desire paths criss-cross through both physical and virtual landscapes, they stand as a proof of the collective insistence on forging unconventional routes and embracing the spirit of communal choice.",
+          "zh": "在网络空间里，欲望之路已经引发了一种近乎痴迷的迷恋，Reddit页面就是一个枢纽。贡献者提供了各种各样的故事，从鲜为人知的新捷径到早已确立的替代路线。动物的欲望之路，比如鸭子在结冰的池塘里踩出的小路，或者狗在花园里开辟的直接路线，突出了这些路径在人类和动物体验中的适应性。由于期望路径在物理和虚拟景观中纵横交错，它们证明了集体坚持走非常规路线和信奉共同选择的精神。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    }
+  }
+}

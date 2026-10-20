@@ -58,8 +58,6 @@ test.after(async () => {
 
 test("模块名从页面路径和标题推出来", () => {
   assert.equal(telemetry.moduleForPage("/vocab", ""), "词汇库");
-  assert.equal(telemetry.moduleForPage("/xxrj/", "错题本 · 小屋"), "小屋 · 错题本");
-  assert.equal(telemetry.moduleForPage("/xxrj/", ""), "小屋");
   assert.equal(telemetry.moduleForPage("/", "首页"), "首页");
   assert.equal(telemetry.moduleForPage("/nope/deep", ""), "其他");
 });
@@ -73,9 +71,9 @@ test("在线时长按心跳间隔累加，超时算新会话", async () => {
   const userId = "student-duration";
   await beat(userId, "/vocab", "词汇库", base);
   await beat(userId, "/vocab", "词汇库", base + MINUTE);
-  await beat(userId, "/xxrj/", "错题本 · 小屋", base + 2 * MINUTE);
+  await beat(userId, "/intensive", "精读", base + 2 * MINUTE);
   // 中间断了 10 分钟：这段不计时长，只记成新的一次会话。
-  await beat(userId, "/xxrj/", "错题本 · 小屋", base + 12 * MINUTE);
+  await beat(userId, "/intensive", "精读", base + 12 * MINUTE);
 
   const summary = await summaryAt(base + 12 * MINUTE);
   const entry = summary.activity.find((item) => item.userId === userId);
@@ -87,11 +85,11 @@ test("在线时长按心跳间隔累加，超时算新会话", async () => {
   assert.equal(entry.online, true);
 
   const vocab = entry.modules.find((item) => item.name === "词汇库");
-  const review = entry.modules.find((item) => item.name === "小屋 · 错题本");
+  const intensive = entry.modules.find((item) => item.name === "精读");
   assert.equal(vocab.ms, 2 * MINUTE, "间隔算给上一次心跳所在的模块");
   assert.equal(vocab.beats, 2);
-  assert.equal(review.ms, 0);
-  assert.equal(review.beats, 2);
+  assert.equal(intensive.ms, 0);
+  assert.equal(intensive.beats, 2);
   assert.equal(entry.modules[0].name, "词汇库", "模块按停留时长排序");
 });
 
@@ -109,12 +107,21 @@ test("超过 3 分钟没有心跳就不算时长，也不误判在线", async ()
 
 test("模块与按天时长都有上限", async () => {
   const userId = "student-caps";
-  for (let index = 0; index < 30; index += 1) {
-    await beat(userId, "/xxrj/", `M${index} · 小屋`, base + index * MINUTE);
+  const modulePages = [
+    "/vocab", "/review", "/quiz", "/leaderboard", "/listen", "/shadow",
+    "/speaking", "/intensive", "/periodical", "/reading", "/movie", "/writing",
+    "/kaoyan", "/admin", "/", "/other-a", "/other-b", "/other-c",
+    "/other-d", "/other-e", "/other-f", "/other-g", "/other-h", "/other-i",
+    "/other-j", "/other-k", "/other-l", "/other-m", "/other-n", "/other-o",
+  ];
+  for (let index = 0; index < modulePages.length; index += 1) {
+    await beat(userId, modulePages[index], `模块 ${index}`, base + index * MINUTE);
   }
   const store = await telemetry.load();
   const modules = Object.keys(store.activity[userId].modules || {});
-  assert.equal(modules.length, 24, "模块最多留 24 个");
+  // 路径规则一共只会产生 16 个模块名，达不到 24 个的上限；
+  // 这里确认它们全部保留、没有被意外截断。
+  assert.equal(modules.length, 16, "16 个模块名都应保留");
 
   const dayUser = "student-days";
   for (let day = 0; day < 15; day += 1) {

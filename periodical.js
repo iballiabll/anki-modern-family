@@ -67,6 +67,7 @@
     picked: {},
     revealed: {},
     allRevealed: false,
+    pendingFocusWord: "",
   };
 
   /* --------------------------------------------------------------- 工具 */
@@ -2526,7 +2527,10 @@
       state.data = data;
       renderContent();
       prefetchNeighbours(issueId);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // 词汇库回跳时由 focusWordInPage 定位，别先滑回顶部再跳走。
+      if (!state.pendingFocusWord) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     } catch (error) {
       if (run !== state.loadingRun) {
         return;
@@ -2983,6 +2987,7 @@
       return;
     }
     const key = normalizeWord(active.phrase);
+    let addedToLibrary = false;
     if (mode === "unknown") {
       const existing = state.unknown.get(key);
       state.unknown.set(key, {
@@ -2992,12 +2997,28 @@
         issueId: active.issueId,
         savedAt: existing?.savedAt || new Date().toISOString(),
       });
+      addedToLibrary = saveToVocabLibrary({
+        phrase: active.phrase,
+        meaning: (active.meanings || []).slice(0, 3).join("；"),
+        phonetic: elements.wordPanelPhonetic?.textContent || "",
+        context: {
+          issueId: active.issueId,
+          paragraph: active.paragraphIndex,
+        },
+        sentence: active.sentence,
+        translation: active.sentenceZh,
+      });
     } else {
       state.unknown.delete(key);
     }
     persistState();
     updateWordPanelMarkState();
     updateMarkSummary();
+    if (mode === "unknown" && elements.markUnknownButton) {
+      elements.markUnknownButton.title = addedToLibrary
+        ? "已加入我的生词，并同步到词汇库"
+        : "已加入我的生词（词汇库写入失败）";
+    }
     if (state.tab === "reading" || state.tab === "articles") {
       document
         .querySelectorAll(`.word-token[data-word="${CSS.escape(key)}"]`)
@@ -3005,6 +3026,83 @@
           token.classList.toggle("is-unknown-token", state.unknown.has(key));
         });
     }
+  }
+
+  /* -------------------------------------------------------- 词汇库归集 */
+
+  /**
+   * 组装「这个生词从哪来」：外刊期号、段落、原句与译文，
+   * 再拼一个带 ?word= 的回跳地址，词汇库据此可以反查回原文。
+   */
+  function describeWordSource(phrase, options = {}) {
+    const context = options.context || {};
+    const issueId = String(context.issueId || state.issueId || "");
+    const meta = getIssueMeta(issueId) || {};
+    const params = new URLSearchParams();
+    if (issueId) {
+      params.set("issue", issueId);
+    }
+    params.set("tab", state.tab === "articles" ? "articles" : "reading");
+    if (phrase) {
+      params.set("word", normalizeWord(phrase));
+    }
+    const paragraph =
+      Number(context.paragraph) > 0 ? String(context.paragraph) : "";
+    return {
+      level: "periodical",
+      module: "periodical",
+      paperId: issueId,
+      paperTitle:
+        meta.titleZh && meta.title
+          ? `${meta.titleZh}（${meta.title}）`
+          : meta.titleZh || meta.title || meta.label || issueId,
+      pieceId: issueId,
+      pieceTitle: meta.label || "",
+      kind: "外刊精读",
+      question: "",
+      paragraph,
+      sentence: String(options.sentence || "").slice(0, 600),
+      translation: String(options.translation || "").slice(0, 600),
+      url: `periodical.html?${params.toString()}`,
+    };
+  }
+
+  /** 标记「不会」时同步写进词汇库；失败只提示，不影响原来的生词记录。 */
+  function saveToVocabLibrary(options) {
+    const Library = window.IballVocabLibrary;
+    if (!Library || !options?.phrase) {
+      return false;
+    }
+    const record = Library.add({
+      word: options.phrase,
+      phonetic: options.phonetic || "",
+      meaning: String(options.meaning || "").slice(0, 400),
+      source: describeWordSource(options.phrase, options),
+    });
+    return Boolean(record);
+  }
+
+  /** 从词汇库跳回来时，把原文里的那个词高亮并滚到视野内。 */
+  function focusWordInPage(word) {
+    const key = normalizeWord(word);
+    if (!key) {
+      return;
+    }
+    const match = document.querySelector(
+      `.word-token[data-word="${CSS.escape(key)}"]`,
+    );
+    if (!match) {
+      return;
+    }
+    match.classList.add("is-library-target");
+    window.setTimeout(() => {
+      match.classList.remove("is-library-target");
+    }, 6000);
+    const rect = match.getBoundingClientRect();
+    window.scrollTo({
+      top: Math.max(0, rect.top + window.scrollY - window.innerHeight / 3),
+      behavior: "auto",
+    });
   }
 
   function updateMarkSummary() {
@@ -3267,6 +3365,19 @@
   function init() {
     cacheElements();
     readStoredState();
+    // 词汇库回跳参数：?issue= 指定期号、?tab= 指定视图、?word= 高亮单词。
+    let params = null;
+    try {
+      params = new URLSearchParams(window.location.search);
+    } catch {
+      params = null;
+    }
+    state.pendingFocusWord = params?.get("word") || "";
+    const requestedTab = params?.get("tab") || "";
+    if (requestedTab && TAB_LABELS[requestedTab]) {
+      state.tab = requestedTab;
+      state.previousTab = requestedTab;
+    }
     // 搭配索引与站内词库在首屏后台预热，段落旁注和查词都不用等。
     ensurePhraseIndex();
     renderHeroStats();
@@ -3277,8 +3388,13 @@
       renderError("没有读到外刊索引，请刷新页面重试。");
       return;
     }
+    const requestedIssue = params?.get("issue") || "";
     const initial =
-      issues.find((issue) => issue.id === state.issueId)?.id || issues[0].id;
+      (requestedIssue && issues.some((issue) => issue.id === requestedIssue)
+        ? requestedIssue
+        : "") ||
+      issues.find((issue) => issue.id === state.issueId)?.id ||
+      issues[0].id;
     state.issueId = initial;
     renderIssueSelect();
     renderFilters();
@@ -3295,7 +3411,13 @@
 
     bindEvents();
     renderNavigation();
-    openIssue(initial);
+    openIssue(initial).then(() => {
+      const word = state.pendingFocusWord;
+      state.pendingFocusWord = "";
+      if (word) {
+        window.setTimeout(() => focusWordInPage(word), 60);
+      }
+    });
   }
 
   if (document.readyState === "loading") {

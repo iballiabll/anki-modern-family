@@ -5,7 +5,7 @@
   "title": "Modern Family S01E06",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E06 Run for Your Wife.��Ӣ.ass",
+  "source": "Modern Family S01E06 Run for Your Wife.中英.ass",
   "blockCount": 500,
   "wordCount": 0,
   "vocabCount": 902,

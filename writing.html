@@ -20,14 +20,23 @@
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./writing.css" />
-    <link rel="stylesheet" href="./writing-templates.css" />
+    <link rel="stylesheet" href="./writing-templates.css?v=20260929-wordpanel" />
     <link rel="stylesheet" href="./exam-scores.css" />
-    <script src="./account-store.js" defer></script>
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
     <script src="./exam-scores.js" defer></script>
     <script src="./speech-transport.js" defer></script>
+    <script src="./vocab-index.js" defer></script>
+    <script src="./collocation-index.js" defer></script>
   <script src="./writing-grade.js?v=20260925-rubric" defer></script>
-  <script src="./writing.js?v=20260925-rubric" defer></script>
-  </head>
+  <script src="./writing.js?v=20260929-wordpanel" defer></script>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body class="writing-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 
@@ -36,6 +45,7 @@
         <a class="topbar-link topbar-back" href="./index.html">返回素材库</a>
         <a class="topbar-link" href="./quiz.html">单词测试</a>
         <a class="topbar-link" href="./vocab.html">词汇库</a>
+        <a class="topbar-link" href="./writing-corpus.html">作文语料库</a>
         <a class="topbar-link topbar-link-extra" href="./kaoyan.html">考研真题</a>
       </span>
       <a class="intensive-brand" href="./index.html" aria-label="iball的小屋首页">
@@ -257,6 +267,27 @@
         </div>
       </section>
 
+      <section id="methodSection" class="writing-method" aria-labelledby="methodTitle">
+        <div class="writing-method-head">
+          <div>
+            <h2 id="methodTitle">考研写作方法论 · 老师视角</h2>
+            <p class="writing-method-intro">
+              模板给的是骨架，真正让分数动起来的是「原因怎么想、段落怎么排、槽位怎么填」。
+              这一块按考研英语一/二老师的批改口径整理：万能原因体系、三段式配额、逻辑词链、
+              话题主题词、按写作功能分类的短语与固定搭配库，以及写完之后的自检清单。
+              短语库点英文条目即可查释义与搭配。方法论为本站原创整理，不是官方范文。
+            </p>
+          </div>
+          <span id="methodMeta" class="writing-method-meta" role="status" aria-live="polite">
+            滚动到这里时再加载
+          </span>
+        </div>
+
+        <div id="methodBody" class="writing-method-body">
+          <p class="writing-template-empty">方法论滚动到此处后自动读取。</p>
+        </div>
+      </section>
+
       <section class="writing-attribution" aria-labelledby="writingCreditTitle">
         <h2 id="writingCreditTitle">数据来源与开源借鉴</h2>
         <ul>
@@ -282,6 +313,23 @@
             示例段落为压缩版，套用时必须替换花括号槽位、补充题目例子，并按考试目标词数扩写。
           </li>
           <li>
+            考研写作方法论（万能原因体系、三段式配额、逻辑词链、话题主题词、自检清单）
+            为本站原创整理，方法论骨架参照考研英语一/二写作课程的教学体系提炼，
+            <strong>只保留通用结构与功能句，不含任何付费课程原文</strong>，
+            也不是官方范文；考场必须按题目改写槽位。
+          </li>
+          <li>
+            模板「老师视角」中的定档与自检思路（硬槽数判定、双评取中、清错优先级、
+            低配→高配替换链）借鉴开源项目
+            <a
+              href="https://github.com/dengduanglang/kaoyan-english-2-writing-skills"
+              target="_blank"
+              rel="noopener noreferrer"
+            >dengduanglang/kaoyan-english-2-writing-skills</a>
+            的方法论（MIT/个人学习用途），未复制其代码或原文；
+            其分数为档位估计，不是官方评分。
+          </li>
+          <li>
             题库结构参考
             <a
               href="https://github.com/lilinji/English"
@@ -300,6 +348,29 @@
             考研英语一/二写作题目来自站内 <code>kaoyan-data</code>；六级写作来自
             <code>cet6-extra-data</code>；四级写作是站内按历年题材整理的题库，
             标注为“题材整理”，不冒充官方真题原文。
+          </li>
+          <li>
+            短语与固定搭配库按四级 / 六级 / 考研标注难度，条目与例句为本站原创整理，
+            不属于任何课程的官方讲义，也不逐句复制素材原文；
+            词条释义与搭配由站内 <code>vocab-index</code> 与
+            <code>collocation-index</code> 本地词库提供。
+          </li>
+          <li>
+            素材整理阶段使用的 PDF 文本抽取工具为
+            <a
+              href="https://github.com/pymupdf/PyMuPDF"
+              target="_blank"
+              rel="noopener noreferrer"
+            >PyMuPDF</a>
+            （AGPL-3.0，用于 PDF 页面渲染）与
+            <a
+              href="https://github.com/RapidAI/RapidOCR"
+              target="_blank"
+              rel="noopener noreferrer"
+            >RapidOCR</a>
+            （Apache-2.0，用于中英文 OCR 识别）。
+            两者只用于把个人学习资料转成可检索文本，站内呈现的是重新编写的知识点，
+            不整本复制课程原文，也不对外分发原始 PDF。
           </li>
           <li>
             逐段逐句讲解（审题拆解、原句→问题→修改→解释、提分优先级、复写清单）
@@ -342,5 +413,35 @@
         ></div>
       </section>
     </main>
+
+    <aside
+      id="writingWordPanel"
+      class="word-panel writing-word-panel"
+      aria-labelledby="writingWordTitle"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="word-panel-head">
+        <span>作文查词</span>
+        <button id="writingWordClose" class="icon-button" type="button">关闭</button>
+      </div>
+      <div class="word-heading">
+        <h2 id="writingWordTitle" lang="en"></h2>
+        <button id="writingWordSpeak" class="compact-button" type="button">朗读</button>
+      </div>
+      <p id="writingWordPhonetic" class="word-phonetic" lang="en"></p>
+      <p id="writingWordStatus" class="word-lookup-status" role="status"></p>
+      <div id="writingWordMeanings" class="word-meanings"></div>
+
+      <section id="writingWordPhraseSection" class="word-block" hidden>
+        <span class="word-block-label">固定搭配</span>
+        <div id="writingWordPhrases" class="word-phrases"></div>
+      </section>
+
+      <div class="word-context">
+        <span>当前句子</span>
+        <p id="writingWordContext" lang="en"></p>
+      </div>
+    </aside>
   </body>
 </html>

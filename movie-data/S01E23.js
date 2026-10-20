@@ -5,7 +5,7 @@
   "title": "Modern Family S01E23",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E23 Hawaii.��Ӣ.ass",
+  "source": "Modern Family S01E23 Hawaii.中英.ass",
   "blockCount": 484,
   "wordCount": 0,
   "vocabCount": 841,

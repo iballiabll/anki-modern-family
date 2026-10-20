@@ -36,7 +36,6 @@ const PRACTICE_SETTINGS_STORAGE_KEY =
   "iball-listening-cabin-speaking-settings";
 const FREE_CONVERSATION_STORAGE_KEY =
   "iball-listening-cabin-free-conversation";
-const WELCOME_OVERLAY_STORAGE_KEY = "iball-listening-cabin-welcome-seen";
 const COLLAPSED_CATEGORIES_STORAGE_KEY =
   "iball-listening-cabin-collapsed-categories";
 const GITHUB_SEARCH_URL = "https://github.com/search";
@@ -225,7 +224,7 @@ const VIRTUAL_CATEGORY_NAMES = ["外刊"];
 const LARGE_DECK_UNIT_THRESHOLD = 300;
 const INTENSIVE_ENTRY_CATEGORIES = ["四级", "六级", "电影"];
 const INTENSIVE_ENTRY_SEARCH_TEXT =
-  "四级听力全文翻译语法精读出题点技巧原文2022至2026美剧台词摩登家庭精翻固定搭配";
+  "四级听力全文翻译语法精读出题点技巧原文2015至2026美剧台词摩登家庭精翻固定搭配";
 const READING_ENTRY_CATEGORIES = ["四级", "六级", "考研"];
 const READING_ENTRY_SEARCH_TEXT =
   "上传四六级考研题目翻译阅读背单词真题精读";
@@ -1964,7 +1963,6 @@ const elements = {
   reviewIntervalGood: document.querySelector("#reviewIntervalGood"),
   reviewIntervalEasy: document.querySelector("#reviewIntervalEasy"),
   reviewStatus: document.querySelector("#reviewStatus"),
-  welcomeOverlay: document.querySelector("#welcomeOverlay"),
   searchInput: document.querySelector("#searchInput"),
   showAllMeaningsButton: document.querySelector("#showAllMeaningsButton"),
   hideAllMeaningsButton: document.querySelector("#hideAllMeaningsButton"),
@@ -8638,7 +8636,7 @@ function createIntensiveEntry(categoryName) {
     ? "摩登家庭 S01E01 · 逐句精翻 · 考试词与固定搭配"
     : isCet6
       ? `2015-2026 年已收录 ${cet6ListeningCount} 套 · 逐段翻译 · 出题点提示`
-      : `2022-2026 年已收录 ${intensivePaperCount} 套 · 逐句翻译 · 答案位置提示`;
+      : `2015-2026 年已收录 ${intensivePaperCount} 套 · 逐句翻译 · 答案位置提示`;
 
   const count = document.createElement("span");
   count.className = "resource-count";
@@ -10141,7 +10139,7 @@ function render() {
 
 const AUTH_MODE_COPY = {
   login: {
-    kicker: "欢迎回来",
+    kicker: "账号登录",
     title: "进入小屋",
     copy: "使用账号密码继续你的听力词汇复习。",
     button: "登录",
@@ -10168,6 +10166,98 @@ function renderAuthNotice(text = "", tone = "info") {
 
 /** 有账号服务的正式入口；只读镜像上所有登录／注册动作都指向这里。 */
 const MAIN_SITE_URL = "https://app.iball.top/";
+
+/**
+ * 当日登录标记。
+ *
+ * 需求：站内返回、浏览器返回、手势返回都不许再撞见登录页，
+ * 每天第一次打开时才允许出现一次。这里用 localStorage 记录
+ * 「今天是否已经登录过」：Cookie 会话正常时它只是兜底，
+ * 会话探测失败/被清时也能保证当天不再弹登录页，改为进入本地模式，
+ * 用户仍可点右上角「登录」手动登录。
+ */
+const AUTH_DAY_KEY = "iball:auth-day";
+// 登录面板是否由用户主动打开（区分「返回撞见登录页」和「我正在登录」）。
+let authPanelOpen = false;
+
+function authDayStamp() {
+  const now = new Date();
+  return [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+/**
+ * 当天登录标记是「设备级」的：account-store.js 会把 window.localStorage
+ * 换成按账号命名空间的兼容层，而 index.html 头部的登录壳预判读的是真
+ * localStorage（它的脚本跑在兼容层接管之前）。所以这里统一走 rawStore，
+ * 两边才看得到同一个值；拿不到时退回普通 localStorage。
+ */
+function deviceStore() {
+  try {
+    const raw = window.iballAccounts && window.iballAccounts.rawStore;
+    if (raw && typeof raw.getItem === "function") {
+      return raw;
+    }
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function readAuthDay() {
+  try {
+    return deviceStore()?.getItem(AUTH_DAY_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function markAuthDay() {
+  try {
+    deviceStore()?.setItem(AUTH_DAY_KEY, authDayStamp());
+  } catch {
+    // 隐私模式下写不进去，退回默认行为即可。
+  }
+}
+
+function clearAuthDay() {
+  try {
+    deviceStore()?.removeItem(AUTH_DAY_KEY);
+  } catch {
+    // 同上。
+  }
+}
+
+/**
+ * 认证成功后把 ?next= / #register 从地址栏与历史记录里抹掉，
+ * 避免浏览器返回时又落回登录/注册入口。
+ */
+function sanitizeAuthUrl() {
+  try {
+    const current = new URL(window.location.href);
+    let changed = false;
+    if (current.hash === "#register") {
+      current.hash = "";
+      changed = true;
+    }
+    if (current.searchParams.has("next")) {
+      current.searchParams.delete("next");
+      changed = true;
+    }
+    if (changed) {
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${current.pathname}${current.search}${current.hash}`,
+      );
+    }
+  } catch {
+    // 取不到地址时忽略，不影响主流程。
+  }
+}
 
 /**
  * 登录页可能由其它页面带 ?next= 跳进来。只接受本站绝对路径，
@@ -10270,6 +10360,10 @@ function setAuthMode(mode, message = "") {
 }
 
 function showLogin(message = "") {
+  authPanelOpen = true;
+  // 登录壳预判（html.auth-resume）只在「今天已经登录过」时挂上；一旦
+  // 真的需要露出登录面板，就要把它摘掉，否则面板会被 CSS 顶住看不见。
+  document.documentElement.classList.remove("auth-resume");
   setPasswordVisibility(false);
   elements.loginView.hidden = false;
   elements.appView.hidden = true;
@@ -10296,13 +10390,20 @@ function setPasswordVisibility(visible) {
 
 async function showApp(user) {
   state.user = user;
+  authPanelOpen = false;
+  const guest = !user || user === "本地模式";
   elements.userLabel.textContent = user;
+  // 未登录的本地模式把「退出」换成「登录」，保留一个常驻登录入口。
+  elements.logoutButton.textContent = guest ? "登录" : "退出";
   if (elements.adminLink) {
     elements.adminLink.hidden = !state.isAdmin;
   }
-  removeWelcomeOverlay();
   elements.loginView.hidden = true;
   elements.appView.hidden = false;
+  markAuthDay();
+  if (!guest) {
+    sanitizeAuthUrl();
+  }
 
   if (state.resources.length === 0) {
     await loadLibrary();
@@ -10397,13 +10498,18 @@ async function checkSession() {
     if (redirectToRequestedPage()) {
       return;
     }
-    removeWelcomeOverlay();
     await showApp(session.user || "用户");
     return;
   }
 
   await activateAccount(null);
   state.isAdmin = false;
+  // 当天已经登录过一次：返回或刷新不再弹登录页，先按本地进度浏览；
+  // 需要重新登录时点右上角「登录」即可。
+  if (readAuthDay() === authDayStamp()) {
+    await showApp("本地模式");
+    return;
+  }
   // 从「还没有账号？注册」这类链接进来时，直接把面板切到注册页签。
   if (
     window.location.hash === "#register" &&
@@ -10417,7 +10523,6 @@ async function checkSession() {
       ? "本站当前未开放注册，请使用已有账号登录。"
       : "",
   );
-  showWelcomeOverlay();
 }
 
 async function loadLibrary() {
@@ -10526,6 +10631,9 @@ async function handleAuthSubmit(event) {
     if (elements.inviteCode) {
       elements.inviteCode.value = "";
     }
+    // 先记下当天已登录：activateAccount 可能立刻 reload 页面，
+    // 有标记后 index.html 的登录壳预判就不会再闪一下登录页。
+    markAuthDay();
     state.authMode = "login";
     state.isAdmin = Boolean(data.admin);
     const reloading = await activateAccount(data.account);
@@ -10551,6 +10659,14 @@ async function handleAuthSubmit(event) {
 }
 
 async function handleLogout() {
+  // 未登录的本地模式：按钮显示为「登录」，点击直接进入登录面板。
+  if (!state.user || state.user === "本地模式") {
+    clearAuthDay();
+    state.authMode = "login";
+    elements.loginError.hidden = true;
+    showLogin();
+    return;
+  }
   elements.logoutButton.disabled = true;
   try {
     await window.iballProgress?.flushSync();
@@ -10560,6 +10676,7 @@ async function handleLogout() {
   }
   window.iballProgress?.stopHeartbeat();
   window.iballProgress?.disableSync("已退出登录。");
+  clearAuthDay();
   elements.logoutButton.disabled = false;
   state.user = "";
   state.isAdmin = false;
@@ -11212,58 +11329,6 @@ window.addEventListener("scroll", closeWordPopover, { passive: true });
 const mobileLibraryMediaQuery = window.matchMedia(MOBILE_LIBRARY_QUERY);
 mobileLibraryMediaQuery.addEventListener?.("change", syncLibraryDisclosure);
 
-function dismissWelcomeOverlay() {
-  const overlay = elements.welcomeOverlay;
-  if (!overlay || overlay.hidden) {
-    return;
-  }
-
-  const reduceMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-  window.setTimeout(
-    () => {
-      overlay.classList.add("is-leaving");
-      window.setTimeout(
-        () => overlay.remove(),
-        reduceMotion ? 150 : 900,
-      );
-    },
-    reduceMotion ? 700 : 3000,
-  );
-}
-
-function removeWelcomeOverlay() {
-  elements.welcomeOverlay?.remove();
-}
-
-function welcomeOverlaySeen() {
-  try {
-    return window.sessionStorage.getItem(WELCOME_OVERLAY_STORAGE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markWelcomeOverlaySeen() {
-  try {
-    window.sessionStorage.setItem(WELCOME_OVERLAY_STORAGE_KEY, "1");
-  } catch {
-    // Storage can be unavailable; the curtain then simply reappears once more.
-  }
-}
-
-function showWelcomeOverlay() {
-  const overlay = elements.welcomeOverlay;
-  if (!overlay || welcomeOverlaySeen()) {
-    return;
-  }
-
-  markWelcomeOverlaySeen();
-  overlay.hidden = false;
-  dismissWelcomeOverlay();
-}
-
 if ("speechSynthesis" in window) {
   refreshSpeechVoiceCache();
   window.speechSynthesis.addEventListener("voiceschanged", () => {
@@ -11280,5 +11345,45 @@ restorePracticeHistory();
 restoreFreeConversation();
 restorePracticeSettings();
 restoreReviewData();
+// 旧版欢迎幕布已经移除，顺手清掉遗留的状态标记。
+try {
+  window.sessionStorage.removeItem("iball-listening-cabin-welcome-seen");
+} catch {
+  // Storage can be unavailable; nothing to clean then.
+}
 syncLibraryDisclosure();
+
+/**
+ * BFCache 恢复兜底：iPad / iPhone Safari 返回页面时可能不重新执行脚本，
+ * 恢复出来的若是登录视图，用户就会以为「返回退回了登录页」。
+ * 这里按当天登录标记重新决定一次；用户主动打开登录面板时不打扰。
+ */
+function resumeViewAfterHistoryRestore() {
+  if (!elements.loginView || !elements.appView || authPanelOpen) {
+    return;
+  }
+  if (elements.loginView.hidden) {
+    return;
+  }
+  if (state.user) {
+    elements.loginView.hidden = true;
+    elements.appView.hidden = false;
+    return;
+  }
+  if (readAuthDay() === authDayStamp()) {
+    checkSession();
+  }
+}
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    resumeViewAfterHistoryRestore();
+  }
+});
+window.addEventListener("popstate", () => {
+  if (state.user && !authPanelOpen && !elements.loginView.hidden) {
+    elements.loginView.hidden = true;
+    elements.appView.hidden = false;
+  }
+});
+
 checkSession();

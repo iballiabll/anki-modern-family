@@ -22,6 +22,8 @@
   } = Deck;
 
   const INDEX_PATH = "./kaoyan-data/index.js";
+  // 动态加载的题库脚本走无查询参数 URL，会被 CDN/浏览器长期缓存；统一加版本号强制取新数据。
+  const DATA_VERSION = "20261009-notes1";
   const LIBRARY = (window.IBALL_KAOYAN_LIBRARY = window.IBALL_KAOYAN_LIBRARY || {});
   const WORD_PATTERN = /[A-Za-z]+(?:['’\-][A-Za-z]+)*/g;
   const PHONETIC_PLACEHOLDERS = new Set(["暂无音标", "音标查询中"]);
@@ -185,6 +187,7 @@
     year: "",
     kind: "all",
     paperId: "",
+    sectionId: "",
     data: null,
     openRun: 0,
     lookupRun: 0,
@@ -541,7 +544,8 @@
     }
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = src;
+      const separator = src.includes("?") ? "&" : "?";
+      script.src = `${src}${separator}v=${DATA_VERSION}`;
       script.async = true;
       script.addEventListener("load", () => resolve());
       script.addEventListener("error", () =>
@@ -611,6 +615,53 @@
     } catch {
       // 地址栏更新失败不影响阅读。
     }
+  }
+
+  // 浏览器返回 / 前进后，按「试卷 + 筛选」找回上次的阅读位置。
+  const scrollPositions = new Map();
+  // 加载新试卷时页面高度会先塌缩再撑开，期间产生的滚动事件不能写进记忆。
+  let scrollMemoryPaused = false;
+
+  function locationKey(params = getLocationParams()) {
+    return [
+      params.get("paper") || "",
+      params.get("kind") || "",
+      params.get("section") || "",
+    ].join("|");
+  }
+
+  function rememberScrollPosition() {
+    if (scrollMemoryPaused) {
+      return;
+    }
+    scrollPositions.set(locationKey(), window.scrollY);
+  }
+
+  function storedScrollPosition(params) {
+    const saved = scrollPositions.get(locationKey(params));
+    return typeof saved === "number" ? saved : null;
+  }
+
+  // 站点全局开了 scroll-behavior: smooth，恢复位置必须瞬时完成。
+  function scrollInstantly(top) {
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo({ top, behavior: "auto" });
+    root.style.scrollBehavior = previous;
+  }
+
+  // 切换板块时直接落到这个板块的开头，不走长距离平滑滚动。
+  function scrollToSectionStart(sectionId) {
+    const target = sectionId
+      ? document.querySelector(`#section-${CSS.escape(sectionId)}`)
+      : null;
+    if (!target) {
+      scrollInstantly(0);
+      return;
+    }
+    const top = target.getBoundingClientRect().top + window.scrollY - 12;
+    scrollInstantly(Math.max(0, top));
   }
 
   function getPapersForTrack(track) {
@@ -1088,7 +1139,7 @@
   /** 点词时只保留含这个词的搭配，避免把整段的搭配都堆到面板里。 */
   function phrasesForWord(word, sentence) {
     const index = window.CollocationIndex;
-    if (!index || !index.ready || typeof index.findInText !== "function") {
+    if (!index || !index.ready) {
       return [];
     }
     const forms = new Set();
@@ -1101,9 +1152,15 @@
     }
     const exact = typeof index.lookup === "function" ? index.lookup(word) : null;
     const pool = exact ? [{ item: exact, always: true }] : [];
-    index
-      .findInText(sentence || word)
-      .forEach((item) => pool.push({ item, always: false }));
+    // 题干 / 选项里的短语：用 containing() 直接找"含该词"的搭配，覆盖面更广。
+    if (typeof index.containing === "function") {
+      index.containing(word, 12).forEach((item) => pool.push({ item, always: true }));
+    }
+    if (typeof index.findInText === "function") {
+      index
+        .findInText(sentence || word)
+        .forEach((item) => pool.push({ item, always: false }));
+    }
 
     const seen = new Set();
     const result = [];
@@ -1181,7 +1238,9 @@
       `查看固定搭配 ${entry.phrase} 的释义${entry.meaning ? `：${entry.meaning}` : ""}`,
     );
     button.addEventListener("click", () => {
-      openWordPanel(entry.phrase, context.sentence, context.translation);
+      openWordPanel(entry.phrase, context.sentence, context.translation, {
+        sectionId: context.sectionId || "",
+      });
     });
     return button;
   }
@@ -1837,14 +1896,21 @@
         : question.options || [];
 
     optionList.forEach((item) => {
-      const button = createElement("button", "question-option");
-      button.type = "button";
+      // 用 div + role=button，选项文本里才能放可点击的单词按钮。
+      const button = createElement("div", "question-option");
       button.dataset.optionKey = item.key;
+      button.setAttribute("role", "button");
+      button.setAttribute("tabindex", "0");
       button.append(createElement("span", "option-letter", item.key));
       if (item.text) {
-        button.append(createElement("span", "option-text", item.text));
+        const textNode = createElement("span", "option-text");
+        appendEnglishText(textNode, item.text, {
+          sectionId: options?.sectionId || "",
+          translation: options?.translation || "",
+        });
+        button.append(textNode);
       }
-      button.addEventListener("click", () => {
+      const pick = () => {
         setChoice(question.number, item.key);
         const answer = card.dataset.answer || "";
         if (item.key !== answer) {
@@ -1853,6 +1919,23 @@
         refreshQuestionCard(card);
         refreshBlankSlots();
         refreshQuestionProgress();
+      };
+      // 点到单词 token 时不触发选择：直接返回，让事件继续冒泡，
+      // 由内容区上的代理监听打开词面板（不要 stopPropagation，否则点词无效）。
+      button.addEventListener("click", (event) => {
+        if (event.target.closest(".word-token")) {
+          return;
+        }
+        pick();
+      });
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          if (event.target.closest(".word-token")) {
+            return;
+          }
+          event.preventDefault();
+          pick();
+        }
       });
       list.append(button);
     });
@@ -1944,7 +2027,10 @@
   function renderParagraphList(article, section, paragraphs, options = {}) {
     const list = createElement("div", "paragraph-list");
     const blankNumbers = new Set((section.blankNumbers || []).map(Number));
+    const translations = Array.isArray(options.translations) ? options.translations : [];
     paragraphs.forEach((text, index) => {
+      const translation =
+        String(translations[index] || "").trim() || String(options.translation || "").trim();
       const row = createElement("div", "paragraph-row");
       row.append(createElement("span", "paragraph-number", `P${index + 1}`));
       const toolbar = createElement("div", "paragraph-toolbar");
@@ -1957,7 +2043,7 @@
       const paragraph = createElement("p", "paragraph-english");
       const context = {
         sectionId: section.id,
-        translation: options.translation || "",
+        translation,
       };
       if (options.cloze && blankNumbers.size) {
         appendClozeText(paragraph, text, context, blankNumbers);
@@ -1965,6 +2051,9 @@
         appendEnglishText(paragraph, text, context);
       }
       row.append(paragraph);
+      if (translation) {
+        row.append(createElement("p", "paragraph-chinese", translation));
+      }
 
       const notes = createElement("div", "paragraph-notes");
       mountPhraseRow(
@@ -1972,7 +2061,7 @@
         text,
         {
           sentence: text,
-          translation: options.translation || "",
+          translation,
           sectionId: section.id,
         },
         10,
@@ -1988,6 +2077,167 @@
       list.append(row);
     });
     article.append(list);
+  }
+
+  // 段落结构标注只按连接词与标点机械命中，用于回读定位，不冒充官方篇章分析。
+  const PARAGRAPH_CUE_GROUPS = [
+    {
+      tag: "转折",
+      words: [
+        "but",
+        "however",
+        "yet",
+        "nevertheless",
+        "nonetheless",
+        "in fact",
+        "actually",
+        "instead",
+        "rather",
+        "on the contrary",
+        "by contrast",
+        "unfortunately",
+      ],
+    },
+    {
+      tag: "让步",
+      words: [
+        "although",
+        "though",
+        "while",
+        "whereas",
+        "despite",
+        "in spite of",
+        "even if",
+        "even though",
+        "admittedly",
+      ],
+    },
+    {
+      tag: "因果",
+      words: [
+        "because",
+        "since",
+        "therefore",
+        "thus",
+        "hence",
+        "consequently",
+        "as a result",
+        "so that",
+        "due to",
+        "owing to",
+        "thanks to",
+        "leads to",
+      ],
+    },
+    {
+      tag: "举例",
+      words: ["for example", "for instance", "such as", "e.g.", "a case in point"],
+    },
+    {
+      tag: "递进",
+      words: [
+        "moreover",
+        "furthermore",
+        "in addition",
+        "besides",
+        "what is more",
+        "not only",
+      ],
+    },
+    {
+      tag: "对比",
+      words: ["in contrast", "compared with", "compared to", "unlike", "on the other hand"],
+    },
+    {
+      tag: "结论",
+      words: [
+        "in short",
+        "in conclusion",
+        "to sum up",
+        "in sum",
+        "to conclude",
+        "overall",
+        "ultimately",
+      ],
+    },
+  ];
+
+  function escapeForRegExp(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function paragraphCues(text) {
+    const source = String(text || "");
+    const lower = source.toLowerCase();
+    const cues = [];
+    PARAGRAPH_CUE_GROUPS.forEach((group) => {
+      const hit = group.words.find((word) =>
+        new RegExp(`(^|[^a-z])${escapeForRegExp(word)}([^a-z]|$)`).test(lower),
+      );
+      if (hit) {
+        cues.push(`${group.tag}（${hit}）`);
+      }
+    });
+    if (/[“”]/.test(source)) {
+      cues.push("直接引语（“ ”）");
+    }
+    if (/\d+(\.\d+)?\s?(%|percent|million|billion|trillion)/i.test(source)) {
+      cues.push("数据（数字 / 百分比）");
+    }
+    return cues;
+  }
+
+  /** 阅读篇章的段落结构定位：机读标注转折 / 让步 / 因果 / 举例 / 对比 / 结论。 */
+  function renderPassageStructure(article, section) {
+    if (article.dataset.passageStructure === "1") {
+      return;
+    }
+    const paragraphs = section.paragraphs || [];
+    if (paragraphs.length < 2) {
+      return;
+    }
+    const rows = paragraphs.map((text, index) => ({
+      index,
+      words: countWords(text),
+      cues: paragraphCues(text),
+    }));
+    if (!rows.some((row) => row.cues.length)) {
+      return;
+    }
+    article.dataset.passageStructure = "1";
+    const details = createElement("details", "passage-structure");
+    details.append(
+      createElement(
+        "summary",
+        "passage-structure-summary",
+        `段落结构定位 · 机读标注（${paragraphs.length} 段）`,
+      ),
+    );
+    const body = createElement("div", "passage-structure-body");
+    rows.forEach((row) => {
+      const line = createElement("div", "passage-structure-row");
+      line.append(createElement("span", "passage-structure-no", `P${row.index + 1}`));
+      const cues = createElement("div", "passage-structure-cues");
+      if (row.cues.length) {
+        row.cues.forEach((cue) => {
+          cues.append(createElement("span", "passage-structure-cue", cue));
+        });
+      } else {
+        cues.append(createElement("span", "passage-structure-none", "无典型连接词"));
+      }
+      line.append(cues);
+      line.append(createElement("span", "passage-structure-words", `${row.words} 词`));
+      body.append(line);
+    });
+    body.append(
+      createElement(
+        "p",
+        "passage-structure-note",
+        "标注按连接词与标点机械命中，用于定位转折、让步、因果、举例与结论句；连接词存在一词多义（如 while / since），篇章主旨与题目正误仍以官方解析为准。",
+      ),
+    );
+    details.append(body);
+    article.append(details);
   }
 
   function renderEnrichment(article, section) {
@@ -2030,10 +2280,27 @@
 
   function renderReading(article, section) {
     const head = article.querySelector(".piece-head");
+    const paragraphs = section.paragraphs || [];
     head.append(
-      createPlayButton(section.paragraphs || [], section.label),
+      createPlayButton(paragraphs, section.label),
     );
-    renderParagraphList(article, section, section.paragraphs || []);
+    const translations = Array.isArray(section.paragraphTranslations)
+      ? section.paragraphTranslations
+      : [];
+    const translated = translations.filter((item) => String(item || "").trim()).length;
+    if (translated) {
+      const callout = createElement("p", "kaoyan-callout");
+      callout.innerHTML =
+        "<strong>译文口径：</strong>逐段中文参考译文由公开翻译接口生成，属于机器初稿（非官方），只用于对照原文理解；长难句与固定搭配为站点机读解析，题目正误以官方答案为准。";
+      if (translated < paragraphs.length) {
+        callout.append(
+          document.createTextNode(`本卷 ${translated}/${paragraphs.length} 段已配译文。`),
+        );
+      }
+      article.append(callout);
+    }
+    renderParagraphList(article, section, paragraphs, { translations });
+    renderPassageStructure(article, section);
     renderPhraseDigest(article, section);
     article.append(
       createQuestionSection(
@@ -2618,6 +2885,19 @@
     return article;
   }
 
+  // 板块切换：一次只显示一个板块，切换后直接落到这个板块的开头。
+  function openSection(section) {
+    if (!section) {
+      return;
+    }
+    state.sectionId = section.id;
+    setLocationParams({ section: section.id }, true);
+    if (state.data) {
+      renderPaper(state.data);
+    }
+    scrollToSectionStart(section.id);
+  }
+
   function renderNavigation(paper) {
     if (!elements.pieceNavigation) {
       return;
@@ -2647,9 +2927,11 @@
       link.append(copy);
       link.addEventListener("click", (event) => {
         event.preventDefault();
-        document
-          .querySelector(`#section-${CSS.escape(section.id)}`)
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (state.sectionId === section.id) {
+          scrollToSectionStart(section.id);
+          return;
+        }
+        openSection(section);
       });
       elements.pieceNavigation.append(link);
     });
@@ -2679,9 +2961,11 @@
       );
       card.addEventListener("click", (event) => {
         event.preventDefault();
-        document
-          .querySelector(`#section-${CSS.escape(section.id)}`)
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (state.sectionId === section.id) {
+          scrollToSectionStart(section.id);
+          return;
+        }
+        openSection(section);
       });
       grid.append(card);
     });
@@ -2714,11 +2998,23 @@
           "这套试卷没有所选题型，换一个题型筛选试试。",
         ),
       );
+      state.sectionId = "";
+    } else {
+      // 一次只渲染当前板块，板块之间通过导航切换，避免整卷堆在一页。
+      const currentSection =
+        sections.find((section) => section.id === state.sectionId) ||
+        sections[0];
+      if (state.sectionId !== currentSection.id) {
+        state.sectionId = currentSection.id;
+        setLocationParams({ section: currentSection.id }, false);
+      }
+      fragment.append(
+        renderSection(
+          currentSection,
+          (paper.sections || []).indexOf(currentSection),
+        ),
+      );
     }
-    sections.forEach((section) => {
-      const index = (paper.sections || []).indexOf(section);
-      fragment.append(renderSection(section, index));
-    });
     elements.content.replaceChildren(fragment);
     state.sectionNodes = [...elements.content.querySelectorAll(".kaoyan-piece")];
     updateAnswerToggleButton();
@@ -2755,6 +3051,7 @@
       return;
     }
     const run = ++state.openRun;
+    scrollMemoryPaused = true;
     renderLoading(meta);
     stopSpeech();
     closeWordPanel();
@@ -2765,6 +3062,14 @@
       }
       state.paperId = meta.id;
       state.data = data;
+      const requestedSection =
+        options.section || getLocationParams().get("section") || "";
+      const sectionIds = new Set(
+        (data.sections || []).map((section) => section.id),
+      );
+      state.sectionId = sectionIds.has(requestedSection)
+        ? requestedSection
+        : "";
       if (state.kind === "all") {
         const paramKind = getLocationParams().get("kind");
         if (paramKind && KIND_FILTERS.some((item) => item.value === paramKind)) {
@@ -2791,7 +3096,13 @@
       } else if (options.toTop !== false) {
         window.scrollTo({ top: 0, behavior: "auto" });
       }
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          scrollMemoryPaused = false;
+        });
+      });
     } catch (error) {
+      scrollMemoryPaused = false;
       if (run !== state.openRun) {
         return;
       }
@@ -2920,7 +3231,7 @@
     elements.wordPanelPhonetic.textContent = isUsablePhonetic(value) ? value : "暂无音标";
   }
 
-  function openWordPanel(phrase, sentence, translation) {
+  function openWordPanel(phrase, sentence, translation, context = {}) {
     const presets = phrasesForWord(phrase, sentence);
     state.activeWord = {
       phrase,
@@ -2936,6 +3247,7 @@
         phonetic: "",
       },
       meanings: [],
+      context: context && typeof context === "object" ? { ...context } : {},
     };
     if (elements.wordPanelTitle) {
       elements.wordPanelTitle.textContent = phrase;
@@ -3108,8 +3420,9 @@
       .slice(0, 4)
       .map((item) => (item.meaning ? `${item.phrase}（${item.meaning}）` : item.phrase))
       .join("；");
+    const coreMeaning = getCombinedMeaning(activeWord.meanings, note);
     const meaning = [
-      getCombinedMeaning(activeWord.meanings, note),
+      coreMeaning,
       phraseText ? `固定搭配：${phraseText}` : "",
     ]
       .filter(Boolean)
@@ -3143,30 +3456,120 @@
     activeWord.item = item;
     updateTokenMarks();
     updateWordPanelMarkState();
+    const addedToLibrary =
+      mark === "unknown"
+        ? saveToVocabLibrary({
+            phrase: item.phrase,
+            meaning: coreMeaning,
+            phonetic: item.phonetic,
+            context: activeWord.context,
+            sentence: activeWord.sentence,
+            translation: activeWord.translation,
+          })
+        : false;
     showToast(
       mark === "unknown"
-        ? `${item.phrase} 已加入考研不会`
+        ? `${item.phrase} 已加入考研不会${
+            addedToLibrary ? "，并同步到词汇库" : "（词汇库写入失败）"
+          }`
         : `${item.phrase} 已标记为掌握`,
     );
+  }
+
+  /* -------------------------------------------------------- 词汇库归集 */
+
+  /** 考研卷子里的板块种类映射到词汇库的模块名，写作单独归一类。 */
+  function kaoyanModuleForKind(kind) {
+    return kind === "writing" ? "writing" : "reading";
+  }
+
+  /**
+   * 组装「这个生词从哪来」：级别、试卷、板块、题号、原句与译文，
+   * 再拼一个带 ?word= 的回跳地址，词汇库据此可以反查回原文。
+   */
+  function describeWordSource(phrase, options = {}) {
+    const context = options.context || {};
+    const sectionId = String(context.sectionId || "");
+    const sections = state.data?.sections || [];
+    const section = sections.find((item) => item.id === sectionId) || null;
+    const params = new URLSearchParams();
+    const paperId = state.paperId || "";
+    if (paperId) {
+      params.set("paper", paperId);
+    }
+    if (sectionId) {
+      params.set("section", sectionId);
+    }
+    if (phrase) {
+      params.set("word", phrase);
+    }
+    return {
+      level: "kaoyan",
+      module: kaoyanModuleForKind(section?.kind),
+      paperId,
+      paperTitle: state.data?.title || paperId,
+      pieceId: sectionId,
+      pieceTitle: section?.label || section?.title || "",
+      kind: KIND_LABELS[section?.kind] || "",
+      question: String(context.question || ""),
+      paragraph: String(context.paragraph || ""),
+      sentence: String(options.sentence || "").slice(0, 600),
+      translation: String(options.translation || "").slice(0, 600),
+      url: `kaoyan.html?${params.toString()}`,
+    };
+  }
+
+  /** 标记「不会」时同步写进词汇库；失败只提示，不影响原来的不会 / 掌握记录。 */
+  function saveToVocabLibrary(options) {
+    const Library = window.IballVocabLibrary;
+    if (!Library || !options?.phrase) {
+      return false;
+    }
+    const record = Library.add({
+      word: options.phrase,
+      phonetic: options.phonetic || "",
+      meaning: String(options.meaning || "").slice(0, 400),
+      source: describeWordSource(options.phrase, options),
+    });
+    return Boolean(record);
+  }
+
+  /** 从词汇库跳回来时，把原句里的那个词高亮并滚到视野内。 */
+  function focusWordInPage(word) {
+    const target = String(word || "").trim().toLowerCase();
+    if (!target) {
+      return;
+    }
+    const tokens = [...document.querySelectorAll(".word-token")];
+    const match = tokens.find(
+      (token) => String(token.dataset.word || "").toLowerCase() === target,
+    );
+    if (!match) {
+      return;
+    }
+    match.classList.add("is-library-target");
+    window.setTimeout(() => {
+      match.classList.remove("is-library-target");
+    }, 6000);
+    const rect = match.getBoundingClientRect();
+    window.scrollTo({
+      top: Math.max(0, rect.top + window.scrollY - window.innerHeight / 3),
+      behavior: "auto",
+    });
   }
 
   /* -------------------------------------------------------------- 其他 UI */
 
   function updateActiveNavigation() {
-    if (!state.sectionNodes.length) {
-      return;
-    }
-    const threshold = 150;
-    let activeId = state.sectionNodes[0].dataset.sectionId;
-    state.sectionNodes.forEach((node) => {
-      if (node.getBoundingClientRect().top <= threshold) {
-        activeId = node.dataset.sectionId;
-      }
-    });
+    // 单板块显示：高亮直接跟随当前板块，不再按滚动位置推断。
+    const activeId = state.sectionId;
     elements.pieceNavigation
       ?.querySelectorAll(".navigation-link")
       .forEach((link) => {
-        link.classList.toggle("is-active", link.dataset.sectionId === activeId);
+        link.classList.toggle(
+          "is-active",
+          Boolean(activeId) && link.dataset.sectionId === activeId,
+        );
       });
   }
 
@@ -3241,21 +3644,26 @@
 
   function playWholePaper() {
     const texts = [];
-    state.sectionNodes.forEach((node) => {
-      node.querySelectorAll(".paragraph-english").forEach((paragraph) => {
-        const text = paragraph.textContent || "";
-        if (text.trim()) {
-          texts.push(text.trim());
-        }
-      });
-      if (node.dataset.kind === "writing") {
-        node.querySelectorAll(".kaoyan-writing-prompt").forEach((prompt) => {
-          const text = prompt.textContent || "";
+    // 板块改为单篇渲染后，播放仍覆盖整套试卷，避免「全文播放」缩水成单板块。
+    (state.data?.sections || []).forEach((section) => {
+      if (section.kind === "writing") {
+        (section.writingParts || []).forEach((part) => {
+          const text = String(part?.prompt || "");
           if (text.trim()) {
             texts.push(text.trim());
           }
         });
+        return;
       }
+      (section.paragraphs || []).forEach((paragraph) => {
+        const text =
+          typeof paragraph === "string"
+            ? paragraph
+            : paragraph?.english || paragraph?.text || "";
+        if (String(text).trim()) {
+          texts.push(String(text).trim());
+        }
+      });
     });
     playSequence(texts, elements.readAllButton, "整套试卷");
   }
@@ -3282,9 +3690,9 @@
       state.kind = elements.kindSelect.value;
       writeStoredValue(KIND_STORAGE_KEY, state.kind);
       if (state.data) {
-        renderPaper(state.data);
         setLocationParams({ kind: state.kind === "all" ? "" : state.kind }, true);
-        window.scrollTo({ top: 0, behavior: "auto" });
+        renderPaper(state.data);
+        scrollToSectionStart(state.sectionId);
       }
     });
     elements.displayModeButtons.forEach((button) => {
@@ -3313,21 +3721,73 @@
         return;
       }
       event.preventDefault();
+      const questionCard = trigger.closest("[data-question-number]");
       openWordPanel(
         trigger.dataset.word || trigger.textContent || "",
         trigger.dataset.sentence || "",
         trigger.dataset.translation || "",
+        {
+          sectionId:
+            trigger.dataset.sectionId ||
+            trigger.closest("[data-section-id]")?.dataset.sectionId ||
+            "",
+          question: questionCard?.dataset.questionNumber || "",
+        },
       );
     });
     window.addEventListener("scroll", () => {
+      rememberScrollPosition();
       updateProgressBar();
       window.requestAnimationFrame(updateActiveNavigation);
     });
     window.addEventListener("popstate", () => {
+      const params = getLocationParams();
+      const requestedKind = params.get("kind") || "all";
+      const requestedSection = params.get("section") || "";
+      const normalizedKind = KIND_FILTERS.some(
+        (item) => item.value === requestedKind,
+      )
+        ? requestedKind
+        : "all";
+      const saved = storedScrollPosition(params);
       const meta = pickPaper();
-      if (meta) {
-        openPaper(meta.id);
+      if (!meta) {
+        return;
       }
+      if (meta.id === state.paperId) {
+        let needsRender = false;
+        if (normalizedKind !== state.kind) {
+          state.kind = normalizedKind;
+          if (elements.kindSelect) {
+            elements.kindSelect.value = normalizedKind;
+          }
+          needsRender = true;
+        }
+        if (requestedSection && requestedSection !== state.sectionId) {
+          state.sectionId = requestedSection;
+          needsRender = true;
+        }
+        if (needsRender && state.data) {
+          renderPaper(state.data);
+        }
+        if (saved !== null) {
+          window.requestAnimationFrame(() => {
+            scrollInstantly(saved);
+          });
+        } else if (requestedSection) {
+          scrollToSectionStart(state.sectionId);
+        }
+        return;
+      }
+      state.kind = normalizedKind;
+      if (elements.kindSelect) {
+        elements.kindSelect.value = normalizedKind;
+      }
+      openPaper(meta.id, { toTop: false }).then(() => {
+        window.requestAnimationFrame(() => {
+          scrollInstantly(saved === null ? 0 : saved);
+        });
+      });
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !elements.wordPanel?.hidden) {
@@ -3341,6 +3801,9 @@
   }
 
   async function boot() {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
     const params = getLocationParams();
     state.track = params.get("track") || readStoredValue(TRACK_STORAGE_KEY) || "all";
     state.year = params.get("year") || readStoredValue(YEAR_STORAGE_KEY) || "";
@@ -3367,8 +3830,17 @@
       renderError("题库里没有可选试卷。");
       return;
     }
-    await openPaper(meta.id, { toTop: false });
+    // 词汇库回跳：先落到对应板块，再高亮原句里的那个词。
+    const wantSection = params.get("section") || "";
+    await openPaper(meta.id, {
+      toTop: !wantSection && !params.get("word"),
+      scrollTo: wantSection,
+    });
     updateProgressBar();
+    const focusWord = params.get("word");
+    if (focusWord) {
+      window.setTimeout(() => focusWordInPage(focusWord), 80);
+    }
   }
 
   boot();

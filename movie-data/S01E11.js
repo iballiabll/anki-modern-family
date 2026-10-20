@@ -5,7 +5,7 @@
   "title": "Modern Family S01E11",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E11 Up All Night.��Ӣ.ass",
+  "source": "Modern Family S01E11 Up All Night.中英.ass",
   "blockCount": 527,
   "wordCount": 0,
   "vocabCount": 866,

@@ -25,12 +25,23 @@
     </script>
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
-    <link rel="stylesheet" href="./vocab.css?v=20260927-blur4" />
-    <script src="./account-store.js?v=20260927-blur4" defer></script>
+    <link rel="stylesheet" href="./vocab.css?v=20261005-ui10" />
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
+    <script src="./vocab-library.js?v=20261005-ui10" defer></script>
+    <script src="./vocab-userbook.js?v=20261005-ui10" defer></script>
     <script src="./vocab-recite-api.js?v=20260927-blur4" defer></script>
     <script src="./speech-transport.js?v=20260927-blur4" defer></script>
-    <script src="./vocab.js?v=20260927-blur4" defer></script>
-  </head>
+    <script src="./vocab.js?v=20261005-ui10" defer></script>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <link rel="stylesheet" href="./back-to-top.css?v=20261005-ui10" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+    <script src="./back-to-top.js?v=20261005-ui11" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body class="vocab-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 
@@ -119,15 +130,6 @@
             </div>
 
             <div class="tool-actions">
-              <a
-                id="backXxjrButton"
-                class="tool-button vocab-xxjr-link"
-                href="./xxrj/"
-                target="_top"
-                title="返回刷题计划页面"
-              >
-                返回 XXRJ
-              </a>
               <button id="favoriteOnlyButton" class="tool-button" type="button" aria-pressed="false">
                 收藏夹 (<span id="favoriteCount">0</span>)
               </button>
@@ -160,6 +162,15 @@
               </button>
               <button id="wordbookButton" class="tool-button" type="button">
                 生词本 (<span id="wordbookCount">0</span>)
+              </button>
+              <button
+                id="libraryButton"
+                class="tool-button"
+                type="button"
+                aria-pressed="false"
+                title="各模块标记「不会」的单词都汇总在这里，可按来源筛选并跳回原文"
+              >
+                我的词汇库 (<span id="libraryCount">0</span>)
               </button>
               <button id="clearProgressButton" class="tool-button" type="button">
                 清空进度
@@ -233,6 +244,321 @@
           </div>
           <div id="wordDetail" class="vocab-detail" role="status" aria-live="polite"></div>
         </aside>
+      </section>
+
+      <section
+        id="libraryBoard"
+        class="vocab-board vocab-library-board"
+        hidden
+        aria-labelledby="libraryTitle"
+      >
+        <div class="vocab-list-panel">
+          <div class="vocab-panel-head">
+            <div class="vocab-head-copy">
+              <h2 id="libraryTitle">词汇库</h2>
+              <span id="libraryMeta" class="vocab-panel-hint">
+                先选入口：我的词书，或各模块标记「不会」的单词。
+              </span>
+            </div>
+            <div class="vocab-panel-actions">
+              <button
+                id="libraryBackButton"
+                class="compact-button"
+                type="button"
+                hidden
+              >
+                返回上一层
+              </button>
+              <button id="libraryCloseButton" class="compact-button" type="button">
+                返回词库
+              </button>
+            </div>
+          </div>
+
+          <!-- 第一级：入口选择 -->
+          <div id="libraryEntry" class="library-entry">
+            <button id="libraryEntryNotebook" class="library-entry-card" type="button">
+              <span class="library-entry-badge" aria-hidden="true">不</span>
+              <span class="library-entry-copy">
+                <strong>不会的单词</strong>
+                <small>
+                  各模块和词书里标记「不会」的词都归到这里，可按来源、按背词进度筛选，并能跳回原文。
+                </small>
+              </span>
+              <span id="libraryEntryNotebookCount" class="library-entry-count">0 词</span>
+            </button>
+            <button id="libraryEntryBooks" class="library-entry-card" type="button">
+              <span class="library-entry-badge" aria-hidden="true">书</span>
+              <span class="library-entry-copy">
+                <strong>我的词书</strong>
+                <small>
+                  导入自己的词书（粘贴 / CSV / JSON），逐词记 未背 / 已斩 / 模糊 / 不会；标不会的词自动进「不会的单词」。
+                </small>
+              </span>
+              <span id="libraryEntryBooksCount" class="library-entry-count">0 本</span>
+            </button>
+          </div>
+
+          <!-- 第二级 A：词书列表 -->
+          <div id="libraryBooksView" class="library-books" hidden>
+            <div class="library-tool-actions">
+              <button
+                id="libraryBookImportButton"
+                class="compact-button is-primary"
+                type="button"
+              >
+                导入词书
+              </button>
+              <button id="libraryBookExportAllButton" class="compact-button" type="button">
+                导出全部词书
+              </button>
+            </div>
+            <div id="libraryBookList" class="library-book-list"></div>
+            <span
+              id="libraryBooksStatus"
+              class="vocab-list-status"
+              role="status"
+              aria-live="polite"
+            ></span>
+          </div>
+
+          <!-- 第二级 B：某本词书 -->
+          <div id="libraryBookView" class="library-book-view" hidden>
+            <div class="library-tools">
+              <input
+                id="libraryBookSearch"
+                class="paper-select"
+                type="search"
+                placeholder="搜索这本书里的单词"
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="搜索词书里的单词"
+              />
+              <div class="library-tool-actions">
+                <button id="libraryBookExportButton" class="compact-button" type="button">
+                  导出这本
+                </button>
+                <button id="libraryBookRenameButton" class="compact-button" type="button">
+                  重命名
+                </button>
+                <button
+                  id="libraryBookReviewButton"
+                  class="compact-button"
+                  type="button"
+                  title="把当前筛选结果放进抽卡复习"
+                >
+                  复习当前
+                </button>
+                <button id="libraryBookDeleteButton" class="compact-button is-danger" type="button">
+                  删除词书
+                </button>
+              </div>
+            </div>
+            <div class="library-filter-bar">
+              <div class="library-filter-group">
+                <div class="library-filter-head">
+                  <span class="library-filter-label">背词进度</span>
+                  <div
+                    class="library-mode-switch"
+                    role="group"
+                    aria-label="进度筛选模式"
+                    data-library-mode="bookProgress"
+                  >
+                    <button type="button" data-library-mode-value="all">全部</button>
+                    <button type="button" data-library-mode-value="single">单选</button>
+                    <button type="button" data-library-mode-value="multi">多选</button>
+                  </div>
+                </div>
+                <div
+                  id="libraryBookProgressFilters"
+                  class="library-filters"
+                  role="group"
+                  aria-label="按背词进度筛选词书"
+                ></div>
+              </div>
+            </div>
+            <div id="libraryBookListWords" class="vocab-list" aria-label="词书单词列表"></div>
+            <div class="vocab-list-foot">
+              <button id="libraryBookLoadMoreButton" class="tool-button" type="button" hidden>
+                加载更多
+              </button>
+              <span
+                id="libraryBookStatus"
+                class="vocab-list-status"
+                role="status"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+
+          <!-- 第二级 C：不会的单词 -->
+          <div id="libraryNotebookView" class="library-notebook" hidden>
+            <div class="library-tools">
+              <input
+                id="librarySearch"
+                class="paper-select"
+                type="search"
+                placeholder="搜索单词或释义"
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="搜索词汇库"
+              />
+              <div class="library-tool-actions">
+                <button id="librarySelectAllButton" class="compact-button" type="button">
+                  全选当前
+                </button>
+                <button
+                  id="libraryClearSelectionButton"
+                  class="compact-button"
+                  type="button"
+                  hidden
+                >
+                  清空勾选
+                </button>
+                <button
+                  id="libraryCustomButton"
+                  class="compact-button"
+                  type="button"
+                  aria-pressed="false"
+                  title="只看手动勾选的单词组合"
+                >
+                  自定义组合 (<span id="librarySelectedCount">0</span>)
+                </button>
+                <button
+                  id="libraryReviewButton"
+                  class="compact-button"
+                  type="button"
+                  title="把当前筛选结果放进抽卡复习"
+                >
+                  复习当前
+                </button>
+                <button
+                  id="libraryDeleteSelectedButton"
+                  class="compact-button is-danger"
+                  type="button"
+                >
+                  删除勾选
+                </button>
+              </div>
+            </div>
+            <div class="library-filter-bar">
+              <div class="library-filter-group">
+                <div class="library-filter-head">
+                  <span class="library-filter-label">来源</span>
+                  <div
+                    class="library-mode-switch"
+                    role="group"
+                    aria-label="来源筛选模式"
+                    data-library-mode="source"
+                  >
+                    <button type="button" data-library-mode-value="all">全部</button>
+                    <button type="button" data-library-mode-value="single">单选</button>
+                    <button type="button" data-library-mode-value="multi">多选</button>
+                  </div>
+                </div>
+                <div
+                  id="libraryFilters"
+                  class="library-filters"
+                  role="group"
+                  aria-label="按来源筛选词汇库"
+                ></div>
+              </div>
+              <div class="library-filter-group">
+                <div class="library-filter-head">
+                  <span class="library-filter-label">背词进度</span>
+                  <div
+                    class="library-mode-switch"
+                    role="group"
+                    aria-label="进度筛选模式"
+                    data-library-mode="progress"
+                  >
+                    <button type="button" data-library-mode-value="all">全部</button>
+                    <button type="button" data-library-mode-value="single">单选</button>
+                    <button type="button" data-library-mode-value="multi">多选</button>
+                  </div>
+                </div>
+                <div
+                  id="libraryProgressFilters"
+                  class="library-filters"
+                  role="group"
+                  aria-label="按背词进度筛选词汇库"
+                ></div>
+              </div>
+            </div>
+            <div id="libraryList" class="vocab-list" aria-label="词汇库单词列表"></div>
+            <div class="vocab-list-foot">
+              <button id="libraryLoadMoreButton" class="tool-button" type="button" hidden>
+                加载更多
+              </button>
+              <span
+                id="libraryStatus"
+                class="vocab-list-status"
+                role="status"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+
+          <!-- 导入词书：底部弹层，手机端单手可操作 -->
+          <div id="libraryImportDialog" class="library-dialog" hidden>
+            <div
+              class="library-dialog-card"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="libraryImportTitle"
+            >
+              <div class="library-dialog-head">
+                <h3 id="libraryImportTitle">导入词书</h3>
+                <button id="libraryImportCancelButton" class="compact-button" type="button">
+                  关闭
+                </button>
+              </div>
+              <label class="library-dialog-field">
+                <span>词书名称</span>
+                <input
+                  id="libraryImportName"
+                  type="text"
+                  maxlength="60"
+                  autocomplete="off"
+                  placeholder="例如：核心词 3000"
+                />
+              </label>
+              <label class="library-dialog-field">
+                <span>词表内容</span>
+                <textarea
+                  id="libraryImportText"
+                  rows="8"
+                  spellcheck="false"
+                  placeholder="一行一个词，例如：&#10;apple 苹果&#10;banana,香蕉&#10;也可以粘贴 CSV / TSV / JSON"
+                ></textarea>
+              </label>
+              <div class="library-dialog-actions">
+                <input
+                  id="libraryImportFile"
+                  class="visually-hidden"
+                  type="file"
+                  accept=".txt,.csv,.tsv,.json,text/plain,application/json"
+                />
+                <button id="libraryImportFileButton" class="compact-button" type="button">
+                  选择文件
+                </button>
+                <button
+                  id="libraryImportConfirmButton"
+                  class="compact-button is-primary"
+                  type="button"
+                >
+                  导入
+                </button>
+              </div>
+              <span
+                id="libraryImportStatus"
+                class="library-dialog-status"
+                role="status"
+                aria-live="polite"
+              ></span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="drawPanel" class="vocab-draw-panel" hidden aria-labelledby="drawTitle">

@@ -1,0 +1,181 @@
+{
+  "id": "english-ii-2019",
+  "track": "english-ii",
+  "year": 2019,
+  "provider": "mixed-public-mt",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.193Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2019 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "50a1e8143a8b8da6",
+          "en": "Unlike so-called basic emotions such as sadness, fear, and anger, guilt emerges a little later, in conjunction with a child’s growing grasp of social and moral norms. Children aren’t born knowing how to say “I’m sorry”; rather, they learn over time that such statements appease parents and friends—and their own consciences. This is why researchers generally regard so-called moral guilt, in the right amount, to be a good thing.",
+          "zh": "与悲伤、恐惧和愤怒等所谓的基本情绪不同，内疚感的出现要晚一些，与孩子对社会和道德规范的掌握程度的提高相结合。相反，随着时间的推移，他们会发现这样的陈述可以安抚父母和朋友以及他们自己的良心。这就是为什么研究人员通常认为所谓的道德内疚，在适当的程度上，这是件好事。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b62b52605faaacdb",
+          "en": "In the popular imagination, of course, guilt still gets a bad rap. It is deeply uncomfortable—it’s the emotional equivalent of wearing a jacket weighted with stones. Yet this understanding is outdated. “There has been a kind of revival or a rethinking about what guilt is and what role guilt can serve,” says Amrisha Vaish, a psychology researcher at the University of Virginia, adding that this revival is part of a larger recognition that emotions aren’t binary—feelings that may be advantageous in one context may be harmful in another. Jealousy and anger, for example, may have evolved to alert us to important inequalities. Too much happiness can be destructive.",
+          "zh": "当然，在大众的想象中，负罪感仍然是一个坏名声。它让人非常不舒服--它在情感上就像穿了一件用石头压着的夹克。然而，这种理解已经过时了。弗吉尼亚大学的心理学研究员阿姆里沙·瓦伊什说：“人们对什么是负罪感以及负罪感可以起到什么作用有了一种复兴或重新思考。”他补充说，这种复兴是一种更广泛的认识的一部分，即情绪不是二元的--在一种情况下有利的情绪在另一种情况下可能是有害的。例如，嫉妒和愤怒可能已经演变成提醒我们注意重要的不平等。太多的幸福可能是破坏性的。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "d7ef78c352cc679c",
+          "en": "And guilt, by prompting us to think more deeply about our goodness, can encourage humans to make up for errors and fix relationships. Guilt, in other words, can help hold a cooperative species together. It is a kind of social glue. Viewed in this light, guilt is an opportunity. Work by Tina Malti, a psychology professor at the University of Toronto, suggests that guilt may compensate for an emotional deficiency. In a number of studies, Malti and others have shown that guilt and sympathy may represent different pathways to cooperation and sharing. Some kids who are low in sympathy may make up for that shortfall by experiencing more guilt, which can rein in their nastier impulses. And vice versa: High sympathy can substitute for low guilt. In a 2014 study, for example, Malti looked at 244 children. Using caregiver assessments and the children’s self-observations, she rated each child’s overall sympathy level and his or her tendency to feel negative emotions after moral transgressions. Then the kids were handed chocolate coins, and given a chance to share them with an anonymous child. For the low-sympathy kids, how much they shared appeared to turn on how inclined they were to feel guilty. The guilt-prone ones shared more, even though they hadn’t magically become more sympathetic to the other child’s deprivation.",
+          "zh": "内疚，通过促使我们更深入地思考我们的善良，可以鼓励人类弥补错误，修复人际关系。换句话说，内疚可以帮助将一个合作的物种团结在一起。它是一种社会粘合剂。从这个角度来看，内疚是一个机会。多伦多大学心理学教授蒂娜·马尔蒂的研究表明内疚可以弥补情感上的缺陷。在许多研究中，马尔蒂和其他人已经表明内疚和同情可能代表着不同的合作和分享途径。一些同情心低的孩子可能会通过体验更多的内疚来弥补这一缺陷。可以抑制他们的邪恶冲动，反之亦然高同情心可以代替低内疚感。例如，在2014年的一项研究中，马尔蒂观察了244名儿童。通过看护者的评估和儿童的自我观察，她对每个儿童的整体同情心水平以及他们在道德违规后感受到负面情绪的倾向进行了评级。然后，孩子们被发给巧克力硬币。并让他们有机会与一个匿名的孩子分享。对于同情心低的孩子来说，他们分享的多少似乎取决于他们有多容易感到内疚。有内疚倾向的孩子分享的更多，尽管他们并没有神奇地对另一个孩子的贫困变得更加同情。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "ea0a405a0417f954",
+          "en": "“That’s good news, ” Malti says. “We can be prosocial because we caused harm and we feel regret.”",
+          "zh": "“这是个好消息，“马尔蒂说，“我们可以变得亲社会，因为我们造成了伤害，我们感到后悔。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2019 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "2c5fda45b498fb80",
+          "en": "Forests give us shade, quiet and one of the harder challenges in the fight against climate change. Even as we humans count on forests to soak up a good share of the carbon dioxide we produce, we are threatening their ability to do so. The climate change we are hastening could one day leave us with forests that emit more carbon than they absorb.",
+          "zh": "森林为我们提供了阴凉、宁静，也是应对气候变化的最大挑战之一。尽管我们人类指望森林吸收我们产生的二氧化碳中的很大一部分，但我们正在威胁森林吸收二氧化碳的能力。我们正在加速的气候变化可能有一天会让我们的森林排放的碳超过它们吸收的碳。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "7c2094337c791280",
+          "en": "Thankfully, there is a way out of this trap—but it involves striking a subtle balance. Helping forests flourish as valuable “carbon sinks” long into the future may require reducing their capacity to absorb carbon now. California is leading the way, as it does on so many climate efforts, in figuring out the details. The state’s proposed Forest Carbon Plan aims to double efforts to thin out young trees and clear brush in parts of the forest. This temporarily lowers carbon-carrying capacity. But the remaining trees draw a greater share of the available moisture, so they grow and thrive, restoring the forest’s capacity to pull carbon from the air. Healthy trees are also better able to fend off insects. The landscape is rendered less easily burnable. Even in the event of a fire, fewer trees are consumed.",
+          "zh": "值得庆幸的是，有一种方法可以摆脱这个陷阱--但这需要达到一种微妙的平衡。要想让森林在未来很长一段时间内成为有价值的“碳汇”，可能需要降低它们现在吸收碳的能力。加州在这方面走在了前面，就像它在许多气候努力中所做的那样，该州提出的森林碳计划旨在加倍努力，在森林的部分地区间伐小树和清除灌木。这暂时是一个问题。降低了碳的承载能力。但剩下的树木吸收了更多的可用水分，因此它们生长茁壮，恢复了森林从空气中吸收碳的能力。健康的树木也能更好地抵御昆虫。景观变得不那么容易燃烧。即使发生火灾，也会消耗更少的树木。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "71fd3038a4315308",
+          "en": "The need for such planning is increasingly urgent. Already, since 2010, drought and insects have killed over 100 million trees in California, most of them in 2016 alone, and wildfires have burned hundreds of thousands of acres. California plans to treat 35,000 acres of forest a year by 2020, and 60,000 by 2030—financed from the proceeds of the state’s emissions-permit auctions. That’s only a small share of the total acreage that could benefit, about half a million acres in all, so it will be vital to prioritize areas at greatest risk of fire or drought.",
+          "zh": "自2010年以来，干旱和虫害已经导致加州1亿多棵树死亡，其中大部分是在2016年，野火烧毁了数十万英亩土地。加州计划到2020年每年处理35,000英亩的森林，到2030年每年处理60,000英亩的森林--资金来自该州的排放许可证拍卖所得。这只是可能受益的总面积的一小部分，总共约50万英亩，因此优先考虑火灾或干旱风险最大的地区至关重要。",
+          "provider": "transmart-sentence",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "55f2ddd2685548b0",
+          "en": "The strategy also aims to ensure that carbon in woody material removed from the forests is locked away in the form of solid lumber or burned as biofuel in vehicles that would otherwise run on fossil fuels. New research on transportation biofuels is already under way.",
+          "zh": "该战略还旨在确保从森林中移除的木质材料中的碳以固体木材的形式被锁定，或者作为生物燃料在车辆中燃烧，否则这些车辆将使用化石燃料。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "473e5a409de4f4cf",
+          "en": "State governments are well accustomed to managing forests, but traditionally they’ve focused on wildlife, watersheds and opportunities for recreation. Only recently have they come to see the vital part forests will have to play in storing carbon. California’s plan, which is expected to be finalized by the governor next year, should serve as a model.",
+          "zh": "州政府已经习惯了管理森林，但传统上他们关注的是野生动物、流域和娱乐机会。直到最近，他们才开始看到森林在储存碳方面的重要作用。加州的计划预计将于明年由州长敲定，应该成为一个典范。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2019 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "aea17f2e12135b01",
+          "en": "American farmers have been complaining of labor shortages for several years. The complaints are unlikely to stop without an overhaul of immigration rules for farm workers.",
+          "zh": "美国农民抱怨劳动力短缺已经有好几年了。如果不对农业工人的移民规定进行彻底改革，这种抱怨不太可能停止。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "5c888fa1e49a897c",
+          "en": "Congress has obstructed efforts to create a more straightforward visa for agricultural workers that would let foreign workers stay longer in the U.S. and change jobs within the industry. If this doesn’t change, American businesses, communities, and consumers will be the losers.",
+          "zh": "国会一直在阻挠为农业工人创造一个更简单的签证的努力，该签证将允许外国工人在美国停留更长时间，并在该行业内更换工作。如果这种情况不改变，美国企业，社区和消费者将成为输家。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "a468f3a2d7709fa7",
+          "en": "Perhaps half of U.S. farm laborers are undocumented immigrants. As fewer such workers enter the country, the characteristics of the agricultural workforce are changing. Today’s farm laborers, while still predominantly born in Mexico, are more likely to be settled rather than migrating and more likely to be married than single. They’re also aging. At the start of this century, about one-third of crop workers were over the age of 35. Now more than half are. And picking crops is hard on older bodies. One oft-debated cure for this labor shortage remains as implausible as it’s been all along: Native U.S. workers won’t be returning to the farm.",
+          "zh": "美国的农业劳动力可能有一半是无证移民。随着进入美国的此类工人越来越少，农业劳动力的特征正在发生变化。今天的农业劳动力虽然仍主要出生在墨西哥，但更有可能定居而不是移民，更有可能已婚而不是单身。他们也在老龄化。在本世纪初，大约三分之一的农作物工人年龄在35岁以上。现在超过一半。年纪大的人很难采摘庄稼。一个经常被争论的解决劳动力短缺的办法仍然是不可信的，因为它一直沿着：美国本土工人不会回到农场。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "6c44d28e02cc485b",
+          "en": "Mechanization isn’t the answer, either—not yet, at least. Production of corn, cotton, rice, soybeans, and wheat has been largely mechanized, but many high-value, labor-intensive crops, such as strawberries, need labor. Even dairy farms, where robots do a small share of milking, have a long way to go before they’re automated.",
+          "zh": "机械化也不是解决问题的办法，至少目前还不是。玉米、棉花、水稻、大豆和小麦的生产已经基本实现了机械化，但许多高价值的劳动密集型作物，如草莓，需要劳动力。即使是机器人承担一小部分挤奶工作的奶牛场，在实现自动化之前也有很长的路要走。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "74d78d31092b90e4",
+          "en": "As a result, farms have grown increasingly reliant on temporary guest workers using the H-2A visa to fill the gaps in the workforce. Starting around 2012, requests for the visas rose sharply; from 2011 to 2016 the number of visas issued more than doubled.",
+          "zh": "因此，农场越来越依赖使用H-2A签证的临时客工来填补劳动力缺口。从2012年左右开始，签证申请急剧增加;从2011年到2016年，签发的签证数量增加了一倍多。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "ff0a0fb2c5535258",
+          "en": "The H-2A visa has no numerical cap, unlike the H-2B visa for nonagricultural work, which is limited to 66,000 a year. Even so, employers complain they aren’t given all the workers they need. The process is cumbersome, expensive, and unreliable. One survey found that bureaucratic delays led the average H-2A worker to arrive on the job 22 days late. The shortage is compounded by federal immigration raids, which remove some workers and drive others underground. In a 2012 survey, 71 percent of tree-fruit growers and almost 80 percent of raisin and berry growers said they were short of labor. Some western farmers have responded by moving operations to Mexico. From 1998 to 2000, 14.5 percent of the fruit Americans consumed was imported. Little more than a decade later, the share of imports was 25.8 percent.",
+          "zh": "H-2A签证没有人数上限，不像非农业工作的H-2B签证，每年限制在6.6万人。即便如此，雇主们抱怨说，他们没有得到所需的所有工人。这个过程既繁琐又昂贵，一项调查发现，官僚主义的拖延导致平均H-2一名工人迟到22天才上班。联邦移民局的突击检查加剧了这种短缺，这些突击检查将一些工人转移到地下。在2012年的一项调查中，71%的果树种植者和近80%的葡萄干和浆果种植者说，他们缺乏劳动力。一些西方农民的反应是将业务转移到墨西哥。从1998年到2000年，美国人消费的水果中有14.5%是进口的，10年后，进口水果的比例为25.8%。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "1b3405f886174131",
+          "en": "In effect, the U.S. can import food or it can import the workers who pick it.",
+          "zh": "实际上，美国可以进口食物，也可以进口采摘食物的工人。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2019 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "3ff068ae302d8108",
+          "en": "Arnold Schwarzenegger, Dia Mirza and Adrian Grenier have a message for you: It’s easy to beat plastic. They’re part of a bunch of celebrities starring in a new video for World Environment Day—encouraging you, the consumer, to swap out your single-use plastic staples to combat the plastics crisis. The key messages that have been put together for World Environment Day do include a call for governments to enact legislation to curb single-use plastics. But the overarching message is directed at individuals.",
+          "zh": "阿诺德·施瓦辛格、迪亚·米尔扎和阿德里安·格雷尼尔有话要对你说：击败塑料很容易。他们是一群名人中的一员，他们在世界环境日的一个新视频中担任主角-鼓励你，消费者，把你的单身-使用塑料斯台普斯来应对塑料危机。世界环境日的关键信息包括呼吁各国政府制定立法，一次性塑料。但总体信息是针对个人的。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "0c899defed63aa54",
+          "en": "My concern with leaving it up to the individual, however, is our limited sense of what needs to be achieved. On their own, taking our own bags to the grocery store or quitting plastic straws, for example, will accomplish little and require very little of us. They could even be harmful, satisfying a need to have “done our bit” without ever progressing onto bigger, bolder, more effective actions—a kind of “moral licensing” that eases our concerns and stops us doing more and asking more of those in charge.",
+          "zh": "然而，我担心的是，把事情交给个人，是因为我们对需要实现的目标的认识有限。比如，自己拿购物袋去杂货店，或者放弃塑料吸管，靠自己完成的事情很少，对我们的要求也很少。它们甚至可能是有害的，满足了“尽自己的一份力”的需要，却没有进步到更大、更大胆的程度，更有效的行动--一种“道德许可”，它减轻了我们的担忧，阻止我们做更多的事情，并向那些负责人提出更多的要求。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "6edf0b36e1feb132",
+          "en": "While the conversation around our environment and our responsibility toward it remains centered on shopping bags and straws, we’re ignoring the balance of power that implies that as “consumers” we must shop sustainably, rather than as “citizens” hold our governments and industries to account to push for real systemic change.",
+          "zh": "虽然围绕我们的环境和我们对它的责任的谈话仍然集中在购物袋和吸管上，但我们忽视了权力的平衡，这意味着作为“消费者”我们必须可持续地购物，而不是作为“公民”要求我们的政府和行业负责推动真实的系统性变革。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "f29aa9bb7bd2712e",
+          "en": "It’s important to acknowledge that the environment isn’t everyone’s priority—or even most people’s. We shouldn’t expect it to be. In her latest book, Why Good People Do Bad Environmental Things, Wellesley College professor Elizabeth R. DeSombre argues that the best way to collectively change the behavior of large numbers of people is for the change to be structural. This might mean implementing policy such as a plastic tax that adds a cost to environmentally problematic action, or banning single-use plastics altogether. India has just announced it will “eliminate all single-use plastic in the country by 2022.” There are also incentive-based ways of making better environmental choices easier, such as ensuring recycling is at least as easy as trash disposal. DeSombre isn’t saying people should stop caring about the environment. It’s just that individual actions are too slow, she says, for that to be the only, or even primary, approach to changing widespread behavior.",
+          "zh": "重要的是要认识到，环境并不是每个人的首要任务，甚至不是大多数人的首要任务。我们不应该期望它是。在她的最新著作《为什么好人做坏环境的事情》中，韦尔斯利学院教授伊丽莎白·R·德松布尔认为，集体改变大量人行为的最佳方式是结构性改变。这可能意味着实施塑料税等政策，为有环境问题的行动增加成本，或者完全禁止一次性塑料。印度刚刚宣布将“到2022年在该国消除所有一次性塑料”。还有一些基于激励的方法可以让更好的环境选择变得更容易，比如确保回收至少和垃圾处理一样容易。DeSombre并不是说人们应该停止关心环境。只是个人她说，行动太慢，这不是改变普遍行为的唯一甚至主要方法。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "d4367b462101f3cf",
+          "en": "None of this is about writing off the individual. It’s just about putting things into perspective. We don’t have time to wait. We need progressive policies that shape collective action, alongside engaged citizens pushing for change.",
+          "zh": "所有这些都不是要贬低个人。这只是要把事情放在正确的角度。我们没有时间等待。我们需要形成集体行动的进步政策，以及参与推动变革的公民。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    }
+  }
+}

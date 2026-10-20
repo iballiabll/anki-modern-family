@@ -20,14 +20,23 @@
     <link rel="stylesheet" href="./intensive.css" />
     <link rel="stylesheet" href="./movie.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
-    <script src="./account-store.js" defer></script>
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
     <script src="./collocation-index.js" defer></script>
     <script src="./movie-data/index.js" defer></script>
     <script src="./movie.js" defer></script>
-  </head>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <link rel="stylesheet" href="./back-to-top.css?v=20261005-ui10" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+    <script src="./back-to-top.js?v=20261005-ui11" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body class="movie-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 

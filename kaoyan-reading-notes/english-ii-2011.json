@@ -1,0 +1,160 @@
+{
+  "id": "english-ii-2011",
+  "track": "english-ii",
+  "year": 2011,
+  "provider": "google-vps",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.184Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2011 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "ee41250284e98799",
+          "en": "Ruth Simmons joined Goldman Sachs’s board as an outside director in January 2000; a year later she became president of Brown University. For the rest of the decade she apparently managed both roles without attracting much criticism. But by the end of 2009 Ms. Simmons was under fire for having sat on Goldman’s compensation committee; how could she have let those enormous bonus payouts pass unremarked? By February the next year Ms. Simmons had left the board. The position was just taking up too much time, she said.",
+          "zh": "露丝·西蒙斯 (Ruth Simmons) 于 2000 年 1 月加入高盛董事会，担任外部董事；一年后，她成为布朗大学校长。在接下来的十年里，她显然扮演了这两个角色，没有引起太多批评。但到 2009 年底，西蒙斯女士因担任高盛薪酬委员会成员而受到批评。她怎么可能对这些巨额奖金视而不见呢？到第二年二月，西蒙斯女士离开了董事会。她说，这个职位占用了太多时间。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "6f0f0f8ae744ddaf",
+          "en": "Outside directors are supposed to serve as helpful, yet less biased, advisers on a firm’s board. Having made their wealth and their reputations elsewhere, they presumably have enough independence to disagree with the chief executive’s proposals. If the sky, and the share price is falling, outside directors should be able to give advice based on having weathered their own crises.",
+          "zh": "外部董事应该在公司董事会中充当有用但不带偏见的顾问。他们在其他地方积累了财富和声誉，想必有足够的独立性来反对首席执行官的提议。如果天空和股价下跌，外部董事应该能够根据自己度过的危机提供建议。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "a52237132f7032ad",
+          "en": "The researchers from Ohio University used a database that covered more than 10, 000 firms and more than 64, 000 different directors between 1989 and 2004.",
+          "zh": "俄亥俄大学的研究人员使用的数据库涵盖了 1989 年至 2004 年间超过 10, 000 家公司和超过 64, 000 名不同的董事。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "74a5a47b53f3cb42",
+          "en": "Then they simply checked which directors stayed from one proxy statement to the next. The most likely reason for departing a board was age, so the researchers concentrated on those “surprise” disappearances by directors under the age of 70. They found that after a surprise departure, the probability that the company will subsequently have to restate earnings increased by nearly 20%. The likelihood of being named in a federal class-action lawsuit also increases, and the stock is likely to perform worse. The effect tended to be larger for larger firms. Although a correlation between them leaving and subsequent bad performance at the firm is suggestive, it does not mean that such directors are always jumping off a sinking ship. Often they “trade up,” leaving riskier, smaller firms for larger and more stable firms.",
+          "zh": "然后他们简单地检查了哪些董事从一份委托书到下一份委托书都留下了。董事会离职最有可能的原因是年龄，因此研究人员将注意力集中在70岁以下董事的“意外”失踪上。他们发现，意外离职后，公司随后不得不重述收益的可能性增加了近20%。被联邦集体诉讼点名的可能性也增加，该股的表现可能会更差。对于规模较大的公司来说，这种影响往往更大。尽管他们的离职与公司随后的糟糕表现之间存在相关性，但这并不意味着这些董事总是从一艘正在下沉的船上跳下来。他们通常会“升级”，离开风险较高、规模较小的公司，转向规模更大、更稳定的公司。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "ec031774b24b93c0",
+          "en": "But the researchers believe that outside directors have an easier time of avoiding a blow to their reputations if they leave a firm before bad news break, even if a review of history shows that they were on the board at the time any wrongdoing occurred. Firms who want to keep their outside directors through tough times may have to create incentives. Otherwise outside directors will follow the example of Ms. Simmons, once again very popular on campus.",
+          "zh": "但研究人员认为，如果外部董事在坏消息传出之前离开公司，他们就更容易避免声誉受到打击，即使对历史的回顾表明，在任何不当行为发生时，他们都是董事会成员。想要留住外部董事度过困难时期的公司可能必须制定激励措施。否则，外部董事将效仿西蒙斯女士的做法，她再次在校园里很受欢迎。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2011 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "e82af31d911500e2",
+          "en": "Whatever happened to the death of newspapers? A year ago the end seemed near. The recession threatened to remove the advertising and readers that had not already fled to the Internet. Newspapers like the San Francisco Chronicle were chronicling their own doom. America’s Federal Trade Commission launched a round of talks about how to save newspapers. Should they become charitable corporations? Should the state subsidize them? It will hold another meeting soon. But the discussions now seem out of date.",
+          "zh": "报纸的消亡到底是怎么回事？一年前，结局似乎已近在眼前。经济衰退可能会消除尚未逃往互联网的广告和读者。像《旧金山纪事报》这样的报纸正在记录他们自己的厄运。美国联邦贸易委员会发起了一轮关于如何拯救报纸的讨论。他们应该成为慈善公司吗？国家应该补贴他们吗？不久将举行另一次会议。但现在的讨论似乎已经过时了。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "ff9a8c88d6e9dc7a",
+          "en": "In much of the world there is little sign of crisis. German and Brazilian papers have shrugged off the recession. Even American newspapers, which inhabit the most troubled corner of the global industry, have not only survived but often returned to profit. Not the 20% profit margins that were routine a few years ago, but profit all the same.",
+          "zh": "世界大部分地区几乎没有出现危机的迹象。德国和巴西的报纸已经摆脱了经济衰退的影响。即使是位于全球行业最困难角落的美国报纸，也不仅生存了下来，而且常常恢复盈利。虽然不是几年前常见的 20% 利润率，但利润还是一样。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "5e53a15d831cdd36",
+          "en": "It has not been much fun. Many papers stayed afloat by pushing journalists overboard. The American Society of News Editors reckons that 13, 500 newsroom jobs have gone since 2007. Readers are paying more for slimmer products. Some papers even had the nerve to refuse delivery to distant suburbs. Yet these desperate measures have proved the right ones and, sadly for many journalists, they can be pushed further.",
+          "zh": "这并不有趣。许多报纸靠记者的努力才得以维持下去。美国新闻编辑协会估计，自 2007 年以来，已有 13, 500 个新闻编辑室工作岗位消失。读者正在为更薄的产品支付更多费用。有些报纸甚至厚颜无耻地拒绝向偏远郊区投递。然而事实证明，这些孤注一掷的措施是正确的，而且对许多记者来说可悲的是，这些措施还可以进一步推进。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "ab12fefd7827eb29",
+          "en": "Newspapers are becoming more balanced businesses, with a healthier mix of revenues from readers and advertisers. American papers have long been highly unusual in their reliance on ads. Fully 87% of their revenues came from advertising in 2008, according to the Organization for Economic Cooperation ＆ Development (OECD). In Japan the proportion is 35%. Not surprisingly, Japanese newspapers are much more stable.",
+          "zh": "报纸业务正在变得更加平衡，来自读者和广告商的收入组合更加健康。美国报纸长期以来对广告的依赖是极不寻常的。根据经济合作与发展组织 (OECD) 的数据，2008 年他们 87% 的收入来自广告。在日本这一比例为35%。毫不奇怪，日本报纸要稳定得多。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "25e1b65b6f0c8407",
+          "en": "The whirlwind that swept through newsrooms harmed everybody, but much of the damage has been concentrated in areas where newspapers are least distinctive. Car and film reviewers have gone. So have science and general business reporters. Foreign bureaus have been savagely cut off. Newspapers are less complete as a result. But completeness is no longer a virtue in the newspaper business.",
+          "zh": "席卷新闻编辑室的旋风伤害了所有人，但大部分损害都集中在报纸最不独特的领域。汽车和电影评论家都走了。科学记者和一般商业记者也是如此。外国机构的联系被野蛮地切断。因此，报纸不太完整。但完整性不再是报纸行业的美德。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2011 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "d7edab879496db3a",
+          "en": "We tend to think of the decades immediately following World War II as a time of prosperity and growth, with soldiers returning home by the millions, going off to college on the G. I. Bill and lining up at the marriage bureaus. But when it came to their houses, it was a time of common sense and a belief that less could truly be more. During the Depression and the war, Americans had learned to live with less, and that restraint, in combination with the postwar confidence in the future, made small, efficient housing positively stylish. Economic condition was only a stimulus for the trend toward efficient living. The phrase “less is more” was actually first popularized by a German, the architect Ludwig Mies van der Rohe, who like other people associated with the Bauhaus, a school of design, emigrated to the United States before World War II and took up posts at American architecture schools. These designers came to exert enormous influence on the course of American architecture, but none more so than Mies. Mies’s signature phrase means that less decoration, properly organized, has more impact than a lot. Elegance, he believed, did not derive from abundance. Like other modern architects, he employed metal, glass and laminated wood—materials that we take for granted today but that in the 1940s symbolized the future. Mies’s sophisticated presentation masked the fact that the spaces he designed were small and efficient, rather than big and often empty.",
+          "zh": "我们倾向于将第二次世界大战后的几十年视为繁荣和发展的时期，数以百万计的士兵回国，靠《退伍军人权利法案》上大学，并在婚姻登记处排队。但当谈到他们的房子时，这是一个常识和信念的时代，即少即是多。在大萧条和战争期间，美国人学会了用更少的钱生活，这种克制加上战后对未来的信心，使小型、高效的住房变得非常时尚。经济状况只是高效生活趋势的刺激因素。 “少即是多”这句话实际上是由德国建筑师路德维希·密斯·凡德罗（Ludwig Mies van der Rohe）首先流行起来的，他和其他与包豪斯设计学院有联系的人一样，在二战前移居美国，并在美国建筑学校任职。这些设计师对美国建筑的进程产生了巨大的影响，但密斯影响最大。密斯的标志性短语意味着，较少的装饰，适当的组织，比大量的装饰具有更大的影响力。他相信，优雅并非源自丰富。与其他现代建筑师一样，他采用了金属、玻璃和层压木材——这些材料在今天我们看来是理所当然的，但在 20 世纪 40 年代却象征着未来。密斯复杂的演示掩盖了这样一个事实：他设计的空间小而高效，而不是大且经常空荡荡的。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "d4136a3af944786e",
+          "en": "The apartments in the elegant towers Mies built on Chicago’s Lake Shore Drive, for example, were smaller—two-bedroom units under 1, 000 square feet— than those in their older neighbors along the city’s Gold Coast. But they were popular because of their airy glass walls, the views they afforded and the elegance of the buildings’ details and proportions, the architectural equivalent of the abstract art so popular at the time.",
+          "zh": "例如，密斯在芝加哥湖滨大道上建造的优雅塔楼中的公寓比位于城市黄金海岸的老邻居中的公寓要小，两居室单元面积不到 1, 000 平方英尺。但它们之所以受欢迎，是因为它们通风的玻璃墙、提供的视野以及建筑细节和比例的优雅，相当于当时流行的抽象艺术的建筑风格。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "e919189af4ce1a25",
+          "en": "The trend toward “less” was not entirely foreign. In the 1930s Frank Lloyd Wright started building more modest and efficient houses—usually around 1,200 square feet—than the spreading two-story ones he had designed in the 1890s and the early 20th century.",
+          "zh": "“更少”的趋势并非完全陌生。 20 世纪 30 年代，弗兰克·劳埃德·赖特 (Frank Lloyd Wright) 开始建造比他在 1890 年代和 20 世纪初设计的两层楼更朴素、更高效的房屋（通常面积约为 1,200 平方英尺）。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "b93ff2880ed52b05",
+          "en": "The “Case Study Houses” commissioned from talented modem architects by California Arts ＆ Architecture magazine between 1945 and 1962 were yet another homegrown influence on the “less is more” trend. Aesthetic effect came from the landscape, new materials and forthright detailing. In his Case Study House, Ralph Rapson may have mispredicted just how the mechanical revolution would impact everyday life—few American families acquired helicopters, though most eventually got clothes dryers—but his belief that self-sufficiency was both desirable and inevitable was widely shared.",
+          "zh": "1945 年至 1962 年间，加州艺术与建筑杂志委托才华横溢的现代建筑师设计的“案例研究住宅”是对“少即是多”趋势的另一个本土影响。美学效果来自景观、新材料和直接的细节。在他的案例研究之家中，拉尔夫·拉普森可能错误地预测了机械革命将如何影响日常生活——很少有美国家庭拥有直升机，尽管大多数家庭最终都拥有了干衣机——但他认为自给自足既是可取的也是不可避免的这一信念得到了广泛认同。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2011 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "c05e6ad348a39df3",
+          "en": "Will the European Union make it? The question would have sounded strange not long ago. Now even the project’s greatest cheerleaders talk of a continent facing a “Bermuda triangle” of debt, population decline and lower growth. As well as those chronic problems, the EU faces an acute crisis in its economic core, the 16 countries that use the single currency. Markets have lost faith that the euro zone’s economies, weaker or stronger, will one day converge thanks to the discipline of sharing a single currency, which denies uncompetitive members the quick fix of devaluation.",
+          "zh": "欧盟能做到吗？不久前，这个问题听起来还很奇怪。现在，就连该项目最伟大的啦啦队员也谈到非洲大陆面临着债务、人口下降和增长放缓的“百慕大三角”。除了这些长期存在的问题外，欧盟的经济核心——使用单一货币的 16 个国家——也面临着严重的危机。市场已经失去了信心，欧元区各经济体，无论强弱，终有一天会因共享单一货币的纪律而趋于一致，这种纪律使得缺乏竞争力的成员国无法快速解决贬值问题。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "41b3cda0f85cca2b",
+          "en": "Ye t th e d eb ate ab o u t h o w to save Europe’s single currency from disintegration is stuck. It is stuck because the euro zone’s dominant powers, France and Germany, agree on the need for greater harmonization within the euro zone, but disagree about what to harmonise.",
+          "zh": "然而，关于如何避免欧洲单一货币解体的争论却陷入僵局。之所以陷入困境，是因为欧元区的主导力量法国和德国都同意欧元区内部需要加强协调，但对于协调的内容存在分歧。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "8c3089abecdfc16d",
+          "en": "Germany thinks the euro must be saved by stricter rules on borrowing, spending and competitiveness, backed by quasi-automatic sanctions for governments that do not obey. These might include threats to freeze EU funds for poorer regions and EU mega-projects, and even the suspension of a country’s voting rights in EU ministerial councils. It insists that economic co-ordination should involve all 27 members of the EU club, among whom there is a small majority for free-market liberalism and economic rigour; in the inner core alone, Germany fears, a small majority favour French interference. A “southern” camp headed by France wants something different: “European economic government” within an inner core of euro-zone members. Translated, that means politicians intervening in monetary policy and a system of redistribution from richer to poorer members, via cheaper borrowing for governments through common Eurobonds or complete fiscal transfers. Finally, figures close to the French government have murmured, euro-zone members should agree to some fiscal and social harmonization: e.g., curbing competition in corporate-tax rates or labour costs.",
+          "zh": "德国认为必须通过更严格的借贷、支出和竞争力规则来拯救欧元，并对不遵守规则的政府实施准自动制裁。这些措施可能包括威胁冻结欧盟对贫困地区和欧盟大型项目的资金，甚至暂停一个国家在欧盟部长理事会的投票权。它坚持经济协调应涉及欧盟俱乐部的所有27个成员，其中有微弱多数支持自由市场自由主义和经济严谨；德国担心，仅在内部核心，就有少数人赞成法国干涉。以法国为首的“南方”阵营想要一些不同的东西：在欧元区成员国的核心内建立“欧洲经济政府”。换句话说，这意味着政治家通过共同欧洲债券或完整的财政转移支付为政府提供更便宜的借款，从而干预货币政策和从较富裕成员到较贫穷成员的再分配体系。最后，接近法国政府的人士抱怨称，欧元区成员国应该同意一些财政和社会协调措施：例如，遏制企业税率或劳动力成本方面的竞争。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "d61b1809fceac155",
+          "en": "It is too soon to write off the EU. It remains the world’s largest trading block. At its best, the European project is remarkably liberal: built around a single market of 27 rich and poor countries, its internal borders are far more open to goods, capital and labour than any comparable trading area. It is an ambitious attempt to blunt the sharpest edges of globalization, and make capitalism benign.",
+          "zh": "现在就取消欧盟还为时过早。它仍然是世界上最大的贸易区。在最好的情况下，欧洲项目是非常自由的：围绕27个富国和穷国的单一市场建立，其内部边界对商品、资本和劳动力的开放程度远高于任何类似的贸易区域。这是一次雄心勃勃的尝试，旨在削弱全球化最锋利的边缘，使资本主义变得良性。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    }
+  }
+}

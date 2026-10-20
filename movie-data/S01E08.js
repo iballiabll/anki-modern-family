@@ -5,7 +5,7 @@
   "title": "Modern Family S01E08",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E08 Great Expectations.��Ӣ.ass",
+  "source": "Modern Family S01E08 Great Expectations.中英.ass",
   "blockCount": 478,
   "wordCount": 0,
   "vocabCount": 820,

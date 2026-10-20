@@ -1,0 +1,153 @@
+{
+  "id": "english-i-2010",
+  "track": "english-i",
+  "year": 2010,
+  "provider": "mixed-public-mt",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.164Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2010 考研英语一 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "f4da456f18b5c05f",
+          "en": "Of all the changes that have taken place in English-language newspapers during the past quarter-century, perhaps the most far-reaching has been the inexorable decline in the scope and seriousness of their arts coverage.",
+          "zh": "在过去的四分之一世纪里，英语报纸发生的所有变化中，影响最深远的也许是其艺术报道的范围和严肃性的不可阻挡的下降。",
+          "provider": "youdao-aidemo",
+          "generatedAt": "2026-10-09T13:29:49.841Z"
+        },
+        {
+          "hash": "cdd435c8e845cd75",
+          "en": "It is difficult to the point of impossibility for the average reader under the age of forty to imagine a time when high-quality arts criticism could be found in most big-city newspapers. Yet a considerable number of the most significant collections of criticism published in the 20th century consisted in large part of newspaper reviews. To read such books today is to marvel at the fact that their learned contents were once deemed suitable for publication in general-circulation dailies.",
+          "zh": "对于40岁以下的普通读者来说，很难想象在大多数大城市的报纸上都能找到高质量的艺术评论，这几乎是不可能的。然而，在20世纪出版的最重要的批评文集中，有相当一部分是报纸评论。今天读到这样的书，你会惊讶于这样一个事实：它们的学术内容曾经被认为适合在大众日报上发表。",
+          "provider": "youdao-aidemo",
+          "generatedAt": "2026-10-09T13:29:50.081Z"
+        },
+        {
+          "hash": "663d7fb3762b4f15",
+          "en": "We are even farther removed from the unfocused newspaper reviews published in England between the turn of the 20th century and the eve of World War II, at a time when newsprint was dirt-cheap and stylish arts criticism was considered an ornament to the publications in which it appeared. In those far-off days, it was taken for granted that the critics of major papers would write in detail and at length about the events they covered. Theirs was a serious business, and even those reviewers who wore their learning lightly, like George Bernard Shaw and Ernest Newman, could be trusted to know what they were about. These men believed in journalism as a calling, and were proud to be published in the daily press. “So few authors have brains enough or literary gift enough to keep their own end up in journalism,” Newman wrote, “that I am tempted to define ‘journalism’ as ‘a term of contempt applied by writers who are not read to writers who are’.”",
+          "zh": "从20世纪初到第二次世界大战前夕，英国报纸上发表的那些没有重点的评论甚至离我们更远了，当时新闻纸非常便宜，时尚的艺术评论被认为是出版物的点缀。在那些遥远的日子里，人们理所当然地认为，主要报纸的评论家会详细而详尽地报道他们所报道的事件。他们的作品是严肃的，即使是那些不把自己的学识当回事的评论家，比如萧伯纳（George Bernard Shaw）和纽曼（Ernest Newman），也可以相信他们知道自己写的是什么。这些人相信新闻业是一种天职，并为自己在日报上发表文章而感到自豪。纽曼写道：“很少有作家有足够的头脑或足够的文学天赋，能让自己在新闻行业中终归归。因此，我忍不住把‘新闻’定义为‘一个蔑视的术语，它被那些不被人阅读的作家用来形容那些被人阅读的作家’。”",
+          "provider": "youdao-aidemo",
+          "generatedAt": "2026-10-09T13:29:50.334Z"
+        },
+        {
+          "hash": "4603a79af74283e8",
+          "en": "Unfortunately, these critics are virtually forgotten. Neville Cardus, who wrote for the Manchester Guardian from 1917 until shortly before his death in 1975, is now known solely as a writer of essays on the game of cricket. During his lifetime, though, he was also one of England’s foremost classical-music critics, and a stylist so widely admired that his Autobiography (1947) became a best-seller. He was knighted in 1967, the first music critic to be so honored. Yet only one of his books is now in print, and his vast body of writings on music is unknown save to specialists.",
+          "zh": "不幸的是，这些批评几乎被遗忘了。内维尔·卡德斯（Neville Cardus）从1917年开始为《曼彻斯特卫报》（Manchester Guardian）撰稿，直到1975年去世前不久，他现在只以写板球文章而为人所知。然而，在他的一生中，他也是英国最重要的古典音乐评论家之一，也是一位广受钦佩的造型师，他的自传（1947）成为畅销书。1967年，他被封为爵士，成为首位获此殊荣的音乐评论家。然而，他的书中只有一本现在还在印刷，除了专家之外，他关于音乐的大量著作并不为人所知。",
+          "provider": "youdao-aidemo",
+          "generatedAt": "2026-10-09T13:29:50.752Z"
+        },
+        {
+          "hash": "a0dea077d48c0dc5",
+          "en": "Is there any chance that Cardus’s criticism will enjoy a revival? The prospect seems remote. Journalistic tastes had changed long before his death, and postmodern readers have little use for the richly upholstered Vicwardian prose in which he specialized. Moreover, the amateur tradition in music criticism has been in headlong retreat.",
+          "zh": "卡杜斯的批评有可能复兴吗？这个前景似乎很遥远。早在他去世之前，新闻界的品味就已经发生了变化，后现代读者对他所擅长的华丽的维多利亚式散文几乎没有什么用处。此外，音乐批评的业余传统已经在急速退却。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.084Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2010 考研英语一 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "587d8c46f17b87d1",
+          "en": "Over the past decade, thousands of patents have been granted for what are called business methods. Amazon.com received one for its “one-click” online payment system. Merrill Lynch got legal protection for an asset allocation strategy. One inventor patented a technique for lifting a box.",
+          "zh": "在过去的十年里，数千项所谓的商业方法专利被授予。亚马逊因其“一键式”在线支付系统而获得了一项殊荣。美林的资产配置策略获得了法律保护。一位发明家申请了一项举起盒子的技术的专利。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "c73e6f48be3030eb",
+          "en": "Now the nation’s top patent court appears completely ready to scale back on business-method patents, which have been controversial ever since they were first authorized 10 years ago. In a move that has intellectual-property lawyers abuzz, the U.S. Court of Appeals for the Federal Circuit said it would use a particular case to conduct a broad review of business-method patents. In re Bilski, as the case is known, is “a very big deal,” says Dennis D. Crouch of the University of Missouri School of Law. It “has the potential to eliminate an entire class of patents.” Curbs on business-method claims would be a dramatic about-face, because it was the Federal Circuit itself that introduced such patents with its 1998 decision in the so-called State Street Bank case, approving a patent on a way of pooling mutual-fund assets. That ruling produced an explosion in business-method patent filings, initially by emerging Internet companies trying to stake out exclusive rights to specific types of online transactions. Later, more established companies raced to add such patents to their files, if only as a defensive move against rivals that might beat them to the punch. In 2005, IBM noted in a court filing that it had been issued more than 300 business-method patents, despite the fact that it questioned the legal basis for granting them. Similarly, some Wall Street investment firms armed themselves with patents for financial products, even as they took positions in court cases opposing the practice.",
+          "zh": "现在，美国最高专利法院似乎已完全准备好缩减商业方法专利的申请规模，这些专利自十年前首次授权以来一直备受争议。美国联邦巡回上诉法院表示，将利用一个特定案件对商业方法专利进行广泛审查，此举引起了知识产权律师的热议。密苏里大学法学院的丹尼斯·D·克劳奇 (Dennis D. Crouch) 表示，众所周知，比尔斯基案是“一件大事”。它“有可能消除一整类专利。”对商业方法索赔的限制将是一个戏剧性的大转变，因为正是联邦巡回法院本身在 1998 年在所谓的道富银行案中做出的裁决中引入了此类专利，批准了一项关于汇集共同基金资产的方式的专利。该裁决导致商业方法专利申请激增，最初是新兴互联网公司试图争夺特定类型在线交易的专有权。后来，更多的老牌公司竞相将此类专利添加到他们的档案中，哪怕只是作为一种防御举措，以对抗可能先发制人的竞争对手。 2005年，IBM在一份法庭文件中指出，它已经获得了300多项商业方法专利，尽管它对授予这些专利的法律依据提出了质疑。同样，一些华尔街投资公司用金融产品专利武装自己，尽管他们在法庭案件中表明了反对这种做法的立场。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "31e70a87787edcf6",
+          "en": "The Bilski case involves a claimed patent on a method for hedging risk in the energy market. The Federal Circuit issued an unusual order stating that the case would be heard by all 12 of the court’s judges, rather than a typical panel of three, and that one issue it wants to evaluate is whether it should “reconsider” its State Street Bank ruling.",
+          "zh": "比尔斯基案涉及一项有关能源市场风险对冲方法的专利。联邦巡回法院发布了一项不同寻常的命令，规定该案将由法院所有 12 名法官审理，而不是典型的三人小组，并且它想要评估的一个问题是是否应该“重新考虑”其道富银行的裁决。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "c0aae2a4aff1c7a5",
+          "en": "The Federal Circuit’s action comes in the wake of a series of recent decisions by the Supreme Court that has narrowed the scope of protections for patent holders. Last April, for example, the justices signaled that too many patents were being upheld for “inventions” that are obvious. The judges on the Federal Circuit are “reacting to the anti-patent trend at the Supreme Court,” says Harold C. Wegner, a patent attorney and professor at George Washington University Law School.",
+          "zh": "联邦巡回法院的行动是在最高法院最近做出一系列缩小专利持有人保护范围的决定之后采取的。例如，去年四月，法官们表示，太多明显的“发明”专利得到了维护。乔治华盛顿大学法学院专利律师兼教授 Harold C. Wegner 表示，联邦巡回法院的法官正在“对最高法院的反专利趋势做出反应”。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2010 考研英语一 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "30d5e4c4642f7275",
+          "en": "In his book The Tipping Point, Malcolm Gladwell argues that “social epidemics” are driven in large part by the actions of a tiny minority of special individuals, often called influentials, who are unusually informed, persuasive, or well connected. The idea is intuitively compelling, but it doesn’t explain how ideas actually spread.",
+          "zh": "马尔科姆·格拉德威尔在他的《引爆点》一书中指出，“社会流行病”在很大程度上是由极少数特殊个体的行为驱动的，这些特殊个体通常被称为有影响力的人，他们消息灵通、有说服力或人脉广泛。这个想法在直觉上很引人注目，但它并没有解释想法实际上是如何传播的。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "b52d552e126ad562",
+          "en": "The supposed importance of influentials derives from a plausible-sounding but largely untested theory called the “two-step flow of communication”: Information flows from the media to the influentials and from them to everyone else. Marketers have embraced the two-step flow because it suggests that if they can just find and influence the influentials, those select people will do most of the work for them. The theory also seems to explain the sudden and unexpected popularity of certain looks, brands, or neighborhoods. In many such cases, a cursory search for causes finds that some small group of people was wearing, promoting, or developing whatever it is before anyone else paid attention. Anecdotal evidence of this kind fits nicely with the idea that only certain special people can drive trends. In their recent work, however, some researchers have come up with the finding that influentials have far less impact on social epidemics than is generally supposed. In fact, they don’t seem to be required at all.",
+          "zh": "有影响力的所谓重要性源自一种听起来似乎合理但基本上未经检验的理论，称为“两步传播流”：信息从媒体流向有影响力的人，然后从他们流向其他人。营销人员已经接受了两步流程，因为它表明，如果他们能够找到并影响有影响力的人，那么那些选定的人将为他们做大部分工作。这个理论似乎也解释了某些造型、品牌或社区突然出人意料地流行的原因。在许多这样的案例中，粗略地寻找原因就会发现，有一小群人在其他人注意到之前就开始穿着、推广或开发任何东西。此类轶事证据非常符合这样的观点：只有某些特殊的人才能推动趋势。然而，在最近的研究中，一些研究人员发现，有影响力的人对社会流行病的影响远小于人们普遍认为的。事实上，它们似乎根本不需要。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "06af7a6a4f3a42fb",
+          "en": "The researchers’ argument stems from a simple observation about social influence: With the exception of a few celebrities like Oprah Winfrey—whose outsize presence is primarily a function of media, not interpersonal, influence— even the most influential members of a population simply don’t interact with that many others. Yet it is precisely these non-celebrity influentials who, according to the two-step-flow theory, are supposed to drive social epidemics, by influencing their friends and colleagues directly. For a social epidemic to occur, however, each person so affected must then influence his or her own acquaintances, who must in turn influence theirs, and so on; and just how many others pay attention to each of these people has little to do with the initial influential. If people in the network just two degrees removed from the initial influential prove resistant, for example, the cascade of change won’t propagate very far or affect many people. Building on the basic truth about interpersonal influence, the researchers studied the dynamics of social influence by conducting thousands of computer simulations of populations, manipulating a number of variables relating to people’s ability to influence others and their tendency to be influenced. They found that the principal requirement for what is called “global cascades”—the widespread propagation of influence through networks—is the presence not of a few influentials but, rather, of a critical mass of easily influenced people.",
+          "zh": "研究人员的论点源于对社会影响力的一个简单观察：除了奥普拉·温弗瑞（Oprah Winfrey）这样的少数名人（他们的巨大存在主要是媒体影响力而不是人际影响力）之外，即使是人群中最有影响力的成员也不会与那么多其他人互动。然而，根据两步流理论，正是这些非名人影响力人士应该通过直接影响他们的朋友和同事来推动社会流行病。然而，要发生社会流行病，每个受到如此影响的人都必须影响他或她自己的熟人，而这些人又必须影响他们的熟人，依此类推；而有多少人关注这些人，与最初的影响力无关。例如，如果网络中的人们与最初的影响力相距仅两度，那么一连串的变化就不会传播很远，也不会影响很多人。基于人际影响力的基本事实，研究人员通过对人群进行数千次计算机模拟，操纵许多与人们影响他人的能力和受影响倾向相关的变量，研究了社会影响力的动态。他们发现，所谓的“全球级联”（通过网络影响力的广泛传播）的主要要求不是少数有影响力的人的存在，而是大量容易受到影响的人的存在。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2010 考研英语一 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "7aa111828220bffe",
+          "en": "Bankers have been blaming themselves for their troubles in public. Behind the scenes, they have been taking aim at someone else: the accounting standard-setters. Their rules, moan the banks, have forced them to report enormous losses, and it’s just not fair. These rules say they must value some assets at the price a third party would pay, not the price managers and regulators would like them to fetch. Unfortunately, banks’ lobbying now seems to be working. The details may be unknowable, but the independence of standard-setters, essential to the proper functioning of capital markets, is being compromised. And, unless banks carry toxic assets at prices that attract buyers, reviving the banking system will be difficult.",
+          "zh": "银行家们一直在公开场合为自己的麻烦而自责。在幕后，他们一直把矛头指向另一个人：会计准则制定者。银行抱怨说，他们的规则迫使他们报告巨额损失，这是不公平的。这些规则规定，他们必须按照第三方支付的价格对某些资产进行估值，而不是价格管理者和监管机构希望他们获得的价格。不幸的是，银行的游说现在似乎起了作用。细节可能不可知，但对于资本市场正常运作至关重要的标准制定者的独立性正在受到损害。而且，除非银行以吸引买家的价格持有有毒资产，否则重振银行体系将很困难。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "a2a5a63245b01af8",
+          "en": "After a bruising encounter with Congress, America’s Financial Accounting Standards Board (FASB) rushed through rule changes. These gave banks more freedom to use models to value illiquid assets and more flexibility in recognizing losses on long-term assets in their income statements. Bob Herz, the FASB’s chairman, cried out against those who “question our motives.” Yet bank shares rose and the changes enhance what one lobbying group politely calls “the use of judgment by management.”",
+          "zh": "在与国会发生激烈冲突后，美国财务会计准则委员会 (FASB) 匆忙修改了规则。这些使银行能够更自由地使用模型对非流动资产进行估值，并更灵活地在损益表中确认长期资产损失。 FASB 主席鲍勃·赫兹 (Bob Herz) 强烈反对那些“质疑我们动机”的人。然而，银行股价上涨，这些变化增强了一个游说团体礼貌地称之为“管理层判断力的运用”。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "6d4cbc7862b749c8",
+          "en": "European ministers instantly demanded that the International Accounting Standards Board (IASB) do likewise. The IASB says it does not want to act without overall planning, but the pressure to fold when it completes its reconstruction of rules later this year is strong. Charlie McCreevy, a European commissioner, warned the IASB that it did “not live in a political vacuum” but “in the real world” and that Europe could yet develop different rules.",
+          "zh": "欧洲部长们立即要求国际会计准则理事会（IASB）也这样做。 IASB 表示，它不想在没有总体规划的情况下采取行动，但在今年晚些时候完成规则重建时，它面临着很大的压力。欧盟委员查理·麦克里维 (Charlie McCreevy) 警告 IASB，它“并非生活在政治真空中”，而是“生活在现实世界中”，欧洲仍可能制定不同的规则。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "5b438106103ad712",
+          "en": "It was banks that were on the wrong planet, with accounts that vastly overvalued assets. Today they argue that market prices overstate losses, because they largely reflect the temporary illiquidity of markets, not the likely extent of bad debts. The truth will not be known for years. But banks’ shares trade below their book value, suggesting that investors are skeptical. And dead markets partly reflect the paralysis of banks which will not sell assets for fear of booking losses, yet are reluctant to buy all those supposed bargains.",
+          "zh": "银行是在错误的星球上，其账户大大高估了资产。如今，他们认为市场价格夸大了损失，因为它们在很大程度上反映了市场暂时的流动性不足，而不是坏账的可能程度。真相多年后才会为人所知。但银行股票的交易价格低于其账面价值，表明投资者对此持怀疑态度。死气沉沉的市场在一定程度上反映了银行的瘫痪，它们因担心账面损失而不会出售资产，但又不愿购买所有那些所谓的便宜货。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        },
+        {
+          "hash": "b8e039f4e7e8b769",
+          "en": "To get the system working again, losses must be recognized and dealt with. America’s new plan to buy up toxic assets will not work unless banks mark assets to levels which buyers find attractive. Successful markets require independent and even combative standard-setters. The FASB and IASB have been exactly that, cleaning up rules on stock options and pensions, for example, against hostility from special interests. But by giving in to critics now they are inviting pressure to make more concessions.",
+          "zh": "为了使系统重新运行，必须承认并处理损失。除非银行将资产定价到买家认为有吸引力的水平，否则美国收购有毒资产的新计划将不会奏效。成功的市场需要独立的、甚至是好斗的标准制定者。 FASB 和 IASB 正是这样做的，清理了股票期权和养老金等规则，以应对特殊利益集团的敌意。但现在向批评者屈服，他们正在招致做出更多让步的压力。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.085Z"
+        }
+      ]
+    }
+  }
+}

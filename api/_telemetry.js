@@ -156,19 +156,11 @@ function dayKey(timestamp = Date.now()) {
 
 /**
  * 心跳只带页面路径和标题，模块名在服务端推。
- * 小屋是单页应用，用页面标题区分站内的计划 / 错题本 / 待复盘等页面。
  */
 function moduleForPage(page, title = "") {
   const path = String(page || "")
     .trim()
     .toLowerCase();
-  if (path.startsWith("/xxrj")) {
-    const label = String(title || "")
-      .split(/[·|｜|,，:：\-—]/)[0]
-      .trim()
-      .slice(0, 20);
-    return label ? `小屋 · ${label}` : "小屋";
-  }
   const rules = [
     ["/vocab", "词汇库"],
     ["/review", "错词复习"],

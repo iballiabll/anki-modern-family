@@ -8,7 +8,12 @@
  *   vocab-index/shard-map.json     词 -> 分片号（约 60 KB）
  *   vocab-index/lexemes-<n>.json   词卡分片（600-900 KB）：点到哪个词才取哪一片
  *
- * 收藏、生词本、学习进度都只写 localStorage。
+ * 收藏、生词本、学习进度都只写 localStorage；写入的键都带 iball_ 前缀，
+ * account-store 负责按清单 / 映射合并后同步到账号云端（多端一致）。
+ *
+ * 词汇库分两级入口：
+ *   不会的单词 → vocab-library.js 归集的各模块生词（来源可筛选、可回溯原文）
+ *   我的词书   → vocab-userbook.js 里用户自己导入的词书 + 逐词进度
  */
 (function () {
   "use strict";
@@ -34,6 +39,35 @@
     unknown: "不会",
     favorites: "收藏",
   };
+
+  /**
+   * 词汇库的来源筛选。
+   *
+   * level 命中「来源」；core 命中对应的核心词表；两者同时存在时取并集
+   * （例如「四级全部」= 四级核心词 + 各模块里收进来的四级生词）。
+   */
+  const LIBRARY_FILTERS = [
+    { key: "all", label: "全部来源", hint: "所有级别、所有来源的汇总" },
+    { key: "cet4:reading", label: "四级阅读不会", level: "cet4", module: "reading" },
+    { key: "cet4:listening", label: "四级听力不会", level: "cet4", module: "listening" },
+    { key: "cet4:unknown", label: "四级全部不会", level: "cet4" },
+    { key: "cet4:core", label: "四级核心词", core: "cet4" },
+    { key: "cet4:all", label: "四级全部", level: "cet4", core: "cet4" },
+    { key: "cet6:reading", label: "六级阅读不会", level: "cet6", module: "reading" },
+    { key: "cet6:listening", label: "六级听力不会", level: "cet6", module: "listening" },
+    { key: "cet6:unknown", label: "六级全部不会", level: "cet6" },
+    { key: "cet6:core", label: "六级核心词", core: "cet6" },
+    { key: "cet6:all", label: "六级全部", level: "cet6", core: "cet6" },
+    { key: "kaoyan:reading", label: "考研阅读不会", level: "kaoyan", module: "reading" },
+    { key: "kaoyan:unknown", label: "考研全部不会", level: "kaoyan" },
+    { key: "kaoyan:core", label: "考研核心词", core: "kaoyan" },
+    { key: "kaoyan:all", label: "考研全部", level: "kaoyan", core: "kaoyan" },
+    { key: "periodical", label: "外刊生词", level: "periodical" },
+    { key: "wordbook", label: "我的词书", level: "wordbook" },
+  ];
+
+  // 核心词筛选按需加载对应词表；加载失败只影响这几个筛选，不影响来源筛选。
+  const LIBRARY_CORE_DECKS = { cet4: "cet4", cet6: "cet6", kaoyan: "kaoyan1" };
 
   const FAVORITE_KEY = "iball_vocab_favorites_v1";
   const WORDBOOK_KEY = "iball_vocab_wordbook_v1";
@@ -63,6 +97,7 @@
 
   const els = {
     board: document.querySelector(".vocab-board"),
+    listBoard: document.getElementById("wordPanel")?.closest(".vocab-board") || null,
     deckSelect: document.getElementById("deckSelect"),
     search: document.getElementById("searchInput"),
     sortGroup: document.querySelector(".segmented-control[aria-label='排序方式']"),
@@ -108,6 +143,54 @@
     closeWordbook: document.getElementById("closeWordbookButton"),
     progressBar: document.getElementById("readingProgress"),
     toast: document.getElementById("toast"),
+    libraryButton: document.getElementById("libraryButton"),
+    libraryCount: document.getElementById("libraryCount"),
+    libraryBoard: document.getElementById("libraryBoard"),
+    libraryMeta: document.getElementById("libraryMeta"),
+    librarySearch: document.getElementById("librarySearch"),
+    librarySelectAll: document.getElementById("librarySelectAllButton"),
+    libraryClearSelection: document.getElementById("libraryClearSelectionButton"),
+    libraryCustom: document.getElementById("libraryCustomButton"),
+    librarySelectedCount: document.getElementById("librarySelectedCount"),
+    libraryReview: document.getElementById("libraryReviewButton"),
+    libraryDeleteSelected: document.getElementById("libraryDeleteSelectedButton"),
+    libraryClose: document.getElementById("libraryCloseButton"),
+    libraryFilters: document.getElementById("libraryFilters"),
+    libraryList: document.getElementById("libraryList"),
+    libraryLoadMore: document.getElementById("libraryLoadMoreButton"),
+    libraryStatus: document.getElementById("libraryStatus"),
+    libraryProgressFilters: document.getElementById("libraryProgressFilters"),
+    libraryBack: document.getElementById("libraryBackButton"),
+    libraryEntry: document.getElementById("libraryEntry"),
+    libraryEntryNotebook: document.getElementById("libraryEntryNotebook"),
+    libraryEntryNotebookCount: document.getElementById("libraryEntryNotebookCount"),
+    libraryEntryBooks: document.getElementById("libraryEntryBooks"),
+    libraryEntryBooksCount: document.getElementById("libraryEntryBooksCount"),
+    libraryBooksView: document.getElementById("libraryBooksView"),
+    libraryBookList: document.getElementById("libraryBookList"),
+    libraryBooksStatus: document.getElementById("libraryBooksStatus"),
+    libraryBookImport: document.getElementById("libraryBookImportButton"),
+    libraryBookExportAll: document.getElementById("libraryBookExportAllButton"),
+    libraryBookView: document.getElementById("libraryBookView"),
+    libraryBookSearch: document.getElementById("libraryBookSearch"),
+    libraryBookExport: document.getElementById("libraryBookExportButton"),
+    libraryBookRename: document.getElementById("libraryBookRenameButton"),
+    libraryBookReview: document.getElementById("libraryBookReviewButton"),
+    libraryBookDelete: document.getElementById("libraryBookDeleteButton"),
+    libraryBookProgressFilters: document.getElementById("libraryBookProgressFilters"),
+    libraryBookListWords: document.getElementById("libraryBookListWords"),
+    libraryBookLoadMore: document.getElementById("libraryBookLoadMoreButton"),
+    libraryBookStatus: document.getElementById("libraryBookStatus"),
+    libraryNotebookView: document.getElementById("libraryNotebookView"),
+    libraryImportDialog: document.getElementById("libraryImportDialog"),
+    libraryImportName: document.getElementById("libraryImportName"),
+    libraryImportText: document.getElementById("libraryImportText"),
+    libraryImportFile: document.getElementById("libraryImportFile"),
+    libraryImportFileButton: document.getElementById("libraryImportFileButton"),
+    libraryImportConfirm: document.getElementById("libraryImportConfirmButton"),
+    libraryImportCancel: document.getElementById("libraryImportCancelButton"),
+    libraryImportStatus: document.getElementById("libraryImportStatus"),
+    libraryModeSwitches: Array.from(document.querySelectorAll("[data-library-mode]")),
   };
 
   const state = {
@@ -141,6 +224,25 @@
     recite: new Map(),
     favorites: new Set(),
     wordbook: new Map(),
+    libraryOpen: false,
+    libraryView: "entry",
+    libraryBookId: "",
+    libraryBookSearch: "",
+    libraryBookVisibleCount: PAGE_SIZE,
+    libraryFilters: new Set(),
+    libraryFilterMode: "all",
+    libraryProgressFilters: new Set(),
+    libraryProgressMode: "all",
+    libraryBookProgressFilters: new Set(),
+    libraryBookProgressMode: "all",
+    libraryQuery: "",
+    librarySelected: new Set(),
+    libraryCustomOnly: false,
+    libraryVisibleCount: PAGE_SIZE,
+    libraryCoreSets: new Map(),
+    libraryCorePromise: null,
+    drawPoolOverride: null,
+    drawPoolLabel: "",
     prefs: {
       deckKey: DEFAULT_DECK,
       sort: "default",
@@ -782,6 +884,10 @@
   }
 
   function drawCandidates() {
+    if (Array.isArray(state.drawPoolOverride)) {
+      // 词汇库「复习当前」：直接把筛选结果当词池，不再叠加抽卡范围条件。
+      return state.drawPoolOverride.filter((word) => Boolean(normalize(word)));
+    }
     return filteredWords().filter((word) => drawScopeMatch(word) && drawDaysMatch(word));
   }
 
@@ -855,7 +961,9 @@
         state.drawOrder === "sequential" ? "SEQUENTIAL CARD" : "RANDOM CARD";
     }
     if (els.drawStatus) {
-      const pool = `${drawOrderLabel()} · ${drawScopeLabel()} · ${drawDaysLabel()} · 共 ${candidates.length} 词`;
+      const pool = state.drawPoolOverride
+        ? `${state.drawPoolLabel || "自定义词池"} · 共 ${candidates.length} 词`
+        : `${drawOrderLabel()} · ${drawScopeLabel()} · ${drawDaysLabel()} · 共 ${candidates.length} 词`;
       els.drawStatus.textContent = state.drawWord
         ? `${pool} · 本轮已抽 ${Math.min(state.drawSeen.size, candidates.length)} 张`
         : `${pool}${candidates.length ? " · 点「下一张」开始" : " · 暂无可抽词"}`;
@@ -926,10 +1034,14 @@
     }
   }
 
-  function openDrawMode() {
+  function openDrawMode(options = {}) {
     if (!els.drawPanel) {
       return;
     }
+    state.drawPoolOverride = Array.isArray(options.pool) ? options.pool.slice() : null;
+    state.drawPoolLabel = state.drawPoolOverride
+      ? String(options.label || "自定义词池")
+      : "";
     state.drawOpen = true;
     state.drawSeen.clear();
     els.drawPanel.hidden = false;
@@ -945,6 +1057,8 @@
     state.drawRevealed = false;
     state.drawWord = "";
     state.drawSeen.clear();
+    state.drawPoolOverride = null;
+    state.drawPoolLabel = "";
     if (els.drawPanel) {
       els.drawPanel.hidden = true;
     }
@@ -1153,6 +1267,7 @@
         ? "移出生词本"
         : "加入生词本";
     }
+    syncLibraryCounters();
     syncReciteBar();
   }
 
@@ -1161,7 +1276,10 @@
       return;
     }
     els.panel.hidden = !open;
-    els.board?.classList.toggle("has-detail", open);
+    // 词卡面板会在「词库」和「我的词汇库」两个板之间搬动，has-detail 跟随所在板。
+    document.querySelectorAll(".vocab-board").forEach((board) => {
+      board.classList.toggle("has-detail", open && board.contains(els.panel));
+    });
   }
 
   /** 关掉模糊复习时，把所有「临时看清」的单条释义一起还原。 */
@@ -1365,6 +1483,968 @@
     const max = document.documentElement.scrollHeight - window.innerHeight;
     const ratio = max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0;
     els.progressBar.style.transform = `scaleX(${ratio})`;
+  }
+
+  /* ------------------------------------------------------------- 词汇库 */
+
+  // 词汇库数据由各模块的「不会」标记写入，account-store 负责多端同步；
+  // 这里只做展示、筛选、勾选组合与回跳原文。
+
+  function libraryApi() {
+    return window.IballVocabLibrary || null;
+  }
+
+  function librarySourceLevel(source) {
+    const level = String(source?.level || "").trim();
+    if (level) {
+      return level;
+    }
+    return String(source?.module || "").trim() === "periodical" ? "periodical" : "";
+  }
+
+  function libraryFilterConfig(key) {
+    return LIBRARY_FILTERS.find((item) => item.key === key) || null;
+  }
+
+  function libraryCoreSet(level) {
+    return state.libraryCoreSets.get(level) || null;
+  }
+
+  function libraryRecordMatches(record, filterKey) {
+    if (!filterKey || filterKey === "all") {
+      return true;
+    }
+    const filter = libraryFilterConfig(filterKey);
+    if (!filter) {
+      return true;
+    }
+    const sources = Array.isArray(record?.sources) ? record.sources : [];
+    const sourceMatch = filter.level
+      ? sources.some((source) => {
+          if (librarySourceLevel(source) !== filter.level) {
+            return false;
+          }
+          return !filter.module || String(source?.module || "") === filter.module;
+        })
+      : false;
+    if (filter.module || !filter.core) {
+      return sourceMatch;
+    }
+    const core = libraryCoreSet(filter.core);
+    const coreMatch = core ? core.has(normalize(record?.word)) : false;
+    return filter.level ? sourceMatch || coreMatch : coreMatch;
+  }
+
+  function libraryRecords() {
+    const api = libraryApi();
+    return api ? api.list() : [];
+  }
+
+  function userbookApi() {
+    return window.IballVocabUserbook || null;
+  }
+
+  function libraryMatchesFilters(record, filters) {
+    if (!filters || !filters.size) {
+      return true;
+    }
+    return [...filters].some((key) => libraryRecordMatches(record, key));
+  }
+
+  /** 一个词当前的背词进度：优先词书里的逐词记录，其次当前词库的背词记录。 */
+  function libraryProgressStatus(word) {
+    const latest = userbookApi()?.latestStatusFor?.(word);
+    if (latest?.status) {
+      return latest.status;
+    }
+    const recite = window.IballVocabRecite;
+    const record = recite?.getRecord?.(state.deckKey, word);
+    return record?.status || "none";
+  }
+
+  function libraryFilteredRecords() {
+    let records = libraryRecords();
+    if (state.libraryFilterMode !== "all") {
+      records = records.filter((record) =>
+        libraryMatchesFilters(record, state.libraryFilters),
+      );
+    }
+    if (state.libraryProgressMode !== "all") {
+      records = records.filter((record) =>
+        state.libraryProgressFilters.has(libraryProgressStatus(record.word)),
+      );
+    }
+    if (state.libraryCustomOnly) {
+      records = records.filter((record) =>
+        state.librarySelected.has(normalize(record.word)),
+      );
+    }
+    const query = state.libraryQuery;
+    if (query) {
+      records = records.filter((record) => {
+        if (normalize(record.word).includes(query)) {
+          return true;
+        }
+        if (normalize(record.meaning).includes(query)) {
+          return true;
+        }
+        const quick = quickEntry(record.word);
+        if (quick && normalize(quick.meaning).includes(query)) {
+          return true;
+        }
+        const api = libraryApi();
+        return (Array.isArray(record.sources) ? record.sources : []).some((source) =>
+          normalize(api?.describeSource?.(source) || "").includes(query),
+        );
+      });
+    }
+    return records;
+  }
+
+  /** 核心词筛选按需加载词表；词表是现成的，加载完重渲染一次即可。 */
+  function ensureLibraryCoreSets() {
+    if (state.libraryCorePromise) {
+      return state.libraryCorePromise;
+    }
+    const entries = Object.entries(LIBRARY_CORE_DECKS);
+    state.libraryCorePromise = Promise.all(
+      entries.map(async ([level, deckKey]) => {
+        if (state.libraryCoreSets.has(level)) {
+          return;
+        }
+        try {
+          const words = await loadDeck(deckKey);
+          state.libraryCoreSets.set(
+            level,
+            new Set(words.map((word) => normalize(word)).filter(Boolean)),
+          );
+        } catch {
+          state.libraryCoreSets.set(level, new Set());
+        }
+      }),
+    ).then(() => {
+      state.libraryCorePromise = null;
+      if (state.libraryOpen) {
+        renderLibraryBoard();
+      }
+    });
+    return state.libraryCorePromise;
+  }
+
+  const LIBRARY_PROGRESS_FILTERS = [
+    { key: "all", label: "全部" },
+    { key: "none", label: "未背" },
+    { key: "known", label: "已斩" },
+    { key: "fuzzy", label: "模糊" },
+    { key: "unknown", label: "不会" },
+  ];
+
+  function libraryBooks() {
+    return userbookApi()?.listBooks?.() || [];
+  }
+
+  function libraryMetaText() {
+    const total = libraryRecords().length;
+    const books = libraryBooks();
+    if (state.libraryView === "book") {
+      const book = userbookApi()?.getBook?.(state.libraryBookId);
+      if (book) {
+        return `${book.name} · ${book.words.length} 词 · 标「不会」自动进「不会的单词」`;
+      }
+      return "词书不存在或已被删除";
+    }
+    if (state.libraryView === "books") {
+      return `${books.length} 本词书 · 导入后逐词记 未背 / 已斩 / 模糊 / 不会`;
+    }
+    if (state.libraryView === "notebook") {
+      return `共 ${total} 词 · 当前筛选 ${libraryFilteredRecords().length} 词 · 随账号同步`;
+    }
+    return `不会的单词 ${total} 词 · 我的词书 ${books.length} 本`;
+  }
+
+  function syncLibraryCounters() {
+    const total = libraryRecords().length;
+    const books = libraryBooks();
+    if (els.libraryCount) {
+      els.libraryCount.textContent = String(total);
+    }
+    if (els.libraryEntryNotebookCount) {
+      els.libraryEntryNotebookCount.textContent = `${total} 词`;
+    }
+    if (els.libraryEntryBooksCount) {
+      els.libraryEntryBooksCount.textContent = `${books.length} 本`;
+    }
+    if (els.librarySelectedCount) {
+      els.librarySelectedCount.textContent = String(state.librarySelected.size);
+    }
+    if (els.libraryClearSelection) {
+      els.libraryClearSelection.hidden = state.librarySelected.size === 0;
+    }
+    els.libraryCustom?.setAttribute("aria-pressed", String(state.libraryCustomOnly));
+    els.libraryCustom?.classList.toggle("is-primary", state.libraryCustomOnly);
+    if (els.libraryDeleteSelected) {
+      els.libraryDeleteSelected.disabled = state.librarySelected.size === 0;
+    }
+  }
+
+  function syncLibraryModeSwitches() {
+    els.libraryModeSwitches.forEach((group) => {
+      const name = String(group.dataset.libraryMode || "");
+      const mode =
+        name === "source"
+          ? state.libraryFilterMode
+          : name === "progress"
+            ? state.libraryProgressMode
+            : state.libraryBookProgressMode;
+      group.querySelectorAll("[data-library-mode-value]").forEach((button) => {
+        const active = button.dataset.libraryModeValue === mode;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    });
+  }
+
+  function renderLibraryFilters() {
+    if (!els.libraryFilters) {
+      return;
+    }
+    const records = libraryRecords();
+    els.libraryFilters.innerHTML = LIBRARY_FILTERS.map((filter) => {
+      const corePending = Boolean(filter.core) && !libraryCoreSet(filter.core);
+      const count =
+        filter.key === "all"
+          ? records.length
+          : records.filter((record) => libraryRecordMatches(record, filter.key)).length;
+      const active =
+        filter.key === "all"
+          ? state.libraryFilterMode === "all" || !state.libraryFilters.size
+          : state.libraryFilters.has(filter.key);
+      return `
+        <button
+          class="library-chip${active ? " is-active" : ""}"
+          type="button"
+          data-library-filter="${escapeHtml(filter.key)}"
+          aria-pressed="${active}"
+          title="${escapeHtml(filter.hint || filter.label)}"
+        >${escapeHtml(filter.label)}<span class="library-chip-count">${
+          corePending ? `${count}+` : count
+        }</span></button>`;
+    }).join("");
+  }
+
+  /** 进度筛选（未背 / 已斩 / 模糊 / 不会）在三处复用：不会的单词 + 我的词书。 */
+  function renderLibraryProgressFilters() {
+    if (!els.libraryProgressFilters) {
+      return;
+    }
+    const records = libraryRecords();
+    const counts = { all: records.length, none: 0, known: 0, fuzzy: 0, unknown: 0 };
+    records.forEach((record) => {
+      const status = libraryProgressStatus(record.word);
+      counts[status] = (counts[status] || 0) + 1;
+    });
+    els.libraryProgressFilters.innerHTML = LIBRARY_PROGRESS_FILTERS.map((filter) => {
+      const active =
+        filter.key === "all"
+          ? state.libraryProgressMode === "all" || !state.libraryProgressFilters.size
+          : state.libraryProgressFilters.has(filter.key);
+      return `
+        <button
+          class="library-chip${active ? " is-active" : ""}"
+          type="button"
+          data-library-progress="${escapeHtml(filter.key)}"
+          aria-pressed="${active}"
+        >${escapeHtml(filter.label)}<span class="library-chip-count">${
+          counts[filter.key] || 0
+        }</span></button>`;
+    }).join("");
+  }
+
+  function librarySourceHtml(source) {
+    const api = libraryApi();
+    const label = api?.sourceLabel ? api.sourceLabel(source) : "其他";
+    const desc = api?.describeSource ? api.describeSource(source) : "";
+    const url = api?.returnUrl ? api.returnUrl(source) : "";
+    const isWordbook = source?.level === "wordbook" || source?.module === "userbook";
+    const sentence = source?.sentence
+      ? `<span class="library-source-sentence">${escapeHtml(
+          String(source.sentence).slice(0, 160),
+        )}</span>`
+      : "";
+    return `
+      <li class="library-source">
+        <span class="library-source-chip">${escapeHtml(label)}</span>
+        <span class="library-source-desc">${escapeHtml(desc)}</span>
+        ${
+          url
+            ? `<a class="library-source-link" href="${escapeHtml(url)}">${
+                isWordbook ? "回到词书" : "回到原文"
+              }</a>`
+            : ""
+        }
+        ${sentence}
+      </li>`;
+  }
+
+  function libraryCardHtml(record) {
+    const key = normalize(record.word);
+    const quick = quickEntry(record.word);
+    const phonetic = record.phonetic || quick?.phonetic || "";
+    const meaning =
+      record.meaning || quick?.meaning || "释义还没加载，点开词卡可以看完整内容。";
+    const sources = Array.isArray(record.sources) ? record.sources : [];
+    const picked = state.librarySelected.has(key);
+    const status = libraryProgressStatus(record.word);
+    const statusLabel = userbookApi()?.statusLabel?.(status) || "未背";
+    return `
+      <article class="library-card${picked ? " is-picked" : ""}" data-word="${escapeHtml(
+        record.word,
+      )}">
+        <header class="library-card-head">
+          <label class="library-pick" title="勾选后可以做自定义组合或批量删除">
+            <input
+              type="checkbox"
+              data-library-pick="${escapeHtml(record.word)}"
+              ${picked ? "checked" : ""}
+              aria-label="勾选 ${escapeHtml(record.word)}"
+            />
+          </label>
+          <button class="library-word" type="button" data-library-open="${escapeHtml(
+            record.word,
+          )}" aria-label="查看 ${escapeHtml(record.word)} 的词卡">
+            <span class="library-word-text">${escapeHtml(record.word)}</span>
+            ${phonetic ? `<small>/${escapeHtml(phonetic)}/</small>` : ""}
+            <span class="library-progress-badge is-${escapeHtml(status)}">${escapeHtml(
+              statusLabel,
+            )}</span>
+          </button>
+          <button
+            class="library-remove"
+            type="button"
+            data-library-remove="${escapeHtml(record.word)}"
+            title="从词汇库删除；原文里的「不会」标记不受影响"
+          >删除</button>
+        </header>
+        <p class="library-meaning">${escapeHtml(meaning)}</p>
+        ${
+          sources.length
+            ? `<ul class="library-sources">${sources
+                .map((source) => librarySourceHtml(source))
+                .join("")}</ul>`
+            : `<p class="library-source-desc">这条记录没有来源信息，可能是旧版本数据。</p>`
+        }
+      </article>`;
+  }
+
+  function renderLibraryList() {
+    if (!els.libraryList) {
+      return;
+    }
+    const pendingCore =
+      state.libraryFilterMode === "all"
+        ? null
+        : [...state.libraryFilters]
+            .map((key) => libraryFilterConfig(key))
+            .find((filter) => filter?.core && !libraryCoreSet(filter.core));
+    if (pendingCore) {
+      ensureLibraryCoreSets();
+      els.libraryList.innerHTML = `<p class="vocab-empty">正在加载「${escapeHtml(
+        pendingCore.label,
+      )}」的词表…</p>`;
+      if (els.libraryLoadMore) {
+        els.libraryLoadMore.hidden = true;
+      }
+      if (els.libraryStatus) {
+        els.libraryStatus.textContent = "正在加载词表";
+      }
+      return;
+    }
+    const total = libraryRecords().length;
+    const records = libraryFilteredRecords();
+    if (!records.length) {
+      els.libraryList.innerHTML = `<p class="vocab-empty">${
+        total
+          ? "当前筛选下没有单词。换个来源筛选、清掉搜索词或取消自定义组合再试。"
+          : "词汇库里还没有单词。去精读、听力或真题里把不认识的词标记一下，这里会自动归集。"
+      }</p>`;
+      if (els.libraryLoadMore) {
+        els.libraryLoadMore.hidden = true;
+      }
+      if (els.libraryStatus) {
+        els.libraryStatus.textContent = total
+          ? `共 ${total} 词，当前筛选 0 词`
+          : "词汇库是空的";
+      }
+      return;
+    }
+    const shown = records.slice(0, state.libraryVisibleCount);
+    els.libraryList.innerHTML = shown
+      .map((record) => libraryCardHtml(record))
+      .join("");
+    if (els.libraryLoadMore) {
+      els.libraryLoadMore.hidden = shown.length >= records.length;
+    }
+    if (els.libraryStatus) {
+      els.libraryStatus.textContent = `已显示 ${shown.length} / ${records.length} 个单词`;
+    }
+  }
+
+  /* ------------------------------------------- 我的词书：列表 / 某本词书 */
+
+  function renderLibraryBooks() {
+    const api = userbookApi();
+    const books = libraryBooks();
+    if (els.libraryBookList) {
+      if (!books.length) {
+        els.libraryBookList.innerHTML = `<p class="vocab-empty">还没有词书。点「导入词书」，把要背的词表导进来：一行一个词，也可以粘贴 CSV / JSON 或选择文件。</p>`;
+      } else {
+        els.libraryBookList.innerHTML = books
+          .map((book) => {
+            const totals = api?.summary?.(api.deckFor(book.id)) || {
+              known: 0,
+              fuzzy: 0,
+              unknown: 0,
+            };
+            const studied = totals.known + totals.fuzzy + totals.unknown;
+            const percent = book.words.length
+              ? Math.min(100, Math.round((studied / book.words.length) * 100))
+              : 0;
+            return `
+              <button class="library-book-card" type="button" data-library-book="${escapeHtml(
+                book.id,
+              )}">
+                <span class="library-book-head">
+                  <strong>${escapeHtml(book.name)}</strong>
+                  <span class="library-book-count">${book.words.length} 词</span>
+                </span>
+                <span class="library-book-meta">已斩 ${totals.known} · 模糊 ${totals.fuzzy} · 不会 ${totals.unknown} · 未背 ${Math.max(
+                  0,
+                  book.words.length - studied,
+                )}</span>
+                <span class="library-book-bar" aria-hidden="true"><i style="width:${percent}%"></i></span>
+              </button>`;
+          })
+          .join("");
+      }
+    }
+    if (els.libraryBooksStatus) {
+      els.libraryBooksStatus.textContent = books.length
+        ? `共 ${books.length} 本词书 · 词书里标「不会」的词会自动进「不会的单词」`
+        : "";
+    }
+  }
+
+  /** 某本词书按 进度 + 搜索 过滤后的词表（也是「复习当前」的数据源）。 */
+  function libraryBookWords() {
+    const api = userbookApi();
+    const book = api?.getBook?.(state.libraryBookId) || null;
+    if (!api || !book) {
+      return { book: null, words: [] };
+    }
+    const progress = api.progressMap(api.deckFor(book.id));
+    let words = book.words.map((entry) => ({
+      ...entry,
+      status: progress.get(api.normalizeWord(entry.word))?.status || "none",
+    }));
+    if (state.libraryBookProgressMode !== "all" && state.libraryBookProgressFilters.size) {
+      words = words.filter((item) => state.libraryBookProgressFilters.has(item.status));
+    }
+    const query = state.libraryBookSearch;
+    if (query) {
+      words = words.filter(
+        (item) =>
+          api.normalizeWord(item.word).includes(query) ||
+          normalize(item.meaning).includes(query),
+      );
+    }
+    return { book, words };
+  }
+
+  function bookWordCardHtml(item) {
+    const status = item.status;
+    const label = userbookApi()?.statusLabel?.(status) || "未背";
+    const quick = quickEntry(item.word);
+    const phonetic = item.phonetic || quick?.phonetic || "";
+    const meaning = item.meaning || quick?.meaning || "没有释义，点开词卡可以看完整内容。";
+    const actions = [
+      ["known", "已斩"],
+      ["fuzzy", "模糊"],
+      ["unknown", "不会"],
+      ["none", "未背"],
+    ]
+      .map(
+        ([key, text]) => `
+          <button
+            class="library-status-button${status === key ? " is-active" : ""}"
+            type="button"
+            data-book-status="${key}"
+            data-book-word="${escapeHtml(item.word)}"
+            aria-pressed="${status === key}"
+          >${text}</button>`,
+      )
+      .join("");
+    return `
+      <article class="library-card library-book-word" data-word="${escapeHtml(item.word)}">
+        <header class="library-card-head">
+          <button class="library-word" type="button" data-library-open="${escapeHtml(
+            item.word,
+          )}" aria-label="查看 ${escapeHtml(item.word)} 的词卡">
+            <span class="library-word-text">${escapeHtml(item.word)}</span>
+            ${phonetic ? `<small>/${escapeHtml(phonetic)}/</small>` : ""}
+          </button>
+          <span class="library-progress-badge is-${escapeHtml(status)}">${escapeHtml(
+            label,
+          )}</span>
+        </header>
+        <p class="library-meaning">${escapeHtml(meaning)}</p>
+        <div class="library-status-actions" role="group" aria-label="标记 ${escapeHtml(
+          item.word,
+        )} 的背词进度">${actions}</div>
+      </article>`;
+  }
+
+  function renderLibraryBookProgressFilters() {
+    if (!els.libraryBookProgressFilters) {
+      return;
+    }
+    const api = userbookApi();
+    const book = api?.getBook?.(state.libraryBookId);
+    const counts = { all: 0, none: 0, known: 0, fuzzy: 0, unknown: 0 };
+    if (api && book) {
+      const progress = api.progressMap(api.deckFor(book.id));
+      book.words.forEach((entry) => {
+        const status = progress.get(api.normalizeWord(entry.word))?.status || "none";
+        counts[status] = (counts[status] || 0) + 1;
+        counts.all += 1;
+      });
+    }
+    els.libraryBookProgressFilters.innerHTML = LIBRARY_PROGRESS_FILTERS.map((filter) => {
+      const active =
+        filter.key === "all"
+          ? state.libraryBookProgressMode === "all" ||
+            !state.libraryBookProgressFilters.size
+          : state.libraryBookProgressFilters.has(filter.key);
+      return `
+        <button
+          class="library-chip${active ? " is-active" : ""}"
+          type="button"
+          data-book-progress="${escapeHtml(filter.key)}"
+          aria-pressed="${active}"
+        >${escapeHtml(filter.label)}<span class="library-chip-count">${
+          counts[filter.key] || 0
+        }</span></button>`;
+    }).join("");
+  }
+
+  function renderLibraryBook() {
+    const api = userbookApi();
+    const book = api?.getBook?.(state.libraryBookId) || null;
+    renderLibraryBookProgressFilters();
+    if (els.libraryBookListWords) {
+      if (!book) {
+        els.libraryBookListWords.innerHTML = `<p class="vocab-empty">这本书不存在，可能已经在另一台设备上删掉了。</p>`;
+      }
+    }
+    if (els.libraryBookView) {
+      els.libraryBookView.classList.toggle("is-missing", !book);
+    }
+    if (!book || !els.libraryBookListWords) {
+      if (els.libraryBookStatus) {
+        els.libraryBookStatus.textContent = "";
+      }
+      if (els.libraryBookLoadMore) {
+        els.libraryBookLoadMore.hidden = true;
+      }
+      return;
+    }
+    const { words } = libraryBookWords();
+    if (!words.length) {
+      els.libraryBookListWords.innerHTML = `<p class="vocab-empty">${
+        book.words.length
+          ? "当前筛选下没有单词，换个进度筛选或清掉搜索词再试。"
+          : "这本书是空的。"
+      }</p>`;
+      if (els.libraryBookLoadMore) {
+        els.libraryBookLoadMore.hidden = true;
+      }
+      if (els.libraryBookStatus) {
+        els.libraryBookStatus.textContent = `共 ${book.words.length} 词，当前筛选 0 词`;
+      }
+      return;
+    }
+    const shown = words.slice(0, state.libraryBookVisibleCount);
+    els.libraryBookListWords.innerHTML = shown.map((item) => bookWordCardHtml(item)).join("");
+    if (els.libraryBookLoadMore) {
+      els.libraryBookLoadMore.hidden = shown.length >= words.length;
+    }
+    if (els.libraryBookStatus) {
+      els.libraryBookStatus.textContent = `已显示 ${shown.length} / ${words.length} 个单词`;
+    }
+    if (els.libraryBookSearch && els.libraryBookSearch.value !== state.libraryBookSearch) {
+      els.libraryBookSearch.value = state.libraryBookSearch;
+    }
+  }
+
+  function renderLibraryBoard() {
+    if (!els.libraryBoard) {
+      return;
+    }
+    const views = {
+      entry: els.libraryEntry,
+      books: els.libraryBooksView,
+      book: els.libraryBookView,
+      notebook: els.libraryNotebookView,
+    };
+    if (state.libraryView === "book" && !userbookApi()?.getBook?.(state.libraryBookId)) {
+      state.libraryView = "books";
+    }
+    Object.entries(views).forEach(([name, node]) => {
+      if (node) {
+        node.hidden = name !== state.libraryView;
+      }
+    });
+    if (els.libraryBack) {
+      els.libraryBack.hidden = state.libraryView === "entry";
+      els.libraryBack.textContent = state.libraryView === "book" ? "返回词书列表" : "返回入口";
+    }
+    syncLibraryModeSwitches();
+    if (state.libraryView === "notebook") {
+      renderLibraryFilters();
+      renderLibraryProgressFilters();
+      renderLibraryList();
+    } else if (state.libraryView === "books") {
+      renderLibraryBooks();
+    } else if (state.libraryView === "book") {
+      renderLibraryBook();
+    }
+    syncLibraryCounters();
+    if (els.libraryMeta) {
+      els.libraryMeta.textContent = libraryMetaText();
+    }
+  }
+
+  function setLibraryView(view, bookId = "") {
+    const allowed = ["entry", "books", "book", "notebook"];
+    state.libraryView = allowed.includes(view) ? view : "entry";
+    if (state.libraryView === "book") {
+      state.libraryBookId = String(bookId || state.libraryBookId || "");
+      state.libraryBookVisibleCount = PAGE_SIZE;
+    }
+    renderLibraryBoard();
+    els.libraryBoard?.querySelector(".vocab-list-panel")?.scrollTo?.({ top: 0 });
+  }
+
+  /** 词卡面板跟着打开的那块板走：词库板 / 词汇库板共用同一个面板。 */
+  function moveWordPanel(target) {
+    if (!els.panel || !target || els.panel.parentElement === target) {
+      return;
+    }
+    els.panel.hidden = true;
+    target.appendChild(els.panel);
+    document.querySelectorAll(".vocab-board").forEach((board) => {
+      board.classList.toggle("has-detail", !els.panel.hidden && board.contains(els.panel));
+    });
+  }
+
+  function setLibraryOpen(open) {
+    if (!els.libraryBoard) {
+      return;
+    }
+    state.libraryOpen = Boolean(open);
+    els.libraryBoard.hidden = !state.libraryOpen;
+    // 打开词汇库时收起顶部大 hero，让两级入口直接出现在首屏。
+    document.documentElement.dataset.vocabLibraryOpen = String(
+      state.libraryOpen,
+    );
+    document.querySelectorAll(".vocab-board").forEach((board) => {
+      if (board !== els.libraryBoard) {
+        board.hidden = state.libraryOpen;
+      }
+    });
+    if (state.libraryOpen) {
+      moveWordPanel(els.libraryBoard);
+      state.libraryVisibleCount = PAGE_SIZE;
+      state.libraryBookVisibleCount = PAGE_SIZE;
+      renderLibraryBoard();
+      if (!state.quick) {
+        loadQuickIndex().then(() => {
+          if (state.libraryOpen) {
+            renderLibraryBoard();
+          }
+        });
+      }
+      window.requestAnimationFrame(() => {
+        els.libraryBoard?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    } else {
+      moveWordPanel(els.listBoard);
+    }
+    els.libraryButton?.setAttribute("aria-pressed", String(state.libraryOpen));
+    els.libraryButton?.classList.toggle("is-primary", state.libraryOpen);
+    syncLibraryCounters();
+  }
+
+  function reviewLibraryFilter() {
+    const records = libraryFilteredRecords();
+    if (!records.length) {
+      showToast("当前筛选没有可复习的单词");
+      return;
+    }
+    const labels = [...state.libraryFilters]
+      .map((key) => libraryFilterConfig(key)?.label)
+      .filter(Boolean);
+    openDrawMode({
+      pool: records.map((record) => record.word),
+      label: `不会的单词 · ${labels.length ? labels.join(" + ") : "全部来源"}`,
+    });
+  }
+
+  function reviewLibraryBook() {
+    const book = userbookApi()?.getBook?.(state.libraryBookId);
+    const { words } = libraryBookWords();
+    if (!book || !words.length) {
+      showToast("当前筛选没有可复习的单词");
+      return;
+    }
+    openDrawMode({
+      pool: words.map((item) => item.word),
+      label: `我的词书 · ${book.name}`,
+    });
+  }
+
+  /* --------------------------------------------------- 筛选 / 词书操作 */
+
+  function currentLibraryFilterSet(scope) {
+    if (scope === "source") {
+      return state.libraryFilters;
+    }
+    if (scope === "progress") {
+      return state.libraryProgressFilters;
+    }
+    return state.libraryBookProgressFilters;
+  }
+
+  function currentLibraryFilterMode(scope) {
+    if (scope === "source") {
+      return state.libraryFilterMode;
+    }
+    if (scope === "progress") {
+      return state.libraryProgressMode;
+    }
+    return state.libraryBookProgressMode;
+  }
+
+  function setLibraryFilterMode(scope, mode) {
+    const value = ["all", "single", "multi"].includes(mode) ? mode : "all";
+    const selected = currentLibraryFilterSet(scope);
+    if (scope === "source") {
+      state.libraryFilterMode = value;
+    } else if (scope === "progress") {
+      state.libraryProgressMode = value;
+    } else {
+      state.libraryBookProgressMode = value;
+    }
+    if (value === "all") {
+      selected.clear();
+    } else if (value === "single" && selected.size > 1) {
+      const first = [...selected][0];
+      selected.clear();
+      selected.add(first);
+    }
+    renderLibraryBoard();
+  }
+
+  /** 点筛选 chip：全部模式→单选；单选模式→替换；多选模式→叠加 / 取消。 */
+  function toggleLibraryFilter(scope, key, isAllKey) {
+    const selected = currentLibraryFilterSet(scope);
+    const modeKey =
+      scope === "source"
+        ? "libraryFilterMode"
+        : scope === "progress"
+          ? "libraryProgressMode"
+          : "libraryBookProgressMode";
+    if (isAllKey) {
+      state[modeKey] = "all";
+      selected.clear();
+    } else if (state[modeKey] === "multi") {
+      if (selected.has(key)) {
+        selected.delete(key);
+      } else {
+        selected.add(key);
+      }
+      if (!selected.size) {
+        state[modeKey] = "all";
+      }
+    } else {
+      state[modeKey] = "single";
+      selected.clear();
+      selected.add(key);
+    }
+    if (scope === "source") {
+      state.libraryVisibleCount = PAGE_SIZE;
+    } else if (scope === "progress") {
+      state.libraryVisibleCount = PAGE_SIZE;
+    } else {
+      state.libraryBookVisibleCount = PAGE_SIZE;
+    }
+    renderLibraryBoard();
+  }
+
+  function downloadTextFile(filename, text, mime = "text/plain;charset=utf-8") {
+    try {
+      const blob = new Blob([String(text)], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function safeFilename(name) {
+    return (
+      String(name || "词书")
+        .replace(/[\\/:*?"<>|]+/g, "_")
+        .trim()
+        .slice(0, 40) || "词书"
+    );
+  }
+
+  function exportLibraryBook(bookId) {
+    const api = userbookApi();
+    const book = api?.getBook?.(bookId);
+    if (!api || !book) {
+      showToast("词书不存在");
+      return;
+    }
+    const text = api.exportBook(book.id);
+    if (!downloadTextFile(`${safeFilename(book.name)}.csv`, `\uFEFF${text}`, "text/csv;charset=utf-8")) {
+      showToast("导出失败，浏览器拦住了下载");
+      return;
+    }
+    showToast(`已导出「${book.name}」`);
+  }
+
+  function exportAllLibraryBooks() {
+    const api = userbookApi();
+    const books = libraryBooks();
+    if (!api || !books.length) {
+      showToast("还没有词书可以导出");
+      return;
+    }
+    const payload = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      books,
+      progress: api.listProgress(),
+    };
+    if (
+      !downloadTextFile(
+        `我的词书-${books.length}本.json`,
+        JSON.stringify(payload, null, 2),
+        "application/json;charset=utf-8",
+      )
+    ) {
+      showToast("导出失败，浏览器拦住了下载");
+      return;
+    }
+    showToast(`已导出 ${books.length} 本词书`);
+  }
+
+  function openLibraryImport() {
+    if (!els.libraryImportDialog) {
+      return;
+    }
+    els.libraryImportDialog.hidden = false;
+    if (els.libraryImportName) {
+      els.libraryImportName.value = "";
+    }
+    if (els.libraryImportText) {
+      els.libraryImportText.value = "";
+    }
+    if (els.libraryImportStatus) {
+      els.libraryImportStatus.textContent = "";
+    }
+    window.requestAnimationFrame(() => els.libraryImportName?.focus());
+  }
+
+  function closeLibraryImport() {
+    if (els.libraryImportDialog) {
+      els.libraryImportDialog.hidden = true;
+    }
+  }
+
+  function submitLibraryImport() {
+    const api = userbookApi();
+    if (!api) {
+      return;
+    }
+    const words = api.parseImport(els.libraryImportText?.value || "");
+    if (!words.length) {
+      if (els.libraryImportStatus) {
+        els.libraryImportStatus.textContent =
+          "没解析出单词。一行一个词就行，例如：apple 苹果。";
+      }
+      return;
+    }
+    const typedName = String(els.libraryImportName?.value || "").trim();
+    const book = api.createBook({
+      name: typedName || `导入词书 ${new Date().toLocaleDateString("zh-CN")}`,
+      words,
+    });
+    if (!book) {
+      if (els.libraryImportStatus) {
+        els.libraryImportStatus.textContent =
+          "导入失败：本地存储写不进去，可能是浏览器空间满了。";
+      }
+      return;
+    }
+    closeLibraryImport();
+    showToast(`已导入「${book.name}」共 ${book.words.length} 词`);
+    setLibraryView("book", book.id);
+  }
+
+  function renameLibraryBook() {
+    const api = userbookApi();
+    const book = api?.getBook?.(state.libraryBookId);
+    if (!api || !book) {
+      return;
+    }
+    const name = window.prompt("词书名称", book.name);
+    if (name === null) {
+      return;
+    }
+    const updated = api.updateBook(book.id, { name });
+    if (updated) {
+      showToast(`已重命名为「${updated.name}」`);
+    }
+  }
+
+  function deleteLibraryBook() {
+    const api = userbookApi();
+    const book = api?.getBook?.(state.libraryBookId);
+    if (!api || !book) {
+      return;
+    }
+    if (
+      !window.confirm(
+        `删除词书「${book.name}」？这本书的背词进度会一起删除，已经从这本书收进「不会的单词」的词也会移出。`,
+      )
+    ) {
+      return;
+    }
+    api.removeBook(book.id);
+    state.libraryBookProgressFilters.clear();
+    state.libraryBookProgressMode = "all";
+    showToast(`已删除「${book.name}」`);
+    setLibraryView("books");
   }
 
   /* ------------------------------------------------------------- 事件绑定 */
@@ -1595,6 +2675,271 @@
     els.copyWordbook?.addEventListener("click", copyWordbook);
     els.clearProgress?.addEventListener("click", clearProgress);
 
+    /* ------------------------------------------------------- 词汇库事件 */
+
+    els.libraryButton?.addEventListener("click", () => {
+      setLibraryOpen(!state.libraryOpen);
+    });
+
+    els.libraryClose?.addEventListener("click", () => {
+      setLibraryOpen(false);
+    });
+
+    els.libraryBack?.addEventListener("click", () => {
+      setLibraryView(state.libraryView === "book" ? "books" : "entry");
+    });
+
+    els.libraryEntryNotebook?.addEventListener("click", () => setLibraryView("notebook"));
+    els.libraryEntryBooks?.addEventListener("click", () => setLibraryView("books"));
+
+    els.libraryBoard?.addEventListener("click", (event) => {
+      const modeButton = event.target.closest("[data-library-mode-value]");
+      if (modeButton) {
+        const group = modeButton.closest("[data-library-mode]");
+        setLibraryFilterMode(group?.dataset.libraryMode, modeButton.dataset.libraryModeValue);
+        return;
+      }
+      const bookCard = event.target.closest("[data-library-book]");
+      if (bookCard) {
+        setLibraryView("book", bookCard.dataset.libraryBook);
+      }
+    });
+
+    els.libraryImportCancel?.addEventListener("click", closeLibraryImport);
+    els.libraryImportConfirm?.addEventListener("click", submitLibraryImport);
+    els.libraryImportFileButton?.addEventListener("click", () => els.libraryImportFile?.click());
+    els.libraryImportFile?.addEventListener("change", (event) => {
+      const file = event.target.files?.[0];
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (els.libraryImportText) {
+          els.libraryImportText.value = String(reader.result || "");
+        }
+        if (els.libraryImportName && !els.libraryImportName.value.trim()) {
+          els.libraryImportName.value = file.name.replace(/\.[^.]+$/, "").slice(0, 60);
+        }
+        if (els.libraryImportStatus) {
+          const parsed = userbookApi()?.parseImport?.(String(reader.result || "")) || [];
+          els.libraryImportStatus.textContent = parsed.length
+            ? `已读入 ${file.name}，识别到 ${parsed.length} 个单词`
+            : `已读入 ${file.name}，但没识别出单词，检查一下格式`;
+        }
+      };
+      reader.readAsText(file, "utf-8");
+      event.target.value = "";
+    });
+
+    els.libraryBookImport?.addEventListener("click", openLibraryImport);
+    els.libraryBookExportAll?.addEventListener("click", exportAllLibraryBooks);
+    els.libraryBookExport?.addEventListener("click", () =>
+      exportLibraryBook(state.libraryBookId),
+    );
+    els.libraryBookRename?.addEventListener("click", renameLibraryBook);
+    els.libraryBookDelete?.addEventListener("click", deleteLibraryBook);
+    els.libraryBookReview?.addEventListener("click", reviewLibraryBook);
+
+    let libraryBookSearchTimer = 0;
+    els.libraryBookSearch?.addEventListener("input", (event) => {
+      window.clearTimeout(libraryBookSearchTimer);
+      const value = normalize(event.target.value);
+      libraryBookSearchTimer = window.setTimeout(() => {
+        state.libraryBookSearch = value;
+        state.libraryBookVisibleCount = PAGE_SIZE;
+        renderLibraryBook();
+      }, 140);
+    });
+
+    els.libraryBookLoadMore?.addEventListener("click", () => {
+      state.libraryBookVisibleCount += PAGE_SIZE;
+      renderLibraryBook();
+    });
+
+    els.libraryBookProgressFilters?.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-book-progress]");
+      if (!chip) {
+        return;
+      }
+      const key = chip.dataset.bookProgress;
+      toggleLibraryFilter("bookProgress", key, key === "all");
+    });
+
+    els.libraryBookListWords?.addEventListener("click", (event) => {
+      const open = event.target.closest("[data-library-open]");
+      if (open) {
+        openWord(open.dataset.libraryOpen);
+        return;
+      }
+      const statusButton = event.target.closest("[data-book-status]");
+      if (!statusButton) {
+        return;
+      }
+      const api = userbookApi();
+      const book = api?.getBook?.(state.libraryBookId);
+      const word = statusButton.dataset.bookWord;
+      const status = statusButton.dataset.bookStatus;
+      if (!api || !book || !word) {
+        return;
+      }
+      const deck = api.deckFor(book.id);
+      if (status === "none") {
+        api.clearStatus(deck, word);
+        showToast(`「${word}」标记为未背`);
+      } else {
+        api.setStatus({ deck, word, status, source: `userbook:${book.id}` });
+        showToast(
+          status === "unknown"
+            ? `「${word}」标记为不会，已收进「不会的单词」`
+            : `「${word}」标记为${api.statusLabel(status)}`,
+        );
+      }
+      renderLibraryBook();
+    });
+
+    let librarySearchTimer = 0;
+    els.librarySearch?.addEventListener("input", (event) => {
+      window.clearTimeout(librarySearchTimer);
+      const value = normalize(event.target.value);
+      librarySearchTimer = window.setTimeout(() => {
+        state.libraryQuery = value;
+        state.libraryVisibleCount = PAGE_SIZE;
+        renderLibraryBoard();
+      }, 140);
+    });
+
+    els.libraryFilters?.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-library-filter]");
+      if (!chip) {
+        return;
+      }
+      const key = chip.dataset.libraryFilter;
+      if (!libraryFilterConfig(key)) {
+        return;
+      }
+      toggleLibraryFilter("source", key, key === "all");
+      if (els.libraryList) {
+        els.libraryList.scrollTop = 0;
+      }
+    });
+
+    els.libraryProgressFilters?.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-library-progress]");
+      if (!chip) {
+        return;
+      }
+      const key = chip.dataset.libraryProgress;
+      toggleLibraryFilter("progress", key, key === "all");
+    });
+
+    els.libraryList?.addEventListener("click", (event) => {
+      if (event.target.closest("a")) {
+        return;
+      }
+      const open = event.target.closest("[data-library-open]");
+      if (open) {
+        openWord(open.dataset.libraryOpen);
+        return;
+      }
+      const remove = event.target.closest("[data-library-remove]");
+      if (remove) {
+        const word = remove.dataset.libraryRemove;
+        const api = libraryApi();
+        if (!api) {
+          return;
+        }
+        if (!window.confirm(`把「${word}」从词汇库删除？原文里的「不会」标记不受影响。`)) {
+          return;
+        }
+        api.remove(word);
+        state.librarySelected.delete(normalize(word));
+        renderLibraryBoard();
+        showToast(`已从词汇库删除「${word}」`);
+      }
+    });
+
+    els.libraryList?.addEventListener("change", (event) => {
+      const input = event.target.closest("[data-library-pick]");
+      if (!input) {
+        return;
+      }
+      const key = normalize(input.dataset.libraryPick);
+      if (!key) {
+        return;
+      }
+      if (input.checked) {
+        state.librarySelected.add(key);
+      } else {
+        state.librarySelected.delete(key);
+      }
+      input.closest(".library-card")?.classList.toggle("is-picked", input.checked);
+      syncLibraryCounters();
+      if (els.libraryMeta) {
+        els.libraryMeta.textContent = libraryMetaText();
+      }
+      if (state.libraryCustomOnly) {
+        renderLibraryList();
+      }
+    });
+
+    els.librarySelectAll?.addEventListener("click", () => {
+      const records = libraryFilteredRecords();
+      if (!records.length) {
+        showToast("当前筛选没有可勾选的单词");
+        return;
+      }
+      records.forEach((record) => {
+        state.librarySelected.add(normalize(record.word));
+      });
+      renderLibraryBoard();
+      showToast(`已勾选 ${records.length} 个单词`);
+    });
+
+    els.libraryClearSelection?.addEventListener("click", () => {
+      state.librarySelected.clear();
+      state.libraryCustomOnly = false;
+      renderLibraryBoard();
+    });
+
+    els.libraryCustom?.addEventListener("click", () => {
+      if (!state.librarySelected.size) {
+        showToast("先勾选几个单词，再用自定义组合筛选");
+        return;
+      }
+      state.libraryCustomOnly = !state.libraryCustomOnly;
+      state.libraryVisibleCount = PAGE_SIZE;
+      renderLibraryBoard();
+    });
+
+    els.libraryReview?.addEventListener("click", reviewLibraryFilter);
+
+    els.libraryDeleteSelected?.addEventListener("click", () => {
+      const api = libraryApi();
+      const words = [...state.librarySelected];
+      if (!api || !words.length) {
+        showToast("先勾选要删除的单词");
+        return;
+      }
+      if (
+        !window.confirm(
+          `从词汇库删除勾选的 ${words.length} 个单词？原文里的「不会」标记不受影响。`,
+        )
+      ) {
+        return;
+      }
+      const removed = api.removeMany(words);
+      state.librarySelected.clear();
+      state.libraryCustomOnly = false;
+      renderLibraryBoard();
+      showToast(`已删除 ${removed} 个单词`);
+    });
+
+    els.libraryLoadMore?.addEventListener("click", () => {
+      state.libraryVisibleCount += PAGE_SIZE;
+      renderLibraryList();
+    });
+
     window.addEventListener("scroll", scrollProgress, { passive: true });
     window.addEventListener("resize", scrollProgress);
   }
@@ -1654,6 +2999,10 @@
     const drawParam = params.get("draw");
     const startDraw = drawParam === "1" || drawParam === "true";
     const focusWord = (params.get("word") || "").trim();
+    const libraryParam = params.get("library");
+    const startLibrary = libraryParam === "1" || libraryParam === "true";
+    const libraryViewParam = (params.get("libraryView") || "").trim();
+    const userbookParam = (params.get("userbook") || "").trim();
 
     bindEvents();
     window.IballVocabRecite?.subscribe(() => {
@@ -1665,6 +3014,21 @@
       updateDeckMeta();
       if (state.drawOpen) {
         renderDrawCard();
+      }
+    });
+    window.IballVocabLibrary?.subscribe?.(() => {
+      syncLibraryCounters();
+      if (els.libraryMeta) {
+        els.libraryMeta.textContent = libraryMetaText();
+      }
+      if (state.libraryOpen) {
+        renderLibraryBoard();
+      }
+    });
+    window.IballVocabUserbook?.subscribe?.(() => {
+      syncLibraryCounters();
+      if (state.libraryOpen) {
+        renderLibraryBoard();
       }
     });
     refreshRecite();
@@ -1684,6 +3048,17 @@
       // 清单失败不影响词表本身，词库统计会退回本地计数。
     }
     await selectDeck(state.prefs.deckKey);
+    if (startLibrary) {
+      setLibraryOpen(true);
+    }
+    if (startLibrary && ["entry", "books", "notebook"].includes(libraryViewParam)) {
+      setLibraryView(libraryViewParam);
+    }
+    if (userbookParam) {
+      setLibraryOpen(true);
+      state.libraryVisibleCount = PAGE_SIZE;
+      setLibraryView("book", userbookParam);
+    }
     if (startDraw) {
       openDrawMode();
     }

@@ -1,0 +1,195 @@
+{
+  "id": "english-i-2024",
+  "track": "english-i",
+  "year": 2024,
+  "provider": "google-vps",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.180Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2024 考研英语一 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "ad823b96957334a4",
+          "en": "Nearly 2,000 years ago, as the Romans began to pull out of Scotland, they left behind a curious treasure: 10 tons of nails, nearly a million of the things. The nail hoard was discovered in 1960 in a four-metre-deep pit covered by two metres of gravel.",
+          "zh": "大约 2,000 年前，当罗马人开始撤出苏格兰时，他们留下了一件奇怪的宝藏：10 吨钉子，将近一百万件这样的东西。 1960 年，人们在一个 4 米深、覆盖着 2 米砾石的坑中发现了钉子库。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "c16565da39a644c5",
+          "en": "Why had the Romans buried a million nails? The likely explanation is that the withdrawal was rushed, and they didn’t want the local Caledonians getting their hands on 10 tons of weapon-grade iron. The Romans buried the nails so deep that they would not be discovered for almost two millennia.",
+          "zh": "罗马人为什么要埋一百万颗钉子？可能的解释是撤军仓促，他们不希望当地的喀里多尼亚人得到10吨武器级铁。罗马人将钉子埋得很深，以至于近两千年都没有被发现。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "36e18c3224d920e5",
+          "en": "Later civilisations would value the skilled blacksmith’s labour in a nail even more than the raw material. As Roma Agrawal explains in her new delightful book Nuts and Bolts, early 17th-century Virginians would sometimes burn down their homes if they were planning to relocate. This was an attempt to recover the valuable nails, which could be reused after sifting the ashes. The idea that one might burn down an entire house just to reclaim the nails underlines how scarce, costly and valuable the simple-seeming technology was.",
+          "zh": "后来的文明对熟练铁匠在钉子上的劳动的重视甚至超过了原材料。正如罗马·阿格拉瓦尔 (Roma Agrawal) 在她令人愉快的新书《基本要素》(Nuts and Bolts) 中所解释的那样，17 世纪早期的弗吉尼亚人如果计划搬迁，有时会烧毁自己的房屋。这是一种回收有价值的钉子的尝试，这些钉子可以在筛选骨灰后重新使用。人们可能会烧毁整栋房子只是为了回收钉子，这一想法突显了这项看似简单的技术是多么稀缺、昂贵和有价值。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "f22e56047070313d",
+          "en": "The price of nails fell by 90% between the late 1700s and mid-1900s, as economist Daniel Sichel points out in a research paper. According to Sichel, although the falling price of nails was driven partly by cheaper iron and cheaper energy, most of the credit goes to nail manufacturers who simply found more efficient ways to turn steel into nails.",
+          "zh": "经济学家 Daniel Sichel 在一篇研究论文中指出，从 1700 年代末到 1900 年代中期，钉子的价格下降了 90%。西歇尔表示，尽管钉子价格下跌的部分原因是廉价的铁和能源，但大部分功劳都归功于钉子制造商，他们只是找到了更有效的方法将钢材变成钉子。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "43ed506cb385b43f",
+          "en": "Nails themselves have changed over the years, but Sichel studied them because they haven’t changed much. Roman lamps and Roman chariots are very different from LED strips and sports cars, but Roman nails are still clearly nails. It would be absurd to try to track the changing price of sports cars since 1695, but to ask the same question of nails makes perfect sense.",
+          "zh": "这些年来，指甲本身已经发生了变化，但西歇尔研究了它们，因为它们没有发生太大变化。罗马灯和罗马战车与LED灯带和跑车有很大不同，但罗马钉显然仍然是钉子。试图追踪自 1695 年以来跑车价格的变化是荒谬的，但问同样的钉子问题却是完全有道理的。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "14f07014893169ed",
+          "en": "I make no apology for being obsessed by a particular feature of these objects: their price. I am an economist, after all. After writing two books about the history of inventions, one thing I’ve learnt is that while it is the enchantingly sophisticated technologies that get all the hype, it’s the cheap technologies that change the world. The Gutenberg printing press transformed civilisation not by changing the nature of writing but by changing its cost—and it would have achieved little without a parallel collapse in the price of surfaces to write on, thanks to an often-overlooked technology called paper. Solar panels had a few niche uses until they became cheap; now they are transforming the global energy system.",
+          "zh": "我不会为自己对这些物品的一个特定特征的痴迷而道歉：它们的价格。毕竟我是一名经济学家。在写了两本关于发明史的书之后，我学到的一件事是，虽然令人着迷的复杂技术得到了所有的炒作，但改变世界的却是廉价的技术。古腾堡印刷机改变了文明，不是通过改变书写的本质，而是通过改变其成本——而由于一种经常被忽视的称为纸张的技术，如果书写表面的价格没有同步崩溃，它就不会取得什么成就。太阳能电池板在变得便宜之前曾有一些利基用途。现在他们正在改变全球能源系统。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2024 考研英语一 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "0ed9cbccb7f9f5fe",
+          "en": "Parenting tips obtained from hunter-gatherers in Africa may be the key to bringing up more contented children, researchers have suggested. The idea is based on studies of communities such as the Kung of Botswana, where each child is cared for by many adults. Kung children as young as four will help to look after younger ones and “baby-wearing”, in which infants are carried in slings, is considered the norm.",
+          "zh": "研究人员表示，从非洲狩猎采集者那里获得的育儿秘诀可能是培养更满足的孩子的关键。这个想法是基于对博茨瓦纳 Kung 等社区的研究，那里的每个孩子都由许多成年人照顾。年仅四岁的 Kung 儿童将帮助照顾年幼的孩子，而“婴儿装”（用背带携带婴儿）被认为是常态。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "26330afc5b55405a",
+          "en": "According to Dr Nikhil Chaudhary, an evolutionary anthropologist at Cambridge University, these practices, known as alloparenting, could lead to less anxiety for children and parents.",
+          "zh": "剑桥大学进化人类学家尼基尔·乔杜里 (Nikhil Chaudhary) 博士表示，这些被称为“异育”的做法可以减少孩子和父母的焦虑。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "65c65ef314e56b74",
+          "en": "Dr Annie Swanepoel, a child psychiatrist, believes that there are ways to incorporate them into western life. In Germany, one scheme has paired an old people’s home with a nursery. The residents help to look after the children, an arrangement akin to alloparenting. Another measure could be encouraging friendships between children in different school years, to mirror the unsupervised mixed-age playgroups in hunter-gatherer communities.",
+          "zh": "儿童精神病学家安妮·斯瓦内普尔博士认为，有一些方法可以将他们融入西方生活。在德国，一项计划将老人之家与托儿所配对。居民们帮忙照顾孩子，这种安排类似于异养。另一项措施可能是鼓励不同学年的孩子之间建立友谊，以反映狩猎采集社区中无人监督的混合年龄游戏小组。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "abdd0468fba2e7fc",
+          "en": "In a paper published in the Journal of Child Psychology and Psychiatry, researchers said that the western nuclear family was a recent invention which broke with evolutionary history. This abrupt shift to an “intensive mothering narrative”, which suggests that mothers should manage childcare alone, was likely to have been harmful. “Such narratives can lead to maternal exhaustion and have dangerous consequences,” they wrote.",
+          "zh": "研究人员在《儿童心理学和精神病学杂志》上发表的一篇论文中表示，西方核心家庭是最近的发明，打破了进化史。这种突然转变为“强化母爱叙事”，即母亲应该独自照顾孩子，可能是有害的。 “这样的叙述可能会导致母亲精疲力竭，并产生危险的后果，”他们写道。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "03483b0cf16fa238",
+          "en": "By contrast, in hunter-gatherer societies adults other than the parents can provide almost half of a child’s care. One previous study looked at the Efé people of the Democratic Republic of Congo. It found that infants had an average of 14 alloparents a day by the time they were 18 weeks old, and were passed between caregivers eight times an hour.",
+          "zh": "相比之下，在狩猎采集社会中，父母以外的成年人可以提供几乎一半的儿童照料。之前的一项研究针对的是刚果民主共和国的埃菲人。研究发现，到 18 周大时，婴儿平均每天有 14 个异父母，每小时在护理人员之间传递 8 次。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "6874b8a22124af7d",
+          "en": "Chaudhary said that parents now have less childcare support from family and social networks than during most of humans’ evolutionary history, but introducing additional caregivers could reduce stress and maternal depression, which could have a “knock-on” benefit to a child’s wellbeing. An infant born to a hunter-gatherer society could have more than ten caregivers—this contrasts starkly to nursery settings in the UK where regulations call for a ratio of one carer to four children aged two to three. While hunter-gatherer children learnt from observation and imitation in mixed-age playgroups, researchers said that western “instructive teaching”, where pupils are asked to sit still, may contribute to conditions such as attention deficit hyperactivity disorder. Chaudhary said that Britain should explore the possibility that older siblings helping their parents “might also enhance their own social development.”",
+          "zh": "乔杜里说，与大多数人类进化史相比，现在父母从家庭和社交网络获得的育儿支持较少，但引入额外的照顾者可以减轻压力和产妇抑郁，这可能对孩子的福祉产生“连锁反应”的好处。在狩猎采集社会出生的婴儿可能有十多名照顾者——这与英国的托儿所环境形成鲜明对比，英国的法规要求一名照顾者与四名两到三岁的儿童的比例。虽然狩猎采集儿童在混合年龄的游戏小组中通过观察和模仿来学习，但研究人员表示，西方的“指导性教学”（要求学生安静地坐着）可能会导致注意力缺陷多动障碍等疾病。乔杜里表示，英国应该探索一种可能性，即年长的兄弟姐妹帮助父母“也可能促进他们自身的社会发展”。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2024 考研英语一 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "7f232798ca73973a",
+          "en": "A Polish digital artist who uses classical painting styles to create dreamy fantasy landscapes, Greg Rutkowski has made illustrations for games such as Dungeons & Dragons and Magic: The Gathering. And he’s become a sudden hit in the new world of text-to-image AI generation.",
+          "zh": "Greg Rutkowski 是一位波兰数字艺术家，他使用古典绘画风格创造梦幻般的奇幻风景，曾为《龙与地下城》和《万智牌》等游戏制作插图。他在文本到图像人工智能生成的新世界中突然走红。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "08745788c071f0d0",
+          "en": "His distinctive style is now one of the most commonly used prompts in the new open-source AI art generator Stable Diffusion. The tool, along with other popular image-generation AI models, allows anyone to create impressive images based on text prompts. For example, type in “Wizard with sword and a glowing orb of magic fire fights a fierce dragon Greg Rutkowski,” and the system will produce something that looks not a million miles away from works in Rutkowski’s style. But these open-source programs are built by scraping images from the internet, often without permission and proper attribution to artists. As a result, they are raising tricky questions about ethics and copyright. And artists like Rutkowski have had enough.",
+          "zh": "他独特的风格现在是新的开源 AI 艺术生成器 Stable Diffusion 中最常用的提示之一。该工具与其他流行的图像生成人工智能模型一起，允许任何人根据文本提示创建令人印象深刻的图像。例如，输入“拿着剑和发光的魔法火球的巫师与凶猛的龙格雷格·鲁特科斯基战斗”，系统将生成看起来与鲁特科夫斯基风格的作品相差不到一百万英里的东西。但这些开源程序是通过从互联网上抓取图像来构建的，通常未经艺术家许可和适当归属。因此，他们提出了有关道德和版权的棘手问题。像鲁特科夫斯基这样的艺术家已经受够了。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "36cbeb012dfd9c6f",
+          "en": "According to the website Lexica, which tracks over 10 million images and prompts generated by Stable Diffusion, Rutkowski’s name has been used as a prompt around 93,000 times. Rutkowski was initially surprised but thought it might be a good way to reach new audiences. Then he tried searching for his name to see if a piece he had worked on had been published. The online search brought back work that had his name attached to it but wasn’t his.",
+          "zh": "Lexica 网站跟踪了 Stable Diffusion 生成的超过 1000 万张图像和提示，据该网站称，Rutkowski 的名字已被用作提示约 93,000 次。鲁特科夫斯基最初感到惊讶，但认为这可能是接触新受众的好方法。然后他尝试搜索自己的名字，看看他创作的作品是否已出版。网上搜索找到了附有他名字但不是他的作品。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "9156cc41faafacf9",
+          "en": "“It’s been just a month. What about in a year? I probably won’t be able to find my work out there because the internet will be flooded with AI art,” Rutkowski says. “That’s concerning.”",
+          "zh": "“才一个月。一年后呢？我可能无法在那里找到我的作品，因为互联网将充斥着人工智能艺术，”鲁特科斯基说。 “这很令人担忧。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "654387e4bc352707",
+          "en": "Other artists besides Rutkowski have been surprised by the apparent popularity of their work in text-to-image generators—and some are now fighting back. Karla Ortiz, an illustrator based in San Francisco who found her work in Stable Diffusion’s data set, has been raising awareness about the issues around AI art and copyright. Artists say they risk losing income as people start using AI-generated images based on copyrighted material for commercial purposes. But it’s also a lot more personal, Ortiz says, arguing that because art is so closely linked to a person, it could raise data protection and privacy problems.",
+          "zh": "除了 Rutkowski 之外，其他艺术家都对他们的作品在文本到图像生成器中的明显受欢迎感到惊讶，有些人现在正在反击。 Karla Ortiz 是一位居住在旧金山的插画家，她在 Stable Diffusion 的数据集中发现了自己的作品，她一直在提高人们对人工智能艺术和版权问题的认识。艺术家表示，随着人们开始将基于受版权保护的材料的人工智能生成的图像用于商业目的，他们面临着收入损失的风险。但奥尔蒂斯说，它也更加个人化，他认为，由于艺术与人的联系如此紧密，因此可能会引发数据保护和隐私问题。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "1f3d46d9a0a56056",
+          "en": "“There is a coalition growing within artist industries to figure out how to tackle or mitigate this,” says Ortiz. The group is in its early days of mobilization, which could involve pushing for new policies or regulation. One suggestion is that AI models could be trained on images in the public domain, and AI companies could forge partnerships with museums and artists, Ortiz says.",
+          "zh": "“艺术家行业内正在形成一个联盟，以找出解决或缓解这一问题的方法，”奥尔蒂斯说。该组织正处于动员的早期阶段，这可能涉及推动新的政策或监管。奥尔蒂斯说，一个建议是人工智能模型可以在公共领域的图像上进行训练，人工智能公司可以与博物馆和艺术家建立合作伙伴关系。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2024 考研英语一 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "3e1a5d4bca08ae0c",
+          "en": "The miracle of the Chesapeake Bay lies not in its depths, but in the complexity of its natural construction, the interaction of fresh and saline waters, and the mix of land and water. The shallows provide homes for hundreds of species while storing floodwaters, filtering pollutants from water, and protecting nearby communities from potentially destructive storm surges.",
+          "zh": "切萨皮克湾的奇迹不在于它的深度，而在于其自然构造的复杂性、淡水和咸水的相互作用以及陆地和水的混合。浅滩为数百种物种提供了家园，同时储存洪水、过滤水中的污染物，并保护附近社区免受潜在破坏性风暴潮的影响。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "5e797d0246d60a77",
+          "en": "All this was put at great risk late last month, when the U.S. Supreme Court issued a ruling in an Idaho case that provides the U.S. Environmental Protection Agency (EPA) far less authority to regulate wetlands and waterways. Specifically, a 5-4 majority decided that wetlands protected by the EPA under its Clean Water Act authority must have a “continuous surface connection” to bodies of water. This narrowing of the regulatory scope was a victory for builders, mining operators and other commercial interests often at odds with environmental rules. And it carries “significant repercussions for water quality and flood control throughout the United States,” as Justice Brett Kavanaugh observed.",
+          "zh": "上个月末，当美国最高法院对爱达荷州的一起案件做出裁决时，所有这一切都面临着巨大的风险，该裁决赋予美国环境保护局（EPA）监管湿地和水道的权力大大减少。具体而言，以 5 比 4 的多数票决定，根据《清洁水法》授权，受 EPA 保护的湿地必须与水体有“连续的表面连接”。监管范围的缩小对于建筑商、采矿运营商和其他经常违反环境规则的商业利益来说是一次胜利。正如布雷特·卡瓦诺法官所观察到的那样，它“对整个美国的水质和防洪产生了重大影响”。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "709b062241d74c30",
+          "en": "In Maryland, the good news is that there are many state laws in place that provide wetlands protections. But that’s a very shortsighted view, particularly when it comes to the Chesapeake Bay. The reality is that water, and the pollutants that so often come with it, don’t respect state boundaries. The Chesapeake draws from a 64,000-square-mile watershed that extends into Virginia, Pennsylvania, New York, West Virginia, the District of Columbia and Delaware. Will those jurisdictions extend the same protections now denied under Sackett v. EPA? Perhaps some, but all? That seems unlikely.",
+          "zh": "在马里兰州，好消息是有许多州法律提供湿地保护。但这是一种非常短视的观点，尤其是在切萨皮克湾方面。现实情况是，水以及随之而来的污染物并不尊重国界。切萨皮克河流域面积达 64,000 平方英里，延伸至弗吉尼亚州、宾夕法尼亚州、纽约州、西弗吉尼亚州、哥伦比亚特区和特拉华州。这些司法管辖区是否会提供目前在萨克特诉美国环保署案中被拒绝的相同保护？也许是一些，但全部？这似乎不太可能。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "bcc8775cd2a7e1e4",
+          "en": "It is too easy, and misleading, to see such court rulings as merely standing up for the rights of land owners when the consequences can be so dire for their neighbors. And it’s a reminder that the EPA’s involvement in the Chesapeake Bay Program has long been crucial as the means to transcend the influence of deep-pocketed special interests in neighboring states. Pennsylvania farmers, to use one telling example, aren’t thinking about next year’s blue crab harvest in Maryland when they decide whether to spread animal waste on their fields, yet the runoff into nearby creeks can have enormous impact downstream.",
+          "zh": "当后果可能对邻居造成如此可怕的影响时，人们很容易将此类法院裁决视为只是维护土地所有者的权利，而且很容易产生误导。这提醒人们，美国环保署参与切萨皮克湾计划长期以来一直至关重要，因为这是超越邻国财力雄厚的特殊利益集团影响的手段。举一个有说服力的例子，宾夕法尼亚州的农民在决定是否将动物粪便撒在田里时，并没有考虑明年马里兰州蓝蟹的收成，但流入附近小溪的径流可能会对下游产生巨大影响。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "de76429b670a82e0",
+          "en": "And so we would also call on state lawmakers from Richmond to Albany to consider reviewing their own wetlands protections and see for themselves the enormous stakes involved. We can offer them a visit to Blackwater National Wildlife Refuge in Dorchester County where bald eagles fly over tidal marshes so shallow you could not paddle a boat across them but teaming with aquatic life. It’s worth the scenic drive.",
+          "zh": "因此，我们还呼吁从里士满到奥尔巴尼的州立法者考虑审查他们自己的湿地保护，并亲眼看看所涉及的巨大利害关系。我们可以带他们参观多切斯特县的黑水国家野生动物保护区，那里的秃鹰飞越浅浅的潮汐沼泽，你无法划船穿过它们，但只能与水生生物合作。值得开车去欣赏风景。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    }
+  }
+}

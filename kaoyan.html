@@ -21,14 +21,24 @@
     <link rel="stylesheet" href="./kaoyan.css" />
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./exam-scores.css" />
-    <script src="./account-store.js" defer></script>
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
+    <script src="./vocab-library.js?v=20261005-ui10" defer></script>
     <script src="./exam-scores.js" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
     <script src="./collocation-index.js" defer></script>
-    <script src="./kaoyan.js" defer></script>
-  </head>
+    <script src="./kaoyan.js?v=20261009-notes1" defer></script>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <link rel="stylesheet" href="./back-to-top.css?v=20261005-ui10" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+    <script src="./back-to-top.js?v=20261005-ui11" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body class="kaoyan-page">
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 
@@ -207,8 +217,10 @@
       <p>
         真题原文、答案与写作题目来自本机 <code>kaoyan-english</code> skill
         的 corpus；完形与翻译的参考译文、难点评析标注为「Echo 生成的非官方学习材料」，
-        可用于自测和复盘，不等同于官方答案。站点结构、按句学词与生词卡组设计参考了下列开源项目的公开做法，
-        只借鉴思路与数据结构，未复制其受版权保护的正文内容。
+        可用于自测和复盘，不等同于官方答案。阅读正文另附逐段中文参考译文，均由公开
+        机器翻译接口生成，页面标注为「机器初稿（非官方）」，不等同于人工精校译文。
+        站点结构、按句学词、段落结构定位与生词卡组设计参考了下列开源项目的公开做法，
+        只借鉴思路与数据结构，未复制其受版权保护的正文、译文或解析模板。
       </p>
       <ul>
         <li>
@@ -243,10 +255,11 @@
           <a href="https://github.com/oliveranderson1089-crypto/Kaoyan-English-Writing-Tutor" target="_blank" rel="noopener noreferrer">Writing Tutor</a>。
         </li>
         <li>
-          考研真题与解析结构参考（三者均无 License，仅参考其公开的题型划分、逐句翻译与长难句拆解思路，未复制仓库代码、真题正文、译文或模板）：
+          考研真题与解析结构参考（四者均无 License，仅参考其公开的题型划分、整段译文与段落讲解组织方式、逐句翻译与长难句拆解思路，未复制仓库代码、真题正文、译文或模板）：
           <a href="https://github.com/Echo1LZJY/echo-kaoyan-english-skill" target="_blank" rel="noopener noreferrer">Echo1LZJY/echo-kaoyan-english-skill</a>、
           <a href="https://github.com/Destinnnnn/kaoyan-english-1-2005-2026" target="_blank" rel="noopener noreferrer">Destinnnnn/kaoyan-english-1-2005-2026</a>、
-          <a href="https://github.com/m2kar/KaoYan-English" target="_blank" rel="noopener noreferrer">m2kar/KaoYan-English</a>。
+          <a href="https://github.com/m2kar/KaoYan-English" target="_blank" rel="noopener noreferrer">m2kar/KaoYan-English</a>、
+          <a href="https://github.com/LIziak112/structured-kaoyan-english" target="_blank" rel="noopener noreferrer">LIziak112/structured-kaoyan-english</a>。
         </li>
         <li>
           界面设计体系参考（均 MIT，仅借鉴设计规范与检查清单，未引入其组件代码）：

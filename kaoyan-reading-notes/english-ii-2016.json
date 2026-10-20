@@ -1,0 +1,139 @@
+{
+  "id": "english-ii-2016",
+  "track": "english-ii",
+  "year": 2016,
+  "provider": "mixed-public-mt",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.190Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2016 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "f9b13a1a0149bfb4",
+          "en": "It’s true that high-school coding classes aren’t essential for learning computer science in college. Students without experience can catch up after a few introductory courses, said Tom Cortina, the assistant dean at Carnegie Mellon’s School of Computer Science.",
+          "zh": "卡内基梅隆大学计算机科学学院（Carnegie Mellon's School of Computer Science）副院长汤姆·科尔蒂纳（Tom Cortina）说，的确，高中的编程课程对于大学里学习计算机科学并不是必不可少的。没有经验的学生可以在上几门入门课程后跟上。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "b9f89a704b408a2b",
+          "en": "However, Cortina said, early exposure is beneficial. When younger kids learn computer science, they learn that it’s not just a confusing, endless string of letters and numbers—but a tool to build apps, or create artwork, or test hypotheses. It’s not as hard for them to transform their thought processes as it is for older students. Breaking down problems into bite-sized chunks and using code to solve them becomes normal. Giving more children this training could increase the number of people interested in the field and help fill the jobs gap, Cortina said. Students also benefit from learning something about coding before they get to college, where introductory computer-science classes are packed to the brim, which can drive the less-experienced or -determined students away. The Flatiron School, where people pay to learn programming, started as one of the many coding bootcamps that’s become popular for adults looking for a career change. The high-schoolers get the same curriculum, but “we try to gear lessons toward things they’re interested in,” said Victoria Friedman, an instructor. For instance, one of the apps the students are developing suggests movies based on your mood.",
+          "zh": "然而，科蒂娜说，早期接触是有益的。当年幼的孩子学习计算机科学时，他们会知道它不仅仅是一个令人困惑的，无穷无尽的字母和数字串-而是一个构建应用程序或创作艺术品的工具，或者测试假设。对他们来说，转变他们的思维过程并不像对高年级学生那样困难。把问题分解成小问题--Cortina说，让更多的孩子接受这种培训可以增加对该领域感兴趣的人的数量，并有助于填补就业缺口。学生们在上大学之前学习一些编程知识也会受益，在那里，计算机科学入门课程座无虚席，这可能会把经验不足或意志薄弱的学生赶走。在熨斗学校，人们付费学习编程，作为众多编程训练营中的一个，它已经成为寻求职业转变的成年人的热门课程。高中生也有同样的课程，但“我们会尽量让课程与他们感兴趣的东西挂钩，”讲师维多利亚弗里德曼（Victoria Friedman）说。例如，学生们正在开发的一个应用程序会根据你的情绪推荐电影。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "548e8eecff469543",
+          "en": "The students in the Flatiron class probably won’t drop out of high school and build the next Facebook. Programming languages have a quick turnover, so the “Ruby on Rails” language they learned may not even be relevant by the time they enter the job market. But the skills they learn—how to think logically through a problem and organize the results—apply to any coding language, said Deborah Seehorn, an education consultant for the state of North Carolina. Indeed, the Flatiron students might not go into IT at all. But creating a future army of coders is not the sole purpose of the classes. These kids are going to be surrounded by computers—in their pockets, in their offices, in their homes—for the rest of their lives. The younger they learn how computers think, how to coax the machine into producing what they want—the earlier they learn that they have the power to do that—the better.",
+          "zh": "Flatiron班的学生可能不会从高中辍学，去创建下一个Facebook。编程语言的更替速度很快，所以当他们进入就业市场时，他们所学的“Ruby on Rails”语言可能已经不重要了。但他们学到的技能--如何通过逻辑思考问题并组织结果--适用于任何编程语言，Deborah Seehorn说，北卡罗来纳州的教育顾问。的确，Flatiron的学生可能根本不会进入IT行业。但培养未来的程序员大军并不是这些课程的唯一目的。这些孩子将被电脑包围--在他们的口袋里，在他们的办公室里，他们越年轻就学会计算机如何思考，如何引导机器生产他们想要的东西--他们越早知道自己有能力做到这一点--越好。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2016 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "9ca4bfd4e4c585a1",
+          "en": "Biologists estimate that as many as 2 million lesser prairie chickens—a kind of bird living on stretching grasslands—once lent red to the often grey landscape of the midwestern and southwestern United States. But just some 22,000 birds remain today, occupying about 16% of the species’ historic range. The crash was a major reason the U.S. Fish and Wildlife Service (USFWS) decided to formally list the bird as threatened. “The lesser prairie chicken is in a desperate situation,” said USFWS Director Daniel Ashe. Some environmentalists, however, were disappointed. They had pushed the agency to designate the bird as “endangered,” a status that gives federal officials greater regulatory power to crack down on threats. But Ashe and others argued that the “threatened” tag gave the federal government flexibility to try out new, potentially less confrontational conservation approaches. In particular, they called for forging closer collaborations with western state governments, which are often uneasy with federal action, and with the private landowners who control an estimated 95% of the prairie chicken’s habitat.",
+          "zh": "生物学家估计，多达200万只小草原鸡--一种生活在绵延的草地上的鸟类--曾经为美国中西部和西南部经常是灰色的景观增添了红色。但今天只剩下大约22,000只鸟，占该物种历史分布区的16%。这起事故是美国鱼类和野生动物管理局（USFWS）美国渔业和野生动物管理局局长丹尼尔·阿什说：“这种小草原鸡处于绝望的境地。”然而，一些环保主义者感到失望。他们曾敦促该机构将这种鸟列为“濒危物种，“这一地位赋予了联邦官员更大的监管权力来打击威胁。但阿什和其他人认为，“受威胁”的标签给了联邦政府灵活性，特别是，他们呼吁与西部各州政府建立更密切的合作关系，这些政府经常对联邦行动感到不安，并与控制着估计95%的草原鸡栖息地的私人土地所有者建立更密切的合作关系。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "8dfc8ee4ae00a6d4",
+          "en": "Under the plan, for example, the agency said it would not prosecute landowners or businesses that unintentionally kill, harm, or disturb the bird, as long as they had signed a range-wide management plan to restore prairie chicken habitat. Negotiated by USFWS and the states, the plan requires individuals and businesses that damage habitat as part of their operations to pay into a fund to replace every acre destroyed with 2 new acres of suitable habitat. The fund will also be used to compensate landowners who set aside habitat. USFWS also set an interim goal of restoring prairie chicken populations to an annual average of 67,000 birds over the next 10 years. And it gives the Western Association of Fish and Wildlife Agencies (WAFWA), a coalition of state agencies, the job of monitoring progress. Overall, the idea is to let “states remain in the driver’s seat for managing the species,” Ashe said.",
+          "zh": "例如，根据该计划，该机构表示，只要土地所有者或企业签署了一项恢复草原鸡栖息地的范围管理计划，就不会起诉无意中杀死、伤害或打扰这种鸟的土地所有者或企业。该计划要求个人和企业，破坏栖息地作为其业务的一部分，支付到一个基金，以取代每英亩被摧毁的2新英亩的适宜栖息地。该基金还将用于补偿那些留出栖息地的土地所有者。USFWS还设定了一个中期目标，即在未来10年内将草原鸡的数量恢复到年均67，000只。它还赋予了西部鱼类和野生动物机构协会（WAFWA），一个州机构联盟，监督进展的工作。总体而言，阿什说，这个想法是为了让“各州在管理物种方面保持主导地位”。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "5426bb61edb908ab",
+          "en": "Not everyone buys the win-win rhetoric. Some Congress members are trying to block the plan, and at least a dozen industry groups, four states, and three environmental groups are challenging it in federal court. Not surprisingly, industry groups and states generally argue it goes too far; environmentalists say it doesn’t go far enough. “The federal government is giving responsibility for managing the bird to the same industries that are pushing it to extinction,” says biologist Jay Lininger.",
+          "zh": "并不是所有人都相信这种双赢的说法。一些国会议员试图阻止这项计划，至少有十几个行业组织、四个州和三个环保组织在联邦法院对它提出质疑。毫不奇怪，行业组织和州普遍认为它走得太远了;环保人士说，这还远远不够。“联邦政府把管理这种鸟的责任交给了那些把它推向灭绝的行业，”生物学家杰伊·利宁格说。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2016 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "6ca49167f2367f27",
+          "en": "That everyone’s too busy these days is a cliché. But one specific complaint is made especially mournfully: There’s never any time to read.",
+          "zh": "说现在每个人都很忙碌已经是老生常谈了，但有一个特别令人悲哀的抱怨是：从来没有时间读书。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "f9433559e8a00032",
+          "en": "What makes the problem thornier is that the usual time-management techniques don’t seem sufficient. The web’s full of articles offering tips on making time to read: “Give up TV” or “Carry a book with you at all times.” But in my experience, using such methods to free up the odd 30 minutes doesn’t work.",
+          "zh": "更棘手的是，通常的时间管理技巧似乎还不够。网上到处都是关于腾出时间阅读的文章：“放弃电视”或“随时带本书”。但根据我的经验，用这些方法腾出30分钟是行不通的。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "96ad50954bfb2354",
+          "en": "Sit down to read and the flywheel of work-related thoughts keeps spinning— or else you’re so exhausted that a challenging book’s the last thing you need.",
+          "zh": "坐下来阅读，与工作相关的想法的飞轮继续旋转-否则你太累了，一本有挑战性的书是你最不需要的。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "9871d6c8e9464128",
+          "en": "The modern mind, Tim Parks, a novelist and critic, writes, “is overwhelmingly inclined toward communication...It is not simply that one is interrupted; it is that one is actually inclined to interruption.” Deep reading requires not just time, but a special kind of time which can’t be obtained merely by becoming more efficient.",
+          "zh": "小说家兼评论家蒂姆·帕克斯（Tim Parks）写道，现代人的思想“压倒性地倾向于交流......这不仅仅是一个人被打断了，而是一个人实际上倾向于打断。”深度阅读不仅需要时间，而且需要一种特殊的时间，这种时间不能仅仅通过提高效率来获得。",
+          "provider": "transmart-sentence",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "611e156fb945f0be",
+          "en": "In fact, “becoming more efficient” is part of the problem. Thinking of time as a resource to be maximised means you approach it instrumentally, judging any given moment as well spent only in so far as it advances progress toward some goal. Immersive reading, by contrast, depends on being willing to risk inefficiency, goallessness, even time-wasting. Try to slot it in as a to-do list item and you’ll manage only goal-focused reading—useful, sometimes, but not the most fulfilling kind. “The future comes at us like empty bottles along an unstoppable and nearly infinite conveyor belt,” writes Gary Eberle in his book Sacred Time, and “we feel a pressure to fill these different-sized bottles (days, hours, minutes) as they pass, for if they get by without being filled, we will have wasted them.” No mind-set could be worse for losing yourself in a book.",
+          "zh": "事实上，“变得更有效率”是问题的一部分。把时间看作是一种可以最大化的资源，意味着你要用工具的方式来对待它，只有在它朝着某个目标前进的过程中，你才能判断任何给定的时刻是否值得利用。相比之下，沉浸式阅读取决于你愿意冒着效率低下、目标不明确、甚至是浪费时间。试着把它作为一个待办事项列在清单上，你只能做到以目标为中心的阅读--有时是有用的，但不是最有成就感的那种。“未来就像空瓶子一样沿着一条不可阻挡的、几乎无限的传送带向我们走来，“加里埃伯利在他的著作《神圣的时间》中写道，“我们感到有一种压力，要在这些不同大小的瓶子（天、小时、分钟）流逝时把它们装满，因为如果它们没有被装满，我们就浪费了它们。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "82b166b1fddf4083",
+          "en": "So what does work? Perhaps surprisingly, scheduling regular times for reading. You’d think this might fuel the efficiency mind-set, but in fact, Eberle notes, such ritualistic behaviour helps us “step outside time’s flow” into “soul time.” You could limit distractions by reading only physical books, or on single-purpose e-readers. “Carry a book with you at all times” can actually work, too— providing you dip in often enough, so that reading becomes the default state from which you temporarily surface to take care of business, before dropping back down. On a really good day, it no longer feels as if you’re “making time to read,” but just reading, and making time for everything else.",
+          "zh": "那么，什么是有效的呢？也许令人惊讶的是，定期安排阅读的时间。你可能会认为这可能会助长效率思维，但事实上，埃伯利指出，这种仪式化的行为帮助我们“走出时间的流动”进入“灵魂的时间”。你可以通过只阅读实体书或单一用途的电子阅读器来限制分心。“随身携带一本书”实际上也可以起作用--只要你经常阅读，这样，阅读就成了你的默认状态，你会暂时从这个状态中浮出来处理事务，然后再回落下来。在一个真正美好的日子里，你不再觉得自己在“腾出时间来阅读”，而只是阅读，腾出时间做其他的事情。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2016 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "0713432a6ecb7a29",
+          "en": "Against a backdrop of drastic changes in economy and population structure, younger Americans are drawing a new 21st-century road map to success, a latest poll has found.",
+          "zh": "一项最新的民意调查发现，在经济和人口结构发生巨大变化的背景下，美国年轻人正在绘制一幅新的21世纪成功路线图。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "472427524a965cdc",
+          "en": "Across generational lines, Americans continue to prize many of the same traditional milestones of a successful life, including getting married, having children, owning a home, and retiring in their sixties. But while young and old mostly agree on what constitutes the finish line of a fulfilling life, they offer strikingly different paths for reaching it.",
+          "zh": "在不同的世代中，美国人仍然珍视成功生活中许多相同的传统里程碑，包括结婚、生子、拥有一套房子，以及在60多岁时退休。但是，尽管年轻人和老年人对什么是充实生活的终点线基本上是一致的，但他们为达到终点线提供了截然不同的道路。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "75371c6152a4b173",
+          "en": "Young people who are still getting started in life were more likely than older adults to prioritize personal fulfillment in their work, to believe they will advance their careers most by regularly changing jobs, to favor communities with more public services and a faster pace of life, to agree that couples should be financially secure before getting married or having children, and to maintain that children are best served by two parents working outside the home, the survey found. From career to community and family, these contrasts suggest that in the aftermath of the searing Great Recession, those just starting out in life are defining priorities and expectations that will increasingly spread through virtually all aspects of American life, from consumer preferences to housing patterns to politics. Young and old converge on one key point: Overwhelming majorities of both groups said they believe it is harder for young people today to get started in life than it was for earlier generations. While younger people are somewhat more optimistic than their elders about the prospects for those starting out today, big majorities in both groups believe those “just getting started in life” face a tougher climb than earlier generations in reaching such signpost achievements as securing a good-paying job, starting a family, managing debt, and finding affordable housing. Pete Schneider considers the climb tougher today. Schneider, a 27-year-old auto technician from the Chicago suburbs, says he struggled to find a job after graduating from college. Even now that he is working steadily, he said, “I can’t afford to pay my monthly mortgage payments on my own, so I have to rent rooms out to people to make that happen.” Looking back, he is struck that his parents could provide a comfortable life for their children even though neither had completed college when he was young. “I still grew up in an upper middle-class home with parents who didn’t have college degrees,” Schneider said. “I don’t think people are capable of that anymore.”",
+          "zh": "与老年人相比，生活仍处于起步阶段的年轻人更有可能在工作中优先考虑个人成就感，相信定期换工作会最大限度地促进职业发展，更喜欢拥有更多公共服务和更快生活节奏的社区，同意夫妇在结婚或生孩子之前应该有经济保障，调查发现，父母外出工作对孩子最有好处。从职业到社区和家庭，这些对比表明，在严重的大衰退之后，那些刚刚开始生活的人正在确定优先事项和期望，这些优先事项和期望将越来越多地渗透到美国生活的各个方面，从消费者偏好到住房模式再到政治。2年轻人和老年人都在一个关键点上汇合：这两个群体中的绝大多数人都表示，他们认为，与前几代人相比，今天的年轻人更难开始生活。虽然年轻人对今天开始的人的前景比他们的长辈更乐观，这两个群体中的绝大多数人都认为，那些“刚刚开始生活”的人在取得诸如获得良好的挣钱工作，组建家庭，管理债务，找到负担得起的住房。皮特·施耐德认为今天的攀登更加艰难。施耐德是一名来自芝加哥郊区的27岁的汽车技术员，他说他大学毕业后很难找到工作。即使现在他工作稳定，他说：“我自己也负担不起每月的抵押贷款，所以我不得不把房间租给别人来实现这一点。”回想起来，他感到震惊的是，他的父母可以为他们的孩子提供舒适的生活，尽管在他年轻的时候，他们都没有完成大学学业。“我仍然在一个中上层阶级的家庭长大，父母没有大学学位，施耐德说，“我认为人们再也做不到了。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    }
+  }
+}

@@ -14,6 +14,8 @@ const staticEntries = [
   "admin.html",
   "admin.js",
   "app.js",
+  "back-to-top.css",
+  "back-to-top.js",
   "cet4-writing-papers.js",
   "cet6-data",
   "cet6.css",
@@ -34,6 +36,7 @@ const staticEntries = [
   "deck-data.js",
   "exam-scores.css",
   "exam-scores.js",
+  "home-today.js",
   "index.html",
   "intensive-data",
   "intensive.css",
@@ -77,6 +80,9 @@ const staticEntries = [
   "shadow.css",
   "shadow.html",
   "shadow.js",
+  "site-nav.css",
+  "site-nav.js",
+  "site-theme.css",
   "speaking-engine.js",
   "speaking-ielts.js",
   "speaking-personas.js",
@@ -94,6 +100,7 @@ const staticEntries = [
   "vocab-index",
   "vocab-index.js",
   "vocab-index.json",
+  "vocab-library.js",
   "vocab-recite-api.js",
   "vocab.js",
   "writing-data",
@@ -102,6 +109,14 @@ const staticEntries = [
   "writing.html",
   "writing.js",
   "writing-templates.css",
+  // 考研英语作文高级表达语料库：独立模块页 + 结构化数据 + 原件 PDF
+  // （原件放在 materials/考研/作文模板/ 下，随 "materials" 一起进 public）。
+  "writing-corpus.html",
+  "writing-corpus.css",
+  "writing-corpus.js",
+  "writing-corpus-data.js",
+  // 封神之路 · 11408 学习档案：原仓库里就有的独立页面（iball.top/xxrj/），
+  // 2026-10-05 全量部署时被覆盖删除，此处补回并纳入 public 构建，避免继续丢内容。
   "xxrj",
   "materials",
 ];

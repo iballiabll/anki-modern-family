@@ -626,6 +626,7 @@ body.is-english-only .kaoyan-enrichment {
   .kaoyan-pool-list,
   .kaoyan-enrichment,
   .kaoyan-segments,
+  .passage-structure,
   .kaoyan-writing-grid {
     margin-right: 18px;
     margin-left: 18px;
@@ -651,6 +652,10 @@ body.is-english-only .kaoyan-enrichment {
   .kaoyan-enrichment {
     margin: 0 14px 16px;
     padding: 12px 13px;
+  }
+
+  .passage-structure {
+    margin: 0 14px 16px;
   }
 
   .kaoyan-segments,
@@ -940,6 +945,93 @@ body.is-english-only .kaoyan-enrichment {
 }
 
 /* ------------------------------------------------- 翻译逐句精读卡片 */
+
+/* ------------------------------------------- 阅读篇章段落结构定位（机读） */
+
+.passage-structure {
+  margin: 0 26px 18px;
+  overflow: hidden;
+  background: #f7f8fa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.passage-structure-summary {
+  padding: 10px 13px;
+  color: var(--forest-deep);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  list-style: none;
+}
+
+.passage-structure-summary::-webkit-details-marker {
+  display: none;
+}
+
+.passage-structure-body {
+  padding: 0 13px 13px;
+  display: grid;
+  gap: 7px;
+  border-top: 1px solid #e6e7ee;
+}
+
+.passage-structure-row {
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.passage-structure-no {
+  padding: 1px 7px;
+  color: #555b71;
+  background: #edeef3;
+  border: 1px solid #d6d8e2;
+  border-radius: 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.passage-structure-cues {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.passage-structure-cue {
+  padding: 2px 7px;
+  color: #6a4d0b;
+  background: #faefd3;
+  border: 1px solid #ead69f;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.passage-structure-none {
+  color: #949aa8;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.passage-structure-words {
+  color: #8a681e;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.passage-structure-note {
+  margin: 2px 0 0;
+  color: #838795;
+  font-size: 10.5px;
+  line-height: 1.7;
+}
 
 .kaoyan-segments > .translation-machine-note {
   margin: 0;

@@ -1,10 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "redirects": [
-    { "source": "/yantu", "destination": "/xxrj/", "permanent": true },
-    { "source": "/yantu/(.*)", "destination": "/xxrj/$1", "permanent": true }
-  ],
   "headers": [
     {
       "source": "/materials/(.*)",

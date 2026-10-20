@@ -14,30 +14,45 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260927-embed1" />
+    <script>
+      /*
+       * 登录壳预判：当天已经登录过的设备，返回首页时先挂上 appView 外壳，
+       * 等会话探测结束后再渲染真实数据，避免登录页在返回瞬间闪出来。
+       * 标记由 app.js 在登录成功 / 认证通过时写入。
+       */
+      (function () {
+        try {
+          var now = new Date();
+          var stamp = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0"),
+          ].join("-");
+          if (window.localStorage.getItem("iball:auth-day") === stamp) {
+            document.documentElement.classList.add("auth-resume");
+          }
+        } catch (error) {
+          // 隐私模式下读不到 localStorage 时保持默认登录页。
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="./styles.css?v=20261005-ui10" />
     <link rel="stylesheet" href="./speech-transport.css?v=20260925-perf1" />
-    <script src="./account-store.js?v=20260925-perf1" defer></script>
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
     <script src="./speech-transport.js?v=20260925-perf1" defer></script>
     <script src="./deck-data.js?v=20260925-perf1" defer></script>
     <script src="./vocab-index.js?v=20260925-perf1" defer></script>
     <script src="./session-guard.js?v=20260925-perf1" defer></script>
-    <script src="./app.js?v=20260927-embed1" defer></script>
-  </head>
+    <script src="./app.js?v=20261005-ui10" defer></script>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body>
-    <div
-      id="welcomeOverlay"
-      class="welcome-overlay"
-      hidden
-      role="status"
-      aria-live="polite"
-    >
-      <div class="welcome-inner">
-        <span class="welcome-eyebrow">IBALL'S LISTENING CABIN</span>
-        <strong class="welcome-title">欢迎光临 iball 的小屋</strong>
-        <span class="welcome-sub">小屋的灯已经点亮，慢慢进来就好。</span>
-      </div>
-    </div>
-
     <section id="loginView" class="login-view" aria-labelledby="loginTitle">
       <div class="login-shell">
         <div class="login-story">
@@ -61,7 +76,7 @@
 
         <div class="login-panel">
           <div>
-            <p id="authKicker" class="panel-kicker">欢迎回来</p>
+            <p id="authKicker" class="panel-kicker">账号登录</p>
             <h2 id="authTitle">进入小屋</h2>
             <p id="authCopy" class="panel-copy">
               使用账号密码继续你的听力词汇复习。
@@ -330,6 +345,82 @@
       </aside>
 
       <main class="workspace">
+        <!-- Astra「今天」首屏：真实数据来自本机最近打开，不伪造热度或打卡 -->
+        <section
+          id="todayBand"
+          class="today-band"
+          aria-labelledby="todayBandTitle"
+        >
+          <div class="today-band-head">
+            <p id="todayBandDate" class="today-band-date">今天</p>
+            <button
+              id="todayBandToggle"
+              class="today-band-toggle"
+              type="button"
+              aria-expanded="true"
+              aria-controls="todayBandBody"
+            >
+              收起
+            </button>
+          </div>
+          <h2 id="todayBandTitle" class="today-band-title">
+            今天，从这里继续。
+          </h2>
+          <p class="today-band-copy">
+            一篇文章，一些新词，按自己的节奏来。
+          </p>
+          <div id="todayBandBody" class="today-band-body">
+            <div class="today-band-grid">
+              <div class="today-resume">
+                <p class="today-resume-label">继续上次学习</p>
+                <p id="todayResumeTitle" class="today-resume-title">
+                  从一篇材料开始
+                </p>
+                <p id="todayResumeNote" class="today-resume-note">
+                  还没有打开记录，从下面任意一处开始都可以。
+                </p>
+                <div class="today-resume-actions">
+                  <a
+                    id="todayResumeButton"
+                    class="today-resume-button"
+                    href="./periodical.html"
+                  >
+                    开始精读
+                  </a>
+                  <a class="today-link-plain" href="#resourceList">
+                    查看全部素材
+                  </a>
+                </div>
+              </div>
+              <div class="today-quick">
+                <p class="today-quick-title">接着做点什么</p>
+                <a class="today-quick-row" href="./review.html">
+                  <span>复习任务</span>
+                  <span>打开 →</span>
+                </a>
+                <a class="today-quick-row" href="./vocab.html?library=1">
+                  <span>我的词书</span>
+                  <span>打开 →</span>
+                </a>
+                <a class="today-quick-row" href="./quiz.html">
+                  <span>单词测试</span>
+                  <span>进入 →</span>
+                </a>
+                <p class="today-quick-note">
+                  待复习数量以复习引擎算出的队列为准；队列未载入时不显示数字。
+                </p>
+              </div>
+            </div>
+            <div class="today-recent">
+              <div class="today-recent-head">
+                <strong>本机最近打开</strong>
+                <a class="today-link-plain" href="#resourceList">全部素材 →</a>
+              </div>
+              <div id="todayRecentList" class="today-recent-list"></div>
+            </div>
+          </div>
+        </section>
+
         <header class="workspace-header">
           <div class="workspace-title">
             <button

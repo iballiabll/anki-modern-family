@@ -1,0 +1,270 @@
+{
+  "note": "作文高分短语与固定搭配，本站按功能分类原创整理；例句为本站编写的通用句式，不是真题原文，也不是官方范文。",
+  "updatedAt": "2026-09-29",
+  "levels": ["四级", "六级", "考研"],
+  "groups": [
+    {
+      "id": "opening",
+      "title": "开头段：引出话题",
+      "intro": "开头只做两件事：把话题点出来，把立场亮出来。先用一个普遍现象起句，再用转折把焦点收窄到本题。",
+      "items": [
+        { "en": "in recent years", "zh": "近年来", "level": "四级", "slot": "时间状语，适合现象列举型开头", "example": "In recent years, an increasing number of students have turned to online courses." },
+        { "en": "it is widely acknowledged that", "zh": "人们普遍认为", "level": "六级", "slot": "引述共识，后面接完整句子", "example": "It is widely acknowledged that reading widely broadens the mind." },
+        { "en": "there is a growing concern over", "zh": "人们对……日益担忧", "level": "六级", "slot": "引出有争议的公共话题", "example": "There is a growing concern over the pressure on young graduates." },
+        { "en": "nothing is more important than", "zh": "没有什么比……更重要", "level": "四级", "slot": "强调式开头，适合比较型题目", "example": "Nothing is more important than a healthy balance between study and rest." },
+        { "en": "with the rapid development of", "zh": "随着……的快速发展", "level": "四级", "slot": "背景铺垫，后面接名词", "example": "With the rapid development of technology, online learning has become routine." },
+        { "en": "as is vividly shown in the picture", "zh": "如图中生动展示的那样", "level": "考研", "slot": "图画作文开头，承接图画描述", "example": "As is vividly shown in the picture, a young man is buried in his phone." },
+        { "en": "it goes without saying that", "zh": "不言而喻", "level": "六级", "slot": "开头亮明立场，语气正式", "example": "It goes without saying that a clear plan saves time." },
+        { "en": "nowadays more and more people tend to", "zh": "如今越来越多的人倾向于", "level": "四级", "slot": "描述趋势，后面接动词原形", "example": "Nowadays more and more people tend to shop through mobile apps." },
+        { "en": "the issue of ... has aroused wide discussion", "zh": "……问题引起了广泛讨论", "level": "考研", "slot": "引出热议话题，中间填名词", "example": "The issue of exam pressure has aroused wide discussion among parents." },
+        { "en": "when it comes to", "zh": "谈到……", "level": "四级", "slot": "引出话题的过渡开头，后面接名词或动名词", "example": "When it comes to choosing a career, personal interest matters a lot." }
+      ]
+    },
+    {
+      "id": "describing",
+      "title": "图表与图画：描述数据",
+      "intro": "图表作文不写数字堆砌，写趋势和对比。一句话说清什么在变、变得快不快，再点出对比项。",
+      "items": [
+        { "en": "account for", "zh": "占据……比例；解释", "level": "四级", "slot": "后接百分比，描述占比", "example": "Part-time jobs account for nearly a third of their income." },
+        { "en": "see a sharp rise in", "zh": "在……方面急剧上升", "level": "六级", "slot": "描述增长趋势，主语用时间或地点", "example": "The city has seen a sharp rise in bike sharing." },
+        { "en": "witness a steady decline in", "zh": "在……方面持续下降", "level": "六级", "slot": "描述下降趋势，语气客观", "example": "The town witnessed a steady decline in water use." },
+        { "en": "remain almost unchanged", "zh": "几乎保持不变", "level": "四级", "slot": "描述平稳数据", "example": "The number of readers remained almost unchanged last year." },
+        { "en": "in sharp contrast to", "zh": "与……形成鲜明对比", "level": "考研", "slot": "对比两组数据或两种情况", "example": "In sharp contrast to last year, paper sales dropped by half." },
+        { "en": "twice as many as", "zh": "是……的两倍", "level": "四级", "slot": "倍数比较，注意接可数名词", "example": "The library received twice as many visitors as the year before." },
+        { "en": "the proportion of ... stands at", "zh": "……的比例为", "level": "六级", "slot": "汇报具体百分比", "example": "The proportion of female engineers stands at 38 percent." },
+        { "en": "there has been a marked increase in", "zh": "……明显增加", "level": "六级", "slot": "现在完成时描述已完成的变化", "example": "There has been a marked increase in online lectures." },
+        { "en": "be roughly equal to", "zh": "大致等于", "level": "四级", "slot": "描述相近数值，避免绝对化", "example": "The two groups are roughly equal to each other in size." },
+        { "en": "the figure for ... is slightly higher than that for", "zh": "……的数字比……略高", "level": "考研", "slot": "图表作文精确比较", "example": "The figure for urban families is slightly higher than that for rural ones." }
+      ]
+    },
+    {
+      "id": "opinion",
+      "title": "表达观点与立场",
+      "intro": "观点句一句就够，位置放在首段末或第二段首。写完立场，后面必须有理由接住，别让观点悬空。",
+      "items": [
+        { "en": "from my perspective", "zh": "在我看来", "level": "四级", "slot": "亮明个人观点，后接完整句", "example": "From my perspective, the rule is reasonable but too strict." },
+        { "en": "I am firmly convinced that", "zh": "我坚信", "level": "六级", "slot": "强立场，适合议论文", "example": "I am firmly convinced that honesty pays in the long run." },
+        { "en": "as far as I am concerned", "zh": "就我而言", "level": "四级", "slot": "个人立场，语气中性", "example": "As far as I am concerned, teamwork matters more than talent." },
+        { "en": "it is reasonable to argue that", "zh": "有理由认为", "level": "考研", "slot": "论证型立场，比 in my opinion 更正式", "example": "It is reasonable to argue that part-time work trains independence." },
+        { "en": "I side with those who believe that", "zh": "我支持那些认为……的人", "level": "考研", "slot": "立场表态，后接完整句", "example": "I side with those who believe that effort outweighs luck." },
+        { "en": "in my eyes", "zh": "在我眼里", "level": "四级", "slot": "偏口语的立场表达", "example": "In my eyes, a good teacher listens first." },
+        { "en": "this view deserves serious consideration", "zh": "这一观点值得认真考虑", "level": "考研", "slot": "评价他人观点，适合讨论型作文", "example": "This view deserves serious consideration before we make a decision." },
+        { "en": "I can hardly agree with the idea that", "zh": "我很难认同……这一观点", "level": "六级", "slot": "反对型立场，后面必须给理由", "example": "I can hardly agree with the idea that money decides success." }
+      ]
+    },
+    {
+      "id": "reasons",
+      "title": "原因段：解释为什么会这样",
+      "intro": "原因段最忌一句话一个原因。用两种句式把原因分层：直接原因用 contribute to，根本原因用 stem from。",
+      "items": [
+        { "en": "contribute to", "zh": "促成；有助于", "level": "四级", "slot": "中性或正面原因，后接名词或动名词", "example": "Regular exercise contributes to better sleep." },
+        { "en": "give rise to", "zh": "引起；导致", "level": "六级", "slot": "多接负面结果", "example": "Long delays gave rise to widespread complaints." },
+        { "en": "stem from", "zh": "源于", "level": "六级", "slot": "追溯根本原因", "example": "Much of the anxiety stems from unrealistic expectations." },
+        { "en": "be attributed to", "zh": "归因于", "level": "考研", "slot": "客观归因，学术感强", "example": "The improvement can be attributed to better planning." },
+        { "en": "out of curiosity", "zh": "出于好奇", "level": "四级", "slot": "动机类原因", "example": "Many students try new apps out of curiosity." },
+        { "en": "under enormous pressure", "zh": "在巨大压力下", "level": "六级", "slot": "情境类原因，常放句首", "example": "Under enormous pressure, some students skip breakfast." },
+        { "en": "lack of", "zh": "缺乏", "level": "四级", "slot": "后接名词，说明缺失项", "example": "A lack of sleep weakens memory." },
+        { "en": "have much to do with", "zh": "与……有很大关系", "level": "四级", "slot": "相关性表述，不作因果断言", "example": "Their progress has much to do with daily practice." },
+        { "en": "on the grounds that", "zh": "理由是", "level": "考研", "slot": "正式论证原因，后接句子", "example": "The school changed the rule on the grounds that safety comes first." },
+        { "en": "this is partly because", "zh": "部分原因是", "level": "六级", "slot": "引出多因之一，避免绝对", "example": "This is partly because information spreads much faster now." }
+      ]
+    },
+    {
+      "id": "examples",
+      "title": "举例与引用",
+      "intro": "例子的作用是把抽象理由落地。一个具体场景胜过三句空话，但不要编造精确到小数点的假数据。",
+      "items": [
+        { "en": "take ... as an example", "zh": "以……为例", "level": "四级", "slot": "举例标志，中间填名词短语", "example": "Take my roommate as an example; he improved his writing in three months." },
+        { "en": "a case in point is", "zh": "一个恰当的例子是", "level": "六级", "slot": "后接名词或句子", "example": "A case in point is the rise of mobile payment." },
+        { "en": "according to a recent survey", "zh": "根据最近的一项调查", "level": "四级", "slot": "引出数据，不要编造过细结论", "example": "According to a recent survey, most freshmen worry about time management." },
+        { "en": "as the saying goes", "zh": "常言道", "level": "四级", "slot": "引出谚语或俗语", "example": "As the saying goes, practice makes perfect." },
+        { "en": "it is not uncommon for", "zh": "……并不少见", "level": "六级", "slot": "描述普遍现象，后接人加不定式", "example": "It is not uncommon for students to stay up before exams." },
+        { "en": "this is well illustrated by", "zh": "这一点在……中得到很好的说明", "level": "考研", "slot": "举例论证，后面接名词", "example": "This is well illustrated by the growth of online libraries." },
+        { "en": "history offers a telling example", "zh": "历史提供了有说服力的例子", "level": "考研", "slot": "引出历史类论据", "example": "History offers a telling example of how teamwork built great projects." },
+        { "en": "consider the case of", "zh": "想想……的情况", "level": "六级", "slot": "引导读者设想具体场景", "example": "Consider the case of a student who studies alone all day." }
+      ]
+    },
+    {
+      "id": "emphasis",
+      "title": "强调与递进",
+      "intro": "强调句用在段中最关键的那一句，一段最多一次。用多了反而没有重点。",
+      "items": [
+        { "en": "what matters most is", "zh": "最重要的是", "level": "四级", "slot": "强调核心，后接名词或从句", "example": "What matters most is whether you keep going." },
+        { "en": "more importantly", "zh": "更重要的是", "level": "四级", "slot": "递进，置于句首或插入", "example": "More importantly, the habit lasts a lifetime." },
+        { "en": "it is ... that ...", "zh": "正是……", "level": "考研", "slot": "强调句型，中间放被强调成分", "example": "It is daily practice that makes the difference." },
+        { "en": "not merely ... but also ...", "zh": "不仅……而且……", "level": "六级", "slot": "递进，注意两端结构对称", "example": "Reading is not merely a habit but also a way of thinking." },
+        { "en": "above all", "zh": "首先；首要的是", "level": "四级", "slot": "强调优先级", "example": "Above all, be honest with your readers." },
+        { "en": "let alone", "zh": "更不用说", "level": "六级", "slot": "否定句后的递进", "example": "He cannot finish one book, let alone ten." },
+        { "en": "far from being", "zh": "远非", "level": "考研", "slot": "否定并纠正误解，后接名词", "example": "Far from being a waste of time, review saves time." },
+        { "en": "this is precisely why", "zh": "这正是……的原因", "level": "考研", "slot": "承接推理后下结论", "example": "This is precisely why we need a clear schedule." }
+      ]
+    },
+    {
+      "id": "contrast",
+      "title": "对比与让步",
+      "intro": "先让一步再转折，是议论文最稳的写法。让步句承认对方合理之处，转折句给出自己的判断。",
+      "items": [
+        { "en": "on the one hand ... on the other hand", "zh": "一方面……另一方面……", "level": "四级", "slot": "双面论述，注意两面都要写", "example": "On the one hand, phones help us study; on the other hand, they distract us." },
+        { "en": "admittedly", "zh": "诚然", "level": "六级", "slot": "先让步，下一句必须转折", "example": "Admittedly, the plan costs time at the start." },
+        { "en": "while it is true that", "zh": "虽然……是事实", "level": "考研", "slot": "让步从句，主句给转折", "example": "While it is true that talent helps, effort decides the result." },
+        { "en": "rather than", "zh": "而不是", "level": "四级", "slot": "对比选择，注意前后结构一致", "example": "We should plan the week rather than the day." },
+        { "en": "in spite of", "zh": "尽管", "level": "四级", "slot": "后接名词或动名词", "example": "In spite of the rain, the reading room was full." },
+        { "en": "there is no denying that", "zh": "不可否认", "level": "六级", "slot": "先承认事实再转折", "example": "There is no denying that mistakes are part of learning." },
+        { "en": "nevertheless", "zh": "然而", "level": "六级", "slot": "句间转折副词，需与前句形成对照", "example": "The task is hard; nevertheless, it is worth doing." },
+        { "en": "by contrast", "zh": "相比之下", "level": "六级", "slot": "对比两组情况或数据", "example": "By contrast, the second group improved twice as fast." },
+        { "en": "whereas", "zh": "然而；反之", "level": "考研", "slot": "从句对比，前后必须平行", "example": "Some prefer debate, whereas others prefer quiet reading." },
+        { "en": "it does not follow that", "zh": "并不能由此认为", "level": "考研", "slot": "防止过度推论，后接句子", "example": "It does not follow that a higher price means better quality." }
+      ]
+    },
+    {
+      "id": "effects",
+      "title": "影响与结果",
+      "intro": "写影响要分时间层级：眼前结果用 result in，长期结果用 the long-term consequences of。",
+      "items": [
+        { "en": "have a profound impact on", "zh": "对……产生深远影响", "level": "六级", "slot": "影响类，后接名词", "example": "Social media has a profound impact on how teenagers read." },
+        { "en": "result in", "zh": "导致", "level": "四级", "slot": "后接结果，主语多为行为", "example": "Careless planning results in wasted time." },
+        { "en": "at the cost of", "zh": "以……为代价", "level": "六级", "slot": "代价表述，后接名词", "example": "He gained speed at the cost of accuracy." },
+        { "en": "the long-term consequences of", "zh": "……的长期后果", "level": "考研", "slot": "长期影响，后接名词", "example": "The long-term consequences of burning out are easy to underestimate." },
+        { "en": "improve one's efficiency", "zh": "提高效率", "level": "四级", "slot": "正面效果，主语多用方法或工具", "example": "A clear checklist improves your efficiency." },
+        { "en": "be bound to", "zh": "必然", "level": "六级", "slot": "推断结果，语气较强", "example": "Cut corners repeatedly, and the plan is bound to fail." },
+        { "en": "take a toll on", "zh": "对……造成损害", "level": "六级", "slot": "负面消耗，多接健康或精力", "example": "Late nights take a toll on your health." },
+        { "en": "bring about", "zh": "带来", "level": "四级", "slot": "中性，后接名词", "example": "Small habits bring about lasting change." },
+        { "en": "leave ... with little choice but to", "zh": "使……别无选择只能", "level": "考研", "slot": "被动后果，后接动词原形", "example": "The flood left the village with little choice but to rebuild." },
+        { "en": "the immediate effect is that", "zh": "直接的影响是", "level": "考研", "slot": "落脚到具体后果，后接句子", "example": "The immediate effect is that fewer students copy homework." }
+      ]
+    },
+    {
+      "id": "solutions",
+      "title": "建议段：怎么解决",
+      "intro": "建议段写两层：谁来做，怎么做。不要只写 should，否则整段是空的。",
+      "items": [
+        { "en": "take effective measures to", "zh": "采取有效措施", "level": "四级", "slot": "建议段起句，后接动词原形", "example": "The university should take effective measures to reduce plastic use." },
+        { "en": "raise public awareness of", "zh": "提高公众对……的意识", "level": "六级", "slot": "宣传教育类措施", "example": "Campaigns can raise public awareness of data privacy." },
+        { "en": "make full use of", "zh": "充分利用", "level": "四级", "slot": "资源利用类建议", "example": "Make full use of the library before you buy new books." },
+        { "en": "strike a balance between", "zh": "在……之间取得平衡", "level": "六级", "slot": "平衡类建议", "example": "Students should strike a balance between study and exercise." },
+        { "en": "set a good example for", "zh": "为……树立榜样", "level": "四级", "slot": "家庭与教育场景", "example": "Parents set a good example for their children." },
+        { "en": "keep a close eye on", "zh": "密切关注", "level": "六级", "slot": "监管类措施", "example": "Schools should keep a close eye on screen time." },
+        { "en": "be committed to", "zh": "致力于", "level": "六级", "slot": "后接名词或动名词", "example": "The city is committed to cutting carbon emissions." },
+        { "en": "give priority to", "zh": "优先考虑", "level": "考研", "slot": "排序型建议，后接名词", "example": "Give priority to the task that blocks others." },
+        { "en": "it is advisable to", "zh": "明智的做法是", "level": "四级", "slot": "温和建议，后接动词原形", "example": "It is advisable to review new words the next day." },
+        { "en": "only by working together can we", "zh": "只有共同努力我们才能", "level": "六级", "slot": "倒装句，收束建议段", "example": "Only by working together can we protect the river." }
+      ]
+    },
+    {
+      "id": "ending",
+      "title": "结尾段：总结与展望",
+      "intro": "结尾不写新观点。第一句收结论，第二句给条件或展望，两句话足够。",
+      "items": [
+        { "en": "in conclusion", "zh": "总之", "level": "四级", "slot": "结论段第一句", "example": "In conclusion, habits shape results." },
+        { "en": "to sum up", "zh": "概括来说", "level": "四级", "slot": "in conclusion 的同义替换", "example": "To sum up, the benefits outweigh the risks." },
+        { "en": "it is high time that", "zh": "是时候了", "level": "六级", "slot": "虚拟语气，后面用过去式", "example": "It is high time that we took rest seriously." },
+        { "en": "as long as", "zh": "只要", "level": "四级", "slot": "条件收束，后接句子", "example": "As long as you keep reading, progress will come." },
+        { "en": "pave the way for", "zh": "为……铺平道路", "level": "考研", "slot": "前瞻型结尾，后接名词", "example": "Today's practice paves the way for tomorrow's confidence." },
+        { "en": "only in this way can we", "zh": "只有这样我们才能", "level": "六级", "slot": "倒装结尾，承接前面的措施", "example": "Only in this way can we make study sustainable." },
+        { "en": "a bright future awaits those who", "zh": "美好的未来属于那些……的人", "level": "考研", "slot": "展望式结尾，后接句子", "example": "A bright future awaits those who keep learning." },
+        { "en": "there is every reason to believe that", "zh": "完全有理由相信", "level": "考研", "slot": "乐观收尾，后接句子", "example": "There is every reason to believe that the trend will continue." },
+        { "en": "the sooner we act, the better", "zh": "越早行动越好", "level": "四级", "slot": "紧迫型结尾", "example": "The sooner we act, the better our chances are." },
+        { "en": "let us start with small steps", "zh": "让我们从小事做起", "level": "四级", "slot": "呼吁型结尾", "example": "Let us start with small steps and see where they lead." }
+      ]
+    },
+    {
+      "id": "letters",
+      "title": "小作文：书信与通知常用表达",
+      "intro": "小作文看格式和礼貌层级。开头一句说明写信目的，结尾一句给联系方式或期待回复，中间才是内容。",
+      "items": [
+        { "en": "I am writing to", "zh": "我写信是为了", "level": "四级", "slot": "书信开头，后接动词原形", "example": "I am writing to apply for the position of campus guide." },
+        { "en": "I would appreciate it if you could", "zh": "如果您能……我将不胜感激", "level": "四级", "slot": "礼貌请求，后接动词原形", "example": "I would appreciate it if you could reply before Friday." },
+        { "en": "I am writing to express my sincere gratitude for", "zh": "我写信是为了对……表达诚挚的感谢", "level": "六级", "slot": "感谢信开头，后接名词", "example": "I am writing to express my sincere gratitude for your generous help." },
+        { "en": "I apologize for any inconvenience caused", "zh": "对由此造成的不便我深表歉意", "level": "六级", "slot": "道歉信，紧接说明原因", "example": "I apologize for any inconvenience caused by the delay." },
+        { "en": "please feel free to contact me at", "zh": "请随时通过……联系我", "level": "四级", "slot": "提供联系方式", "example": "Please feel free to contact me at 12345678." },
+        { "en": "I am looking forward to your reply", "zh": "期待您的回复", "level": "四级", "slot": "书信结尾礼貌用语", "example": "I am looking forward to your reply at your earliest convenience." },
+        { "en": "all are welcome to attend", "zh": "欢迎所有人参加", "level": "六级", "slot": "通知类结尾", "example": "All are welcome to attend the lecture on Friday evening." },
+        { "en": "I am writing to inform you that", "zh": "我写信是要通知您", "level": "六级", "slot": "通知正式开头，后接句子", "example": "I am writing to inform you that the meeting has been moved." },
+        { "en": "it would be a great honor for me to", "zh": "如能……我将深感荣幸", "level": "考研", "slot": "请求类正式表达", "example": "It would be a great honor for me to introduce the guest speaker." },
+        { "en": "I would like to make a suggestion regarding", "zh": "我想就……提个建议", "level": "考研", "slot": "建议信，后接名词", "example": "I would like to make a suggestion regarding the library hours." },
+        { "en": "your prompt attention to this matter would be highly appreciated", "zh": "如您能及时处理此事，不胜感激", "level": "考研", "slot": "正式催促，适合投诉或申请信", "example": "Your prompt attention to this matter would be highly appreciated." },
+        { "en": "please let me know if you need any further information", "zh": "如需更多信息请告知", "level": "六级", "slot": "结尾补充，后接句子", "example": "Please let me know if you need any further information about my application." }
+      ]
+    },
+    {
+      "id": "connectors",
+      "title": "衔接词链：让段落接得上",
+      "intro": "衔接词不是装饰，是逻辑标记。一段里最多两到三个，用多了会显得分不清主次。",
+      "items": [
+        { "en": "to begin with", "zh": "首先", "level": "四级", "slot": "列举第一层", "example": "To begin with, the cost is affordable." },
+        { "en": "what is more", "zh": "而且", "level": "四级", "slot": "递进补充", "example": "What is more, the plan is easy to follow." },
+        { "en": "in addition", "zh": "此外", "level": "四级", "slot": "补充并列信息", "example": "In addition, the app works offline." },
+        { "en": "as a result", "zh": "因此", "level": "四级", "slot": "承接因果关系", "example": "As a result, more students joined the club." },
+        { "en": "consequently", "zh": "因此；结果", "level": "六级", "slot": "偏正式的因果副词", "example": "Consequently, the number of readers doubled." },
+        { "en": "in other words", "zh": "换句话说", "level": "四级", "slot": "解释重述前句", "example": "In other words, the rule rewards consistency." },
+        { "en": "from a long-term perspective", "zh": "从长期来看", "level": "考研", "slot": "切换观察视角", "example": "From a long-term perspective, the change is worth the cost." },
+        { "en": "by the same token", "zh": "同样地", "level": "考研", "slot": "类比延伸，语气正式", "example": "By the same token, rest improves focus." },
+        { "en": "in the meantime", "zh": "与此同时", "level": "六级", "slot": "描述并行发生的事", "example": "In the meantime, teachers updated their lesson plans." },
+        { "en": "on the whole", "zh": "总体而言", "level": "六级", "slot": "阶段性归纳", "example": "On the whole, the experiment went smoothly." },
+        { "en": "that is to say", "zh": "也就是说", "level": "六级", "slot": "把前句说得更清楚", "example": "That is to say, the rule applies to everyone." },
+        { "en": "last but not least", "zh": "最后但同样重要的是", "level": "四级", "slot": "列举收尾", "example": "Last but not least, remember to proofread." }
+      ]
+    },
+    {
+      "id": "cet4-core",
+      "title": "四级高频动词搭配",
+      "intro": "这类搭配考的是介词，不是词义。写作时用错介词比用错单词更显眼，背的时候连着后面的词一起记。",
+      "items": [
+        { "en": "be good at", "zh": "擅长", "level": "四级", "slot": "后接名词或动名词", "example": "She is good at explaining difficult ideas." },
+        { "en": "be interested in", "zh": "对……感兴趣", "level": "四级", "slot": "固定介词 in", "example": "Many teenagers are interested in short videos." },
+        { "en": "take part in", "zh": "参加", "level": "四级", "slot": "强调参与活动", "example": "Over 300 students took part in the survey." },
+        { "en": "pay attention to", "zh": "注意", "level": "四级", "slot": "to 是介词，后接名词或动名词", "example": "Pay attention to the words in bold." },
+        { "en": "depend on", "zh": "取决于；依赖", "level": "四级", "slot": "褒贬由语境决定", "example": "The result depends on how you plan." },
+        { "en": "be responsible for", "zh": "对……负责", "level": "四级", "slot": "后接名词或动名词", "example": "Each member is responsible for one part." },
+        { "en": "get used to", "zh": "习惯于", "level": "四级", "slot": "to 后接名词或动名词", "example": "Freshmen soon get used to campus life." },
+        { "en": "look forward to", "zh": "期待", "level": "四级", "slot": "to 是介词，后接名词或动名词", "example": "I look forward to hearing from you." },
+        { "en": "make a difference", "zh": "起作用；有影响", "level": "四级", "slot": "可加 to 引出对象", "example": "Small efforts make a difference." },
+        { "en": "in charge of", "zh": "负责", "level": "四级", "slot": "前面接 be 动词", "example": "She is in charge of the reading club." },
+        { "en": "as a matter of fact", "zh": "事实上", "level": "四级", "slot": "转折过渡，纠正前文预期", "example": "As a matter of fact, the second plan is cheaper." },
+        { "en": "keep in touch with", "zh": "与……保持联系", "level": "四级", "slot": "书信类常用", "example": "We keep in touch with our teachers after graduation." },
+        { "en": "spend ... doing", "zh": "花时间做", "level": "四级", "slot": "spend 加时间加动名词", "example": "She spends an hour reading every night." },
+        { "en": "would rather ... than ...", "zh": "宁愿……而不愿……", "level": "四级", "slot": "两端接动词原形", "example": "I would rather walk than wait for the bus." }
+      ]
+    },
+    {
+      "id": "cet6-core",
+      "title": "六级与考研高频搭配",
+      "intro": "这一组是学术写作的骨架搭配，议论文里几乎每段都能用上一个。注意 to 是介词还是不定式符号。",
+      "items": [
+        { "en": "play an important role in", "zh": "在……中起重要作用", "level": "六级", "slot": "万能积极句，后接名词或动名词", "example": "Teamwork plays an important role in long projects." },
+        { "en": "attach importance to", "zh": "重视", "level": "六级", "slot": "to 后接名词", "example": "Schools attach importance to mental health." },
+        { "en": "be aware of", "zh": "意识到", "level": "六级", "slot": "后接名词，或用 that 从句", "example": "More people are aware of the risk of oversharing." },
+        { "en": "take ... into account", "zh": "把……考虑在内", "level": "六级", "slot": "中间填名词", "example": "We should take the cost into account." },
+        { "en": "give full play to", "zh": "充分发挥", "level": "六级", "slot": "正式表达，后接名词", "example": "The program gives full play to student creativity." },
+        { "en": "be exposed to", "zh": "接触；暴露于", "level": "六级", "slot": "后接名词", "example": "Children are exposed to advertisements every day." },
+        { "en": "make sense of", "zh": "理解", "level": "六级", "slot": "后接复杂信息类名词", "example": "It takes time to make sense of the data." },
+        { "en": "be faced with", "zh": "面临", "level": "六级", "slot": "后接名词，注意与 face 的区别", "example": "Graduates are faced with many choices." },
+        { "en": "have access to", "zh": "有机会获得", "level": "六级", "slot": "后接名词", "example": "Rural students now have access to online courses." },
+        { "en": "in terms of", "zh": "在……方面", "level": "六级", "slot": "限定比较维度", "example": "In terms of speed, the new system wins." },
+        { "en": "be subject to", "zh": "受制于；须经", "level": "考研", "slot": "后接名词，多用于规则与条件", "example": "The schedule is subject to change." },
+        { "en": "shed light on", "zh": "阐明", "level": "考研", "slot": "学术写作，后接名词", "example": "The study sheds light on how habits form." },
+        { "en": "be prone to", "zh": "易于", "level": "考研", "slot": "后接名词或动名词", "example": "Beginners are prone to overplanning." },
+        { "en": "give an insight into", "zh": "使了解", "level": "考研", "slot": "后接名词", "example": "The interview gives an insight into campus life." }
+      ]
+    },
+    {
+      "id": "topic-collocations",
+      "title": "常考话题固定搭配",
+      "intro": "话题词要成组备：环保一组、科技一组、教育一组。考场上直接调用，比临场拼词稳得多。",
+      "items": [
+        { "en": "environmental protection", "zh": "环境保护", "level": "四级", "slot": "环保话题名词短语", "example": "Environmental protection starts with small habits." },
+        { "en": "sustainable development", "zh": "可持续发展", "level": "六级", "slot": "发展类话题", "example": "The city is working toward sustainable development." },
+        { "en": "climate change", "zh": "气候变化", "level": "六级", "slot": "环保话题", "example": "Climate change affects farming seasons." },
+        { "en": "technological innovation", "zh": "技术创新", "level": "六级", "slot": "科技话题", "example": "Technological innovation changed how we learn." },
+        { "en": "digital literacy", "zh": "数字素养", "level": "考研", "slot": "网络与教育话题", "example": "Digital literacy is now part of basic education." },
+        { "en": "mental health", "zh": "心理健康", "level": "六级", "slot": "健康话题", "example": "Schools are paying more attention to mental health." },
+        { "en": "work-life balance", "zh": "工作与生活的平衡", "level": "六级", "slot": "职场话题", "example": "A work-life balance keeps energy steady." },
+        { "en": "cultural heritage", "zh": "文化遗产", "level": "六级", "slot": "文化话题", "example": "Volunteers help protect cultural heritage." },
+        { "en": "public transport", "zh": "公共交通", "level": "四级", "slot": "城市话题", "example": "Public transport reduces traffic pressure." },
+        { "en": "lifelong learning", "zh": "终身学习", "level": "考研", "slot": "教育话题", "example": "Lifelong learning keeps skills fresh." },
+        { "en": "online privacy", "zh": "网络隐私", "level": "考研", "slot": "网络话题", "example": "Online privacy deserves clear rules." },
+        { "en": "food safety", "zh": "食品安全", "level": "四级", "slot": "社会话题", "example": "Food safety requires strict inspection." }
+      ]
+    }
+  ]
+}

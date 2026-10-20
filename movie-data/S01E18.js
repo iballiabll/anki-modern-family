@@ -5,7 +5,7 @@
   "title": "Modern Family S01E18",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E18 Starry Night.��Ӣ.ass",
+  "source": "Modern Family S01E18 Starry Night.中英.ass",
   "blockCount": 467,
   "wordCount": 0,
   "vocabCount": 824,

@@ -5,7 +5,7 @@
   "title": "Modern Family S01E20",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E20 Benched.��Ӣ.ass",
+  "source": "Modern Family S01E20 Benched.中英.ass",
   "blockCount": 491,
   "wordCount": 0,
   "vocabCount": 832,

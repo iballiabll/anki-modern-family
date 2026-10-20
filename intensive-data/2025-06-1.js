@@ -5,7 +5,7 @@
     "title": "2025 年 6 月四级听力第 1 套",
     "subtitle": "逐段对照翻译、固定搭配、出题点提醒，逐题作答验证并给出定位与排除解析。",
     "sourceUrl": "https://english-exam.lazynote.cn/cet4/sections/listening/2025-06-1/",
-    "generatedAt": "2026-09-17",
+    "generatedAt": "2026-10-10",
     "pieceCount": 8,
     "paragraphCount": 51,
     "grammarCount": 34,

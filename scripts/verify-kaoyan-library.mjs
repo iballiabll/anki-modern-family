@@ -4,6 +4,7 @@
  * Usage:
  *   node scripts/verify-kaoyan-library.mjs           # verify generated data
  *   node scripts/verify-kaoyan-library.mjs --rebuild # run the builder first
+ *   node scripts/verify-kaoyan-library.mjs --require-translations # 阅读每段都要有译文
  *
  * Exits with a non-zero code when any paper fails a structural check, so the
  * result can be used as an acceptance gate instead of eyeballing the report.
@@ -24,6 +25,7 @@ for (let year = 2010; year <= 2026; year += 1) {
   EXPECTED_YEARS.push(year);
 }
 const OPTION_KEYS = ["A", "B", "C", "D"];
+const REQUIRE_TRANSLATIONS = process.argv.includes("--require-translations");
 
 function loadScript(relativePath, globalName) {
   const sandbox = { window: {} };
@@ -44,6 +46,8 @@ const stats = {
   options: 0,
   references: 0,
   paragraphs: 0,
+  translatedParagraphs: 0,
+  missingTranslations: 0,
   writingParts: 0,
 };
 const seen = new Set();
@@ -120,6 +124,26 @@ function checkReading(paperId, section) {
     `${section.label} 题量为 ${questions.length}，应为 4-5`,
   );
   questions.forEach((question) => checkQuestion(paperId, section, question, 4));
+
+  // 整段参考译文必须与正文逐段对齐，缺译文允许留空，错位则视为构建错误。
+  const translations = Array.isArray(section.paragraphTranslations)
+    ? section.paragraphTranslations
+    : [];
+  requireValue(
+    paperId,
+    translations.length === paragraphs.length,
+    `${section.label} 段落译文 ${translations.length} 条与正文 ${paragraphs.length} 段不对齐`,
+  );
+  translations.forEach((item, index) => {
+    if (String(item || "").trim()) {
+      stats.translatedParagraphs += 1;
+      return;
+    }
+    stats.missingTranslations += 1;
+    if (REQUIRE_TRANSLATIONS) {
+      fail(paperId, `${section.label} 第 ${index + 1} 段缺少整段参考译文`);
+    }
+  });
 }
 
 function checkCloze(paperId, section) {
@@ -318,6 +342,9 @@ console.log(
 );
 console.log(
   `正文段落：${stats.paragraphs} 段 ｜ 作文题目：${stats.writingParts} 个`,
+);
+console.log(
+  `阅读整段参考译文：${stats.translatedParagraphs} 段已配 ｜ ${stats.missingTranslations} 段留空`,
 );
 
 if (failures.length) {

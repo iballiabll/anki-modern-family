@@ -15,8 +15,14 @@
  * 语料里的 Echo 内容是非官方学习材料，输出时原样保留并单独标注。
  *
  * 找不到语料时只提示并保留已有产物，不阻塞整站构建。
+ *
+ * 阅读整段参考译文单独存放在 kaoyan-reading-notes/<track>-<year>.json
+ * （由 scripts/generate-kaoyan-reading-notes.mjs 生成），构建时按段落文本
+ * hash 对齐后写进阅读 section 的 paragraphTranslations 字段；译稿缺失或
+ * 语料已变动时逐段留空，不阻塞构建。
  */
 
+import crypto from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,6 +31,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = path.join(root, "kaoyan-data");
 const reportPath = path.join(outputRoot, "build-report.json");
 const generatedAt = new Date().toISOString().slice(0, 10);
+const readingNotesRoot = process.env.KAOYAN_READING_NOTES_DIR
+  ? path.resolve(process.env.KAOYAN_READING_NOTES_DIR)
+  : path.join(root, "kaoyan-reading-notes");
 
 const TRACKS = [
   { id: "english-i", label: "英语一", short: "英一" },
@@ -941,12 +950,86 @@ function validateSection(section, sectionId) {
   return warnings;
 }
 
+/* ------------------------------------------- 阅读整段参考译文（机器初稿） */
+
+/**
+ * 与 scripts/generate-kaoyan-reading-notes.mjs 的 collapse/hash 保持一致，
+ * 两边算法一旦不同，译文会被判为过期。
+ */
+function collapseForTranslation(text) {
+  return String(text || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
+
+function paragraphHash(text) {
+  return crypto
+    .createHash("sha1")
+    .update(collapseForTranslation(text))
+    .digest("hex")
+    .slice(0, 16);
+}
+
+async function readReadingNotes(track, year) {
+  const filePath = path.join(readingNotesRoot, `${track}-${year}.json`);
+  try {
+    const parsed = JSON.parse(await fs.readFile(filePath, "utf8"));
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 把译稿按段落位置对齐到正文。hash 不一致说明语料改过，该段译文作废，
+ * 留空而不是把旧译文贴到新段落上。
+ */
+function alignReadingTranslations(section, notes) {
+  const paragraphs = Array.isArray(section.paragraphs) ? section.paragraphs : [];
+  const stored = notes?.sections?.[section.section]?.paragraphs;
+  const translations = paragraphs.map(() => "");
+  if (!Array.isArray(stored)) {
+    return { translations, provider: "", stale: 0, missing: paragraphs.length };
+  }
+  let stale = 0;
+  let filled = 0;
+  paragraphs.forEach((text, index) => {
+    const item = stored[index];
+    if (!item || typeof item !== "object") {
+      return;
+    }
+    const unchanged = item.hash
+      ? item.hash === paragraphHash(text)
+      : collapseForTranslation(item.en) === collapseForTranslation(text);
+    if (!unchanged) {
+      stale += 1;
+      return;
+    }
+    const zh = String(item.zh || "").trim();
+    if (!zh) {
+      return;
+    }
+    translations[index] = zh;
+    filled += 1;
+  });
+  return {
+    translations,
+    provider: filled ? String(notes?.provider || "machine") : "",
+    stale,
+    missing: paragraphs.length - filled,
+  };
+}
+
 async function buildPaper(track, year, corpusRoot) {
   const directory = path.join(corpusRoot, track, String(year));
   const answersFile = await readJson(path.join(directory, "answers.json"), {});
   const answerMap = answersFile.answers || {};
   const meta = await readJson(path.join(directory, "meta.json"), {});
   const questionMap = await readJson(path.join(directory, "question-map.json"), {});
+  const readingNotes = await readReadingNotes(track, year);
   const reportedSections = Array.isArray(meta.sections) ? meta.sections : SECTION_ORDER;
   const trackInfo = TRACKS.find((item) => item.id === track);
   const sections = [];
@@ -973,6 +1056,13 @@ async function buildPaper(track, year, corpusRoot) {
             { sectionId, questionMap, enrichment },
           );
     const writingParts = metaInfo.kind === "writing" ? parseWriting(main) : [];
+    const readingTranslation =
+      metaInfo.kind === "reading"
+        ? alignReadingTranslations(
+            { section: sectionId, paragraphs: parsed.paragraphs || [] },
+            readingNotes,
+          )
+        : null;
 
     const section = {
       ...metaInfo,
@@ -983,6 +1073,11 @@ async function buildPaper(track, year, corpusRoot) {
       }`,
       directions: parsed.directions || [],
       paragraphs: parsed.paragraphs || [],
+      paragraphTranslations: readingTranslation?.translations || [],
+      translationProvider: readingTranslation?.provider || "",
+      translationNotice: readingTranslation?.provider
+        ? "逐段中文参考译文为公开翻译接口生成的机器初稿（非官方），仅用于对照理解。"
+        : "",
       segmentParagraphs: parsed.segmentParagraphs || [],
       segments: parsed.segments || [],
       options: parsed.options || [],
@@ -1004,6 +1099,11 @@ async function buildPaper(track, year, corpusRoot) {
       ),
     };
     warnings.push(...validateSection(section, sectionId).map((item) => `${sectionId}：${item}`));
+    if (readingTranslation?.stale) {
+      warnings.push(
+        `${sectionId}：${readingTranslation.stale} 段译文与当前语料 hash 不一致已作废，请重跑 scripts/generate-kaoyan-reading-notes.mjs`,
+      );
+    }
     // question-map.json 说这一题归属本篇、语料却没有题干：2025 英语二 Text 3
     // 曾因漏号（32 后直接跳到 34）踩过这里，这里显式报警，不再静默放过。
     const ownedNumbers = Object.entries(questionMap || {})
@@ -1027,6 +1127,14 @@ async function buildPaper(track, year, corpusRoot) {
   const stats = {
     sections: sections.length,
     paragraphs: sections.reduce((total, section) => total + section.paragraphs.length, 0),
+    readingParagraphs: sections
+      .filter((section) => section.kind === "reading")
+      .reduce((total, section) => total + section.paragraphs.length, 0),
+    translatedParagraphs: sections.reduce(
+      (total, section) =>
+        total + (section.paragraphTranslations || []).filter((item) => item).length,
+      0,
+    ),
     questions: sections.reduce((total, section) => total + section.questions.length, 0),
     words: sections.reduce((total, section) => total + section.wordCount, 0),
     enrichment: sections.reduce((total, section) => total + section.enrichment.length, 0),
@@ -1111,6 +1219,8 @@ for (const track of TRACKS) {
         label: section.label,
         shortLabel: section.shortLabel,
         paragraphs: section.paragraphs.length,
+        translatedParagraphs: (section.paragraphTranslations || []).filter((item) => item)
+          .length,
         questions: section.questions.length,
         enrichment: section.enrichment.length,
       })),
@@ -1146,7 +1256,13 @@ console.log(
   `已生成 ${index.length} 套考研试卷，共 ${index.reduce(
     (total, paper) => total + paper.stats.questions,
     0,
-  )} 道题、${index.reduce((total, paper) => total + paper.stats.words, 0)} 个英文词。`,
+  )} 道题、${index.reduce((total, paper) => total + paper.stats.words, 0)} 个英文词、阅读整段参考译文 ${index.reduce(
+    (total, paper) => total + (paper.stats.translatedParagraphs || 0),
+    0,
+  )}/${index.reduce(
+    (total, paper) => total + (paper.stats.readingParagraphs || 0),
+    0,
+  )} 段。`,
 );
 if (report.warnings.length) {
   console.warn(`有 ${report.warnings.length} 条解析提示，详见 kaoyan-data/build-report.json`);

@@ -5,7 +5,7 @@
   "title": "Modern Family S01E12",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E12 Not in My House.��Ӣ.ass",
+  "source": "Modern Family S01E12 Not in My House.中英.ass",
   "blockCount": 477,
   "wordCount": 0,
   "vocabCount": 850,

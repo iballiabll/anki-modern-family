@@ -99,14 +99,7 @@ const PRIVATE_FILES = new Set([
   "/vercel.json",
 ]);
 
-/**
- * 老地址永久跳转：学习档案页从 /yantu/ 改名成 /xxrj/。线上由 vercel.json
- * 的 redirects 负责，本地开发服务器和自建服务器走这里，保证行为一致。
- */
-const LEGACY_REDIRECTS = [
-  [/^\/yantu\/?$/, () => "/xxrj/"],
-  [/^\/yantu\/(.+)$/, (rest) => `/xxrj/${rest}`],
-];
+const LEGACY_REDIRECTS = [];
 
 export function legacyRedirectTarget(pathname) {
   for (const [pattern, build] of LEGACY_REDIRECTS) {

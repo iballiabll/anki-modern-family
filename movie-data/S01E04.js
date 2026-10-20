@@ -5,7 +5,7 @@
   "title": "Modern Family S01E04",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E04 The Incident.��Ӣ.ass",
+  "source": "Modern Family S01E04 The Incident.中英.ass",
   "blockCount": 509,
   "wordCount": 0,
   "vocabCount": 791,

@@ -47,7 +47,7 @@
           eyebrow: "CET-4 LISTENING",
           title: "四级听力全文精读",
           description:
-            "2022 至 2026 年四级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。",
+            "2015 至 2026 年四级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。",
           storagePrefix: "iball-intensive",
           papers: Array.isArray(window.IBALL_INTENSIVE_PAPERS)
             ? window.IBALL_INTENSIVE_PAPERS.slice()
@@ -72,6 +72,7 @@
 
   const state = {
     paperId: "",
+    pieceId: "",
     data: null,
     openRun: 0,
     lookupRun: 0,
@@ -620,6 +621,88 @@
     }
   }
 
+  function getPieceFromLocation() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("piece") || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function setPieceInLocation(pieceId, push) {
+    try {
+      const url = new URL(window.location.href);
+      if (pieceId) {
+        url.searchParams.set("piece", pieceId);
+      } else {
+        url.searchParams.delete("piece");
+      }
+      const next = `${url.pathname}${url.search}${url.hash}`;
+      if (push) {
+        window.history.pushState({ piece: pieceId }, "", next);
+      } else {
+        window.history.replaceState({ piece: pieceId }, "", next);
+      }
+    } catch {
+      // 地址栏更新失败不影响阅读。
+    }
+  }
+
+  // 浏览器返回 / 前进后，按试卷找回上次的阅读位置。
+  const scrollPositions = new Map();
+  // 加载新试卷时页面高度会先塌缩再撑开，期间产生的滚动事件不能写进记忆。
+  let scrollMemoryPaused = false;
+
+  function locationKey(params = new URLSearchParams(window.location.search)) {
+    return [params.get("paper") || "", params.get("piece") || ""].join("|");
+  }
+
+  function rememberScrollPosition() {
+    if (scrollMemoryPaused) {
+      return;
+    }
+    scrollPositions.set(locationKey(), window.scrollY);
+  }
+
+  function storedScrollPosition(params) {
+    const saved = scrollPositions.get(locationKey(params));
+    return typeof saved === "number" ? saved : null;
+  }
+
+  // 站点全局开了 scroll-behavior: smooth，恢复位置必须瞬时完成。
+  function scrollInstantly(top) {
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo({ top, behavior: "auto" });
+    root.style.scrollBehavior = previous;
+  }
+
+  // 切换篇目时直接落到这一篇的开头，不走长距离平滑滚动。
+  function scrollToPieceStart(pieceId) {
+    const target = pieceId
+      ? document.querySelector(`[data-piece-id="${CSS.escape(pieceId)}"]`)
+      : null;
+    if (!target) {
+      scrollInstantly(0);
+      return;
+    }
+    const top = target.getBoundingClientRect().top + window.scrollY - 12;
+    scrollInstantly(Math.max(0, top));
+  }
+
+  function restoreStoredScroll(params) {
+    const saved = storedScrollPosition(params);
+    if (saved === null) {
+      return false;
+    }
+    window.requestAnimationFrame(() => {
+      scrollInstantly(saved);
+    });
+    return true;
+  }
+
   function populatePaperSelect() {
     if (!elements.paperSelect) {
       return;
@@ -685,6 +768,7 @@
     }
 
     const run = ++state.openRun;
+    scrollMemoryPaused = true;
     showLoading(meta);
     stopSpeech();
     closeWordPanel();
@@ -700,11 +784,29 @@
       if (elements.paperSelect) {
         elements.paperSelect.value = meta.id;
       }
+      // 单篇显示：URL 里的 piece 指到哪一篇就渲染哪一篇，失效时回落到首篇。
+      const pieces = Array.isArray(data.pieces) ? data.pieces : [];
+      const requestedPiece =
+        options.piece || getPieceFromLocation() || state.pieceId || "";
+      state.pieceId = pieces.some((piece) => piece.id === requestedPiece)
+        ? requestedPiece
+        : pieces[0]?.id || "";
       setPaperInLocation(meta.id, Boolean(options.push));
+      setPieceInLocation(state.pieceId, false);
       writeStoredValue(PAPER_STORAGE_KEY, meta.id);
       renderPage();
-      window.scrollTo({ top: 0, behavior: "auto" });
+      if (typeof options.restoreScroll === "number") {
+        scrollInstantly(options.restoreScroll);
+      } else {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          scrollMemoryPaused = false;
+        });
+      });
     } catch (error) {
+      scrollMemoryPaused = false;
       if (run !== state.openRun) {
         return;
       }
@@ -786,6 +888,7 @@
 
     const note = String(elements.wordNoteInput?.value || "").trim();
     const meanings = activeWord.meanings || [];
+    const coreMeaning = getCombinedMeaning(meanings, note);
     const phraseText = (activeWord.item.phrases || [])
       .filter((item) => item?.phrase)
       .slice(0, 4)
@@ -794,7 +897,7 @@
       )
       .join("；");
     const meaning = [
-      getCombinedMeaning(meanings, note),
+      coreMeaning,
       phraseText ? `固定搭配：${phraseText}` : "",
     ]
       .filter(Boolean)
@@ -840,11 +943,105 @@
     state.activeWord.item = item;
     updateTokenMarks();
     updateWordPanelMarkState();
+    const addedToLibrary =
+      mark === "unknown"
+        ? saveToVocabLibrary({
+            phrase: item.phrase,
+            meaning: coreMeaning,
+            phonetic: item.phonetic,
+            context: activeWord.context,
+            sentence: activeWord.sentence,
+            translation: activeWord.translation,
+          })
+        : false;
     showToast(
       mark === "unknown"
-        ? `${item.phrase} 已加入${INTENSIVE_CATEGORY}不会`
+        ? `${item.phrase} 已加入${INTENSIVE_CATEGORY}不会${
+            addedToLibrary ? "，并同步到词汇库" : "（词汇库写入失败）"
+          }`
         : `${item.phrase} 已标记为掌握`,
     );
+  }
+
+  /* -------------------------------------------------------- 词汇库归集 */
+
+  /** 「这个生词从哪来」：级别、试卷、听力篇章、题目 / 段落、原句与回跳地址。 */
+  function describeWordSource(phrase, options = {}) {
+    const context = options.context || {};
+    const paperMeta = state.data?.meta || {};
+    const paragraphId = String(context.paragraphId || "");
+    const pieceId =
+      context.pieceId ||
+      (paragraphId ? paragraphId.replace(/-p\d+$/, "") : "");
+    const piece = (state.data?.pieces || []).find((item) => item.id === pieceId);
+    const params = new URLSearchParams();
+    const paperId = state.paperId || paperMeta.id || "";
+    if (paperId) {
+      params.set("paper", paperId);
+    }
+    if (pieceId) {
+      params.set("piece", pieceId);
+    }
+    if (phrase) {
+      params.set("word", phrase);
+    }
+    const page = window.location.pathname.split("/").pop() || "intensive.html";
+    const paragraphMatch = paragraphId.match(/-p(\d+)$/);
+    return {
+      level: LISTENING_LEVEL,
+      module: "listening",
+      paperId,
+      paperTitle: paperMeta.title || "",
+      pieceId,
+      pieceTitle: piece?.title || piece?.type || "",
+      kind: piece?.type || "",
+      question: String(context.question || ""),
+      paragraph: String(context.paragraph || paragraphMatch?.[1] || ""),
+      sentence: String(context.sentence || options.sentence || "").slice(0, 600),
+      translation: String(
+        context.translation || options.translation || "",
+      ).slice(0, 600),
+      url: `${page}?${params.toString()}`,
+    };
+  }
+
+  /** 标记「不会」时同步写进词汇库；失败只提示，不影响原来的不会 / 掌握记录。 */
+  function saveToVocabLibrary(options) {
+    const Library = window.IballVocabLibrary;
+    if (!Library || !options?.phrase) {
+      return false;
+    }
+    const record = Library.add({
+      word: options.phrase,
+      phonetic: options.phonetic || "",
+      meaning: String(options.meaning || "").slice(0, 400),
+      source: describeWordSource(options.phrase, options),
+    });
+    return Boolean(record);
+  }
+
+  /** 从词汇库跳回来时，把原句里的那个词高亮并滚到视野内。 */
+  function focusWordInPage(word) {
+    const target = String(word || "").trim().toLowerCase();
+    if (!target) {
+      return;
+    }
+    const tokens = [...document.querySelectorAll(".word-token")];
+    const match = tokens.find(
+      (token) => String(token.dataset.word || "").toLowerCase() === target,
+    );
+    if (!match) {
+      return;
+    }
+    match.classList.add("is-library-target");
+    window.setTimeout(() => {
+      match.classList.remove("is-library-target");
+    }, 6000);
+    const rect = match.getBoundingClientRect();
+    window.scrollTo({
+      top: Math.max(0, rect.top + window.scrollY - window.innerHeight / 3),
+      behavior: "auto",
+    });
   }
 
   /* --------------------------------------------------------- word panel */
@@ -949,7 +1146,7 @@
     });
   }
 
-  function openWordPanel(phrase, paragraph, item, kind = "word") {
+  function openWordPanel(phrase, paragraph, item, kind = "word", context = {}) {
     state.activeWord = {
       phrase,
       kind,
@@ -957,6 +1154,7 @@
       translation: paragraph?.chinese || "",
       item: { ...item },
       meanings: [],
+      context: context && typeof context === "object" ? { ...context } : {},
     };
 
     if (elements.wordPanelTitle) {
@@ -1005,7 +1203,7 @@
     elements.layout?.classList.remove("has-word-panel");
   }
 
-  function applyWordResult(activeWord, data, statusText) {
+  function applyWordResult(activeWord, data, statusText, options = {}) {
     const meanings = [
       ...(Array.isArray(data.translations) ? data.translations : []),
       ...(Array.isArray(data.definitions) ? data.definitions : []),
@@ -1016,7 +1214,16 @@
       isUsablePhonetic(data.phonetic) ||
       isUsablePhonetic(activeWord.item.phonetic);
     activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
-    activeWord.item.phrases = Array.isArray(data.phrases) ? data.phrases : [];
+
+    const remotePhrases = Array.isArray(data.phrases) ? data.phrases : [];
+    const localPhrases = Array.isArray(activeWord.localPhrases)
+      ? activeWord.localPhrases
+      : [];
+    const phrases =
+      remotePhrases.length || !options.keepLocalPhrases
+        ? remotePhrases
+        : localPhrases;
+    activeWord.item.phrases = phrases;
 
     renderPanelPhonetic(
       isUsablePhonetic(data.phonetic) || activeWord.item.phonetic,
@@ -1027,7 +1234,7 @@
         : "词典没有返回释义，可手动补充";
     }
     renderMeanings(activeWord.meanings);
-    renderPhrases(activeWord.item.phrases);
+    renderPhrases(phrases);
     renderExamples(Array.isArray(data.examples) ? data.examples : []);
   }
 
@@ -1101,7 +1308,7 @@
       !cached.remoteFailed &&
       hasUsableWordResult(cached)
     ) {
-      applyWordResult(activeWord, cached, "已从本次缓存读取释义");
+      applyWordResult(activeWord, cached, "已从本次缓存读取释义", { keepLocalPhrases: true });
       return;
     }
 
@@ -1126,6 +1333,7 @@
             activeWord,
             localData,
             `已从本地词库读取释义与音标（${localEntry.source}）`,
+            { keepLocalPhrases: true },
           );
           return;
         }
@@ -1145,6 +1353,7 @@
           merged.phonetic
             ? "本地词库释义，在线词典已补充音标与固定搭配"
             : "本地词库释义；在线词典暂未提供音标",
+          { keepLocalPhrases: true },
         );
         return;
       }
@@ -1161,6 +1370,7 @@
         remoteReady
           ? "已查询到释义与固定搭配"
           : "在线词典暂时没有返回释义，可手动补充",
+        { keepLocalPhrases: true },
       );
     } catch (error) {
       if (run !== state.lookupRun || state.activeWord !== activeWord) {
@@ -1171,6 +1381,7 @@
           activeWord,
           localData,
           "已读取本地释义；在线音标暂时不可用",
+          { keepLocalPhrases: true },
         );
         return;
       }
@@ -1192,7 +1403,18 @@
       return;
     }
     const kind = button.dataset.wordKind === "phrase" ? "phrase" : "word";
-    const paragraph = getParagraphById(button.dataset.paragraphId);
+    const physical = getParagraphById(button.dataset.paragraphId);
+    // 题干 / 选项里的 token 自带句子与译文，优先使用以保证语境准确。
+    const inlineSentence = button.dataset.sentence || "";
+    const hasInlineContext =
+      button.dataset.sentence !== undefined ||
+      button.dataset.translation !== undefined;
+    const paragraph = hasInlineContext
+      ? {
+          english: inlineSentence || physical?.english || "",
+          chinese: button.dataset.translation || physical?.chinese || "",
+        }
+      : physical;
     const existing = getStoredWord(phrase, paragraph?.english || "", kind);
     const chipLevels = String(button.dataset.phraseLevels || "")
       .split("|")
@@ -1214,7 +1436,15 @@
     if (existing) {
       item.id = existing.id;
     }
-    openWordPanel(phrase, paragraph, item, kind);
+    const questionCard = button.closest("[data-question-number]");
+    const sectionNode = button.closest("[data-piece-id]");
+    openWordPanel(phrase, paragraph, item, kind, {
+      paragraphId: button.dataset.paragraphId || "",
+      pieceId: button.dataset.sectionId || sectionNode?.dataset.pieceId || "",
+      question: questionCard?.dataset.questionNumber || "",
+      sentence: paragraph?.english || "",
+      translation: paragraph?.chinese || "",
+    });
     lookupActiveWord();
   }
 
@@ -1272,6 +1502,18 @@
 
     copy.append(title, meta);
     link.append(number, copy);
+
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (state.pieceId === piece.id) {
+        scrollToPieceStart(piece.id);
+        return;
+      }
+      state.pieceId = piece.id;
+      setPieceInLocation(piece.id, true);
+      renderPage();
+      scrollToPieceStart(piece.id);
+    });
     return link;
   }
 
@@ -1307,8 +1549,12 @@
     return details;
   }
 
-  function appendEnglishText(container, text, paragraphId) {
+  function appendEnglishText(container, text, paragraphIdOrContext) {
     const source = String(text || "");
+    const context =
+      paragraphIdOrContext && typeof paragraphIdOrContext === "object"
+        ? paragraphIdOrContext
+        : { paragraphId: paragraphIdOrContext };
     let lastIndex = 0;
     let match = WORD_PATTERN.exec(source);
 
@@ -1323,12 +1569,23 @@
       button.type = "button";
       button.className = "word-token";
       button.dataset.word = match[0];
-      button.dataset.paragraphId = paragraphId;
+      if (context.paragraphId) {
+        button.dataset.paragraphId = context.paragraphId;
+      }
+      if (context.sentence) {
+        button.dataset.sentence = context.sentence;
+      }
+      if (context.translation) {
+        button.dataset.translation = context.translation;
+      }
+      if (context.sectionId) {
+        button.dataset.sectionId = context.sectionId;
+      }
       button.dataset.wordId = makeWordId(match[0], source);
       button.textContent = match[0];
       button.setAttribute(
         "aria-label",
-        `查看单词 ${match[0]} 的释义与固定搭配`,
+        `查看单词或搭配 ${match[0]} 的释义`,
       );
       container.append(button);
 
@@ -1445,6 +1702,23 @@
       .replace(/[^a-z0-9'\- ]+/g, " ")
       .replace(/\s+/g, " ")
       .trim();
+  }
+
+  // 词面板打开时先用本地四六级考研搭配库给出"含该词的固定搭配"，不必等在线词典。
+  // 题干 / 选项里的短语常常查不到在线释义，这一步能保证面板一打开就有内容。
+  function localPhrasesFor(value, limit = 8) {
+    const index = window.CollocationIndex;
+    if (!index || typeof index.containing !== "function") {
+      return [];
+    }
+    const found = index.containing(value, limit);
+    return (Array.isArray(found) ? found : [])
+      .filter((item) => item?.phrase)
+      .map((item) => ({
+        phrase: item.phrase,
+        levels: Array.isArray(item.levels) ? item.levels : [],
+        meaning: String(item.meaning || "").trim(),
+      }));
   }
 
   function collectPhraseEntries(paragraph) {
@@ -1905,10 +2179,12 @@
     options.setAttribute("aria-label", `第 ${question.number} 题选项`);
 
     question.choices.forEach((choice) => {
-      const button = document.createElement("button");
-      button.type = "button";
+      // 用 div + role=button 承载选项，选项文本里才能放可点击的单词。
+      const button = document.createElement("div");
       button.className = "question-option";
       button.dataset.letter = choice.letter;
+      button.setAttribute("role", "button");
+      button.setAttribute("tabindex", "0");
 
       const letter = document.createElement("span");
       letter.className = "option-letter";
@@ -1918,10 +2194,15 @@
       const text = document.createElement("span");
       text.className = "option-text";
       text.lang = "en";
-      text.textContent = choice.text;
+      appendEnglishText(text, choice.text, {
+        paragraphId: context.id,
+        sentence: choice.text || question.stem || "",
+        translation: question.stemTranslation || "",
+        sectionId: piece.id,
+      });
 
       button.append(letter, text);
-      button.addEventListener("click", () => {
+      const pick = () => {
         state.answers[getAnswerKey(question.number)] = choice.letter;
         persistAnswers();
         applyQuestionCardState(card, question);
@@ -1931,6 +2212,23 @@
           piece,
           card.dataset.revealed === "true",
         );
+      };
+      // 点到单词 token 时不触发选择：直接返回，让事件继续冒泡，
+      // 由内容区上的代理监听打开词面板（不要 stopPropagation，否则点词无效）。
+      button.addEventListener("click", (event) => {
+        if (event.target.closest(".word-token")) {
+          return;
+        }
+        pick();
+      });
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          if (event.target.closest(".word-token")) {
+            return;
+          }
+          event.preventDefault();
+          pick();
+        }
       });
       options.append(button);
     });
@@ -2336,20 +2634,12 @@
       elements.readingProgress.style.transform = `scaleX(${ratio})`;
     }
 
+    // 单篇显示：高亮直接跟随当前篇，不再按滚动位置推断。
     const pieces = state.data?.pieces || [];
-    const marker = window.innerWidth <= 640 ? 92 : 124;
-    let activeId = pieces[0]?.id || "";
-
-    pieces.forEach((piece) => {
-      const pieceElement = document.getElementById(piece.id);
-      if (pieceElement && pieceElement.getBoundingClientRect().top <= marker) {
-        activeId = piece.id;
-      }
-    });
-
-    if (ratio > 0.995 && pieces.length) {
-      activeId = pieces.at(-1).id;
-    }
+    const activeId =
+      pieces.find((piece) => piece.id === state.pieceId)?.id ||
+      pieces[0]?.id ||
+      "";
 
     elements.pieceNavigation
       ?.querySelectorAll("[data-piece-target]")
@@ -2370,6 +2660,7 @@
     }
     scrollFrame = window.requestAnimationFrame(() => {
       scrollFrame = 0;
+      rememberScrollPosition();
       updateReadingState();
     });
   }
@@ -2465,10 +2756,19 @@
     });
     elements.pieceNavigation?.replaceChildren(navigation);
 
+    // 一次只渲染当前篇，篇目之间通过导航切换，避免整卷内容堆在一页。
     const content = document.createDocumentFragment();
-    pieces.forEach((piece, index) => {
-      content.append(createPieceSection(piece, index));
-    });
+    const currentPiece =
+      pieces.find((piece) => piece.id === state.pieceId) || pieces[0] || null;
+    if (currentPiece) {
+      if (state.pieceId !== currentPiece.id) {
+        state.pieceId = currentPiece.id;
+        setPieceInLocation(currentPiece.id, false);
+      }
+      content.append(
+        createPieceSection(currentPiece, pieces.indexOf(currentPiece)),
+      );
+    }
     elements.content?.replaceChildren(content);
 
     setDisplayMode(
@@ -2552,9 +2852,28 @@
 
   window.addEventListener("popstate", () => {
     const paperId = getPaperFromLocation();
-    if (paperId && paperId !== state.paperId) {
-      openPaper(paperId, { push: false });
+    if (!paperId) {
+      return;
     }
+    const pieceId = getPieceFromLocation();
+    const saved = storedScrollPosition();
+    if (paperId === state.paperId) {
+      if (pieceId && pieceId !== state.pieceId) {
+        state.pieceId = pieceId;
+        renderPage();
+        if (!restoreStoredScroll()) {
+          scrollToPieceStart(pieceId);
+        }
+        return;
+      }
+      restoreStoredScroll();
+      return;
+    }
+    openPaper(paperId, {
+      push: false,
+      restoreScroll: saved === null ? undefined : saved,
+      piece: pieceId,
+    });
   });
 
   window.addEventListener("scroll", requestReadingStateUpdate, {
@@ -2570,6 +2889,9 @@
 
   function initialize() {
     document.title = `${LEVEL_CONFIG.title} · iball的小屋`;
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
     const pageTitle = document.querySelector("#pageTitle");
     if (pageTitle) {
       pageTitle.textContent = LEVEL_CONFIG.title;
@@ -2594,7 +2916,34 @@
         ? stored
         : papers[0].id;
 
-    openPaper(initialId, { push: false });
+    openPaper(initialId, { push: false }).then(() => {
+      // 词汇库回跳：先落到对应篇章，再高亮原句里的那个词。
+      let params = null;
+      try {
+        params = new URLSearchParams(window.location.search);
+      } catch {
+        params = null;
+      }
+      const pieceId = params?.get("piece") || "";
+      if (pieceId) {
+        const section = document.querySelector(
+          `[data-piece-id="${CSS.escape(pieceId)}"]`,
+        );
+        if (section) {
+          window.scrollTo({
+            top: Math.max(
+              0,
+              section.getBoundingClientRect().top + window.scrollY - 12,
+            ),
+            behavior: "auto",
+          });
+        }
+      }
+      const focusWord = params?.get("word") || "";
+      if (focusWord) {
+        window.setTimeout(() => focusWordInPage(focusWord), 60);
+      }
+    });
 
     // 搭配索引 280KB 左右，只影响标记高亮；先出正文，空闲后再拉。
     const warmCollocations = () => {

@@ -56,6 +56,7 @@ async function handler(request, response) {
       ...result,
       entries: snapshot.entries,
       tombstones: snapshot.tombstones,
+      removed: snapshot.removed,
       updatedAt: snapshot.updatedAt,
     });
   } catch (error) {

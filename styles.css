@@ -489,6 +489,27 @@ p {
   align-items: start;
 }
 
+/*
+ * 登录壳预判（见 index.html 顶部脚本）：当天已登录的设备返回首页时，
+ * 先把 appView 外壳挂出来，等会话探测结束再渲染数据，
+ * 避免返回瞬间闪一下登录页。
+ */
+html.auth-resume #loginView {
+  display: none;
+}
+
+/* 全局 [hidden] { display:none !important } 优先级更高，
+   这里同样用 !important 才能把「今天已登录」的应用外壳先挂出来。 */
+html.auth-resume #appView[hidden] {
+  display: grid !important;
+}
+
+@media (max-width: 760px) {
+  html.auth-resume #appView[hidden] {
+    display: block !important;
+  }
+}
+
 .library-panel {
   position: sticky;
   top: 0;
@@ -3997,6 +4018,17 @@ p {
   .dialogue-scenario-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* 平板竖屏（如 iPad 834px）下，首页页脚 13 个子项不换行会把文档撑到 ~1046px，
+     导致 position:fixed 的底部导航挂到可视区之外。这里允许换行并允许收缩。 */
+  .workspace-footer {
+    flex-wrap: wrap;
+  }
+
+  .workspace-footer > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (max-width: 760px) {
@@ -4718,96 +4750,6 @@ p {
   background: #fbe3cc;
 }
 
-/* Welcome curtain */
-
-.welcome-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  padding: 28px;
-  display: grid;
-  place-items: center;
-  color: #ffffff;
-  text-align: center;
-  background:
-    radial-gradient(
-      circle at 50% 40%,
-      rgba(29, 38, 74, 0.96),
-      rgba(8, 13, 35, 0.985) 64%
-    ),
-    var(--forest-deep);
-  opacity: 0;
-  animation: welcome-in 1500ms ease-out 180ms forwards;
-}
-
-.welcome-overlay.is-leaving {
-  animation: welcome-out 900ms ease-in forwards;
-}
-
-.welcome-overlay[hidden] {
-  display: none;
-}
-
-.welcome-inner {
-  max-width: 640px;
-  display: grid;
-  gap: 14px;
-  justify-items: center;
-}
-
-.welcome-eyebrow {
-  color: #e1c16c;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.welcome-title {
-  position: relative;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(30px, 6.4vw, 54px);
-  line-height: 1.16;
-}
-
-.welcome-title::after {
-  content: "";
-  display: block;
-  width: 72px;
-  height: 3px;
-  margin: 18px auto 0;
-  background: linear-gradient(
-    90deg,
-    var(--coral),
-    var(--gold) 52%,
-    #838eb9
-  );
-}
-
-.welcome-sub {
-  color: #a9aec3;
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-@keyframes welcome-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes welcome-out {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
 /* Realtime voice bar */
 
 .practice-realtime-bar {
@@ -5279,15 +5221,6 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .welcome-overlay {
-    animation: none;
-    opacity: 1;
-  }
-
-  .welcome-overlay.is-leaving {
-    animation: welcome-out 150ms ease-in forwards;
-  }
-
   .practice-realtime-button.is-active + .practice-realtime-status::before {
     animation: none;
   }

@@ -1,0 +1,132 @@
+{
+  "id": "english-i-2016",
+  "track": "english-i",
+  "year": 2016,
+  "provider": "google-vps",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.171Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2016 考研英语一 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "e2141b9326e049b2",
+          "en": "France, which prides itself as the global innovator of fashion, has decided its fashion industry has lost an absolute right to define physical beauty for women. Its lawmakers gave preliminary approval last week to a law that would make it a crime to employ ultra-thin models on runways. The parliament also agreed to ban websites that “incite excessive thinness” by promoting extreme dieting. Such measures have a couple of uplifting motives. They suggest beauty should not be defined by looks that end up impinging on health. That’s a start. And the ban on ultra-thin models seems to go beyond protecting models from starving themselves to death—as some have done. It tells the fashion industry that it must take responsibility for the signal it sends women, especially teenage girls, about the social tape-measure they must use to determine their individual worth.",
+          "zh": "法国自诩为全球时尚创新者，但它的时尚业已经失去了定义女性外表美的绝对权利。上周，立法者初步批准了一项法律，该法律将在跑道上使用超薄模特定为犯罪行为。议会还同意禁止通过宣传极端节食“煽动过度瘦身”的网站。这些措施有几个令人振奋的动机。他们建议美丽不应该由最终影响健康的外表来定义。这是一个开始。对超薄模特的禁令似乎不仅仅是为了保护模特免于饿死——正如一些人所做的那样。它告诉时尚界，它必须对它向女性，尤其是十几岁的女孩发出的关于她们必须使用社会卷尺来确定个人价值的信号负责。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "667dd95099e155ab",
+          "en": "The bans, if fully enforced, would suggest to women (and many men) that they should not let others be arbiters of their beauty. And perhaps faintly, they hint that people should look to intangible qualities like character and intellect rather than dieting their way to size zero or wasp-waist physiques. The French measures, however, rely too much on severe punishment to change a culture that still regards beauty as skin-deep—and bone-showing. Under the law, using a fashion model that does not meet a government-defined index of body mass could result in a $85,000 fine and six months in prison. The fashion industry knows it has an inherent problem in focusing on material adornment and idealized body types. In Denmark, the United States, and a few other countries, it is trying to set voluntary standards for models and fashion images that rely more on peer pressure for enforcement. In contrast to France’s actions, Denmark’s fashion industry agreed last month on rules and sanctions regarding the age, health, and other characteristics of models. The newly revised Danish Fashion Ethical Charter clearly states: “We are aware of and take responsibility for the impact the fashion industry has on body ideals, especially on young people.” The charter’s main tool of enforcement is to deny access for designers and modeling agencies to Copenhagen Fashion Week (CFW), which is run by the Danish Fashion Institute. But in general it relies on a name-and-shame method of compliance.",
+          "zh": "这些禁令如果得到全面执行，将向女性（以及许多男性）表明，她们不应该让别人成为她们美丽的仲裁者。也许他们隐隐约约地暗示，人们应该关注品格和智力等无形品质，而不是通过节食来获得零号或黄蜂腰的体格。然而，法国的措施过于依赖严厉的惩罚来改变仍然认为美丽肤浅、骨子里的文化。根据法律，使用不符合政府规定的体重指数的时装模特可能会被处以 85,000 美元的罚款和六个月的监禁。时尚界知道它在关注物质装饰和理想化体型方面存在固有的问题。在丹麦、美国和其他一些国家，它正在尝试为模特和时尚形象制定自愿标准，这些标准更多地依赖同侪压力来执行。与法国的行动相反，丹麦时尚界上个月就模特年龄、健康状况和其他特征的规则和制裁达成一致。新修订的丹麦时尚道德宪章明确指出：“我们意识到时尚行业对理想身材的影响，尤其是对年轻人的影响，并对此承担责任。”该宪章的主要执行工具是拒绝设计师和模特经纪公司参加由丹麦时装学院主办的哥本哈根时装周（CFW）。但总的来说，它依赖于一种点名羞辱的合规方法。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "7a89fb98fd44f85d",
+          "en": "Relying on ethical persuasion rather than law to address the misuse of body ideals may be the best step. Even better would be to help elevate notions of beauty beyond the material standards of a particular industry.",
+          "zh": "依靠道德说服而不是法律来解决对身体理想的滥用可能是最好的一步。更好的是帮助将美的概念提升到特定行业的物质标准之外。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2016 考研英语一 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "b0e9c394904bbdcc",
+          "en": "For the first time in history more people live in towns than in the country. In Britain this has had a curious result. While polls show Britons rate “the countryside” alongside the royal family, Shakespeare and the National Health Service (NHS) as what makes them proudest of their country, this has limited political support.",
+          "zh": "历史上第一次，居住在城镇的人口多于居住在乡村的人口。在英国，这产生了一个奇怪的结果。尽管民意调查显示，英国人将“乡村”与王室、莎士比亚和国家医疗服务体系 (NHS) 并列视为让他们为国家感到最自豪的因素，但这的政治支持有限。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "78e984315f7534e9",
+          "en": "A century ago Octavia Hill launched the National Trust not to rescue stylish houses but to save “the beauty of natural places for everyone forever.” It was specifically to provide city dwellers with spaces for leisure where they could experience “a refreshing air.” Hill’s pressure later led to the creation of national parks and green belts. They don’t make countryside any more, and every year concrete consumes more of it. It needs constant guardianship. At the next election none of the big parties seem likely to endorse this sentiment. The Conservatives’ planning reform explicitly gives rural development priority over conservation, even authorising “off-plan” building where local people might object. The concept of sustainable development has been defined as profitable. Labour likewise wants to discontinue local planning where councils oppose development. The Liberal Democrats are silent. Only Ukip, sensing its chance, has sided with those pleading for a more considered approach to using green land. Its Campaign to Protect Rural England struck terror into many local Conservative parties.",
+          "zh": "一个世纪前，奥克塔维亚·希尔 (Octavia Hill) 成立了国民信托基金，其目的不是为了拯救时尚的房屋，而是为了“永远为每个人保留自然美景”。它专门为城市居民提供休闲空间，让他们体验“清新的空气”。希尔的压力后来导致了国家公园和绿化带的创建。他们不再建造乡村，混凝土每年消耗更多的乡村。它需要不断的守护。在下一次选举中，似乎没有一个大党会支持这种观点。保守党的规划改革明确将农村发展置于保护之上，甚至在当地人可能反对的情况下授权“计划外”建设。可持续发展的概念被定义为盈利。工党同样希望在议会反对开发的地方停止规划。自由民主党保持沉默。只有英国独立党意识到了机遇，站在了那些呼吁采取更加深思熟虑的绿地利用方式的人一边。它的“保护英格兰乡村运动”让许多当地保守党感到恐惧。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "b20c5a29e1f07f3d",
+          "en": "The sensible place to build new houses, factories and offices is where people are, in cities and towns where infrastructure is in place. The London agents Stirling Ackroyd recently identified enough sites for half a million houses in the London area alone, with no intrusion on green belt. What is true of London is even truer of the provinces.",
+          "zh": "建造新房屋、工厂和办公室的明智地点是有人居住的地方、基础设施完善的城镇。伦敦代理商斯特林·艾克罗伊德 (Stirling Ackroyd) 最近仅在伦敦地区就确定了足够的地点，可容纳 50 万栋房屋，且不会侵占绿化带。伦敦的情况对于其他省份来说更是如此。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "72decdf502a90c6b",
+          "en": "The idea that “housing crisis” equals “concreted meadows” is pure lobby talk. The issue is not the need for more houses but, as always, where to put them. Under lobby pressure, George Osborne favours rural new-build against urban renovation and renewal. He favours out-of-town shopping sites against high streets. This is not a free market but a biased one. Rural towns and villages have grown and will always grow. They do so best where building sticks to their edges and respects their character. We do not ruin urban conservation areas. Why ruin rural ones? Development should be planned, not let rip. After the Netherlands, Britain is Europe’s most crowded country. Half a century of town and country planning has enabled it to retain an enviable rural coherence, while still permitting low-density urban living. There is no doubt of the alternative—the corrupted landscapes of southern Portugal, Spain or Ireland. Avoiding this rather than promoting it should unite the left and right of the political spectrum.",
+          "zh": "“住房危机”等于“混凝土草地”的想法纯粹是游说言论。问题不在于需要更多的房子，而在于一如既往地把它们放在哪里。在游说压力下，乔治·奥斯本支持乡村新建，反对城市改造和更新。他更喜欢城外的购物场所而不是商业街。这不是一个自由市场，而是一个有偏见的市场。农村城镇和村庄已经发展并将永远发展。他们在建筑坚持自己的立场并尊重他们的性格时做得最好。我们不会破坏城市保护区。为什么要毁掉农村呢？发展应该有计划，而不是随波逐流。英国是继荷兰之后欧洲最拥挤的国家。半个世纪的城镇和乡村规划使其能够保持令人羡慕的乡村一致性，同时仍然允许低密度的城市生活。毫无疑问还有另一种选择——葡萄牙南部、西班牙或爱尔兰的腐败景观。避免这种情况而不是促进它应该团结政治领域的左翼和右翼。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2016 考研英语一 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "572cf281dd4b832a",
+          "en": "“There is one and only one social responsibility of business,” wrote Milton Friedman, a Nobel prize-winning economist. “That is, to use its resources and engage in activities designed to increase its profits.” But even if you accept Friedman’s premise and regard corporate social responsibility (CSR) policies as a waste of shareholders’ money, things may not be absolutely clear-cut. New research suggests that CSR may create monetary value for companies—at least when they are prosecuted for corruption.",
+          "zh": "诺贝尔经济学奖得主米尔顿·弗里德曼写道：“企业的社会责任只有一项。” “也就是说，利用其资源并从事旨在增加利润的活动。”但即使你接受弗里德曼的前提，并将企业社会责任（CSR）政策视为浪费股东的钱，事情也可能不是绝对明确的。新的研究表明，企业社会责任可以为公司创造货币价值——至少当它们因腐败而被起诉时。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "7b257eed6d783ae9",
+          "en": "The largest firms in America and Britain together spend more than $15 billion a year on CSR, according to an estimate last year by EPG, a consulting firm. This could add value to their businesses in three ways. First, consumers may take CSR spending as a “signal” that a company’s products are of high quality. Second, customers may be willing to buy a company’s products as an indirect way to donate to the good causes it helps. And third, through a more diffuse “halo effect”, whereby its good deeds earn it greater consideration from consumers and others. Previous studies on CSR have had trouble differentiating these effects because consumers can be affected by all three. A recent paper attempts to separate them by looking at bribery prosecutions under America’s Foreign Corrupt Practices Act (FCPA). It argues that since prosecutors do not consume a company’s products as part of their investigations, they could be influenced only by the halo effect. The study found that, among prosecuted firms, those with the most comprehensive CSR programmes tended to get more lenient penalties. Their analysis ruled out the possibility that it was firms’ political influence, rather than their CSR stand, that accounted for the leniency: Companies that contributed more to political campaigns did not receive lower fines.",
+          "zh": "根据咨询公司 EPG 去年的估计，美国和英国最大的公司每年在企业社会责任上的支出合计超过 150 亿美元。这可以通过三种方式为其业务增加价值。首先，消费者可能将企业社会责任支出视为公司产品高品质的“信号”。其次，客户可能愿意购买公司的产品，作为间接为其所帮助的公益事业捐款的方式。第三，通过更广泛的“光环效应”，其善行可以赢得消费者和其他人的更多关注。之前关于企业社会责任的研究很难区分这些影响，因为消费者可能会受到这三种影响。最近的一篇论文试图通过研究美国《反海外腐败法》(FCPA) 下的贿赂起诉来区分它们。它认为，由于检察官在调查过程中不会消费公司的产品，因此他们可能只会受到光环效应的影响。研究发现，在被起诉的公司中，那些拥有最全面的企业社会责任计划的公司往往会受到更宽松的处罚。他们的分析排除了一种可能性，即企业的政治影响力，而不是企业社会责任立场，导致了宽大处理：为政治运动做出更多贡献的公司并没有收到较低的罚款。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "5b43af32ba581cb9",
+          "en": "In all, the study concludes that whereas prosecutors should only evaluate a case based on its merits, they do seem to be influenced by a company’s record in CSR. “We estimate that either eliminating a substantial labour-rights concern, such as child labour, or increasing corporate giving by about 20% results in fines that generally are 40% lower than the typical punishment for bribing foreign officials,” says one researcher.",
+          "zh": "总而言之，该研究的结论是，虽然检察官应该只根据案情来评估案件，但他们似乎确实受到公司企业社会责任记录的影响。一位研究人员表示：“我们估计，要么消除童工等重大劳工权利问题，要么将企业捐赠增加约 20%，所产生的罚款通常比贿赂外国官员的典型处罚低 40%。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "12bdd1693e350026",
+          "en": "Researchers admit that their study does not answer the question of how much businesses ought to spend on CSR. Nor does it reveal how much companies are banking on the halo effect, rather than the other possible benefits, when they decide their do-gooding policies. But at least they have demonstrated that when companies get into trouble with the law, evidence of good character can win them a less costly punishment.",
+          "zh": "研究人员承认，他们的研究并没有回答企业应该在企业社会责任上花费多少的问题。它也没有揭示有多少公司在决定行善政策时是指望光环效应，而不是其他可能的好处。但至少他们已经证明，当公司触犯法律时，良好品格的证据可以为他们赢得成本较低的惩罚。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2016 考研英语一 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "072e2ad1ea150c56",
+          "en": "There will eventually come a day when The New York Times ceases to publish stories on newsprint. Exactly when that day will be is a matter of debate. “Sometime in the future,” the paper’s publisher said back in 2010.",
+          "zh": "最终有一天，《纽约时报》将停止在新闻纸上发表报道。那一天具体何时到来仍存在争议。 “在未来的某个时候，”该报的出版商在 2010 年说道。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "e7fe01990c064e43",
+          "en": "Nostalgia for ink on paper and the rustle of pages aside, there’s plenty of incentive to ditch print. The infrastructure required to make a physical newspaper— printing presses, delivery trucks—isn’t just expensive; it’s excessive at a time when online-only competitors don’t have the same set of financial constraints. Readers are migrating away from print anyway. And though print ad sales still dwarf their online and mobile counterparts, revenue from print is still declining. Overhead may be high and circulation lower, but rushing to eliminate its print edition would be a mistake, says BuzzFeed CEO Jonah Peretti. Peretti says the Times shouldn’t waste time getting out of the print business, but only if they go about doing it the right way. “Figuring out a way to accelerate that transition would make sense for them,” he said, “but if you discontinue it, you’re going to have your most loyal customers really upset with you.” Sometimes that’s worth making a change anyway. Peretti gives the example of Netflix discontinuing its DVD-mailing service to focus on streaming. “It was seen as a blunder,” he said. The move turned out to be foresighted. And if Peretti were in charge at the Times? “I wouldn’t pick a year to end print,” he said. “I would raise prices and make it into more of a legacy product.”",
+          "zh": "除了对纸上墨水和书页沙沙作响的怀念之外，还有很多理由放弃印刷。制作实体报纸所需的基础设施——印刷机、送货卡车——不仅价格昂贵，而且还非常昂贵。当纯在线竞争对手没有同样的财务限制时，这是过度的。无论如何，读者正在远离印刷品。尽管平面广告销售额仍然使在线和移动广告相形见绌，但平面广告收入仍在下降。 BuzzFeed 首席执行官乔纳·佩雷蒂 (Jonah Peretti) 表示，管理费用可能较高，发行量较低，但急于取消印刷版将是一个错误。佩雷蒂表示，《纽约时报》不应该浪费时间退出印刷业务，但前提是他们要以正确的方式去做。 “找到一种加速这种转变的方法对他们来说是有意义的，”他说，“但如果你停止这样做，你最忠实的客户就会对你感到非常不满。”有时无论如何，这都值得做出改变。佩雷蒂举了 Netflix 停止 DVD 邮寄服务、专注于流媒体的例子。 “这被视为一个错误，”他说。事实证明，此举是有先见之明的。如果佩雷蒂负责《泰晤士报》呢？ “我不会选择哪一年结束印刷，”他说。 “我会提高价格，使其成为更多的传统产品。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        },
+        {
+          "hash": "1a76bb2830ba1f42",
+          "en": "The most loyal customers would still get the product they favor, the idea goes, and they’d feel like they were helping sustain the quality of something they believe in. “So if you’re overpaying for print, you could feel like you were helping,” Peretti said. “Then increase it at a higher rate each year and essentially try to generate additional revenue.” In other words, if you’re going to make a print product, make it for the people who are already obsessed with it. Which may be what the Times is doing already. Getting the print edition seven days a week costs nearly $500 a year—more than twice as much as a digital-only subscription. “It’s a really hard thing to do and it’s a tremendous luxury that BuzzFeed doesn’t have a legacy business,” Peretti remarked. “But we’re going to have questions like that where we have things we’re doing that don’t make sense when the market changes and the world changes. In those situations, it’s better to be more aggressive than less aggressive.”",
+          "zh": "最忠实的客户仍然会得到他们喜欢的产品，他们会觉得自己正在帮助维持他们所相信的东西的质量。“因此，如果你为印刷品支付过高的费用，你可能会觉得你在提供帮助，”佩雷蒂说。 “然后每年以更高的速度增加，并基本上尝试产生额外的收入。”换句话说，如果你要制作印刷产品，那就为那些已经痴迷于它的人制作它。这可能就是《纽约时报》已经在做的事情。每周 7 天购买印刷版的费用每年近 500 美元，是纯数字订阅的两倍多。 “这确实是一件很难做到的事情，但 BuzzFeed 没有传统业务真是一种奢侈，”佩雷蒂说道。 “但我们会遇到这样的问题，当市场和世界发生变化时，我们正在做的事情就没有意义了。在这种情况下，更积极主动比不那么积极主动更好。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.086Z"
+        }
+      ]
+    }
+  }
+}

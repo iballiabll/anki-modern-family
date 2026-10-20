@@ -17,10 +17,11 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./intensive.css?v=20261010-cet4listen1" />
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./exam-scores.css" />
-    <script src="./account-store.js" defer></script>
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
+    <script src="./vocab-library.js?v=20261005-ui10" defer></script>
     <script src="./exam-scores.js" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
@@ -30,8 +31,17 @@
       window.IBALL_INTENSIVE_LEVEL = "cet6";
     </script>
     <script src="./cet6-listening-papers.js" defer></script>
-    <script src="./intensive.js" defer></script>
-  </head>
+    <script src="./intensive.js?v=20261010-cet4listen1" defer></script>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <link rel="stylesheet" href="./back-to-top.css?v=20261005-ui10" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+    <script src="./back-to-top.js?v=20261005-ui11" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body>
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 

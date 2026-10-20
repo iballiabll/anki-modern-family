@@ -24,6 +24,8 @@
   const META_PREFIX = "iball:__meta__:";
   const ACCOUNT_KEY = "iball:__account__";
   const GUEST_NAMESPACE = "guest";
+  const OWNER_NAMESPACE_PREFIX = "owner-";
+  const VALUE_KEY_PATTERN = /^iball:v1:([A-Za-z0-9_-]{1,64}):([\s\S]+)$/;
   const MAX_TOMBSTONES = 400;
   const MAX_ENTRY_BYTES = 256 * 1024;
   const MAX_ENTRIES = 400;
@@ -31,7 +33,51 @@
   const SYNC_RETRY_MS = 15000;
   const HEARTBEAT_MS = 60000;
 
-  // 接口地址跟着本文件的位置走，而不是当前页面：xxrj/ 这类子目录里的页面
+  // 收藏、生词本这类「清单」型键：值是一个数组，语义是集合而不是快照。
+  // 如果按整键时间戳后写覆盖，手机离线加的单词会被平板稍后上传的旧清单
+  // 冲掉。这里登记这些键，同步时改成并集合并 + 本机删除墓碑。
+  const LIST_MERGE_KEYS = new Map([
+    ["iball_vocab_favorites_v1", (item) => String(item ?? "")],
+    ["iball-listening-cabin-favorites", (item) => String(item ?? "")],
+    ["iball-listening-cabin-known", (item) => String(item ?? "")],
+    ["iball-listening-cabin-unknown", (item) => String(item ?? "")],
+    [
+      "iball_vocab_wordbook_v1",
+      (item) =>
+        Array.isArray(item)
+          ? String(item[0] ?? "")
+          : String(item?.word ?? ""),
+    ],
+    [
+      "iball_vocab_library_v1",
+      (item) =>
+        Array.isArray(item)
+          ? String(item[0] ?? "")
+          : String(item?.word ?? ""),
+    ],
+    // 我的词书：一本书一条，按 id 并集合并（另一台设备建的词书不会丢）。
+    [
+      "iball_vocab_userbooks_v1",
+      (item) =>
+        Array.isArray(item)
+          ? String(item[0] ?? "")
+          : String(item?.id ?? ""),
+    ],
+    // 词书逐词进度：一条记录一个 deck+word，两端各背几个词时不会互相覆盖。
+    [
+      "iball_vocab_userbook_progress_v1",
+      (item) =>
+        item && typeof item === "object"
+          ? `${String(item.deck || "")}::${String(item.word || "").toLowerCase()}`
+          : Array.isArray(item)
+            ? String(item[0] ?? "")
+            : "",
+    ],
+  ]);
+  const MAX_LIST_REMOVALS = 300;
+  const LIST_REMOVAL_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+  // 接口地址跟着本文件的位置走，而不是当前页面：子目录里的页面
   // 用 ../account-store.js 引入时，"api/progress" 仍然指向站点根目录。
   const API_BASE = (() => {
     const src = document.currentScript?.src || "";
@@ -126,7 +172,7 @@
   // ── 命名空间元数据 ────────────────────────────────────────────────────
   // meta 里只放「哪些键存在 + 各自的时间戳」，值本身仍然是独立的存储项。
   function emptyMeta() {
-    return { version: 1, keys: {}, tombstones: {} };
+    return { version: 1, keys: {}, tombstones: {}, removed: {}, added: {} };
   }
 
   function metaKeyFor(namespace) {
@@ -151,6 +197,14 @@
           parsed?.tombstones && typeof parsed.tombstones === "object"
             ? parsed.tombstones
             : {},
+        removed:
+          parsed?.removed && typeof parsed.removed === "object"
+            ? parsed.removed
+            : {},
+        added:
+          parsed?.added && typeof parsed.added === "object"
+            ? parsed.added
+            : {},
       };
     } catch {
       return emptyMeta();
@@ -166,6 +220,149 @@
       (left, right) => Number(right[1]?.t || 0) - Number(left[1]?.t || 0),
     );
     return Object.fromEntries(entries.slice(0, MAX_TOMBSTONES));
+  }
+
+  // ── 清单型键的并集合并 ────────────────────────────────────────────────
+  function parseListValue(text) {
+    if (typeof text !== "string" || !text) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(text);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function pruneListRemovals(removals) {
+    const now = Date.now();
+    const entries = Object.entries(removals || {})
+      .filter(([, time]) => now - Number(time || 0) < LIST_REMOVAL_TTL_MS)
+      .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0));
+    return Object.fromEntries(entries.slice(0, MAX_LIST_REMOVALS));
+  }
+
+  /**
+   * 本机把一个清单键写成新数组时，记下每个词条的「加入时间」与「删除时间」。
+   *
+   * 删除时间会跟着进度同步上服务端：另一台设备拿着旧清单来同步时，靠它
+   * 判断「这个词是对方删掉的，不该被并集带回来」。加入时间用于区分
+   * 「对方删掉之后我又手动收藏」（应保留）和「我这台只是没收到删除通知」
+   * （应按删除处理）。
+   */
+  function trackListDelta(key, previousText, nextText) {
+    const identify = LIST_MERGE_KEYS.get(key);
+    if (!identify) {
+      return;
+    }
+    const before = parseListValue(previousText);
+    const after = parseListValue(nextText);
+    if (!before || !after) {
+      return;
+    }
+    const previousTime = Number(meta.keys[key]?.t || 0) || Date.now();
+    const now = Date.now();
+    const beforeIds = new Set(before.map(identify).filter(Boolean));
+    const afterIds = new Set(after.map(identify).filter(Boolean));
+    const removals = meta.removed[key] || {};
+    const additions = meta.added[key] || {};
+    for (const id of afterIds) {
+      if (!beforeIds.has(id) || !additions[id]) {
+        // 新收藏用当前时间；本来就有的条目没有记录时，保守地沿用
+        // 上一次整键写入时间，避免把旧条目伪装成刚收藏。
+        additions[id] = beforeIds.has(id) ? previousTime : now;
+      }
+      delete removals[id];
+    }
+    for (const id of beforeIds) {
+      if (!afterIds.has(id)) {
+        removals[id] = now;
+        delete additions[id];
+      }
+    }
+    meta.removed[key] = pruneListRemovals(removals);
+    meta.added[key] = additions;
+  }
+
+  /**
+   * 把本机清单和远端清单并起来，逐个词条判断「加入」还是「删除」更新：
+   *   · 这一条同时出现在某份清单里，且那份清单的时间戳晚于删除时间
+   *     —— 说明删掉之后有人重新收藏过，以加入为准；
+   *   · 否则删除记录赢，并集不会把删掉的词带回来。
+   * 返回 null 表示这份数据不是清单格式，调用方退回整键时间戳比较。
+   */
+  function mergeListValue(key, localText, remoteText, remoteTime) {
+    const identify = LIST_MERGE_KEYS.get(key);
+    if (!identify) {
+      return null;
+    }
+    const local = parseListValue(localText);
+    const remote = parseListValue(remoteText);
+    if (!local || !remote) {
+      return null;
+    }
+    const localTime = Number(meta.keys[key]?.t || 0);
+    const removals = meta.removed[key] || {};
+    const additions = meta.added[key] || {};
+    const ordered = [];
+    const byId = new Map();
+    const localIds = new Set();
+    const remoteIds = new Set();
+    const push = (items, source) => {
+      const ids = source === "remote" ? remoteIds : localIds;
+      for (const item of items) {
+        const id = identify(item);
+        if (!id) {
+          continue;
+        }
+        ids.add(id);
+        if (!byId.has(id)) {
+          ordered.push(id);
+          byId.set(id, item);
+        } else if (source === "remote") {
+          byId.set(id, item);
+        }
+      }
+    };
+    push(local, "local");
+    push(remote, "remote");
+    const merged = [];
+    for (const id of ordered) {
+      const removedAt = Number(removals[id] || 0);
+      const presenceTime = Math.max(
+        localIds.has(id) ? Number(additions[id] || localTime || 0) : 0,
+        remoteIds.has(id) ? Number(remoteTime || 0) : 0,
+      );
+      if (removedAt && presenceTime <= removedAt) {
+        // 删除发生在任何一次已知的「在场」之后：以删除为准。
+        delete additions[id];
+        continue;
+      }
+      if (removedAt) {
+        delete removals[id];
+      }
+      additions[id] = Math.max(Number(additions[id] || 0), presenceTime);
+      merged.push(byId.get(id));
+    }
+    meta.removed[key] = pruneListRemovals(removals);
+    meta.added[key] = additions;
+    return { text: JSON.stringify(merged), merged };
+  }
+
+  /**
+   * 同步用的「删除记录」清单：只挑还年轻的记录，避免把服务端撑大。
+   */
+  function activeRemovals() {
+    const result = {};
+    for (const [key, items] of Object.entries(meta.removed)) {
+      const pruned = pruneListRemovals(items);
+      meta.removed[key] = pruned;
+      if (Object.keys(pruned).length) {
+        result[key] = pruned;
+      }
+    }
+    return result;
   }
 
   // ── 当前命名空间 ──────────────────────────────────────────────────────
@@ -278,6 +475,14 @@
         console.warn(`[iball] 这条数据超过 256 KB，未保存：${id}`);
         return;
       }
+      const previous =
+        Object.prototype.hasOwnProperty.call(meta.keys, id) &&
+        LIST_MERGE_KEYS.has(id)
+          ? readRaw(valueKeyFor(namespace, id))
+          : null;
+      if (previous !== null) {
+        trackListDelta(id, previous, text);
+      }
       if (!Object.prototype.hasOwnProperty.call(meta.keys, id)) {
         dropKeyToMakeRoom();
       }
@@ -302,6 +507,7 @@
       for (const key of ownerKeys()) {
         removeRaw(valueKeyFor(namespace, key));
         meta.tombstones[key] = { t: Date.now() };
+        delete meta.removed[key];
       }
       meta.keys = {};
       meta.tombstones = pruneTombstones(meta.tombstones);
@@ -343,6 +549,7 @@
     return {
       entries: pickEntries(ownerKeys()),
       tombstones: { ...meta.tombstones },
+      removed: activeRemovals(),
     };
   }
 
@@ -360,16 +567,65 @@
       incoming.tombstones && typeof incoming.tombstones === "object"
         ? incoming.tombstones
         : {};
+    const removed =
+      incoming.removed && typeof incoming.removed === "object"
+        ? incoming.removed
+        : {};
+
+    // 先把对方带过来的删除记录并进来，下面合并清单时才知道哪些词
+    // 是被别的设备删掉的。逐词条取较新的删除时间。
+    for (const [key, items] of Object.entries(removed)) {
+      if (!items || typeof items !== "object") {
+        continue;
+      }
+      const target = meta.removed[key] || (meta.removed[key] = {});
+      for (const [rawId, time] of Object.entries(items)) {
+        const id = String(rawId);
+        const value = Number(time || 0);
+        if (!id || !value) {
+          continue;
+        }
+        if (Number(target[id] || 0) < value) {
+          target[id] = value;
+        }
+      }
+      meta.removed[key] = pruneListRemovals(target);
+    }
 
     for (const [key, item] of Object.entries(entries)) {
       const incomingTime = Number(item?.t || 0);
       const currentTime = Number(meta.keys[key]?.t || 0);
-      if (currentTime && currentTime >= incomingTime) {
-        continue;
-      }
       const value =
         typeof item?.v === "string" ? item.v : JSON.stringify(item?.v ?? null);
       if (value === null || value === undefined) {
+        continue;
+      }
+      // 清单型键：先并集再落盘，另一台设备的旧清单不会冲掉本机离线新增。
+      if (LIST_MERGE_KEYS.has(key)) {
+        const localText = readRaw(valueKeyFor(namespace, key));
+        const merged =
+          localText === null
+            ? null
+            : mergeListValue(key, localText, value, incomingTime);
+        if (merged) {
+          if (merged.text === localText) {
+            if (incomingTime > currentTime) {
+              meta.keys[key] = { t: incomingTime };
+            }
+            continue;
+          }
+          meta.keys[key] = { t: Date.now() };
+          delete meta.tombstones[key];
+          writeRaw(valueKeyFor(namespace, key), merged.text);
+          changed += 1;
+          if (sync.enabled) {
+            // 并集结果还要推回服务端，另一台设备才能拿到同一条。
+            sync.dirty.add(key);
+          }
+          continue;
+        }
+      }
+      if (currentTime && currentTime >= incomingTime) {
         continue;
       }
       if (!Object.prototype.hasOwnProperty.call(meta.keys, key)) {
@@ -508,13 +764,22 @@
     notifySync();
 
     try {
-      const data = await postProgress({ entries, tombstones }, keepalive);
+      // 删除记录体积很小，每轮都全量带上：服务端负责按词条取较新的时间，
+      // 另一台设备才能知道「这个词是对面删的」，而不是靠自己猜。
+      const data = await postProgress(
+        { entries, tombstones, removed: activeRemovals() },
+        keepalive,
+      );
       // 请求期间又写过东西的话，保留这些脏键等下一轮再传。
       if (sync.epoch === epoch) {
         sync.dirty.clear();
         sync.dirtyTombstones.clear();
-        if (data.entries || data.tombstones) {
-          applySnapshot({ entries: data.entries, tombstones: data.tombstones });
+        if (data.entries || data.tombstones || data.removed) {
+          applySnapshot({
+            entries: data.entries,
+            tombstones: data.tombstones,
+            removed: data.removed,
+          });
         }
       } else {
         for (const key of Object.keys(entries)) {
@@ -523,7 +788,11 @@
         for (const key of Object.keys(tombstones)) {
           sync.dirtyTombstones.delete(key);
         }
-        applySnapshot({ entries: data.entries, tombstones: data.tombstones });
+        applySnapshot({
+          entries: data.entries,
+          tombstones: data.tombstones,
+          removed: data.removed,
+        });
       }
       sync.state = "idle";
       sync.lastError = "";
@@ -592,12 +861,90 @@
   }
 
   /**
+   * 把旧站长命名空间（owner-*）里的本地数据并进当前账号。
+   *
+   * 9 月底用户库故障期间，部分设备拿到的是无状态站长会话，进度写进了
+   * owner-<名字> 空间；会话恢复正常后，这些只落本地、还没上传过的数据
+   * （尤其是收藏）必须跟着账号走。只认 owner-* → 普通账号这一个方向：
+   * guest 空间不动，共用设备上别人的浏览数据不会被并进登录账号。
+   */
+  function importOwnerData() {
+    if (
+      namespace === GUEST_NAMESPACE ||
+      namespace.startsWith(OWNER_NAMESPACE_PREFIX)
+    ) {
+      return 0;
+    }
+    const rawKeys = [];
+    try {
+      for (let index = 0; index < store.length; index += 1) {
+        rawKeys.push(store.key(index));
+      }
+    } catch {
+      return 0;
+    }
+
+    let changed = 0;
+    const seen = new Set();
+    for (const rawKey of rawKeys) {
+      const match = rawKey ? VALUE_KEY_PATTERN.exec(rawKey) : null;
+      if (!match) {
+        continue;
+      }
+      const sourceNamespace = match[1];
+      const sourceKey = match[2];
+      if (!sourceNamespace.startsWith(OWNER_NAMESPACE_PREFIX)) {
+        continue;
+      }
+      const dedupe = `${sourceNamespace}:${sourceKey}`;
+      if (seen.has(dedupe)) {
+        continue;
+      }
+      seen.add(dedupe);
+      const sourceTime = Number(
+        readMeta(sourceNamespace).keys?.[sourceKey]?.t || 0,
+      );
+      if (!sourceTime) {
+        continue;
+      }
+      const currentTime = Math.max(
+        Number(meta.keys[sourceKey]?.t || 0),
+        Number(meta.tombstones[sourceKey]?.t || 0),
+      );
+      if (currentTime >= sourceTime) {
+        continue;
+      }
+      const value = readRaw(rawKey);
+      if (value === null) {
+        continue;
+      }
+      if (!Object.prototype.hasOwnProperty.call(meta.keys, sourceKey)) {
+        dropKeyToMakeRoom();
+      }
+      if (!writeRaw(valueKeyFor(namespace, sourceKey), value)) {
+        continue;
+      }
+      meta.keys[sourceKey] = { t: sourceTime };
+      delete meta.tombstones[sourceKey];
+      changed += 1;
+    }
+    return changed;
+  }
+
+  /**
    * 切换账号命名空间。返回 true 表示确实换了人，调用方需要重新读取本地状态。
    */
   function activate(nextAccountId) {
     const clean = String(nextAccountId || "").replace(/[^A-Za-z0-9_-]/g, "");
     const next = clean || GUEST_NAMESPACE;
     if (next === namespace) {
+      // 已经在同一个账号上：顺手补一次旧站长数据的合并，部署后第一次
+      // 加载、以及会话收敛后的设备都靠这里把 owner-* 的存量捞过来。
+      if (importOwnerData() > 0) {
+        persistNamespace();
+        notifyNamespace();
+        return true;
+      }
       return false;
     }
     if (sync.enabled && (sync.dirty.size || sync.dirtyTombstones.size)) {
@@ -607,6 +954,7 @@
     namespace = next;
     accountId = next === GUEST_NAMESPACE ? "" : next;
     meta = readMeta(namespace);
+    importOwnerData();
     persistNamespace();
     notifyNamespace();
     return true;
@@ -670,6 +1018,80 @@
 
   loadNamespace();
   persistNamespace();
+
+  // ── 会话引导：每个页面都把命名空间对齐服务端会话，并接入同步 ────────────
+  // 以前只有 index.html 的 app.js 会激活账号，词汇库、听力等独立页面既不
+  // 激活也不开同步，收藏只落在设备本地，别的设备看不到。这里补齐这条链路：
+  // 页面加载时问一次服务端「我是谁」，命名空间真的变了就刷新一次让页面脚本
+  // 用新空间重新读数；未登录时留在 guest，不发同步请求。
+  const BOOT_RELOAD_FLAG = "iball:namespace-reload";
+
+  function bootReloadOnce() {
+    let alreadyReloaded = true;
+    try {
+      alreadyReloaded =
+        sessionStorage.getItem(BOOT_RELOAD_FLAG) === "1";
+    } catch {
+      // 读写不了 sessionStorage（隐私模式）时干脆不刷新，避免来回跳。
+    }
+    if (!alreadyReloaded) {
+      try {
+        sessionStorage.setItem(BOOT_RELOAD_FLAG, "1");
+      } catch {
+        // 忽略，上面的判断已经保证不会再刷。
+      }
+      window.location.reload();
+      return true;
+    }
+    try {
+      sessionStorage.removeItem(BOOT_RELOAD_FLAG);
+    } catch {
+      // 同上。
+    }
+    return false;
+  }
+
+  async function bootSession() {
+    if (!persistent) {
+      return;
+    }
+    let payload = null;
+    try {
+      const response = await fetch(apiUrl("api/auth"), {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) {
+        return;
+      }
+      payload = await response.json();
+    } catch {
+      // 网络不通（静态镜像、服务端故障）：保持当前命名空间，功能照常。
+      return;
+    }
+
+    const nextAccountId =
+      payload?.authenticated && payload?.account?.id
+        ? String(payload.account.id)
+        : "";
+    if (!nextAccountId && namespace === GUEST_NAMESPACE) {
+      return;
+    }
+
+    const before = namespace;
+    const changed = activate(nextAccountId);
+    if ((changed || namespace !== before) && bootReloadOnce()) {
+      return;
+    }
+    if (!nextAccountId) {
+      // 登出：命名空间已经切回 guest，这一轮不用同步。
+      return;
+    }
+    enableSync().catch(() => {});
+    startHeartbeat();
+  }
+
+  bootSession().catch(() => {});
 
   window.iballAccounts = {
     GUEST_NAMESPACE,

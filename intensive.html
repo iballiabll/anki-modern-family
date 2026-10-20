@@ -10,25 +10,35 @@
     <meta name="theme-color" content="#17204f" />
     <meta
       name="description"
-      content="2022 至 2026 年四级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。"
+      content="2015 至 2026 年四级听力全文翻译、出题点提醒、技巧提示与逐句语法精读。"
     />
     <title>四级听力全文精读 · iball的小屋</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23172554'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial' font-size='28' font-weight='700' fill='white'%3Eib%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="./intensive.css" />
+    <link rel="stylesheet" href="./intensive.css?v=20261010-cet4listen1" />
     <link rel="stylesheet" href="./speech-transport.css" />
     <link rel="stylesheet" href="./exam-scores.css" />
-    <script src="./account-store.js" defer></script>
+    <script src="./account-store.js?v=20261005-ui10" defer></script>
+    <script src="./vocab-library.js?v=20261005-ui10" defer></script>
     <script src="./exam-scores.js" defer></script>
     <script src="./speech-transport.js" defer></script>
     <script src="./deck-data.js" defer></script>
     <script src="./vocab-index.js" defer></script>
     <script src="./collocation-index.js" defer></script>
     <script src="./intensive-papers.js" defer></script>
-    <script src="./intensive.js" defer></script>
-  </head>
+    <script src="./intensive.js?v=20261010-cet4listen1" defer></script>
+    <!-- 移动端/平板底部导航（共享组件，桌面端自动隐藏） -->
+    <link rel="stylesheet" href="./site-nav.css?v=20261011-astra1" />
+    <link rel="stylesheet" href="./back-to-top.css?v=20261005-ui10" />
+    <script src="./site-nav.js?v=20261011-corpus1" defer></script>
+    <script src="./back-to-top.js?v=20261005-ui11" defer></script>
+      <!-- 「今天」首屏与本机最近打开（无依赖，失败时静默降级） -->
+    <script src="./home-today.js?v=20261011-corpus1" defer></script>
+    <!-- Astra 主题层（白 + 清新蓝），放在最后加载以覆盖旧配色令牌 -->
+    <link rel="stylesheet" href="./site-theme.css?v=20261011-astra1" />
+</head>
   <body>
     <div id="readingProgress" class="reading-progress" aria-hidden="true"></div>
 
@@ -202,6 +212,58 @@
           data-exam="cet4"
           data-title="四级听力精读 · 得分统计"
         ></div>
+      </section>
+
+      <section class="intensive-credits" aria-labelledby="intensiveCreditsTitle">
+        <h2 id="intensiveCreditsTitle">数据来源与开源思路借鉴</h2>
+        <p>
+          四级听力原文、题目与译文来自公开的四级听力学习页
+          <a
+            href="https://english-exam.lazynote.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >english-exam.lazynote.cn</a>
+          （2015-2026 年逐套整理）；本站的按套懒加载、逐段对照、点词查义与错题复盘
+          参考了下列开源项目的公开做法，只借鉴思路与数据结构，未复制其代码。
+        </p>
+        <ul class="intensive-credits-list">
+          <li class="intensive-credits-item">
+            <strong>
+              <a
+                href="https://github.com/3056810551/cet-listening"
+                target="_blank"
+                rel="noopener noreferrer"
+              >3056810551/cet-listening</a>
+            </strong>
+            <em>MIT · 仅借鉴结构思路</em>
+            <span>四六级听力原文的整理方式与段落切分粒度，本站六级听力板块已在用，四级板块沿用同一套逐段对照结构。</span>
+          </li>
+          <li class="intensive-credits-item">
+            <strong>
+              <a
+                href="https://github.com/hezkvectory/hermes-edu-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >hezkvectory/hermes-edu-skills</a>
+            </strong>
+            <em>MIT · 仅借鉴结构思路</em>
+            <span>把考试题型拆成可复用 skill 的组织方式，用于听力 / 阅读 / 写作板块的划分与复盘清单。</span>
+          </li>
+          <li class="intensive-credits-item">
+            <strong>
+              <a
+                href="https://github.com/Liuxiangjian-ai/cet-skill"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Liuxiangjian-ai/cet-skill</a>
+            </strong>
+            <em>MIT · 仅借鉴结构思路</em>
+            <span>把四六级真题按年份逐条拆成 skill 的知识组织方式，用于按年份筛选与整套练习的编排。</span>
+          </li>
+        </ul>
+        <p class="intensive-credits-note">
+          真题版权归全国大学英语四六级考试委员会所有；本站仅作个人学习索引，不提供考试原声音频。
+        </p>
       </section>
     </main>
 

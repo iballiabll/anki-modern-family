@@ -1,0 +1,153 @@
+{
+  "id": "english-ii-2024",
+  "track": "english-ii",
+  "year": 2024,
+  "provider": "transmart",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.198Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2024 考研英语二 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "79b72baf83802097",
+          "en": "In her new book Cogs and Monsters: What Economics Is, and What It Should Be, Diane Coyle, an economist at Cambridge University, argues that the digital economy requires new ways of thinking about progress. “Whatever we mean by the economy growing, by things getting better, the gains will have to be more evenly shared than in the recent past,” she writes. “An economy of tech millionaires or billionaires and gig workers, with middle-income jobs undercut by automation, will not be politically sustainable.”",
+          "zh": "在她的新书《Cogs and Monsters》中：剑桥大学经济学家黛安·科伊尔（Diane Coyle）认为，数字经济需要以新的方式思考进步。\"无论我们所说的经济增长是什么意思，情况变得更好，收益将不得不比最近更均匀地分享，她写道，“一个由科技百万富翁或亿万富翁和零工组成的经济体，加上中等收入的工作岗位被自动化所削弱，在政治上是不可持续的。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "6112e76fc4c843bf",
+          "en": "Improving living standards and increasing prosperity for more people will require greater use of digital technologies to boost productivity in various sectors, including health care and construction, says Coyle. But people can’t be expected to embrace the changes if they’re not seeing the benefits—if they’re just seeing good jobs being destroyed.",
+          "zh": "科伊尔说，提高生活水平和增加更多人的财富将需要更多地使用数字技术来提高包括医疗保健和建筑在内的各个部门的生产率。但如果人们看不到好处，如果他们只是看到好工作被摧毁，就不能指望他们接受这些变化。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "952341cbcbf3d828",
+          "en": "In a recent interview, Coyle said she fears that tech’s inequality problem could be a roadblock to deploying AI. “We’re talking about disruption,” she says. “These are transformative technologies that change the ways we spend our time every day, that change business models that succeed.” To make such “tremendous changes,” she adds, you need social buy-in.",
+          "zh": "在最近的一次采访中，科伊尔说，她担心科技的不平等问题可能成为部署人工智能的障碍。\"我们谈论的是颠覆，\"她说。\"这些是变革性的技术，改变了我们每天花费时间的方式，改变了成功的商业模式。\"她补充说，要实现这种\"巨大的改变\"，你需要社会的支持。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b8f3d8e09e08aa63",
+          "en": "Instead, says Coyle, resentment is simmering among many as the benefits are perceived to go to elites in a handful of prosperous cities. According to the Brookings Institution, a short list of eight American cities that included San Francisco, San Jose, Boston, and Seattle had roughly 38% of all tech jobs by 2019. New AI technologies are particularly concentrated: Brookings’s Mark Muro and Sifan Liu estimate that just 15 cities account for two-thirds of the AI assets and capabilities in the United States. The dominance of a few cities in the invention and commercialization of AI means that geographical disparities in wealth will continue to soar. Not only will this foster political and social unrest, but it could, as Coyle suggests, hold back the sorts of AI technologies needed for regional economies to grow. Part of the solution could lie in somehow loosening the stranglehold that Big Tech has on defining the AI agenda. That will likely take increased federal funding for research independent of the tech giants.",
+          "zh": "科伊尔说，相反，许多人的不满情绪正在酝酿，因为这些好处被认为是少数繁荣城市的精英阶层获得的。根据布鲁金斯研究所的数据，到2019年，包括旧金山弗朗西斯科、圣何塞、波士顿和西雅图在内的八个美国城市的科技工作岗位约占38%。新的人工智能技术尤其集中：布鲁金斯的马克·穆罗和刘思凡估计，仅15个城市就占了两个-美国三分之一的人工智能资产和能力。少数城市在人工智能发明和商业化方面的主导地位意味着财富的地域差距将继续扩大。这不仅会促进政治和社会但正如科伊尔所言，这可能会阻碍地区经济增长所需的人工智能技术。部分解决方案可能在于以某种方式放松大型科技公司在定义人工智能议程方面的束缚。这可能需要增加联邦资金，用于独立于科技巨头的研究。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b84759c73c9e054e",
+          "en": "A more immediate response is to broaden our digital imaginations to conceive of AI technologies that don’t simply replace jobs but expand opportunities in the sectors that different parts of the country care most about, like health care, education, and manufacturing.",
+          "zh": "一个更直接的反应是扩大我们的数字想象力，设想人工智能技术不仅仅是取代工作，而是在该国不同地区最关心的行业（如医疗保健，教育和制造业）中扩大机会。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2024 考研英语二 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "c72fab3d18c77ba6",
+          "en": "The UK is facing a future construction crisis because of a failure to plant trees to produce wood, Confor has warned. The forestry and wood trade body has called for urgent action to reduce the country’s reliance on timber imports and provide a stable supply of wood for future generations. Currently only 20 per cent of the UK’s wood requirement is home-grown while it remains the second-largest net importer of timber in the world.",
+          "zh": "英国正面临着未来的建设危机，因为未能种植树木生产木材，Confor警告说。林业和木材贸易机构呼吁采取紧急行动，减少该国对木材进口的依赖，并为子孙后代提供稳定的木材供应。目前，英国木材需求中只有20%是本土种植的，而这仍然是第二大需求。世界上最大的木材净进口国。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "faf674cc9983c339",
+          "en": "Coming at a time of fresh incentives from the UK government for landowners to grow more trees, the trade body says these don’t go far enough and fail to promote the benefits of planting them to boost timber supplies. “Not only are we facing a carbon crisis now, but we will also be facing a future construction crisis because of a failure to plant trees to produce wood,” said Stuart Goodall, chief executive of Confor. “For decades we have not taken responsibility for investing in our domestic wood supply, leaving us exposed to fluctuating prices and fighting for future supplies of wood as global demand rises and our own supplies fall.”",
+          "zh": "在英国政府出台新的激励措施鼓励土地所有者种植更多树木之际，该贸易机构表示，这些措施还不够深入，未能宣传种植树木以增加木材供应的好处。斯图尔特·古道尔说：“我们现在不仅面临着碳危机，而且由于未能种植树木生产木材，我们还将面临未来的建筑危机。”几十年来，我们没有承担起投资国内木材供应的责任，使我们面临价格波动的风险，并在全球需求上升而我们自己的供应下降时争夺未来的木材供应。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "1df0aa896fb9cabd",
+          "en": "The UK has ideal conditions for growing wood to build low-carbon homes and is a global leader in certifying that its forests are sustainably managed, Confor says. While around three quarters of Scottish homes are built from Scottish timber, the use of home-grown wood in England is only around 25 per cent. The causes of the UK’s current position are complex and range from outdated perceptions of productive forestry to the decimation of trees by grey squirrels. It also encompasses significant hesitation on behalf of farmers and other landowners to invest in longer-term planting projects. While productive tree planting can deliver real financial benefits to rural economies and contribute to the UK’s net-zero strategy, the focus of government support continues to be on food production and the rewilding and planting of native woodland solely for biodiversity. Goodall added: “While food production and biodiversity health are clearly of critical importance, we need our land to also provide secure supplies of wood for construction, manufacturing and contribute to net zero.”",
+          "zh": "Confor说，英国拥有种植木材建造低碳家园的理想条件，并且在认证其森林可持续管理方面处于全球领先地位。虽然苏格兰约有四分之三的房屋是用苏格兰木材建造的，家庭的使用-英国目前状况的原因是复杂的，从过时的生产性林业观念到灰松鼠对树木的破坏。它还包括农民和其他土地所有者对投资长期种植项目的重大犹豫。虽然生产性植树可以为农村经济带来真实的经济利益，并有助于英国的净零战略，政府支持的重点仍然是粮食生产，以及仅为生物多样性而重新开垦和种植原生林地。古道尔补充说：“虽然粮食生产和生物多样性健康显然至关重要，但我们需要我们的土地也为建筑，制造业提供安全的木材供应，并为净零做出贡献。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "147f63dde6e2a737",
+          "en": "“While the UK government has stated its ambition for more tree planting, there has been little action on the ground. Confor is now calling for much greater impetus behind those aspirations to ensure we have enough wood to meet increasing demand.”",
+          "zh": "“虽然英国政府已经表达了更多植树的雄心，但实际上几乎没有采取任何行动。Confor现在呼吁在这些愿望背后提供更大的动力，以确保我们有足够的木材来满足不断增长的需求。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2024 考研英语二 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "2531e4a4463c177b",
+          "en": "One of the biggest challenges in keeping unsafe aging drivers off the road is convincing them that it’s time to turn over the keys. “It’s a complete life-changer” when someone stops—or is forced to stop—driving, said former risk manager Anne M. Menke.",
+          "zh": "要想让不安全的老年司机不再上路，最大的挑战之一就是让他们相信是时候交钥匙了。前风险经理安妮·M·门克说，当有人停止或被迫停止驾驶时，“这完全改变了他们的生活”。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "b1e815bc11fe8679",
+          "en": "“The American Medical Association advises physicians that ‘in situations where clear evidence of substantial driving impairment implies a strong threat to patient and public safety, and where the physician’s advice to discontinue driving privileges is ignored, it is desirable and ethical to notify the Department of Motor Vehicles,’” Menke wrote. “Some states require physicians to report, others allow but do not mandate reports, while a few consider a report a breach of confidentiality. There could be liability and penalties if a physician does not act in accordance with state laws on reporting and confidentiality,” she counseled. Part of the problem in keeping older drivers safe is that the difficulties are addressed piecemeal by different professions with different focuses, including gerontologists, highway administration officials, automotive engineers and others, said gerontologist Elizabeth Dugan. “There’s not a National Institute of Older Driver Studies,” she said. “We need better evidence on what makes drivers unsafe” and what can help, said Dugan.",
+          "zh": "“美国医学会建议医生，”在有明显证据表明严重驾驶障碍对患者和公共安全构成严重威胁的情况下，以及医生建议停止驾驶特权被忽视的情况下，通知机动车辆部是可取的和合乎道德的，“门克写道，“一些州要求医生报告，其他州允许但不强制报告，而一些人认为报告违反了保密规定。如果医生不按照州法律的规定报告和保密，可能会有责任和处罚，”她建议说。保证老年司机安全的部分问题是，不同专业的人以不同的重点来解决这些困难，包括老年病学家，公路管理官员，老年病学家伊丽莎白·杜根说：“没有一个国家老年司机研究所。我们需要更好的证据来证明是什么让司机不安全。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "3f8011c8b7afa5eb",
+          "en": "One thing that does seem to work is requiring drivers to report in person for license renewal. Mandatory in-person renewal was associated with a 31 percent reduction in fatal crashes involving drivers 85 or older, according to one study. Passing vision tests also produced a similar decline in fatal crashes for those drivers, although there appeared to be no benefit from combining the two. Many older drivers don’t see eye doctors or can’t afford to. Primary care providers have their hands full and may not be able to follow through with patients who have trouble driving because they can’t turn their heads or remember where they are going—or have gotten shorter and haven’t changed their seat settings sufficiently to reach car pedals easily. As long as there are other cars on the roads, self-driving cars won’t solve the problems of crashes, said Dugan. Avoiding dangers posed by all those human drivers would require too many algorithms, she said. But we need to do more to improve safety, said Dugan. “If we’re going to have 100-year lives, we need cars that a 90-year-old can drive comfortably.”",
+          "zh": "有一件事似乎确实有效，那就是要求驾驶员亲自报告执照更新。根据一项研究，强制性的亲自更新与涉及85岁或以上驾驶员的致命事故减少31%有关。通过视力测试也使这些驾驶员的致命事故减少了类似的下降，尽管两者结合似乎没有什么好处。许多年长的司机不去看眼科医生，或者负担不起。初级保健提供者忙得不可开交，可能无法对有问题的病人进行跟踪治疗驾驶是因为他们无法转动头部或记住自己要去哪里--或者变得更矮，没有充分改变座椅设置，无法轻松到达汽车踏板。杜根说，只要路上还有其他汽车，自动驾驶汽车就不会解决撞车问题。避免所有这些人类驾驶员带来的危险需要太多的算法，但我们需要做更多的工作来提高安全性，杜根说，“如果我们要有100岁的寿命，我们需要90岁的老人可以舒适地驾驶的汽车。”",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2024 考研英语二 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "cb7e4f8e27a2cee9",
+          "en": "If you look at the apps on your phone, chances are you have at least one related to your health—and probably several. Whether it is a mental health app, a fitness tracker, a connected health device or something else, many of us are taking advantage of this technology to keep better track of our health in some shape or form. Recent research from the Organization for the Review of Care and Health Applications found that 350,000 health apps were available on the market, 90,000 of which launched in 2020 alone.",
+          "zh": "如果你看看手机上的应用程序，你很可能至少有一个与你的健康有关--可能有好几个。无论是心理健康应用程序、健身追踪器、联网健康设备还是其他什么，我们中的许多人都在利用这项技术，以某种形式或形式更好地跟踪我们的健康状况。护理和健康应用审查组织最近的研究发现，市场上有35万个健康应用程序，其中9万个仅在2020年推出。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "7c6700e976332dbd",
+          "en": "While these apps have a great deal to offer, it is not always clear how the personal information we input is collected, safeguarded and shared online. Existing health privacy law, such as the Health Insurance Portability and Accountability Act, is primarily focused on the way hospitals, doctors’ offices, clinics and insurance companies store health records online. The health information these apps and health data tracking wearables are collecting typically do not receive the same legal protections.",
+          "zh": "虽然这些应用程序可以提供很多功能，但我们输入的个人信息是如何收集、保护和在线共享的，并不总是很清楚。现有的健康隐私法，如《健康保险携带和责任法》，主要集中在医院、医生办公室、诊所和保险公司在线存储健康记录。这些应用程序和健康数据跟踪可穿戴设备收集的健康信息通常不得到同样的法律的保护。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "17242d3a96892c23",
+          "en": "Without additional protections in place, companies may share (and potentially monetize) personal health information in a way consumers may not have authorized or anticipated. In 2021, Flo Health faced a Federal Trade Commission (FTC) investigation. The FTC alleged in a complaint that “despite express privacy claims, the company took control of users’ sensitive fertility data and shared it with third parties.” Flo Health and the FTC settled the matter with a Consent Order requiring the company to get app users’ express affirmative consent before sharing their health information as well as to instruct the third parties to delete the data they had obtained.",
+          "zh": "如果没有额外的保护措施，公司可能会分享（并可能以消费者可能没有授权或预期的方式将个人健康信息货币化）。2021年，Flo Health面临联邦贸易委员会（FTC）的调查。FTC在一份投诉中称，“尽管明确声称隐私，该公司控制了用户的敏感生育数据，并与第三方分享。”Flo Health和FTC通过同意令解决了这一问题，要求该公司在分享其健康信息之前获得应用程序用户的明确同意，并指示第三方删除他们获得的数据。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "6dae49311e005055",
+          "en": "Section 5 of the FTC Act empowers the FTC to initiate enforcement action against unfair or deceptive acts, meaning the FTC can only act after the fact if a company’s privacy practices are misleading or cause unjustified consumer harm. While the FTC is doing what it can to ensure apps are keeping their promises to consumers around the handling of their sensitive health information, the rate at which these health apps are hitting the market demonstrates just how immense of a challenge this is.",
+          "zh": "《联邦贸易委员会法》第5条授权联邦贸易委员会对不公平或欺骗行为采取执法行动，这意味着联邦贸易委员会只能在公司的隐私做法具有误导性或对消费者造成不合理伤害的情况下采取行动。虽然联邦贸易委员会正在尽其所能确保应用程序在处理敏感健康信息时遵守对消费者的承诺，这些健康应用程序进入市场的速度表明这是一个多么巨大的挑战。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        },
+        {
+          "hash": "51165283f5ba603c",
+          "en": "As to the prospects for federal legislation, commentators suggest that comprehensive federal privacy legislation seems unlikely in the short term. States have begun implementing their own solutions to shore up protections for consumer-generated health data. California has been at the forefront of state privacy efforts with the California Consumer Privacy Act of 2018. Virginia, Colorado and Utah have also recently passed state consumer data privacy legislation.",
+          "zh": "至于联邦立法的前景，评论人士认为，全面的联邦隐私立法在短期内似乎不太可能。各州已开始实施自己的解决方案，以海岸保护消费者生成的健康数据。加州一直处于州隐私努力的前沿，2018年的加州消费者隐私法。弗吉尼亚州，科罗拉多和犹他州最近也通过了州消费者数据隐私立法。",
+          "provider": "transmart",
+          "generatedAt": "2026-10-09T13:49:13.088Z"
+        }
+      ]
+    }
+  }
+}

@@ -5,7 +5,7 @@
   "title": "Modern Family S01E01",
   "generatedBy": "scripts/build-movie-library.mjs",
   "generatedAt": "2026-09-25",
-  "source": "Modern Family S01E01 Pilot.��Ӣ.ass",
+  "source": "Modern Family S01E01 Pilot.中英.ass",
   "blockCount": 496,
   "wordCount": 0,
   "vocabCount": 835,

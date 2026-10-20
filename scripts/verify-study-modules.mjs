@@ -279,8 +279,6 @@ async function verifyVocab(browser, base, out) {
 
   const rows = await page.locator(".vocab-row").count();
   check("词表已渲染", rows >= 20, `${rows} 行`);
-  const backXxjrHref = await page.locator("#backXxjrButton").getAttribute("href");
-  check("词汇页有返回 XXRJ 入口", backXxjrHref === "./xxrj/", backXxjrHref || "(没有链接)");
 
   const deckOptions = await page
     .locator("#deckSelect option")
@@ -662,9 +660,6 @@ async function verifyVocab(browser, base, out) {
   check("搜索能过滤词表", filtered > 0 && filtered <= rows, `${rows} -> ${filtered} 行`);
 
   await page.screenshot({ path: path.join(out, "study-vocab-desktop.png") });
-  await page.locator("#backXxjrButton").click();
-  await page.waitForURL(/\/xxrj\//, { timeout: 10000 });
-  check("返回 XXRJ 可实际打开", /\/xxrj\//.test(page.url()), page.url());
   check("词汇页无脚本报错", errors.length === 0, errors.slice(0, 3).join(" | "));
   await context.close();
 

@@ -1,0 +1,160 @@
+{
+  "id": "english-i-2026",
+  "track": "english-i",
+  "year": 2026,
+  "provider": "google-vps",
+  "note": "整段参考译文为公开机器翻译接口生成的初稿，非官方译文，仅用于对照理解。",
+  "generatedAt": "2026-10-09T13:49:13.182Z",
+  "sections": {
+    "reading-text-1": {
+      "label": "阅读 Text 1",
+      "title": "2026 考研英语一 阅读 Text 1",
+      "paragraphs": [
+        {
+          "hash": "fe472b1e3d05a943",
+          "en": "For thousands of years, donkeys have been critical for propelling human civilizations forward. They’ve helped pull wheeled vehicles, carry travelers and move goods across the world. But where and when these animals first became intertwined with humans has been a mystery. Now, researchers have used genomes of over 200 donkeys to trace their domestication back to a single event around 7,000 years ago in East Africa—about 3,000 years before humans tamed horses. The team published their findings in the journal Science this month.",
+          "zh": "几千年来，驴对于推动人类文明向前发展至关重要。他们帮助拉动轮式车辆、运送旅客以及在世界各地运送货物。但这些动物何时何地首次与人类交织在一起一直是个谜。现在，研究人员利用 200 多头驴的基因组将它们的驯化追溯到大约 7,000 年前东非的一次事件，比人类驯服马早了大约 3,000 年。该团队在本月的《科学》杂志上发表了他们的发现。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "98ee331f19f129fa",
+          "en": "“Through their DNA, the animals are telling their history themselves,” co-author Samantha Brooks, an equine researcher at the University of Florida, says in a statement. “We usually only get the human’s side of history through written accounts, but of course written history does not always record exactly how something happened. Looking at these DNA sequences, we get a biological testimony to the environment these animals lived in and the experiences they survived.”",
+          "zh": "“通过它们的 DNA，这些动物正在讲述它们自己的历史，”合著者、佛罗里达大学马科研究员萨曼莎·布鲁克斯 (Samantha Brooks) 在一份声明中说。 “我们通常只能通过书面记录来了解人类的历史，但当然，书面历史并不总是准确记录事情是如何发生的。通过查看这些 DNA 序列，我们可以获得这些动物所生活的环境以及它们生存的经历的生物学证据。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "b6ad8e6a5581645a",
+          "en": "The researchers examined 207 genomes from modern donkeys living in 31 countries across the globe. They also looked at genomes from 15 wild equids and 31 earlier donkeys that lived between about 4,000 and 100 years ago. The team reconstructed the animals’ evolutionary tree and used computer models to pinpoint the domestication event when herders in Kenya and the Horn of Africa tamed wild asses. They then traced how the animals spread across the rest of the continent and into Europe and Asia about 2,500 years later.",
+          "zh": "研究人员检查了生活在全球 31 个国家的 207 个现代驴的基因组。他们还研究了 15 种野生马科动物和 31 种生活在大约 4000 到 100 年前的早期驴的基因组。研究小组重建了动物的进化树，并使用计算机模型来确定肯尼亚和非洲之角的牧民驯服野驴的驯化事件。然后，他们追踪了大约 2500 年后这些动物是如何传播到非洲大陆其他地区并进入欧洲和亚洲的。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "ab6a4b3c67c53fa2",
+          "en": "Though it’s still unclear why the original domestication happened, Science News’ Freda Kreier reports that the event coincided with the Sahara growing larger and drier. “Donkeys are champions when it comes to carrying stuff and are good at going through deserts,” co-author Ludovic Orlando, an evolutionary biologist at Paul Sabin University in France, tells the publication. Prehistoric humans may have tamed donkeys to help navigate the expanding Sahara.",
+          "zh": "尽管目前还不清楚为什么会发生最初的驯化，但《科学新闻》的弗雷达·克雷尔报道说，这一事件与撒哈拉沙漠变得越来越大、越来越干燥同时发生。法国保罗萨宾大学的进化生物学家、合著者卢多维奇·奥兰多（Ludovic Orlando）告诉该刊物：“在搬运物品方面，驴是冠军，并且擅长穿越沙漠。”史前人类可能已经驯服了驴子，以帮助在不断扩张的撒哈拉沙漠中航行。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "d3d43e3ec85bf997",
+          "en": "Researchers say these findings could help put donkeys in the spotlight. The animals could benefit from more research: Currently, there are no published genomes from donkeys located south of the Equator in Africa. But understanding where the animals were first domesticated could guide archaeologists to a narrow region to search for insights about the original tamed donkeys.",
+          "zh": "研究人员表示，这些发现可能有助于让驴子成为人们关注的焦点。这些动物可以从更多的研究中受益：目前，还没有公布来自非洲赤道以南的驴的基因组。但了解这些动物最初被驯化的地点可以引导考古学家到一个狭窄的区域寻找有关最初被驯养的驴的见解。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "db464100f74d2631",
+          "en": "Not only does understanding the equines’ genetic makeup help reveal their contribution to human history, but it also might improve their management in the future, as climate change alters the planet’s environment, write the authors.",
+          "zh": "作者写道，了解马的基因组成不仅有助于揭示它们对人类历史的贡献，而且还可能改善它们未来的管理，因为气候变化改变了地球的环境。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-2": {
+      "label": "阅读 Text 2",
+      "title": "2026 考研英语一 阅读 Text 2",
+      "paragraphs": [
+        {
+          "hash": "8903b088fb058662",
+          "en": "There’s no business like show business—but in Los Angeles, it feels like there’s no business at all.",
+          "zh": "没有什么行业像演艺界一样——但在洛杉矶，感觉就像根本没有生意。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "60acd2a239ae513d",
+          "en": "If that sounds melodramatic, consider this: The Art Directors Guild, a labor union representing about 3,000 film workers, has suspended a training program and issued a statement explaining that “we cannot in good conscience encourage you to pursue our profession”. This is a reaction to Hollywood’s decline, which is reaching a critical point for the industry and Southern California. Production has been slipping away from Hollywood since the 1950s, but the effects have never been more apparent than at present. Other regions in the United States, Canada and Europe have steadily increased incentives to attract TV shows and movies, leaving California in the dust. Georgia offers up to 30% in transferable tax credits on film and TV production costs, plus an additional 10% increase on the base tax credit if the project includes a Georgia promotional logo. Even as California lost a huge volume of production to other locations, there was still plenty of film production taking place in Los Angeles before this year. We were kept afloat by “peak TV”, the glut of content that was required by the explosion of streaming services.",
+          "zh": "如果这听起来有些夸张，请考虑一下：代表约 3,000 名电影工作者的工会艺术导演协会已暂停一项培训计划，并发表声明解释说，“出于良心，我们不能鼓励你从事我们的职业”。这是对好莱坞衰落的反应，好莱坞的衰落对于该行业和南加州来说已经达到了一个临界点。自 20 世纪 50 年代以来，好莱坞的制作一直在减少，但其影响从未像现在这样明显。美国、加拿大和欧洲的其他地区稳步增加了吸引电视节目和电影的激励措施，使加州望尘莫及。乔治亚州为电影和电视制作成本提供高达 30% 的可转让税收抵免，如果项目包含乔治亚州宣传标志，则在基本税收抵免的基础上额外增加 10%。尽管加州的大量电影制作被转移到了其他地点，但今年之前洛杉矶仍然有大量的电影制作。我们靠“电视峰值”维持生计，即流媒体服务爆炸式增长所需的内容过剩。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "6661aac551994314",
+          "en": "But 2022 was the peak of peak TV. Back then platforms such as Netflix, Amazon and Apple TV hemorrhaged billions of dollars to generate content to attract new subscribers, resulting in 633 scripted series being released that year. As the streamers’ emphasis changed from subscriber growth to profitability, prices for the services went up and the number of new shows went down to 481 released in 2023, with the number expected to dip into the 300s within a few years.",
+          "zh": "但2022年是电视巅峰期。当时，Netflix、亚马逊和 Apple TV 等平台斥资数十亿美元制作内容来吸引新订阅者，导致当年发布了 633 个剧本剧集。随着流媒体的重点从订阅用户增长转向盈利，服务价格上涨，新节目数量下降至 2023 年发布的 481 部，预计几年内将降至 300 部。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "af7065e91bdf16f2",
+          "en": "If productions in Southern California dip below a critical level for too long, the industry’s essential talent will drift away along with enormous sums of revenue. Persuading studios to film here would become much more challenging if we couldn’t offer a deep bench of local film workers, on-screen talent and local businesses that support the entertainment industry.",
+          "zh": "如果南加州的产量长期低于临界水平，该行业的重要人才将随着巨额收入的流失而流失。如果我们不能提供大量本地电影工作者、银幕人才和支持娱乐业的本地企业，那么说服电影公司在这里拍摄电影将变得更具挑战性。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "84b4f534664a3654",
+          "en": "That’s why the California Film Commission and its Los Angeles counterpart, Film LA, now should act, before it’s too late. Those agencies and other government bodies should dramatically improve incentives to keep our current shows and attract new productions to Los Angeles. Let’s go on with the show... and make sure the show doesn’t go on without us.",
+          "zh": "这就是为什么加州电影委员会和洛杉矶电影委员会现在应该采取行动，以免为时已晚。这些机构和其他政府机构应该大幅提高激励措施，以保留我们现有的节目并吸引新作品来到洛杉矶。让我们继续演出……并确保演出不会在没有我们的情况下继续进行。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-3": {
+      "label": "阅读 Text 3",
+      "title": "2026 考研英语一 阅读 Text 3",
+      "paragraphs": [
+        {
+          "hash": "db87a3ba95fabeaf",
+          "en": "The pioneers of wireless saw it as a gift to all the people. Sir John Reith said that it would end “isolation of the spirit” and rejoiced: “It does not matter how many thousands may be listening, there is always enough for others... the genius and the fool, the wealthy and the poor listen simultaneously.” Between two great wars this technological innovation built a new kind of national consciousness. Opening this week, a book and exhibition curated by Beatty Rubens at the Bodleian in Oxford records how radio changed everyday life from 1922 to 1939. She draws on letters, diaries and fiction, and a 1939 field notebook of verbatim audience research by Winifred Gill. There’s fun in testimonies of people enjoying the sheer newness. A cartoon mocks a group failing to converse because they’re all in headphones. People report that broadcast music made workmen whistle new tunes. A woman says there have been fewer street fights since the arrival of the wireless but also less stopping and “talking on the brush handle”.",
+          "zh": "无线先驱将其视为送给所有人的礼物。约翰·里斯爵士表示，这将结束“精神上的孤立”，并很高兴：“无论有多少人在听，总有足够的人听……天才和傻瓜、富人和穷人同时听。”在两次大战之间，这种技术创新建立了一种新的民族意识。比蒂·鲁本斯 (Betty Rubens) 在牛津博德利安图书馆 (Bodleian) 策划的一本书和展览于本周开幕，记录了 1922 年至 1939 年间广播如何改变了日常生活。她借鉴了信件、日记和小说，以及威妮弗雷德·吉尔 (Winifred Gill) 1939 年逐字听众研究的实地笔记本。人们享受纯粹的新鲜感的见证很有趣。一幅漫画嘲笑一群人因为戴着耳机而无法交谈。人们报告说，广播音乐让工人们吹出新曲子。一位女士表示，自从无线技术出现以来，街头斗殴事件减少了，但停下来“在刷柄上说话”的情况也减少了。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "1aca12fa1d3af746",
+          "en": "By and large the wireless was welcome. I loved the man from the Thirties research who found that wireless suddenly offered “a lot of variety...things I thought I’d never be interested in...ice hockey perhaps”. True: for more than 80 pre-digital years, linear speech broadcasting brought the gift of serendipity, random enlivening of a car journey or dull manual task. In my own book about radio I recorded how, on one drive: “I caught up with the news, learnt some 17th-century history, and was startlingly educated by an unpretentious programme on the history of the stethoscope.”",
+          "zh": "总的来说，无线技术很受欢迎。我喜欢三十年代研究中的那个人，他发现无线突然提供了“很多种类……我以为我永远不会感兴趣的东西……也许是冰球”。事实是这样的：在数字化之前的 80 多年里，线性语音广播带来了意外的惊喜、随机的汽车旅行或枯燥的手动任务的活力。在我自己关于广播的书中，我记录了如何在一次驾车中：“我了解了新闻，了解了一些 17 世纪的历史，并且通过一个有关听诊器历史的朴实无华的节目获得了惊人的教育。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "c6f03d5fb9206cec",
+          "en": "But radio’s enriching serendipity is ebbing. With multiple networks and countless podcasts, a smartphone user selects what to hear and when. And while it is wonderful to take a walk with anything in your headphones, infinite choice encourages us to shrink into niche interests and sympathetic beliefs. A hundred years on from Marconi and Reith, is the art of mere listening endangered? Some will say the audiobook boom revives it, though I suppose you can then worry about the decline of reading. But inventions shape all of us and it is worth noticing when techno-social habits do change, and asking whether to control them a bit or shield the youngest. Whatever we do, innovation will happen. Today we fret about the isolating culture of smartphone-staring and selfie-vanity, but already in 1939 there was that lady regretting how, when all her street got wirelesses, it lost the neighbourly habit of “talking on the brush handle”. It’s enough to make a person put down the smartphone and go out front with a yard broom.",
+          "zh": "但广播带来的丰富机缘正在消退。通过多个网络和无数的播客，智能手机用户可以选择听什么以及何时听。虽然戴着耳机散步很美妙，但无限的选择鼓励我们收缩到小众兴趣和同情信念。马可尼和里斯一百年后，单纯倾听的艺术是否濒临灭绝？有人会说有声读物的繁荣复兴了它，尽管我想你可以担心阅读量的下降。但发明塑造了我们所有人，当技术社会习惯确实发生变化时，值得注意的是，并询问是否要稍微控制它们或保护最小的孩子。无论我们做什么，创新都会发生。今天，我们对盯着智能手机和自拍虚荣的孤立文化感到烦恼，但早在 1939 年，就有一位女士后悔，当她所有的街道都配备了无线设备时，却失去了“在刷柄上交谈”的邻里习惯。这足以让人放下智能手机，拿着扫帚出门。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    },
+    "reading-text-4": {
+      "label": "阅读 Text 4",
+      "title": "2026 考研英语一 阅读 Text 4",
+      "paragraphs": [
+        {
+          "hash": "872225856246d48b",
+          "en": "When Tom Swetnam joined the U.S. Forest Service in the 1970s, his mandate was to “put everything out,” he recalled. But when Swetnam enrolled in graduate school at the University of Arizona’s Laboratory of Tree-Ring Research, he was surprised to find a record of repeated blazes dating back hundreds of years before European colonists arrived on the continent. Some of the trees he analyzed bore more than 20 fire scars among their rings.",
+          "zh": "汤姆·斯威特南 (Tom Swetnam) 回忆道，20 世纪 70 年代加入美国林务局时，他的任务是“扑灭一切”。但当斯威特南在亚利桑那大学树木年轮研究实验室攻读研究生时，他惊讶地发现，在欧洲殖民者到达非洲大陆之前的数百年里，反复发生火灾的记录。他分析的一些树木的年轮上有 20 多个火痕。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "e6a461c8831424a3",
+          "en": "The fact that fires happened so often meant they couldn’t have been severe enough to kill most trees. Instead, a growing body of research showed that frequent, low-severity fires made many ecosystems healthier. They rid the forest of dead and sick trees, reducing competition and curbing the spread of disease. Because flammable material couldn’t build up on the landscape, blazes tended to move slowly and peter out when they reached the footprints of previous burns. In 2022, Swetnam and other scientists teamed up to compile a database of fire-scarred trees from across the continent. Their North American tree-ring fire-scar network (NAFSN) provided the basis for a study published last month. In the study, the researchers compared the historical fire cadence with the wildfires recorded over the past few decades, and uncovered a striking shortfall. The NAFSN sites experienced less than a quarter of the number of fires that would have been expected without fire suppression.",
+          "zh": "火灾频繁发生的事实意味着火灾的严重程度不足以杀死大多数树木。相反，越来越多的研究表明，频繁的、低强度的火灾使许多生态系统更加健康。他们清除了森林中的死树和病树，减少了竞争并遏制了疾病的传播。由于易燃物质无法在地面上堆积，因此火焰往往会缓慢移动，并在到达先前燃烧的痕迹时逐渐熄灭。 2022 年，斯威特南和其他科学家联手编制了非洲大陆各地被火烧伤的树木的数据库。他们的北美树木年轮火疤网络（NAFSN）为上个月发表的一项研究提供了基础。在这项研究中，研究人员将历史火灾节奏与过去几十年记录的野火进行了比较，发现了显着的差距。 NAFSN 站点发生的火灾数量不到未采取灭火措施时预计发生火灾数量的四分之一。",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "44cfdcbc044efb7f",
+          "en": "This deficit is a testament to the effectiveness of modern firefighting, said Kelly Martin, a past president of the International Association of Wildland Fire. “Yet the combined consequences of suppression and climate change have eroded humanity’s ability to suppress fires, particularly those that ignite under the most dangerous weather conditions.”",
+          "zh": "国际野火协会前任主席凯利·马丁说，这种赤字证明了现代消防的有效性。 “然而，灭火和气候变化的综合后果削弱了人类扑灭火灾的能力，特别是那些在最危险的天气条件下点燃的火灾。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        },
+        {
+          "hash": "3572e3f9a7862928",
+          "en": "To prevent entire ecosystems from going up in smoke, Martin said, people must bring healthy fire back to the places that need it. At Yosemite National Park, Martin oversaw the use of what are known as prescribed burns to make the landscape more resilient. These fires were carefully planned and intentionally ignited during periods when weather kept the blazes easy to control, and helped eliminate some of the fuel that had built up around important park’s facilities. Research shows that these prescribed burns make subsequent wildfires less severe, even if later fires happen under the most dangerous weather conditions. Yet even as scientists and public officials increasingly agree on the need for more fires in our forests, climate change is making this tactic more challenging, experts said. “It’s a double-edged sword because wildfires are getting more severe and larger under climate change and we need this work even more, but then the work gets more challenging,” said Susan Prichard, a fire ecologist at the University of Washington.",
+          "zh": "马丁说，为了防止整个生态系统化为烟雾，人们必须将健康的火带回需要的地方。在优胜美地国家公园，马丁监督了所谓的规定燃烧的使用，以使景观更具弹性。这些火灾是经过精心策划的，是在天气易于控制火势的时期故意点燃的，并有助于消除重要公园设施周围积聚的一些燃料。研究表明，这些规定的燃烧可以使随后的野火变得不那么严重，即使后来的火灾发生在最危险的天气条件下。然而，专家表示，尽管科学家和政府官员越来越同意我们的森林需要更多的火灾，但气候变化使这一策略变得更具挑战性。华盛顿大学火灾生态学家苏珊·普里查德（Susan Prichard）表示：“这是一把双刃剑，因为在气候变化的影响下，野火变得越来越严重、规模越来越大，我们更加需要这项工作，但随之而来的工作也变得更具挑战性。”",
+          "provider": "google-vps",
+          "generatedAt": "2026-10-09T13:49:13.087Z"
+        }
+      ]
+    }
+  }
+}

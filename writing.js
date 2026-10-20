@@ -52,6 +52,9 @@
     templateIndexPromise: null,
     templateLoadPromise: null,
     templateObserver: null,
+    method: null,
+    methodPromise: null,
+    phraseBank: null,
     grade: null,
     grading: false,
     saveTimer: 0,
@@ -89,6 +92,19 @@
       "templateList",
       "templateDetail",
       "templateJumpLink",
+      "methodSection",
+      "methodMeta",
+      "methodBody",
+      "writingWordPanel",
+      "writingWordClose",
+      "writingWordSpeak",
+      "writingWordTitle",
+      "writingWordPhonetic",
+      "writingWordStatus",
+      "writingWordMeanings",
+      "writingWordPhraseSection",
+      "writingWordPhrases",
+      "writingWordContext",
     ].forEach((id) => {
       els[id] = document.getElementById(id);
     });
@@ -659,6 +675,299 @@
     }
   }
 
+  /* ------------------------------------------------ 模板点词查义 */
+
+  const WORD_TOKEN_RE = /[A-Za-z]+(?:['’-][A-Za-z]+)*/g;
+  const WORD_SLOT_RE = /\{[^{}]+\}/g;
+
+  function normalizeWordKey(value) {
+    return String(value || "")
+      .replace(/[’‘`]/g, "'")
+      .toLowerCase()
+      .trim();
+  }
+
+  function sentenceTokens(value) {
+    const clean = String(value || "").replace(WORD_SLOT_RE, " ");
+    return clean.match(WORD_TOKEN_RE) || [];
+  }
+
+  function createWordToken(word, sentence, index) {
+    const token = document.createElement("span");
+    token.className = "word-token";
+    token.textContent = word;
+    token.dataset.word = word;
+    token.dataset.sentence = sentence;
+    token.dataset.tokenIndex = String(index);
+    token.setAttribute("role", "button");
+    token.setAttribute("tabindex", "0");
+    token.title = "点击查看释义与固定搭配";
+    token.setAttribute("aria-label", `查看 ${word} 的释义与固定搭配`);
+    return token;
+  }
+
+  // 把英文句子渲染成可点单词；花括号槽位保留为不可点的占位标记。
+  function appendExplainableText(container, text, sentence) {
+    const value = String(text || "");
+    if (!value) {
+      return;
+    }
+    const context = String(sentence || value);
+    let tokenIndex = 0;
+    const appendPlain = (chunk) => {
+      if (!chunk) {
+        return;
+      }
+      WORD_TOKEN_RE.lastIndex = 0;
+      let cursor = 0;
+      let match = WORD_TOKEN_RE.exec(chunk);
+      if (!match) {
+        container.append(document.createTextNode(chunk));
+        return;
+      }
+      while (match) {
+        if (match.index > cursor) {
+          container.append(
+            document.createTextNode(chunk.slice(cursor, match.index)),
+          );
+        }
+        container.append(createWordToken(match[0], context, tokenIndex));
+        tokenIndex += 1;
+        cursor = match.index + match[0].length;
+        match = WORD_TOKEN_RE.exec(chunk);
+      }
+      if (cursor < chunk.length) {
+        container.append(document.createTextNode(chunk.slice(cursor)));
+      }
+    };
+
+    WORD_SLOT_RE.lastIndex = 0;
+    let lastIndex = 0;
+    let slotMatch = WORD_SLOT_RE.exec(value);
+    while (slotMatch) {
+      appendPlain(value.slice(lastIndex, slotMatch.index));
+      const slot = document.createElement("span");
+      slot.className = "writing-template-slot";
+      slot.textContent = slotMatch[0];
+      container.append(slot);
+      lastIndex = slotMatch.index + slotMatch[0].length;
+      slotMatch = WORD_SLOT_RE.exec(value);
+    }
+    appendPlain(value.slice(lastIndex));
+  }
+
+  // 点击某个词时，优先命中包含它的两到三个词的固定搭配。
+  function matchPhraseAt(tokens, index) {
+    const index2 = window.CollocationIndex;
+    if (!index2 || typeof index2.lookup !== "function" || !tokens.length) {
+      return null;
+    }
+    if (!Number.isInteger(index) || index < 0 || index >= tokens.length) {
+      return null;
+    }
+    for (let size = 3; size >= 2; size -= 1) {
+      const from = Math.max(0, index - size + 1);
+      const to = Math.min(index, tokens.length - size);
+      for (let start = from; start <= to; start += 1) {
+        const hit = index2.lookup(tokens.slice(start, start + size).join(" "));
+        if (hit?.phrase) {
+          return hit;
+        }
+      }
+    }
+    return null;
+  }
+
+  function relatedWritingPhrases(word, sentence) {
+    const index2 = window.CollocationIndex;
+    if (!index2) {
+      return [];
+    }
+    const seen = new Set();
+    const out = [];
+    const push = (item) => {
+      if (!item?.phrase || seen.has(item.phrase)) {
+        return;
+      }
+      seen.add(item.phrase);
+      out.push(item);
+    };
+    if (typeof index2.findInText === "function") {
+      (index2.findInText(sentence) || []).forEach(push);
+    }
+    if (typeof index2.containing === "function") {
+      (index2.containing(word, 8) || []).forEach(push);
+    }
+    return out.slice(0, 8);
+  }
+
+  function renderWritingWordMeanings(items) {
+    const box = els.writingWordMeanings;
+    if (!box) {
+      return;
+    }
+    box.replaceChildren();
+    const usable = (items || [])
+      .map((item) => String(item || "").trim())
+      .filter(Boolean);
+    if (!usable.length) {
+      return;
+    }
+    const list = document.createElement("ul");
+    usable.forEach((meaning) => {
+      const item = document.createElement("li");
+      item.textContent = meaning;
+      list.append(item);
+    });
+    box.append(list);
+  }
+
+  function renderWritingWordPhrases(items) {
+    const box = els.writingWordPhrases;
+    const section = els.writingWordPhraseSection;
+    if (!box || !section) {
+      return;
+    }
+    box.replaceChildren();
+    const usable = (items || []).filter((item) => item?.phrase);
+    section.hidden = usable.length === 0;
+    if (!usable.length) {
+      return;
+    }
+    const list = document.createElement("ul");
+    usable.forEach((item) => {
+      const entry = document.createElement("li");
+      const phrase = document.createElement("strong");
+      phrase.className = "word-token";
+      phrase.lang = "en";
+      phrase.textContent = item.phrase;
+      phrase.dataset.word = item.phrase;
+      phrase.dataset.sentence = item.phrase;
+      phrase.dataset.tokenIndex = "-1";
+      phrase.setAttribute("role", "button");
+      phrase.setAttribute("tabindex", "0");
+      phrase.title = "点击查看释义与固定搭配";
+      phrase.setAttribute("aria-label", `查看 ${item.phrase} 的释义与固定搭配`);
+      entry.append(phrase);
+      const meaning = String(item.meaning || "").trim();
+      if (meaning) {
+        const copy = document.createElement("span");
+        copy.textContent = meaning;
+        entry.append(copy);
+      }
+      list.append(entry);
+    });
+    box.append(list);
+  }
+
+  async function lookupWritingVocab(word) {
+    const index = window.VocabIndex;
+    if (!index || typeof index.lookup !== "function") {
+      return null;
+    }
+    try {
+      const entry = await index.lookup(word);
+      return entry && (entry.meaning || entry.phonetic) ? entry : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function openWritingWordPanel(word, sentence, rawIndex) {
+    const panel = els.writingWordPanel;
+    const phrase = String(word || "").trim();
+    if (!panel || !phrase) {
+      return;
+    }
+    const clean = String(sentence || phrase)
+      .replace(WORD_SLOT_RE, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    const tokens = sentenceTokens(clean);
+    let index = Number(rawIndex);
+    if (!Number.isInteger(index) || index < 0 || index >= tokens.length) {
+      index = tokens.findIndex(
+        (token) => normalizeWordKey(token) === normalizeWordKey(phrase),
+      );
+    }
+    state.wordLookupRun = (state.wordLookupRun || 0) + 1;
+    const run = state.wordLookupRun;
+    panel.hidden = false;
+    panel.setAttribute("aria-hidden", "false");
+    panel.scrollTop = 0;
+    if (els.writingWordTitle) {
+      els.writingWordTitle.textContent = phrase;
+    }
+    if (els.writingWordPhonetic) {
+      els.writingWordPhonetic.textContent = "";
+    }
+    if (els.writingWordContext) {
+      els.writingWordContext.textContent = clean;
+    }
+    if (els.writingWordStatus) {
+      els.writingWordStatus.textContent = "正在查本地词库…";
+    }
+    renderWritingWordMeanings([]);
+    renderWritingWordPhrases([]);
+
+    await window.CollocationIndex?.load?.();
+    if (run !== state.wordLookupRun || panel.hidden) {
+      return;
+    }
+    const exact = window.CollocationIndex?.lookup?.(phrase);
+    const phraseHit = exact?.phrase ? exact : matchPhraseAt(tokens, index);
+    if (phraseHit?.phrase && els.writingWordTitle) {
+      els.writingWordTitle.textContent = phraseHit.phrase;
+    }
+
+    const vocab = await lookupWritingVocab(phrase);
+    if (run !== state.wordLookupRun || panel.hidden) {
+      return;
+    }
+    const meanings = [];
+    if (phraseHit?.meaning && phraseHit.meaning !== vocab?.meaning) {
+      meanings.push(phraseHit.meaning);
+    }
+    if (vocab?.meaning) {
+      meanings.push(vocab.meaning);
+    }
+    if (vocab?.phonetic && els.writingWordPhonetic) {
+      els.writingWordPhonetic.textContent = vocab.phonetic;
+    }
+    renderWritingWordMeanings(meanings);
+    renderWritingWordPhrases(relatedWritingPhrases(phrase, clean));
+    if (els.writingWordStatus) {
+      els.writingWordStatus.textContent = meanings.length
+        ? `${vocab?.source || "本地词库"} · ${
+            (vocab?.kind || (phraseHit ? "phrase" : "word")) === "phrase"
+              ? "短语"
+              : "单词"
+          }`
+        : "本地词库暂时没有收录这个词，先参考下面的固定搭配。";
+    }
+  }
+
+  function closeWritingWordPanel() {
+    const panel = els.writingWordPanel;
+    if (!panel) {
+      return;
+    }
+    panel.hidden = true;
+    panel.setAttribute("aria-hidden", "true");
+    state.wordLookupRun = (state.wordLookupRun || 0) + 1;
+  }
+
+  function speakWritingWord() {
+    const text = els.writingWordTitle?.textContent || "";
+    if (!text || !window.IballSpeech?.speakSequence) {
+      return;
+    }
+    window.IballSpeech.speakSequence([{ text, lang: "en-US" }], {
+      label: "作文查词",
+      rate: 0.86,
+    });
+  }
+
   function makeTemplateBlock(title, hint) {
     const block = document.createElement("section");
     block.className = "writing-template-block";
@@ -687,6 +996,107 @@
     });
     note.append(list);
     return note;
+  }
+
+  function renderTeacherBlock(teacher) {
+    const block = makeTemplateBlock(
+      "老师视角 · 怎么用这套模板",
+      teacher.role || "按考研阅卷与教学视角整理",
+    );
+    block.classList.add("writing-template-teacher-block");
+
+    if ((teacher.scoring || []).length) {
+      const scoring = document.createElement("section");
+      scoring.className = "writing-teacher-section is-scoring";
+      const h = document.createElement("h5");
+      h.textContent = "阅卷怎么给分";
+      const ul = document.createElement("ul");
+      teacher.scoring.forEach((line) => {
+        const li = document.createElement("li");
+        li.textContent = line;
+        ul.append(li);
+      });
+      scoring.append(h, ul);
+      block.append(scoring);
+    }
+
+    if ((teacher.steps || []).length) {
+      const steps = document.createElement("section");
+      steps.className = "writing-teacher-section is-steps";
+      const h = document.createElement("h5");
+      h.textContent = "老师的写作步骤";
+      const ol = document.createElement("ol");
+      teacher.steps.forEach((line) => {
+        const li = document.createElement("li");
+        li.textContent = line;
+        ol.append(li);
+      });
+      steps.append(h, ol);
+      block.append(steps);
+    }
+
+    if ((teacher.warnings || []).length) {
+      const warn = document.createElement("section");
+      warn.className = "writing-teacher-section is-warning";
+      const h = document.createElement("h5");
+      h.textContent = "老师最想提醒";
+      const ul = document.createElement("ul");
+      teacher.warnings.forEach((line) => {
+        const li = document.createElement("li");
+        li.textContent = line;
+        ul.append(li);
+      });
+      warn.append(h, ul);
+      block.append(warn);
+    }
+
+    if ((teacher.keyPhrases || []).length) {
+      const keys = document.createElement("section");
+      keys.className = "writing-teacher-section is-keyphrases";
+      const h = document.createElement("h5");
+      h.textContent = "重点功能句（点英文单词可查释义与搭配）";
+      const list = document.createElement("div");
+      list.className = "writing-teacher-phrases";
+      (teacher.keyPhrases || []).forEach((item) => {
+        const text =
+          typeof item === "string" ? item : item?.en || item?.phrase || "";
+        if (!text) {
+          return;
+        }
+        const card = document.createElement("article");
+        card.className = "writing-teacher-phrase";
+        const slotText = typeof item === "string" ? "" : item?.slot || "";
+        if (slotText) {
+          const slot = document.createElement("span");
+          slot.className = "writing-teacher-phrase-slot";
+          slot.textContent = slotText;
+          card.append(slot);
+        }
+        const en = document.createElement("p");
+        en.className = "writing-teacher-phrase-en";
+        appendExplainableText(en, text, text);
+        card.append(en);
+        const zhText = typeof item === "string" ? "" : String(item?.zh || "").trim();
+        if (zhText) {
+          const zh = document.createElement("p");
+          zh.className = "writing-teacher-phrase-zh";
+          zh.textContent = zhText;
+          card.append(zh);
+        }
+        list.append(card);
+      });
+      keys.append(h, list);
+      block.append(keys);
+    }
+
+    if (teacher.timePlan) {
+      const time = document.createElement("p");
+      time.className = "writing-teacher-time";
+      time.textContent = `考场时间：${teacher.timePlan}`;
+      block.append(time);
+    }
+
+    return block;
   }
 
   function speakTemplateLines(lines, label) {
@@ -828,7 +1238,7 @@
       section.textContent = step.section || "";
       const en = document.createElement("p");
       en.className = "writing-template-step-en";
-      appendSlotText(en, step.en);
+      appendExplainableText(en, step.en, step.en);
       const zh = document.createElement("p");
       zh.className = "writing-template-step-zh";
       zh.textContent = step.zh || "";
@@ -856,7 +1266,7 @@
       const fn = document.createElement("strong");
       fn.textContent = phrase.function || "功能句";
       const en = document.createElement("em");
-      en.textContent = phrase.en || "";
+      appendExplainableText(en, phrase.en || "", phrase.en || "");
       const zh = document.createElement("span");
       zh.textContent = phrase.zh || "";
       item.append(fn, en, zh);
@@ -883,7 +1293,7 @@
       item.className = "writing-template-demo-paragraph";
       const en = document.createElement("p");
       en.className = "writing-template-demo-en";
-      en.textContent = paragraph;
+      appendExplainableText(en, paragraph, paragraph);
       item.append(en);
       const translation = template.demo?.translation?.[index];
       if (translation) {
@@ -916,6 +1326,10 @@
       makeTemplateNote("套用清单", template.adapt),
     );
     els.templateDetail.append(notes);
+
+    if (template.teacher) {
+      els.templateDetail.append(renderTeacherBlock(template.teacher));
+    }
 
     const foot = document.createElement("p");
     foot.className = "writing-template-foot";
@@ -1099,14 +1513,345 @@
     }
   }
 
+  const METHOD_URL = "./writing-data/kaoyan-method.json";
+  const PHRASE_BANK_URL = "./writing-data/phrase-bank.json";
+
+  function makePhraseBankToken(phrase, example) {
+    const token = document.createElement("span");
+    token.className = "word-token";
+    token.lang = "en";
+    token.textContent = phrase;
+    token.dataset.word = phrase;
+    token.dataset.sentence = example || phrase;
+    token.dataset.tokenIndex = "-1";
+    token.setAttribute("role", "button");
+    token.setAttribute("tabindex", "0");
+    token.title = "点击查看释义与固定搭配";
+    token.setAttribute("aria-label", `查看 ${phrase} 的释义与固定搭配`);
+    return token;
+  }
+
+  /* 短语与固定搭配库：按写作功能分组，英文条目可点击查释义与搭配 */
+  function renderPhraseBank(container) {
+    const data = state.phraseBank;
+    if (!container || !data || !(data.groups || []).length) {
+      return;
+    }
+    const block = makeTemplateBlock(
+      "短语与固定搭配库",
+      "按写作功能分类整理，点英文条目可查释义与搭配。",
+    );
+    block.classList.add("writing-method-phrases");
+    if (data.note) {
+      const note = document.createElement("p");
+      note.className = "writing-method-phrase-note";
+      note.textContent = data.note;
+      block.append(note);
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "writing-method-phrase-grid";
+    (data.groups || []).forEach((group) => {
+      const card = document.createElement("section");
+      card.className = "writing-method-phrase-group";
+      const h = document.createElement("h5");
+      h.textContent = group.title || "";
+      card.append(h);
+      if (group.intro) {
+        const intro = document.createElement("p");
+        intro.className = "writing-method-phrase-intro";
+        intro.textContent = group.intro;
+        card.append(intro);
+      }
+      const ul = document.createElement("ul");
+      (group.items || []).forEach((item) => {
+        const li = document.createElement("li");
+        const top = document.createElement("div");
+        top.className = "writing-method-phrase-top";
+        top.append(makePhraseBankToken(item.en || "", item.example || ""));
+        [item.level, item.slot].filter(Boolean).forEach((text) => {
+          const tag = document.createElement("span");
+          tag.className = "writing-method-phrase-tag";
+          tag.textContent = text;
+          top.append(tag);
+        });
+        li.append(top);
+        if (item.zh) {
+          const zh = document.createElement("p");
+          zh.className = "writing-method-phrase-zh";
+          zh.textContent = item.zh;
+          li.append(zh);
+        }
+        if (item.example) {
+          const ex = document.createElement("p");
+          ex.className = "writing-method-phrase-example";
+          appendExplainableText(ex, item.example, item.example);
+          li.append(ex);
+        }
+        ul.append(li);
+      });
+      card.append(ul);
+      grid.append(card);
+    });
+    block.append(grid);
+    container.append(block);
+  }
+
+  function renderMethodLoading(message) {
+    if (!els.methodBody) return;
+    els.methodBody.textContent = "";
+    const p = document.createElement("p");
+    p.className = "writing-template-empty";
+    p.textContent = message || "正在读取方法论…";
+    els.methodBody.append(p);
+    if (els.methodMeta) els.methodMeta.textContent = message || "正在读取方法论…";
+  }
+
+  function renderMethod() {
+    const data = state.method;
+    if (!data || !els.methodBody) return;
+    els.methodBody.textContent = "";
+
+    /* 万能原因体系 */
+    const reasons = data.universalReasons;
+    if (reasons) {
+      const block = makeTemplateBlock(reasons.title, reasons.intro);
+      block.classList.add("writing-method-reasons");
+      const grid = document.createElement("div");
+      grid.className = "writing-method-reason-grid";
+      (reasons.items || []).forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "writing-method-reason";
+        const head = document.createElement("div");
+        head.className = "writing-method-reason-head";
+        const badge = document.createElement("span");
+        badge.className = "writing-method-reason-badge";
+        badge.textContent = `万能原因 ${item.index}`;
+        const name = document.createElement("strong");
+        name.textContent = item.name || "";
+        head.append(badge, name);
+        card.append(head);
+
+        const fit = document.createElement("p");
+        fit.className = "writing-method-reason-fit";
+        fit.textContent = `适用：${item.fit || ""}`;
+        card.append(fit);
+
+        const en = document.createElement("p");
+        en.className = "writing-method-reason-en";
+        appendSlotText(en, item.skeleton || "");
+        card.append(en);
+
+        const zh = document.createElement("p");
+        zh.className = "writing-method-reason-zh";
+        zh.textContent = item.zh || "";
+        card.append(zh);
+
+        if (item.usage) {
+          const usage = document.createElement("p");
+          usage.className = "writing-method-reason-usage";
+          usage.textContent = `老师提示：${item.usage}`;
+          card.append(usage);
+        }
+        grid.append(card);
+      });
+      block.append(grid);
+      els.methodBody.append(block);
+    }
+
+    /* 三段式结构 */
+    const structure = data.structure;
+    if (structure) {
+      const block = makeTemplateBlock(structure.title, structure.intro);
+      block.classList.add("writing-method-structure");
+      [structure.large, structure.small].filter(Boolean).forEach((group) => {
+        const wrap = document.createElement("section");
+        wrap.className = "writing-method-structure-group";
+        const h = document.createElement("h5");
+        h.textContent = group.label || "";
+        wrap.append(h);
+        (group.paragraphs || []).forEach((para) => {
+          const item = document.createElement("article");
+          item.className = "writing-method-structure-item";
+          const top = document.createElement("div");
+          top.className = "writing-method-structure-top";
+          const no = document.createElement("span");
+          no.className = "writing-method-structure-no";
+          no.textContent = para.no || "";
+          const goal = document.createElement("strong");
+          goal.textContent = para.goal || "";
+          const budget = document.createElement("em");
+          budget.textContent = para.budget || "";
+          top.append(no, goal, budget);
+          item.append(top);
+          const ul = document.createElement("ul");
+          (para.points || []).forEach((pt) => {
+            const li = document.createElement("li");
+            li.textContent = pt;
+            ul.append(li);
+          });
+          item.append(ul);
+          wrap.append(item);
+        });
+        block.append(wrap);
+      });
+      els.methodBody.append(block);
+    }
+
+    /* 逻辑关系词链 */
+    const logic = data.logicChain;
+    if (logic) {
+      const block = makeTemplateBlock(logic.title, logic.intro);
+      block.classList.add("writing-method-logic");
+      const ul = document.createElement("ul");
+      ul.className = "writing-method-logic-list";
+      (logic.groups || []).forEach((g) => {
+        const li = document.createElement("li");
+        const fn = document.createElement("strong");
+        fn.textContent = g.function || "";
+        const opts = document.createElement("span");
+        opts.textContent = (g.options || []).join(" ｜ ");
+        li.append(fn, opts);
+        ul.append(li);
+      });
+      block.append(ul);
+      els.methodBody.append(block);
+    }
+
+    /* 话题主题词 */
+    const topics = data.topicWords;
+    if (topics) {
+      const block = makeTemplateBlock(topics.title, topics.intro);
+      block.classList.add("writing-method-topics");
+      const grid = document.createElement("div");
+      grid.className = "writing-method-topic-grid";
+      (topics.groups || []).forEach((g) => {
+        const card = document.createElement("article");
+        card.className = "writing-method-topic";
+        const h = document.createElement("h5");
+        h.textContent = g.topic || "";
+        card.append(h);
+        const ul = document.createElement("ul");
+        (g.words || []).forEach((pair) => {
+          const li = document.createElement("li");
+          const en = document.createElement("code");
+          en.textContent = pair[0];
+          const zh = document.createElement("span");
+          zh.textContent = pair[1];
+          li.append(en, zh);
+          ul.append(li);
+        });
+        card.append(ul);
+        grid.append(card);
+      });
+      block.append(grid);
+      els.methodBody.append(block);
+    }
+
+    /* 自检清单 */
+    const check = data.selfCheck;
+    if (check) {
+      const block = makeTemplateBlock(check.title, check.intro);
+      block.classList.add("writing-method-check");
+      (check.blocks || []).forEach((b) => {
+        const sec = document.createElement("section");
+        sec.className = "writing-method-check-item";
+        const h = document.createElement("h5");
+        h.textContent = b.name || "";
+        sec.append(h);
+        if (b.detail) {
+          const d = document.createElement("p");
+          d.className = "writing-method-check-detail";
+          d.textContent = b.detail;
+          sec.append(d);
+        }
+        const ul = document.createElement("ul");
+        (b.rules || []).forEach((r) => {
+          const li = document.createElement("li");
+          li.textContent = r;
+          ul.append(li);
+        });
+        sec.append(ul);
+        block.append(sec);
+      });
+      els.methodBody.append(block);
+    }
+
+    renderPhraseBank(els.methodBody);
+
+    if (els.methodMeta) {
+      const n = (reasons?.items || []).length;
+      const groups = (state.phraseBank?.groups || []).length;
+      els.methodMeta.textContent = groups
+        ? `方法论已就绪 · 万能原因 ${n} 条 · 短语库 ${groups} 组`
+        : `方法论已就绪 · 万能原因 ${n} 条`;
+    }
+  }
+
+  async function ensureMethod() {
+    if (state.method) {
+      renderMethod();
+      return;
+    }
+    if (state.methodPromise) {
+      await state.methodPromise;
+      return;
+    }
+    renderMethodLoading("正在读取方法论…");
+    state.methodPromise = (async () => {
+      try {
+        const [res, bankRes] = await Promise.all([
+          fetch(METHOD_URL, { cache: "force-cache" }),
+          fetch(PHRASE_BANK_URL, { cache: "force-cache" }).catch(() => null),
+        ]);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        state.method = await res.json();
+        if (bankRes && bankRes.ok) {
+          try {
+            state.phraseBank = await bankRes.json();
+          } catch (error) {
+            state.phraseBank = null;
+            console.warn("[writing] 短语库解析失败", error);
+          }
+        }
+        renderMethod();
+      } catch (error) {
+        renderMethodLoading("方法论读取失败，请刷新页面重试。");
+        console.warn("[writing] 方法论加载失败", error);
+      } finally {
+        state.methodPromise = null;
+      }
+    })();
+    await state.methodPromise;
+  }
+
+  function setupMethodLazyLoad() {
+    const section = els.methodSection;
+    if (!section) return;
+    const load = () => ensureMethod();
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          observer.disconnect();
+          load();
+        },
+        { rootMargin: "0px" },
+      );
+      observer.observe(section);
+      return;
+    }
+    const rect = section.getBoundingClientRect();
+    if (rect.top < window.innerHeight) load();
+  }
+
   function selectPrompt(id) {
     const item = (state.index?.items || []).find((entry) => entry.id === id);
     if (!item) {
       return;
     }
     state.activeId = id;
-    state.activePrompt = null;
-    state.editorTouched = false;
+    state.activePrompt = null;    state.editorTouched = false;
     storageSet(LAST_PROMPT_KEY, id);
     renderPromptList();
     renderTaskLoading(item);
@@ -2031,7 +2776,7 @@
     body.className = "writing-model-text";
     paragraphs.forEach((paragraph) => {
       const item = document.createElement("p");
-      item.textContent = paragraph;
+      appendExplainableText(item, paragraph, paragraph);
       body.append(item);
     });
     section.append(body);
@@ -2201,6 +2946,49 @@
       }
       switchTemplateKind(button.dataset.kind);
     });
+
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("#writingWordClose")) {
+        closeWritingWordPanel();
+        return;
+      }
+      const token = event.target.closest(".writing-page .word-token");
+      if (!token) {
+        return;
+      }
+      event.preventDefault();
+      openWritingWordPanel(
+        token.dataset.word,
+        token.dataset.sentence,
+        token.dataset.tokenIndex,
+      );
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (
+        event.key === "Escape" &&
+        els.writingWordPanel &&
+        !els.writingWordPanel.hidden
+      ) {
+        closeWritingWordPanel();
+        return;
+      }
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+      const token = event.target.closest(".writing-page .word-token");
+      if (!token) {
+        return;
+      }
+      event.preventDefault();
+      openWritingWordPanel(
+        token.dataset.word,
+        token.dataset.sentence,
+        token.dataset.tokenIndex,
+      );
+    });
+
+    els.writingWordSpeak?.addEventListener("click", speakWritingWord);
   }
 
   function renderEmptyTask() {
@@ -2245,6 +3033,7 @@
     cacheDom();
     bindEvents();
     setupTemplateLazyLoad();
+    setupMethodLazyLoad();
     renderDraftCount();
     updateWordMeter();
     fetch(INDEX_URL, { headers: { Accept: "application/json" } })

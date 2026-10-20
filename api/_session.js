@@ -211,6 +211,15 @@ async function resolveSessionUser(request) {
     ) {
       return null;
     }
+    // 身份收敛：用户库故障期间签发的站长会话，只要用户库里已经有同名账号，
+    // 就一律折回真实账号。否则同一台设备会一半写 owner-<名字>、一半写真实
+    // 账号，进度永远对不上。
+    const real = await findByUsername(account.username).catch(() => null);
+    if (real) {
+      return real.disabled ? null : real;
+    }
+    // 查不到（只读镜像、用户库还没建、读取失败）时保留原来的无状态站长身份，
+    // 免得把镜像站点已经登录的设备踢下线。
     return account;
   }
 

@@ -1468,7 +1468,7 @@
             {
               "letter": "D",
               "text": "They may get offended.",
-              "translation": "他们可能会感到被�冒犯。"
+              "translation": "他们可能会感到被冒犯。"
             }
           ],
           "answer": "D",

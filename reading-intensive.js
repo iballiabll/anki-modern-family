@@ -650,6 +650,51 @@
     }
   }
 
+  // 浏览器返回 / 前进后，按 URL 找回上次的阅读位置，避免被甩回顶部。
+  const scrollPositions = new Map();
+  // 加载新试卷时页面高度会先塌缩再撑开，期间产生的滚动事件不能写进记忆。
+  let scrollMemoryPaused = false;
+
+  function locationKey(params = getLocationParams()) {
+    return [
+      params.get("paper") || "",
+      params.get("piece") || "",
+      params.get("kind") || "",
+    ].join("|");
+  }
+
+  function rememberScrollPosition() {
+    if (scrollMemoryPaused) {
+      return;
+    }
+    scrollPositions.set(locationKey(), window.scrollY);
+  }
+
+  function storedScrollPosition(params) {
+    const saved = scrollPositions.get(locationKey(params));
+    return typeof saved === "number" ? saved : null;
+  }
+
+  // 站点全局开了 scroll-behavior: smooth，恢复位置必须瞬时完成。
+  function scrollInstantly(top) {
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo({ top, behavior: "auto" });
+    root.style.scrollBehavior = previous;
+  }
+
+  function restoreStoredScroll(params) {
+    const saved = storedScrollPosition(params);
+    if (saved === null) {
+      return false;
+    }
+    window.requestAnimationFrame(() => {
+      scrollInstantly(saved);
+    });
+    return true;
+  }
+
   function showLoading(meta) {
     if (!elements.content) {
       return;
@@ -672,6 +717,7 @@
     }
 
     const run = ++state.openRun;
+    scrollMemoryPaused = true;
     showLoading(meta);
     stopSpeech();
     closeWordPanel();
@@ -701,7 +747,13 @@
       } else if (options.toTop !== false) {
         window.scrollTo({ top: 0, behavior: "auto" });
       }
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          scrollMemoryPaused = false;
+        });
+      });
     } catch (error) {
+      scrollMemoryPaused = false;
       if (run !== state.openRun) {
         return;
       }
@@ -732,6 +784,17 @@
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
+
+  // 切换篇目时直接落到这一篇的开头，不走长距离平滑滚动。
+  function scrollToPieceStart(pieceId) {
+    const target = pieceId ? document.getElementById(pieceId) : null;
+    if (!target) {
+      scrollInstantly(0);
+      return;
+    }
+    const top = target.getBoundingClientRect().top + window.scrollY - 12;
+    scrollInstantly(Math.max(0, top));
   }
 
   /* ------------------------------------------------------- cascade menu */
@@ -838,11 +901,10 @@
   function handleKindChange() {
     state.kindFilter = elements.kindSelect?.value || "all";
     writeStoredValue(KIND_STORAGE_KEY, state.kindFilter);
-    if (state.kindFilter === "all") {
-      state.pieceId = "";
-    } else {
-      const piece = getPiece(state.kindFilter, 1);
-      state.pieceId = piece?.id || state.pieceId;
+    // 单篇显示：当前篇若还在新筛选里就保留，否则落到新筛选的第一篇。
+    const visible = getVisiblePieces();
+    if (!visible.some((piece) => piece.id === state.pieceId)) {
+      state.pieceId = visible[0]?.id || "";
     }
     setLocationParams(
       {
@@ -852,6 +914,7 @@
       true,
     );
     renderPage();
+    scrollToPieceStart(state.pieceId);
   }
 
   /* ------------------------------------------------------ navigation tree */
@@ -887,8 +950,8 @@
       if (state.paperId === paper.id) {
         writeStoredValue(PIECE_STORAGE_KEY, piece.id);
         setLocationParams({ piece: piece.id }, true);
-        updateNavigationState();
-        scrollToPiece(piece.id);
+        renderPage();
+        scrollToPieceStart(piece.id);
         return;
       }
       openPaper(paper.id, { push: true, scrollTo: piece.id });
@@ -1105,6 +1168,7 @@
 
     const note = String(elements.wordNoteInput?.value || "").trim();
     const meanings = activeWord.meanings || [];
+    const coreMeaning = getCombinedMeaning(meanings, note);
     const phraseText = (activeWord.item.phrases || [])
       .filter((item) => item?.phrase)
       .slice(0, 4)
@@ -1117,7 +1181,7 @@
       .map((item) => item.word)
       .join("、");
     const meaning = [
-      getCombinedMeaning(meanings, note),
+      coreMeaning,
       phraseText ? `固定搭配：${phraseText}` : "",
       synonymText ? `同义替换：${synonymText}` : "",
     ]
@@ -1161,11 +1225,110 @@
     state.activeWord.item = item;
     updateTokenMarks();
     updateWordPanelMarkState();
+    const addedToLibrary =
+      mark === "unknown"
+        ? saveToVocabLibrary({
+            phrase: item.phrase,
+            meaning: coreMeaning,
+            phonetic: item.phonetic,
+            context: activeWord.context,
+            sentence: activeWord.sentence,
+            translation: activeWord.translation,
+          })
+        : false;
     showToast(
       mark === "unknown"
-        ? `${item.phrase} 已加入${READING_CATEGORY}阅读不会`
+        ? `${item.phrase} 已加入${READING_CATEGORY}阅读不会${
+            addedToLibrary ? "，并同步到词汇库" : "（词汇库写入失败）"
+          }`
         : `${item.phrase} 已标记为掌握`,
     );
+  }
+
+  /* -------------------------------------------------------- 词汇库归集 */
+
+  /**
+   * 组装「这个生词从哪来」：级别、试卷、篇章、题目 / 段落、原句与译文，
+   * 再拼一个带 ?word= 的回跳地址，词汇库据此可以反查回原文。
+   */
+  function describeWordSource(phrase, options = {}) {
+    const context = options.context || {};
+    const paperMeta = state.data?.meta || {};
+    const paragraphId = String(context.paragraphId || "");
+    const pieceId =
+      context.pieceId ||
+      state.pieceId ||
+      (paragraphId ? paragraphId.replace(/-p\d+$/, "") : "");
+    const piece = pieceId ? getPieceById(pieceId) : null;
+    const params = new URLSearchParams();
+    const paperId = state.paperId || paperMeta.id || "";
+    if (paperId) {
+      params.set("paper", paperId);
+    }
+    if (pieceId) {
+      params.set("piece", pieceId);
+    }
+    if (phrase) {
+      params.set("word", phrase);
+    }
+    const page =
+      window.location.pathname.split("/").pop() || "reading-intensive.html";
+    const paragraphMatch = paragraphId.match(/-p(\d+)$/);
+    return {
+      level: READING_LEVEL,
+      module: "reading",
+      paperId,
+      paperTitle: paperMeta.title || paperMeta.label || "",
+      pieceId,
+      pieceTitle: piece?.title || piece?.type || "",
+      kind: KIND_LABELS[piece?.kind] || "",
+      question: String(context.question || ""),
+      paragraph: String(context.paragraph || paragraphMatch?.[1] || ""),
+      sentence: String(context.sentence || options.sentence || "").slice(0, 600),
+      translation: String(
+        context.translation || options.translation || "",
+      ).slice(0, 600),
+      url: `${page}?${params.toString()}`,
+    };
+  }
+
+  /** 标记「不会」时同步写进词汇库；失败只提示，不影响原来的不会 / 掌握记录。 */
+  function saveToVocabLibrary(options) {
+    const Library = window.IballVocabLibrary;
+    if (!Library || !options?.phrase) {
+      return false;
+    }
+    const record = Library.add({
+      word: options.phrase,
+      phonetic: options.phonetic || "",
+      meaning: String(options.meaning || "").slice(0, 400),
+      source: describeWordSource(options.phrase, options),
+    });
+    return Boolean(record);
+  }
+
+  /** 从词汇库跳回来时，把原句里的那个词高亮并滚到视野内。 */
+  function focusWordInPage(word) {
+    const target = String(word || "").trim().toLowerCase();
+    if (!target) {
+      return;
+    }
+    const tokens = [...document.querySelectorAll(".word-token")];
+    const match = tokens.find(
+      (token) => String(token.dataset.word || "").toLowerCase() === target,
+    );
+    if (!match) {
+      return;
+    }
+    match.classList.add("is-library-target");
+    window.setTimeout(() => {
+      match.classList.remove("is-library-target");
+    }, 6000);
+    const rect = match.getBoundingClientRect();
+    window.scrollTo({
+      top: Math.max(0, rect.top + window.scrollY - window.innerHeight / 3),
+      behavior: "auto",
+    });
   }
 
   /* --------------------------------------------------- synonym library */
@@ -1397,6 +1560,37 @@
         return left.word.length - right.word.length;
       })
       .slice(0, limit);
+  }
+
+  // 给词面板用：从本地四六级考研搭配库取相关固定搭配。
+  // 先用 collocation-index 的 containing()（覆盖 5288 条），再用 vocab 词库的 byToken 兜底。
+  function localPhrasesFor(value, limit = 8) {
+    const out = new Map();
+    const index = window.CollocationIndex;
+    if (index && typeof index.containing === "function") {
+      index.containing(value, limit).forEach((item) => {
+        if (!item?.phrase) return;
+        out.set(normalizePhraseKey(item.phrase), {
+          phrase: item.phrase,
+          levels: item.levels || [],
+          meaning: String(item.meaning || "").trim(),
+        });
+      });
+    }
+    collocationsForWord(value, limit).forEach((item) => {
+      const key = normalizePhraseKey(item.word);
+      if (!key || out.has(key)) return;
+      const entry =
+        index && typeof index.lookup === "function"
+          ? index.lookup(item.word)
+          : null;
+      out.set(key, {
+        phrase: item.word,
+        levels: item.levels || entry?.levels || [],
+        meaning: String(entry?.meaning || item.meaning || "").trim(),
+      });
+    });
+    return [...out.values()].slice(0, limit);
   }
 
   function createLevelBadges(levels) {
@@ -1740,7 +1934,9 @@
     elements.wordSynonyms.append(list);
   }
 
-  function openWordPanel(phrase, paragraph, item, kind = "word") {
+  function openWordPanel(phrase, paragraph, item, kind = "word", context = {}) {
+    // 先用本地四六级考研搭配库算出"相关固定搭配"，打开面板即显示，不必等在线词典。
+    const localPhrases = localPhrasesFor(phrase);
     state.activeWord = {
       phrase,
       kind,
@@ -1749,6 +1945,8 @@
       item: { ...item },
       meanings: [],
       synonyms: [],
+      localPhrases,
+      context: context && typeof context === "object" ? { ...context } : {},
     };
 
     if (elements.wordPanelTitle) {
@@ -1763,7 +1961,18 @@
       elements.wordLookupStatus.textContent = "正在查询词典…";
     }
     elements.wordMeanings?.replaceChildren();
-    renderPhrases([]);
+    // 本地释义兜底：题干预选项的短语常常不在在线词典里，先把本地词库释义显示出来。
+    const localEntry = lookupBankEntry(phrase);
+    if (localEntry?.meaning) {
+      renderMeanings([localEntry.meaning]);
+      if (elements.wordPanelPhonetic && isUsablePhonetic(localEntry.phonetic)) {
+        elements.wordPanelPhonetic.textContent = localEntry.phonetic;
+      }
+      if (elements.wordLookupStatus) {
+        elements.wordLookupStatus.textContent = "已从本地词库读取释义，正在补充在线数据…";
+      }
+    }
+    renderPhrases(localPhrases);
     renderWordSynonyms(phrase);
     if (elements.wordContextSentence) {
       elements.wordContextSentence.textContent = paragraph?.english || phrase;
@@ -1797,7 +2006,10 @@
     elements.layout?.classList.remove("has-word-panel");
   }
 
-  function applyWordResult(activeWord, data, statusText) {
+  // 把在线/本地查询结果落到词面板。
+  // keepLocalPhrases=true 时，如果结果里没有搭配，就保留打开面板时先用本地搭配库渲染的那批，
+  // 否则点题干/选项里的词会先看到搭配、随即又被清空。
+  function applyWordResult(activeWord, data, statusText, options = {}) {
     const meanings = [
       ...(Array.isArray(data.translations) ? data.translations : []),
       ...(Array.isArray(data.definitions) ? data.definitions : []),
@@ -1808,7 +2020,16 @@
       isUsablePhonetic(data.phonetic) ||
       isUsablePhonetic(activeWord.item.phonetic);
     activeWord.item.meaning = getCombinedMeaning(activeWord.meanings, "");
-    activeWord.item.phrases = Array.isArray(data.phrases) ? data.phrases : [];
+
+    const remotePhrases = Array.isArray(data.phrases) ? data.phrases : [];
+    const localPhrases = Array.isArray(activeWord.localPhrases)
+      ? activeWord.localPhrases
+      : [];
+    const phrases =
+      remotePhrases.length || !options.keepLocalPhrases
+        ? remotePhrases
+        : localPhrases;
+    activeWord.item.phrases = phrases;
 
     renderPanelPhonetic(
       isUsablePhonetic(data.phonetic) || activeWord.item.phonetic,
@@ -1819,7 +2040,7 @@
         : "词典没有返回释义，可手动补充";
     }
     renderMeanings(activeWord.meanings);
-    renderPhrases(activeWord.item.phrases);
+    renderPhrases(phrases);
   }
 
   async function lookupLocalEntry(value) {
@@ -1885,7 +2106,9 @@
       !cached.remoteFailed &&
       hasUsableWordResult(cached)
     ) {
-      applyWordResult(activeWord, cached, "已从本次缓存读取释义");
+      applyWordResult(activeWord, cached, "已从本次缓存读取释义", {
+        keepLocalPhrases: true,
+      });
       return;
     }
 
@@ -1913,6 +2136,7 @@
             activeWord,
             localData,
             `已从本地词库读取释义与音标（${localEntry.source}）`,
+            { keepLocalPhrases: true },
           );
           return;
         }
@@ -1932,6 +2156,7 @@
           merged.phonetic
             ? "本地词库释义，在线词典已补充音标与固定搭配"
             : "本地词库释义；在线词典暂未提供音标",
+          { keepLocalPhrases: true },
         );
         return;
       }
@@ -1948,6 +2173,7 @@
         remoteReady
           ? "已查询到释义与固定搭配"
           : "在线词典暂时没有返回释义，可手动补充",
+        { keepLocalPhrases: true },
       );
     } catch (error) {
       if (run !== state.lookupRun || state.activeWord !== activeWord) {
@@ -1958,6 +2184,7 @@
           activeWord,
           localData,
           "已读取本地释义；在线音标暂时不可用",
+          { keepLocalPhrases: true },
         );
         return;
       }
@@ -1978,7 +2205,17 @@
       return;
     }
     const kind = button.dataset.wordKind === "phrase" ? "phrase" : "word";
-    const paragraph = getParagraphById(button.dataset.paragraphId);
+    const physical = getParagraphById(button.dataset.paragraphId);
+    // 题干 / 选项上的 token 自带句子与译文，优先使用，保证语境准确。
+    const inlineSentence = button.dataset.sentence || "";
+    const paragraph =
+      inlineSentence || button.dataset.translation !== undefined
+        ? {
+            english: inlineSentence || physical?.english || "",
+            chinese:
+              button.dataset.translation || physical?.chinese || "",
+          }
+        : physical;
     const existing = getStoredWord(phrase, paragraph?.english || "", kind);
     const entry = lookupBankEntry(phrase);
     const item = existing
@@ -1996,7 +2233,13 @@
     if (existing) {
       item.id = existing.id;
     }
-    openWordPanel(phrase, paragraph, item, kind);
+    const questionCard = button.closest("[data-question-number]");
+    openWordPanel(phrase, paragraph, item, kind, {
+      paragraphId: button.dataset.paragraphId || "",
+      question: questionCard?.dataset.questionNumber || "",
+      sentence: paragraph?.english || "",
+      translation: paragraph?.chinese || "",
+    });
     lookupActiveWord();
   }
 
@@ -2033,8 +2276,14 @@
     );
   }
 
-  function appendEnglishText(container, text, paragraphId) {
+  // 把英文文本切成可点击的 word-token。context 里带上句子 / 译文 / 段落 id，
+  // 这样题干与选项被点击时，词面板也能显示正确的上下文语境。
+  function appendEnglishText(container, text, paragraphIdOrContext) {
     const source = String(text || "");
+    const context =
+      paragraphIdOrContext && typeof paragraphIdOrContext === "object"
+        ? paragraphIdOrContext
+        : { paragraphId: paragraphIdOrContext };
     const blankPattern = /__\((\d+)\)__/g;
     let cursor = 0;
     let blankMatch = blankPattern.exec(source);
@@ -2052,12 +2301,23 @@
         button.type = "button";
         button.className = "word-token";
         button.dataset.word = match[0];
-        button.dataset.paragraphId = paragraphId;
+        if (context.paragraphId) {
+          button.dataset.paragraphId = context.paragraphId;
+        }
+        if (context.sentence) {
+          button.dataset.sentence = context.sentence;
+        }
+        if (context.translation) {
+          button.dataset.translation = context.translation;
+        }
+        if (context.sectionId) {
+          button.dataset.sectionId = context.sectionId;
+        }
         button.dataset.wordId = makeWordId(match[0], source);
         button.textContent = match[0];
         button.setAttribute(
           "aria-label",
-          `查看单词 ${match[0]} 的释义与固定搭配`,
+          `查看单词或搭配 ${match[0]} 的释义`,
         );
         container.append(button);
         lastIndex = match.index + match[0].length;
@@ -2921,10 +3181,17 @@
     }
     card.append(head);
 
+    const questionContext = {
+      paragraphId: `${piece.id}-q${question.number}`,
+      sentence: question.stem || "",
+      translation: question.stemTranslation || "",
+      sectionId: piece.id,
+    };
+
     const stem = document.createElement("p");
     stem.className = "question-stem";
     stem.lang = "en";
-    stem.textContent = question.stem || "";
+    appendEnglishText(stem, question.stem || "", questionContext);
     card.append(stem);
 
     if (question.stemTranslation) {
@@ -2946,10 +3213,12 @@
     options.setAttribute("role", "group");
     options.setAttribute("aria-label", `第 ${question.number} 题选项`);
     (question.choices || []).forEach((choice) => {
-      const button = document.createElement("button");
-      button.type = "button";
+      // 用 div + role=button 承载选项，避免选项里再嵌可点单词按钮（button 不能嵌套）。
+      const button = document.createElement("div");
       button.className = "question-option";
       button.dataset.letter = choice.letter;
+      button.setAttribute("role", "button");
+      button.setAttribute("tabindex", "0");
 
       const letter = document.createElement("span");
       letter.className = "option-letter";
@@ -2959,7 +3228,12 @@
       const text = document.createElement("span");
       text.className = "option-text";
       text.lang = "en";
-      text.textContent = choice.text;
+      appendEnglishText(text, choice.text, {
+        paragraphId: `${piece.id}-q${question.number}`,
+        sentence: choice.text || question.stem || "",
+        translation: choice.translation || question.stemTranslation || "",
+        sectionId: piece.id,
+      });
 
       button.append(letter, text);
       if (choice.translation) {
@@ -2968,11 +3242,28 @@
         translation.textContent = choice.translation;
         button.append(translation);
       }
-      button.addEventListener("click", () => {
+      const pick = () => {
         state.answers[getAnswerKey(question.number)] = choice.letter;
         persistAnswers();
         applyQuestionCardState(card, question);
         recordAnswerScore(question.number, question.answer, piece);
+      };
+      // 点到单词 token 时不触发选择：直接返回，让事件继续冒泡，
+      // 由内容区/文档上的代理监听打开词面板（不要 stopPropagation，否则点词无效）。
+      button.addEventListener("click", (event) => {
+        if (event.target.closest(".word-token")) {
+          return;
+        }
+        pick();
+      });
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          if (event.target.closest(".word-token")) {
+            return;
+          }
+          event.preventDefault();
+          pick();
+        }
       });
       options.append(button);
     });
@@ -3057,7 +3348,12 @@
     const stem = document.createElement("p");
     stem.className = "question-stem";
     stem.lang = "en";
-    stem.textContent = question.stem || "";
+    appendEnglishText(stem, question.stem || "", {
+      paragraphId: `${piece.id}-q${question.number}`,
+      sentence: question.stem || "",
+      translation: question.stemTranslation || "",
+      sectionId: piece.id,
+    });
     card.append(stem);
     if (question.stemTranslation) {
       const translation = document.createElement("p");
@@ -3685,7 +3981,10 @@
         piece.kind === "matching" ? "段落匹配作答" : "逐题解析与验证";
       const qMeta = document.createElement("span");
       qMeta.textContent = piece.questionRange || "";
-      qHead.append(qTitle, qMeta);
+      const qHint = document.createElement("span");
+      qHint.className = "question-token-hint";
+      qHint.textContent = "题干与选项里的单词都可点击查释义与固定搭配";
+      qHead.append(qTitle, qMeta, qHint);
       questionSection.append(qHead);
 
       const list = document.createElement("div");
@@ -3780,9 +4079,19 @@
     overview.append(overviewTitle, overviewCopy, stats);
     fragment.append(overview);
 
-    pieces.forEach((piece, index) => {
-      fragment.append(createPieceSection(piece, index));
-    });
+    // 一次只渲染当前篇，篇目之间用导航切换，避免整卷文章堆在同一页。
+    const currentPiece =
+      pieces.find((piece) => piece.id === state.pieceId) || pieces[0] || null;
+    if (currentPiece) {
+      if (state.pieceId !== currentPiece.id) {
+        state.pieceId = currentPiece.id;
+        writeStoredValue(PIECE_STORAGE_KEY, currentPiece.id);
+        setLocationParams({ piece: currentPiece.id }, false);
+      }
+      fragment.append(
+        createPieceSection(currentPiece, pieces.indexOf(currentPiece)),
+      );
+    }
 
     elements.content.replaceChildren(fragment);
     updateNavigationState();
@@ -3871,6 +4180,7 @@
     }
     scrollFrame = window.requestAnimationFrame(() => {
       scrollFrame = 0;
+      rememberScrollPosition();
       updateReadingState();
     });
   }
@@ -3936,10 +4246,41 @@
     window.addEventListener("popstate", () => {
       const params = getLocationParams();
       const paperId = params.get("paper");
+      const pieceId = params.get("piece") || "";
+      const kind = params.get("kind") || "all";
       if (paperId && paperId !== state.paperId) {
-        state.pieceId = params.get("piece") || "";
-        state.kindFilter = params.get("kind") || "all";
-        openPaper(paperId, { toTop: false, scrollTo: state.pieceId });
+        state.pieceId = pieceId;
+        state.kindFilter = kind;
+        if (elements.kindSelect) {
+          elements.kindSelect.value = kind;
+        }
+        const saved = storedScrollPosition(params);
+        openPaper(paperId, {
+          toTop: false,
+          scrollTo: saved === null ? pieceId : "",
+        }).then(() => {
+          if (saved !== null) {
+            window.requestAnimationFrame(() => {
+              scrollInstantly(saved);
+            });
+          }
+        });
+        return;
+      }
+      // 同一份试卷内返回：恢复篇目高亮与滚动位置，不重新拉取数据。
+      if (kind !== state.kindFilter) {
+        state.kindFilter = kind;
+        if (elements.kindSelect) {
+          elements.kindSelect.value = kind;
+        }
+        state.pieceId = pieceId;
+        renderPage();
+      } else if (pieceId !== state.pieceId) {
+        state.pieceId = pieceId;
+        renderPage();
+      }
+      if (!restoreStoredScroll(params) && pieceId) {
+        scrollToPieceStart(pieceId);
       }
     });
     if ("speechSynthesis" in window) {
@@ -3949,6 +4290,9 @@
 
   async function initialize() {
     document.title = `${LEVEL_CONFIG.title} · iball的小屋`;
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
     const pageTitle = document.querySelector("#pageTitle");
     if (pageTitle) {
       pageTitle.textContent = LEVEL_CONFIG.title;
@@ -3995,6 +4339,10 @@
       scrollTo: state.pieceId,
     });
     updateReadingState();
+    const focusWord = params.get("word");
+    if (focusWord) {
+      window.setTimeout(() => focusWordInPage(focusWord), 80);
+    }
   }
 
   initialize();
