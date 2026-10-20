@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#17204f" />
+    <title>XXRJ · 考研 11408 学习档案</title>
+    <link rel="stylesheet" href="./styles.css?v=20260927-heatselect3" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">
+            <i data-lucide="swords"></i>
+          </div>
+          <div>
+            <div class="brand-name">XXRJ</div>
+            <div class="brand-sub">封神之路 · 11408 考研</div>
+          </div>
+        </div>
+
+        <div class="nav-label">工作台</div>
+        <nav class="nav">
+          <button class="nav-item active" data-screen="dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>总览</span>
+          </button>
+          <button class="nav-item" data-screen="summary">
+            <i data-lucide="chart-column"></i>
+            <span>成绩汇总</span>
+          </button>
+          <button class="nav-item" data-screen="plan">
+            <i data-lucide="calendar-range"></i>
+            <span>学习计划</span>
+            <span class="nav-badge">7</span>
+          </button>
+          <button class="nav-item" data-screen="english">
+            <i data-lucide="languages"></i>
+            <span>英语一 / 二</span>
+          </button>
+          <button class="nav-item" data-screen="math">
+            <i data-lucide="sigma"></i>
+            <span>数学一</span>
+          </button>
+          <button class="nav-item" data-screen="cs408">
+            <i data-lucide="cpu"></i>
+            <span>408</span>
+          </button>
+          <button class="nav-item" data-screen="mistakes">
+            <i data-lucide="notebook-tabs"></i>
+            <span>不会题 / 错题本</span>
+            <span class="nav-badge" id="mistakes-badge" hidden></span>
+          </button>
+          <button class="nav-item" data-screen="daily-review">
+            <i data-lucide="notebook-pen"></i>
+            <span>待复盘</span>
+            <span class="nav-badge" id="review-badge" hidden></span>
+          </button>
+        </nav>
+
+        <div class="nav-label">设置</div>
+        <nav class="nav">
+          <button class="nav-item" data-screen="goal">
+            <i data-lucide="target"></i>
+            <span>目标与倒计时</span>
+          </button>
+          <button class="nav-item" data-screen="guide">
+            <i data-lucide="book-open-check"></i>
+            <span>使用说明与网址</span>
+          </button>
+          <button class="nav-item" data-screen="data">
+            <i data-lucide="database-backup"></i>
+            <span>数据与备份</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-foot">
+          <div class="sync-line">
+            <span class="sync-dot"></span>
+            <span id="sync-status">本地模式 · 未登录</span>
+          </div>
+          <div class="user-mini">
+            <div class="avatar">神</div>
+            <div>
+              <div class="user-name" id="account-name">未绑定 iball 账号</div>
+              <div class="user-plan" id="account-plan">只和 iball 账号绑定 · 不接第三方登录</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="shell">
+        <header class="topbar">
+          <div class="topbar-brand">XXRJ</div>
+          <div class="crumb">11408 / <strong id="crumb-current">总览</strong></div>
+          <label class="search">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="搜索真题、章节、错题或计划" />
+          </label>
+          <div class="top-actions">
+            <button class="primary-btn" id="open-entry" data-open-entry="create">
+              <i data-lucide="plus"></i>
+              <span class="btn-label">录入成绩</span>
+            </button>
+            <button class="icon-btn" aria-label="通知">
+              <i data-lucide="bell"></i>
+              <span class="notify-dot"></span>
+            </button>
+            <button class="icon-btn" aria-label="设置">
+              <i data-lucide="settings-2"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="account-banner" id="account-banner" hidden>
+          <span class="account-banner-text" id="account-banner-text"></span>
+          <a class="primary-btn" id="account-banner-action" href="/index.html?next=/xxrj/">绑定 iball 账号</a>
+        </div>
+
+        <main class="content" id="app"></main>
+      </div>
+    </div>
+
+    <nav class="mobile-nav">
+      <button class="active" data-screen="dashboard">
+        <i data-lucide="layout-dashboard"></i>
+        <span>总览</span>
+      </button>
+      <button data-screen="summary">
+        <i data-lucide="chart-column"></i>
+        <span>汇总</span>
+      </button>
+      <button data-screen="plan">
+        <i data-lucide="calendar-range"></i>
+        <span>计划</span>
+      </button>
+      <button data-screen="english">
+        <i data-lucide="languages"></i>
+        <span>英语</span>
+      </button>
+      <button data-screen="math">
+        <i data-lucide="sigma"></i>
+        <span>数学</span>
+      </button>
+      <button data-screen="cs408">
+        <i data-lucide="cpu"></i>
+        <span>408</span>
+      </button>
+      <button data-screen="daily-review">
+        <i data-lucide="notebook-pen"></i>
+        <span>复盘</span>
+      </button>
+    </nav>
+
+    <div class="modal-backdrop" id="entry-modal">
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="entry-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="entry-title">录入成绩与进度</h2>
+            <p class="modal-sub">整卷、单模块、章节练习、逐题错题和学习进度都能录入；保存后自动汇总到年度、科目与总成绩。</p>
+          </div>
+          <button class="icon-btn" id="close-entry" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-tabs" id="entry-mode-tabs">
+            <button class="active" type="button" data-entry-mode="create">新增记录</button>
+            <button type="button" data-entry-mode="edit">编辑已有记录</button>
+          </div>
+          <div class="record-banner" id="edit-banner">
+            <span class="tag blue">编辑中</span>
+            <span id="edit-banner-text">数学一 · 2026 数学一真题 · 第 12 题</span>
+            <button class="ghost-btn" id="cancel-edit" type="button">取消编辑</button>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="entry-date">日期</label>
+              <input id="entry-date" type="date" />
+            </div>
+            <div class="field">
+              <label for="entry-subject">科目</label>
+              <select id="entry-subject" data-choice-control>
+                <option>数学一</option>
+                <option>数学二</option>
+                <option>数学三</option>
+                <option>英语一</option>
+                <option>英语二</option>
+                <option>408</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="entry-round">刷题轮次</label>
+              <select id="entry-round" data-choice-control>
+                <option value="1">一刷 · 基础覆盖</option>
+                <option value="2">二刷 · 强化巩固</option>
+                <option value="3">三刷 · 错题回炉</option>
+                <option value="4">四刷 · 套卷冲刺</option>
+                <option value="5">五刷 · 考前保温</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="entry-source">资料 / 试卷</label>
+              <select id="entry-source" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-year-field">
+              <label for="entry-year">年份</label>
+              <select id="entry-year" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-paper-field">
+              <label for="entry-paper-type">卷种 / 类别</label>
+              <select id="entry-paper-type" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-kind-field" hidden>
+              <label for="entry-kind">英语类型</label>
+              <select id="entry-kind" data-choice-control>
+                <option value="">自动判断</option>
+                <option value="paper">整套卷</option>
+                <option value="reading">单纯阅读</option>
+                <option value="other">其他模块</option>
+              </select>
+            </div>
+            <div class="field" id="entry-module-field">
+              <label for="entry-module" id="entry-module-label">分册 / 模块</label>
+              <select id="entry-module" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-chapter-field" hidden>
+              <label for="entry-chapter">章节</label>
+              <select id="entry-chapter" data-choice-control></select>
+            </div>
+            <div class="field" id="entry-range-field" hidden>
+              <label for="entry-range">本章实际题号</label>
+              <input id="entry-range" type="text" placeholder="按手里的书填，例如 1-30 或 1-10,15,20" />
+            </div>
+            <div class="field">
+              <label for="entry-question">题号（可选）</label>
+              <input id="entry-question" type="text" placeholder="也可直接点下面的题号格" />
+            </div>
+            <div class="field span-12" id="entry-wrong-field">
+              <div class="field-head">
+                <label id="entry-wrong-label">逐题标记 · 可多选</label>
+                <span class="field-counter" id="entry-wrong-count">未选择</span>
+                <button class="text-btn" id="clear-entry-wrong" type="button">清空</button>
+              </div>
+              <div class="segmented entry-mark-modes" id="entry-mark-modes" role="group" aria-label="题号标记方式">
+                <button
+                  class="active"
+                  type="button"
+                  data-entry-mark="wrong"
+                  aria-pressed="true"
+                  title="先选这个，再点题号就是做错了；做错的题会生成逐题错题并进入待复盘"
+                >
+                  做错 · 进复盘
+                </button>
+                <button
+                  type="button"
+                  data-entry-mark="correct"
+                  aria-pressed="false"
+                  title="先选这个，再点题号就是做对了；只算完成题数，不进复盘"
+                >
+                  做对
+                </button>
+              </div>
+              <div class="question-heatmap" id="entry-wrong-grid" role="group" aria-labelledby="entry-wrong-label"></div>
+              <p class="field-hint" id="entry-mark-summary">
+                先选「做错」或「做对」，再点题号；同一个题号再点一次取消。做对和做错分开统计，做错的自动进入待复盘。
+              </p>
+            </div>
+            <div class="field">
+              <label for="entry-status">记录类型</label>
+              <select id="entry-status" data-choice-control>
+                <option>套卷成绩</option>
+                <option>章节练习</option>
+                <option>错题复盘</option>
+                <option>一直不会的题</option>
+                <option>学习进度</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="entry-full">满分</label>
+              <input id="entry-full" type="number" placeholder="例如 150" />
+            </div>
+            <div class="field">
+              <label for="entry-score">得分</label>
+              <input id="entry-score" type="number" placeholder="例如 118" />
+            </div>
+            <div class="field">
+              <label for="entry-lost">失分（自动）</label>
+              <input id="entry-lost" type="number" readonly />
+            </div>
+            <div class="field">
+              <label for="entry-count">本次题数</label>
+              <div class="input-suffix">
+                <input id="entry-count" type="number" placeholder="例如 20" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="entry-correct">做对题数</label>
+              <div class="input-suffix">
+                <input id="entry-correct" type="number" placeholder="例如 14" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="entry-time">用时</label>
+              <div class="input-suffix">
+                <input id="entry-time" type="number" placeholder="例如 52" />
+                <span>分钟</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="entry-error-type">错误类型 · 可多选</label>
+              <select id="entry-error-type" data-choice-control multiple>
+                <option selected>计算错误</option>
+                <option>概念不清</option>
+                <option>审题错误</option>
+                <option>时间不足</option>
+                <option>一直不会</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="entry-review">下次复盘</label>
+              <input id="entry-review" type="date" />
+            </div>
+            <div class="field span-12">
+              <label for="entry-note">复盘备注</label>
+              <textarea id="entry-note" placeholder="记下错因、卡点和下次复盘要重点看的步骤"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="entry-modal-note">失分自动计算；保存后写进当前 iball 账号的数据档案。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-entry">取消</button>
+            <button class="primary-btn" id="save-entry">
+              <i data-lucide="check"></i>
+              <span>保存记录</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="task-modal">
+      <section class="modal modal-md" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="task-modal-title">新建计划</h2>
+            <p class="modal-sub">今天、明天或任意一天都能随时加、随时改；不用提前一天布置。</p>
+          </div>
+          <button class="icon-btn" id="close-task" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-tabs" id="task-type-tabs" role="tablist">
+            <button class="active" type="button" data-task-type="custom">普通任务</button>
+            <button type="button" data-task-type="study">学习任务</button>
+            <button type="button" data-task-type="review">复盘任务</button>
+            <button type="button" data-task-type="vocab">单词斩</button>
+          </div>
+          <div class="form-grid">
+            <div class="field span-12" id="task-title-field">
+              <label for="task-title">任务内容（一行一项）</label>
+              <textarea id="task-title" rows="4" placeholder="数学 1000题：第一章全部到第二章前20题
+复盘 1000题：第一章
+英语一：真题阅读 2 篇
+408：王道数据结构 第一章"></textarea>
+            </div>
+            <div class="field">
+              <label for="task-date">日期</label>
+              <input id="task-date" type="date" />
+            </div>
+            <div class="field" id="task-subject-field">
+              <label for="task-subject">科目 · 可多选</label>
+              <select id="task-subject" data-choice-control multiple>
+                <option selected>数学一</option>
+                <option>英语一</option>
+                <option>英语二</option>
+                <option>408</option>
+                <option>政治</option>
+                <option>复盘</option>
+              </select>
+            </div>
+            <div class="field" id="task-subject-one-field" hidden>
+              <label for="task-subject-one">科目</label>
+              <select id="task-subject-one" data-choice-control></select>
+            </div>
+            <div class="field" id="task-round-field" hidden>
+              <label for="task-round">刷题轮次</label>
+              <select id="task-round" data-choice-control>
+                <option value="1">一刷 · 基础覆盖</option>
+                <option value="2">二刷 · 强化巩固</option>
+                <option value="3">三刷 · 错题回炉</option>
+                <option value="4">四刷 · 套卷冲刺</option>
+                <option value="5">五刷 · 考前保温</option>
+              </select>
+            </div>
+            <div class="field" id="task-source-field" hidden>
+              <label for="task-source">资料 / 试卷</label>
+              <select id="task-source" data-choice-control></select>
+            </div>
+            <div class="field" id="task-year-field" hidden>
+              <label for="task-year">年份</label>
+              <select id="task-year" data-choice-control></select>
+            </div>
+            <div class="field" id="task-paper-field" hidden>
+              <label for="task-paper">卷种 / 类别</label>
+              <select id="task-paper" data-choice-control></select>
+            </div>
+            <div class="field" id="task-module-field" hidden>
+              <label for="task-module" id="task-module-label">分册 / 模块</label>
+              <select id="task-module" data-choice-control></select>
+            </div>
+            <div class="field" id="task-chapter-field" hidden>
+              <label for="task-chapter">章节</label>
+              <select id="task-chapter" data-choice-control></select>
+            </div>
+            <div class="field" id="task-range-field" hidden>
+              <label for="task-range">本章实际题号</label>
+              <input id="task-range" type="text" placeholder="按手里的书填，例如 1-30 或 1-10,15,20" />
+            </div>
+            <div class="field" id="task-preview-field" hidden>
+              <label for="task-preview">任务内容（自动生成）</label>
+              <p class="task-preview-text" id="task-preview">选好科目和资料后自动生成。</p>
+            </div>
+            <div class="field" id="task-vocab-deck-field" hidden>
+              <label for="task-vocab-deck">词库</label>
+              <select id="task-vocab-deck" data-choice-control></select>
+            </div>
+            <div class="field" id="task-vocab-target-field" hidden>
+              <label for="task-vocab-target">目标词数</label>
+              <div class="input-suffix">
+                <input id="task-vocab-target" type="number" min="0" step="5" placeholder="例如 60" />
+                <span>词</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="task-minutes">预计用时</label>
+              <div class="input-suffix">
+                <input id="task-minutes" type="number" min="0" step="5" placeholder="例如 90" />
+                <span>分钟</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="task-priority">优先级</label>
+              <select id="task-priority" data-choice-control>
+                <option>高</option>
+                <option selected>中</option>
+                <option>低</option>
+              </select>
+            </div>
+            <div class="field span-12">
+              <label for="task-note">备注</label>
+              <textarea id="task-note" placeholder="例如 重点补强无穷级数，做完立刻标错因"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="task-modal-note">保存后立刻出现在对应日期的计划里。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-task">取消</button>
+            <button class="primary-btn" id="save-task">
+              <i data-lucide="check"></i>
+              <span>保存计划</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="progress-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="progress-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="progress-title">录入章节进度</h2>
+            <p class="modal-sub" id="progress-sub">按这一本书、这一章单独记录，不与其它资料共用进度。</p>
+          </div>
+          <button class="icon-btn" id="close-progress" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field span-12">
+              <label>本轮刷题</label>
+              <div class="progress-round-options" id="progress-round-options" role="tablist" aria-label="本轮刷题">
+                <button type="button" role="tab" data-progress-round="1">一刷</button>
+                <button type="button" role="tab" data-progress-round="2">二刷</button>
+                <button type="button" role="tab" data-progress-round="3">三刷</button>
+                <button type="button" role="tab" data-progress-round="4">四刷</button>
+                <button type="button" role="tab" data-progress-round="5">五刷</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-done">已完成题数</label>
+              <div class="input-suffix">
+                <input id="progress-done" type="number" min="0" placeholder="例如 42" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-total">本章题数</label>
+              <div class="input-suffix">
+                <input id="progress-total" type="number" min="0" placeholder="例如 60" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-accuracy">正确率</label>
+              <div class="input-suffix">
+                <input id="progress-accuracy" type="number" min="0" max="100" placeholder="例如 70" />
+                <span>%</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="progress-wrong">待复盘错题</label>
+              <div class="input-suffix">
+                <input id="progress-wrong" type="number" min="0" placeholder="例如 6" />
+                <span>题</span>
+              </div>
+            </div>
+            <div class="field span-12">
+              <label for="progress-note">本章备注</label>
+              <textarea id="progress-note" placeholder="例如 换序和雅可比容易错，下次先画区域"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="progress-modal-note">只影响这一本书这一章；错题请到「录入成绩」里逐题标注。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="clear-progress">清除本章进度</button>
+            <button class="secondary-btn" id="cancel-progress">取消</button>
+            <button class="primary-btn" id="save-progress">
+              <i data-lucide="check"></i>
+              <span>保存进度</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="knowledge-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="knowledge-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="knowledge-title">新增知识点</h2>
+            <p class="modal-sub">记下今天卡住的概念、公式或题型，并排好下次复盘的时间。</p>
+          </div>
+          <button class="icon-btn" id="close-knowledge" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="knowledge-date">学习日期</label>
+              <input id="knowledge-date" type="date" />
+            </div>
+            <div class="field">
+              <label for="knowledge-subject">科目</label>
+              <select id="knowledge-subject" data-choice-control>
+                <option>数学一</option>
+                <option>英语一</option>
+                <option>英语二</option>
+                <option>408</option>
+                <option>政治</option>
+              </select>
+            </div>
+            <div class="field span-12">
+              <label for="knowledge-topic">知识点</label>
+              <input id="knowledge-topic" type="text" placeholder="例如 无穷级数敛散性判定" />
+            </div>
+            <div class="field">
+              <label for="knowledge-status">状态</label>
+              <select id="knowledge-status" data-choice-control>
+                <option>待复盘</option>
+                <option>已复盘</option>
+                <option>已掌握</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="knowledge-review">下次复盘</label>
+              <input id="knowledge-review" type="date" />
+            </div>
+            <div class="field span-12">
+              <label for="knowledge-detail">卡点 / 备注</label>
+              <textarea id="knowledge-detail" placeholder="当时卡在哪一步、错在哪个概念"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="knowledge-modal-note">保存后按状态进入待复盘队列；复盘笔记在卡片上一条条追加。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-knowledge">取消</button>
+            <button class="primary-btn" id="save-knowledge">
+              <i data-lucide="check"></i>
+              <span>保存知识点</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="review-log-modal">
+      <section class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="review-log-title">
+        <div class="modal-head">
+          <div>
+            <h2 class="modal-title" id="review-log-title">写复盘</h2>
+            <p class="modal-sub" id="review-log-sub">这次能独立做对了吗？还卡在哪一步？</p>
+          </div>
+          <button class="icon-btn" id="close-review-log" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field span-12">
+              <label for="review-log-text">这次复盘</label>
+              <textarea id="review-log-text" placeholder="例如 这次先自己推了一遍判定步骤，比值法没再忘开 n 次方；下次练交错级数"></textarea>
+            </div>
+            <div class="field span-12">
+              <label for="review-log-next">下次复盘（可选）</label>
+              <input id="review-log-next" type="date" />
+            </div>
+          </div>
+          <div class="review-log-history" id="review-log-history"></div>
+        </div>
+        <div class="modal-foot">
+          <div class="modal-foot-note" id="review-log-note">这条笔记会追加到历史里，不会覆盖之前写过的内容。</div>
+          <div class="modal-actions">
+            <button class="secondary-btn" id="cancel-review-log">取消</button>
+            <button class="primary-btn" id="save-review-log">
+              <i data-lucide="check"></i>
+              <span>追加复盘</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="../account-store.js?v=20260927-structured1"></script>
+    <script src="../vocab-recite-api.js?v=20260927-structured1"></script>
+    <script src="../session-guard.js?v=20260927-structured1"></script>
+    <script src="./vendor/lucide.min.js"></script>
+    <script src="../kaoyan-data/index.js?v=20260927-structured1"></script>
+    <script src="./math-books.js?v=20260927-structured1"></script>
+    <script src="./material-catalog.js?v=20260927-structured1"></script>
+    <script src="./store.js?v=20260927-structured4"></script>
+    <script src="./app.js?v=20260927-structured4"></script>
+  </body>
+</html>

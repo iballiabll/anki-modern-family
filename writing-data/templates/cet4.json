@@ -1,0 +1,469 @@
+{
+  "exam": "cet4",
+  "examLabel": "四级",
+  "wordTarget": "120-180 词，通常一段到三段",
+  "note": "本站原创整理的骨架与自查清单，不是官方范文。评分口径参考 kaoyan-english skill 的任务完成 / 组织 / 语法 / 词汇 / 细节五维权重，考场必须替换花括号槽位，照抄整段会被判为不切题。",
+  "templates": [
+    {
+      "id": "cet4-large-phenomenon",
+      "kind": "large",
+      "kindLabel": "大作文 · 120-180 词",
+      "genre": "议论文 · 现象解释型",
+      "title": "现象解释型 · 现象 → 原因 → 建议",
+      "scenario": "题干抛出一种普遍现象或做法（如用手机打卡背单词、大学生做兼职），要求说明原因并给出看法或建议。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 引出现象",
+          "en": "Nowadays, {现象} has become common among {人群}.",
+          "zh": "如今，……在……中已相当普遍。",
+          "note": "把题干整句压成一个名词短语，别原样照抄，否则扣内容分。"
+        },
+        {
+          "section": "第 1 段 · 亮明态度",
+          "en": "In my view, this trend is {正面/值得警惕}, and the reasons deserve a closer look.",
+          "zh": "在我看来，这一趋势……，其原因值得细看。",
+          "note": "四级作文允许直接给立场，一句话说清即可，不必兜圈子。"
+        },
+        {
+          "section": "第 2 段 · 原因一",
+          "en": "To begin with, {原因一}, which makes {结果} possible.",
+          "zh": "首先，……，这让……成为可能。",
+          "note": "原因要落到具体条件，例如设备普及、时间灵活，而不是“因为社会在发展”。"
+        },
+        {
+          "section": "第 2 段 · 原因二 + 例证",
+          "en": "In addition, {原因二}. Take {例子} as an example.",
+          "zh": "其次，……。以……为例。",
+          "note": "一个例子就够，写清“谁、做了什么、结果如何”。"
+        },
+        {
+          "section": "第 3 段 · 建议",
+          "en": "Therefore, it is advisable for {对象} to {做法}.",
+          "zh": "因此，……宜……。",
+          "note": "建议要能被执行，避免“we should pay more attention to it”这类空话。"
+        },
+        {
+          "section": "第 3 段 · 收束",
+          "en": "Only in this way can {对象} benefit from {现象} instead of being controlled by it.",
+          "zh": "只有这样，……才能从……中受益，而不是被它支配。",
+          "note": "Only 引导的状语提前时主句要部分倒装，检查 can / do / be 的位置。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "引出普遍现象",
+          "en": "It has become increasingly common for college students to study with mobile apps.",
+          "zh": "大学生用手机应用学习已越来越普遍。"
+        },
+        {
+          "function": "说明原因",
+          "en": "One reason is that apps make short breaks productive.",
+          "zh": "原因之一是这类应用让碎片时间也能产生效果。"
+        },
+        {
+          "function": "举例支撑",
+          "en": "A case in point is a student who reviews twenty words while waiting for the bus.",
+          "zh": "一个例子是，有学生利用等公交的时间复习二十个单词。"
+        },
+        {
+          "function": "提出建议",
+          "en": "It is advisable to set a daily limit before opening such apps.",
+          "zh": "宜在打开这类应用前先设定每日使用上限。"
+        }
+      ],
+      "demo": {
+        "topic": "现象：越来越多大学生用手机应用安排学习",
+        "paragraphs": [
+          "Nowadays, studying with mobile apps has become common among college students. In my view, this trend is largely positive, and the reasons deserve a closer look.",
+          "To begin with, apps turn scattered time into study time, which makes daily practice possible even in a busy week. A fifteen-minute bus ride is enough for twenty new words. In addition, many apps record progress automatically. Take vocabulary learning as an example: a student can see which words keep coming back, so review stops being a guess. The sense of progress also keeps motivation alive.",
+          "Therefore, it is advisable for students to set a daily limit and a clear goal before opening such apps. Only in this way can we benefit from mobile learning instead of being controlled by it."
+        ],
+        "translation": [
+          "如今，用手机应用学习在大学生中已相当普遍。在我看来，这一趋势总体是积极的，其原因值得细看。",
+          "首先，应用把零散时间变成了学习时间，让忙碌的一周里也能坚持每日练习：一段十五分钟的公交路程就够记二十个新词。其次，许多应用会自动记录进度。以背单词为例，学生能看到哪些词反复出现，复习不再靠猜。看得见的进步也让动力得以维持。",
+          "因此，学生宜在打开这类应用前设定每日上限和明确目标。只有这样，我们才能从移动学习中受益，而不是被它支配。"
+        ]
+      },
+      "pitfalls": [
+        "开头照抄题干整句，既占字数又不体现语言能力。",
+        "原因段写成口号，如 Because society develops fast，无法展开。",
+        "建议段与原因段重复，只把前面的话换词再说一遍。"
+      ],
+      "adapt": [
+        "先圈出题干的三个关键词：现象、对象、要求，再决定第 2、3 段各写什么。",
+        "原因两条要属于不同层面，例如个人需求 + 外部条件。",
+        "结尾落在可执行的建议上，不要空喊口号收尾。"
+      ]
+    },
+    {
+      "id": "cet4-large-choice",
+      "kind": "large",
+      "kindLabel": "大作文 · 120-180 词",
+      "genre": "议论文 · 对比选择型",
+      "title": "对比选择型 · A 还是 B",
+      "scenario": "题干给出两种做法或两种观点（线上课还是线下课、独自复习还是小组学习），要求比较后表明选择并说明理由。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 列出争议",
+          "en": "When it comes to {话题}, people are divided: some prefer {A}, while others choose {B}.",
+          "zh": "谈到……，人们分成两派：有人偏好……，有人选择……。",
+          "note": "两边都要提到，只写一边会被视为漏要点。"
+        },
+        {
+          "section": "第 1 段 · 表明选择",
+          "en": "Personally, I would side with {A}, for two reasons.",
+          "zh": "就我个人而言，我倾向……，理由有两点。",
+          "note": "明确选边，四级作文最忌讳通篇“both are good”。"
+        },
+        {
+          "section": "第 2 段 · 理由一",
+          "en": "The first reason is that {A} allows me to {具体好处}.",
+          "zh": "第一个理由是，……让我能够……。",
+          "note": "理由要和个人体验挂钩，比抽象比较更有说服力。"
+        },
+        {
+          "section": "第 2 段 · 让步",
+          "en": "Admittedly, {B} has its own advantages, such as {优点}.",
+          "zh": "诚然，……也有其优点，例如……。",
+          "note": "先让步再转折，语言层次立刻提升，但让步只能占一句。"
+        },
+        {
+          "section": "第 2 段 · 理由二",
+          "en": "However, {A} matters more when {条件}.",
+          "zh": "然而，在……的情况下，……更为重要。",
+          "note": "用 when / if 把理由限定在具体场景，避免绝对化。"
+        },
+        {
+          "section": "第 3 段 · 结论",
+          "en": "In short, the choice depends on {变量}, and for most students {A} is the wiser start.",
+          "zh": "总之，选择取决于……，而对多数学生来说……是更明智的起点。",
+          "note": "结尾给出判断，不引入新信息。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "引出双方观点",
+          "en": "Opinions vary when it comes to taking online lectures.",
+          "zh": "谈到上网课，人们看法不一。"
+        },
+        {
+          "function": "表示倾向",
+          "en": "I am inclined to favour face-to-face discussion.",
+          "zh": "我更倾向于面对面的讨论。"
+        },
+        {
+          "function": "让步后转折",
+          "en": "Admittedly, recorded lectures save time; however, they rarely answer a sudden question.",
+          "zh": "诚然，录播课省时间；然而它很难回应突然冒出的疑问。"
+        },
+        {
+          "function": "收束选择",
+          "en": "On balance, the benefits of group study outweigh its drawbacks.",
+          "zh": "总体而言，小组学习利大于弊。"
+        }
+      ],
+      "demo": {
+        "topic": "对比：独自复习与小组学习",
+        "paragraphs": [
+          "When it comes to preparing for final exams, students are divided: some prefer reviewing alone, while others choose study groups. Personally, I would side with group study, for two reasons.",
+          "The first reason is that a group forces me to explain what I have read, and explaining is the fastest way to find gaps. Admittedly, studying alone is quieter and more flexible. However, a group matters more when the exam asks for analysis rather than facts, because classmates raise questions I would never think of alone. Explaining a chapter to someone else also fixes it in my own memory.",
+          "In short, the choice depends on the subject, and for most students a small group of three or four is the wiser start."
+        ],
+        "translation": [
+          "谈到期末复习，学生分成两派：有人喜欢独自复习，有人选择小组学习。就我个人而言，我更倾向小组学习，理由有两点。",
+          "第一个理由是，小组逼着我把读过的东西讲出来，而讲解是发现漏洞最快的方式。诚然，独自学习更安静、也更灵活。然而，当考试考查分析而非记忆时，小组更重要，因为同学会提出我独自想不到的问题。把一章内容讲给别人听，也能让它在我记忆里扎得更牢。",
+          "总之，选择取决于科目，而对多数学生来说，三四个人的小组是更明智的起点。"
+        ]
+      },
+      "pitfalls": [
+        "通篇比较却不做选择，任务完成度直接掉档。",
+        "两边各写一大段，篇幅失控且没有重点。",
+        "让步句写成反驳自己，前后立场自相矛盾。"
+      ],
+      "adapt": [
+        "第 1 段一句话交代争议，一句话表态，控制在两句内。",
+        "让步句用 Admittedly / True 起头，紧接 However 拉回自己的立场。",
+        "如果题干已经给定立场，把“表明选择”换成“重申题干立场”。"
+      ]
+    },
+    {
+      "id": "cet4-large-opinion",
+      "kind": "large",
+      "kindLabel": "大作文 · 120-180 词",
+      "genre": "议论文 · 观点论证型",
+      "title": "观点论证型 · 一句话立场撑起全篇",
+      "scenario": "题干给出一句判断（如“大学应把志愿服务设为必修”），要求说明你是否同意并给出理由。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 转述题干",
+          "en": "It is often argued that {题干观点}.",
+          "zh": "人们常认为……。",
+          "note": "用 It is often argued that 转述，避免原句照搬。"
+        },
+        {
+          "section": "第 1 段 · 给出立场",
+          "en": "I largely agree with this view, though {限定条件}.",
+          "zh": "我大体同意这一看法，尽管……。",
+          "note": "限定条件让立场更可信，例如 only when it is well organised。"
+        },
+        {
+          "section": "第 2 段 · 论证一",
+          "en": "The strongest argument for this view is that {论点一}.",
+          "zh": "支持这一观点最有力的理由是……。",
+          "note": "论点后必须跟一句解释，说明“为什么成立”。"
+        },
+        {
+          "section": "第 2 段 · 论证二",
+          "en": "What is more, {论点二}, as can be seen from {事例}.",
+          "zh": "此外，……，从……可以看出。",
+          "note": "第二个论点换角度，例如从个人收益转向社会影响。"
+        },
+        {
+          "section": "第 3 段 · 回应反方",
+          "en": "Some may argue that {反方理由}, but {反驳}.",
+          "zh": "有人可能认为……，但……。",
+          "note": "反驳时承认对方部分合理，再指出其不全面。"
+        },
+        {
+          "section": "第 3 段 · 结论",
+          "en": "On the whole, {立场} holds, provided that {条件}.",
+          "zh": "总体而言，只要……，……是成立的。",
+          "note": "用 provided that 收尾，比 simply correct 更有分寸。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "转述观点",
+          "en": "It is widely believed that volunteering should be a required part of college life.",
+          "zh": "人们普遍认为志愿服务应成为大学生活必修的一部分。"
+        },
+        {
+          "function": "表达认同程度",
+          "en": "I agree with the idea in principle.",
+          "zh": "我原则上同意这一看法。"
+        },
+        {
+          "function": "补充论据",
+          "en": "What is more, such experience shapes how students see their own city.",
+          "zh": "此外，这类经历会塑造学生看待自己城市的方式。"
+        },
+        {
+          "function": "回应反方",
+          "en": "Critics point out that time is limited, but the schedule can be arranged flexibly.",
+          "zh": "批评者指出时间有限，但时间表是可以灵活安排的。"
+        }
+      ],
+      "demo": {
+        "topic": "观点：大学应把志愿服务纳入必修",
+        "paragraphs": [
+          "It is often argued that volunteer work should be a required part of university study. I largely agree with this view, though it has to be organised carefully.",
+          "The strongest argument for this view is that service teaches what a classroom cannot: how a real neighbourhood works and what people actually need. What is more, a shared task builds ties between students from different majors, as can be seen from the reading programme run by our own volunteers, where engineering and literature students worked side by side for a term. Some may argue that required service is not voluntary at all, but a well-designed course still leaves students free to choose where they serve.",
+          "On the whole, the idea holds, provided that the hours stay reasonable and the project is connected to a real need."
+        ],
+        "translation": [
+          "人们常认为志愿服务应成为大学学习的必修部分。我大体同意这一看法，但它必须被精心组织。",
+          "支持该观点最有力的理由是，服务能教课堂教不了的东西：真实的社区如何运转、人们真正需要什么。此外，共同的任务会在不同专业的学生之间建立联系——我们自己的志愿者发起的阅读项目就是例证，工科与文学专业的学生一起做了一个学期。有人可能认为被要求的服务根本不算志愿，但设计良好的课程仍让学生自由选择服务地点。",
+          "总体而言，只要时长合理、项目与真实需求挂钩，这一主张是成立的。"
+        ]
+      },
+      "pitfalls": [
+        "立场含糊：既 agree 又 disagree，读者看不出结论。",
+        "论点只有一句判断，没有解释句，显得像标语。",
+        "忽略题干中的条件词（如 for college students），论证跑出范围。"
+      ],
+      "adapt": [
+        "把题干拆成“对象 + 行为 + 条件”三块，论证时逐块回应。",
+        "两个论点分别写“对个人的作用”和“对他人或社会的作用”。",
+        "结尾的限定条件要来自题干，不要临时引入新话题。"
+      ]
+    },
+    {
+      "id": "cet4-small-email",
+      "kind": "small",
+      "kindLabel": "小作文 · 120-180 词",
+      "genre": "应用文 · 邮件 / 邀请信",
+      "title": "邮件 · 邀请与告知",
+      "scenario": "以学生会、社团或班级成员身份写一封邮件，邀请对方参加活动，或告知活动安排并请求回复。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear {Sirs/Ms. Wang/Fellow students},",
+          "zh": "尊敬的……：",
+          "note": "写给留学生用 Dear fellow students；写给负责人用 Dear Mr./Ms. + 姓。"
+        },
+        {
+          "section": "第 1 段 · 身份与目的",
+          "en": "On behalf of {组织}, I am writing to invite you to {活动}.",
+          "zh": "我代表……写信邀请您参加……。",
+          "note": "先交代身份，再交代事由，一句话说清。"
+        },
+        {
+          "section": "第 2 段 · 时间地点",
+          "en": "The event will be held {地点} on {日期}, from {时间} to {时间}.",
+          "zh": "活动将于……（日期）……（地点）……点至……点举行。",
+          "note": "时间、地点、时长必须写全，这是四级应用文最常见的失分点。"
+        },
+        {
+          "section": "第 2 段 · 活动内容",
+          "en": "There will be {内容一} as well as {内容二}.",
+          "zh": "届时将有……以及……。",
+          "note": "写两三个具体项目，比 only cultural activities 有画面感。"
+        },
+        {
+          "section": "第 3 段 · 报名与期待",
+          "en": "If you are interested, please sign up at {方式} before {截止时间}.",
+          "zh": "如有兴趣，请在……前通过……报名。",
+          "note": "务必给出发起方式和截止时间，才算把任务做完。"
+        },
+        {
+          "section": "落款",
+          "en": "Yours sincerely,\nLi Hua",
+          "zh": "此致\n李华",
+          "note": "题干规定署名时只能用规定名字，不要写自己的真名。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "说明写信目的",
+          "en": "I am writing on behalf of the Student Union to invite you to our Chinese Culture Festival.",
+          "zh": "我代表学生会写信，邀请您参加我们的中国文化节。"
+        },
+        {
+          "function": "交代安排",
+          "en": "The festival will take place in the Main Hall next Friday afternoon.",
+          "zh": "文化节将于下周五下午在大礼堂举行。"
+        },
+        {
+          "function": "邀请对方",
+          "en": "We would be delighted if you could join us.",
+          "zh": "如果您能参加，我们会非常高兴。"
+        },
+        {
+          "function": "请求回复",
+          "en": "Please let us know by Wednesday so that we can prepare enough materials.",
+          "zh": "请在周三前告知我们，以便准备足够的材料。"
+        }
+      ],
+      "demo": {
+        "topic": "邀请留学生参加中国文化节",
+        "paragraphs": [
+          "Dear fellow students,",
+          "I am writing on behalf of the Student Union to invite you to our Chinese Culture Festival. The festival will be held in the Main Hall on Saturday, 12 October, from two to five in the afternoon. There will be a calligraphy corner where you can try brush writing, as well as a tea ceremony and a small market of traditional snacks. Two students from the art club will also explain the stories behind the characters they write.",
+          "If you are interested, please sign up on the Student Union website before Thursday. We would be delighted if you could join us, and you are welcome to bring a friend. For any question, write to culture@university.edu.cn.",
+          "Yours sincerely,\nLi Hua"
+        ],
+        "translation": [
+          "各位同学：",
+          "我代表学生会写信，邀请各位参加我们的中国文化节。文化节将于 10 月 12 日星期六下午两点至五点在主礼堂举行。届时会有书法角，你可以尝试用毛笔写字；还有茶艺表演和传统小吃市集。美术社的两名同学也会讲解他们写的汉字背后的故事。",
+          "如有兴趣，请在周四前在学生会网站报名。如果你能参加，我们会非常高兴，也欢迎你带一位朋友。如有疑问，请写信至 culture@university.edu.cn。",
+          "此致\n李华"
+        ]
+      },
+      "pitfalls": [
+        "时间地点缺项，或写成 next week 这类无法确认的表达。",
+        "语气过随意，如 Come and have fun；正式邀请应用 We would be delighted。",
+        "署名写成自己的姓名或中文字，违反题干要求。"
+      ],
+      "adapt": [
+        "动笔前在草稿上写下 when / where / what / how 四项，逐项填满。",
+        "正文控制在两段，每段三句左右，符合 120 词的节奏。",
+        "结尾必留联系方式或回复方式，这是任务完成的得分点。"
+      ]
+    },
+    {
+      "id": "cet4-small-notice",
+      "kind": "small",
+      "kindLabel": "小作文 · 120-180 词",
+      "genre": "应用文 · 通知 / 告示",
+      "title": "通知 · 把安排写清楚",
+      "scenario": "以组织名义写一则通知，告知讲座、比赛、招募或借还安排，要求信息完整、格式正确。",
+      "skeleton": [
+        {
+          "section": "标题",
+          "en": "Notice",
+          "zh": "通知",
+          "note": "标题居中写在第一行，也可写成 A Notice on ...。"
+        },
+        {
+          "section": "第 1 段 · 事由",
+          "en": "In order to {目的}, {组织} is going to hold {活动}.",
+          "zh": "为了……，……将举办……。",
+          "note": "先写目的再写活动，读者立刻知道为什么值得参加。"
+        },
+        {
+          "section": "第 2 段 · 时间地点对象",
+          "en": "The activity will be held in {地点} on {日期} and is open to {对象}.",
+          "zh": "活动将于……在……举行，面向……开放。",
+          "note": "三项信息各给一句或并列成分，避免与报名信息混在一起。"
+        },
+        {
+          "section": "第 2 段 · 具体安排",
+          "en": "Participants are expected to {要求}, and {注意事项}.",
+          "zh": "参与者需……，并且……。",
+          "note": "写清要带什么、几点集合这类可执行要求。"
+        },
+        {
+          "section": "第 3 段 · 报名与咨询",
+          "en": "Those who wish to take part should contact {联系方式} before {截止时间}.",
+          "zh": "有意参加者请在……前联系……。",
+          "note": "邮箱或电话任选其一，必须清楚可读。"
+        },
+        {
+          "section": "落款",
+          "en": "{组织}\n{日期}",
+          "zh": "……（组织）\n……（日期）",
+          "note": "通知落款写组织名与日期，不需要写个人姓名。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "说明目的",
+          "en": "In order to help freshmen adapt to campus life, the Student Union will hold an orientation meeting.",
+          "zh": "为帮助新生适应校园生活，学生会将举办一次迎新会。"
+        },
+        {
+          "function": "说明对象",
+          "en": "The meeting is open to all first-year students.",
+          "zh": "本次会议面向所有一年级学生。"
+        },
+        {
+          "function": "提出要求",
+          "en": "Participants are expected to arrive ten minutes early.",
+          "zh": "参与者需提前十分钟到场。"
+        },
+        {
+          "function": "给出报名方式",
+          "en": "Please sign up by sending your name and major to studentunion@university.edu.cn before Friday.",
+          "zh": "请在周五前将姓名与专业发送至 studentunion@university.edu.cn 报名。"
+        }
+      ],
+      "demo": {
+        "topic": "通知：图书馆周末延长开放时间",
+        "paragraphs": [
+          "Notice",
+          "In order to support students preparing for the final examinations, the University Library will extend its opening hours on weekends from this Saturday until the end of the term. The reading rooms on the second and third floors will remain open until eleven in the evening, and the self-study area on the first floor will stay open all night.",
+          "Students who wish to use the night area should bring their campus card, and quiet is required after ten o'clock so that others can concentrate. Drinks with lids are allowed, but hot food is not.",
+          "For seat booking or any question, please write to library@university.edu.cn or call 010-12345678 before six in the evening.",
+          "The University Library\n15 May 2026"
+        ],
+        "translation": [
+          "通知",
+          "为支持同学们备考期末考试，校图书馆自本周六起至本学期末延长周末开放时间。二、三层阅览室将开放至晚上十一点，一层自习区通宵开放。",
+          "希望使用夜间区域的同学需携带校园卡，十点以后请保持安静，以便他人专心学习。允许携带带盖饮料，但不得携带热食。",
+          "如需预约座位或有任何疑问，请在傍晚六点前写信至 library@university.edu.cn 或致电 010-12345678。",
+          "校图书馆\n2026 年 5 月 15 日"
+        ]
+      },
+      "pitfalls": [
+        "漏写标题或落款，格式分直接丢掉。",
+        "只写 activity 名称，没有时间、地点、对象。",
+        "通知里出现 Dear classmates 这类信件语域，文体混杂。"
+      ],
+      "adapt": [
+        "先列信息清单：目的、时间、地点、对象、要求、联系方式，缺一补一。",
+        "正文两段即可，一段讲安排，一段讲要求与报名。",
+        "落款用组织名 + 日期，不要写 Li Hua。"
+      ]
+    }
+  ]
+}

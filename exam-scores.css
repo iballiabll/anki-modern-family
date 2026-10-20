@@ -1,0 +1,231 @@
+/* exam-scores.css — 得分统计面板（四六级 / 考研共用） */
+
+.exam-scores-section {
+  width: min(1180px, calc(100% - 32px));
+  margin: 8px auto 56px;
+}
+
+.exam-scores {
+  border: 1px solid rgba(23, 37, 84, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 20px 22px 18px;
+  box-shadow: 0 18px 40px -34px rgba(15, 23, 42, 0.5);
+}
+
+.exam-scores-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.exam-scores-head h2 {
+  margin: 0 0 6px;
+  font-size: 1.16rem;
+  color: #14213d;
+}
+
+.exam-scores-head p {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.83rem;
+  line-height: 1.6;
+  color: #5b6478;
+}
+
+.exam-scores-clear {
+  border: 1px solid rgba(23, 37, 84, 0.18);
+  border-radius: 6px;
+  background: #f7f8fb;
+  color: #3d4560;
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.exam-scores-clear:hover,
+.exam-scores-clear:focus-visible {
+  border-color: rgba(23, 37, 84, 0.34);
+  background: #eef1f7;
+}
+
+.exam-scores-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 14px;
+}
+
+.exam-score-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(23, 37, 84, 0.12);
+  background: #f6f8fb;
+  padding: 7px 12px;
+  color: #3d4560;
+  font-size: 0.78rem;
+}
+
+.exam-score-chip strong {
+  font-size: 1.02rem;
+  color: #172554;
+}
+
+.exam-score-chip.is-soft {
+  background: #fff7ec;
+  border-color: rgba(180, 116, 22, 0.28);
+}
+
+.exam-scores-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.exam-scores-table thead th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(23, 37, 84, 0.16);
+  color: #5b6478;
+  font-weight: 600;
+}
+
+.exam-scores-table tbody th,
+.exam-scores-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(23, 37, 84, 0.07);
+  color: #2b3550;
+  text-align: left;
+  font-weight: 500;
+}
+
+.exam-scores-table tbody td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.exam-scores-table thead th:not(:first-child) {
+  text-align: right;
+}
+
+.exam-scores-table tr.is-paper th {
+  background: #f6f8fb;
+  font-weight: 700;
+}
+
+.exam-scores-table tr.is-paper th strong {
+  display: block;
+  color: #14213d;
+}
+
+.exam-scores-table tr.is-paper th span {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #5b6478;
+}
+
+.exam-scores-table th.is-section {
+  padding-left: 26px;
+  color: #46506b;
+}
+
+.exam-scores-empty,
+.exam-scores-foot {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: #5b6478;
+  line-height: 1.6;
+}
+
+.exam-scores-subjective {
+  margin-top: 16px;
+  border-top: 1px dashed rgba(23, 37, 84, 0.16);
+  padding-top: 12px;
+}
+
+.exam-scores-subjective h4 {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  color: #14213d;
+}
+
+.exam-scores-subjective-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  color: #46506b;
+}
+
+.exam-scores-subjective-row strong {
+  color: #172554;
+}
+
+.exam-scores-wrong {
+  margin-top: 14px;
+  border-top: 1px dashed rgba(23, 37, 84, 0.16);
+  padding-top: 12px;
+}
+
+.exam-scores-wrong summary {
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #172554;
+}
+
+.exam-scores-wrong-group {
+  margin-top: 10px;
+}
+
+.exam-scores-wrong-group p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  color: #46506b;
+}
+
+.exam-scores-wrong-group ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.79rem;
+  color: #46506b;
+  line-height: 1.7;
+}
+
+.exam-scores-wrong-group li em {
+  margin-right: 6px;
+  font-style: normal;
+  color: #a1372c;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .exam-scores-section {
+    width: calc(100% - 20px);
+    margin-bottom: 44px;
+  }
+
+  .exam-scores {
+    padding: 16px 14px 14px;
+  }
+
+  .exam-scores-chips {
+    gap: 8px;
+  }
+
+  .exam-score-chip {
+    padding: 6px 10px;
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "note": "考研英语写作方法论（本站原创整理）。提炼自站内考研写作讲义素材，只保留方法论骨架与通用句式，不搬运讲义原文；不是官方范文，考场必须按题目改写。",
+  "updatedAt": "2026-09-29",
+  "credit": [
+    "方法论骨架按考研英语一/二写作教学体系整理，只保留通用结构与功能句，不含任何付费课程原文。",
+    "定档与自检思路借鉴 dengduanglang/kaoyan-english-2-writing-skills（硬槽数判定、双评取中、四块输出），未复制其代码与原文。",
+    "全部分类、句式与示例为本站原创整理或通用表达，仅用于个人学习。"
+  ],
+  "universalReasons": {
+    "title": "大作文万能原因体系",
+    "intro": "老师最常说的一句话：原因段不是临场想出来的，是平时按「万能原因」背好、考场按话题改写槽位。下面七条覆盖考研大作文绝大多数话题，每条给出适用场景与可直接改写的句式骨架。",
+    "items": [
+      {
+        "id": "reason-1",
+        "index": 1,
+        "name": "社会经济与科技发展",
+        "fit": "科技、AI、直播、支付、外卖、学习方式、信息爆炸等一切「时代变化」类话题。",
+        "skeleton": "Hardly a week goes by without notable advances in technology and society — progress that would have seemed incredible fifty years ago. Amidst the fast-paced advancement of the world, many people, if not most, are becoming increasingly {形容词}, which lays a vital foundation for them to {动作}.",
+        "zh": "几乎每周都出现技术与社会的显著进步，这在五十年前难以想象。在这个快速发展的世界里，许多人（乃至大多数人）正变得越来越……，这为他们……奠定了重要基础。",
+        "usage": "把 {形容词} 换成话题词（如 far-sighted / reliant on AI / efficiency-oriented），{动作} 换成话题行为。这条几乎万能，但正因为万能，必须在槽位里写进本题关键词，否则被判套话。"
+      },
+      {
+        "id": "reason-2",
+        "index": 2,
+        "name": "经济全球化与城市化",
+        "fit": "环保、可持续、城市生活、消费升级、传统与现代社会对比等话题。",
+        "skeleton": "The human race has entered a completely new stage in its history, with increasingly rapid economic globalization and urbanization, which brings both {机遇} and {问题}.",
+        "zh": "人类历史已迈入全新阶段，经济全球化与城市化日益加快，这既带来……也带来……。",
+        "usage": "强调宏观背景，适合放在第一条原因之后作为补充，不要单独只用这一条，否则显得空。"
+      },
+      {
+        "id": "reason-3",
+        "index": 3,
+        "name": "社会风气与价值取向",
+        "fit": "品质精神（坚持、合作、爱心、节俭）、社会责任感、道德与公德类话题。",
+        "skeleton": "The desirable general mood of society should be one of the contributors, such as the gradual acquisition of {品质}, which is often advocated by society. / The undesirable general mood of society is to blame, such as {不良风气}.",
+        "zh": "良好的社会风气应是促成因素之一，例如……逐渐被习得，这种品质常为社会所提倡。/ 不良社会风气难辞其咎，例如……。",
+        "usage": "正面话题用 desirable，负面话题用 undesirable，主语一换即可；后半句务必填本题的具体风向。"
+      },
+      {
+        "id": "reason-4",
+        "index": 4,
+        "name": "社会思想观念转变",
+        "fit": "支付方式、饮食习惯、消费观、职业选择、教育理念等「观念变了」类话题。",
+        "skeleton": "The tendency has been closely associated with the shift in people's outlooks on {话题}. Translated, the fact that {旧做法} is no longer as essential as it used to be demonstrates that what truly matters now is {新做法}.",
+        "zh": "这一趋势与人们对……看法的转变密切相关。换言之，……不再像过去那样必要，这说明如今真正重要的是……。",
+        "usage": "Translated, ... 是讲义里常见的过渡手势，用来把「观念转变」落到具体对比上，非常好用。"
+      },
+      {
+        "id": "reason-5",
+        "index": 5,
+        "name": "政府与制度作为",
+        "fit": "国家发展、航天、体育、环保治理、公益政策等偏宏观话题，也多用于第三段建议。",
+        "skeleton": "The administrations, by exerting effective and strict supervision on {监管对象}, make it possible for us to {目标}. Relevant regulations should be established to severely punish those who {违规行为}.",
+        "zh": "政府通过对……实施有效而严格的监管，使我们得以……。应制定相关法规，严惩……者。",
+        "usage": "写第三段「怎么办」时最稳的一条；考研大作文第三段给出制度性建议比空喊口号得分高。"
+      },
+      {
+        "id": "reason-6",
+        "index": 6,
+        "name": "媒体宣传与舆论引导",
+        "fit": "正能量、公益、环保、节俭、社会责任等需要「倡导」的话题。",
+        "skeleton": "All kinds of media channels, be they newspapers or the Internet, vigorously advocate that what really matters is {主题}, which helps us {收益}.",
+        "zh": "各类媒体渠道，无论报纸还是网络，都大力倡导真正重要的是……，这有助于我们……。",
+        "usage": "be they A or B 是插入语拉分点；用于需要「营造氛围」的话题，通常作为第二或第三条原因。"
+      },
+      {
+        "id": "reason-7",
+        "index": 7,
+        "name": "个人努力与品质",
+        "fit": "所有正能量的落脚点；也用于强调句强调「正是……才使……」。",
+        "skeleton": "It is {品质/付出}, a component critical to {目标}, that makes {结果} possible. / It is the commitment and sacrifice of {主体} that makes possible the thriving of {事业}.",
+        "zh": "正是……——这一对……至关重要的要素——使……成为可能。/ 正是……的奉献与牺牲，使……得以蓬勃发展。",
+        "usage": "强调句 It is ... that ... 是考研大作文最常用的高级句型之一；主语按话题替换（科研人员/运动员/志愿者/个人品质）。"
+      }
+    ]
+  },
+  "structure": {
+    "title": "三段式结构与段落配额",
+    "intro": "考研大作文三段式是阅卷老师最认的结构。下面的段落配额按英语一/英语二分别给出，考场建议先按行数与句数分配，再动笔。",
+    "large": {
+      "label": "大作文（英语一 160-200 词 / 英语二约 150 词）",
+      "paragraphs": [
+        {
+          "no": "第 1 段",
+          "goal": "图画/图表描述 + 点出主题",
+          "budget": "3-4 句；约 4-6 行，每行 9-12 词",
+          "points": [
+            "首句总体描述：What is depicted in this drawing is such a scene: ...",
+            "次句细节/数据：两图对比写差异，图表挑最高最低两组",
+            "一句提炼：这幅图突出了……这一核心问题/品质"
+          ]
+        },
+        {
+          "no": "第 2 段",
+          "goal": "原因/意义分析",
+          "budget": "3-4 句；两条万能原因起步，能写三条更好",
+          "points": [
+            "开头固定句：The fundamental factors contributing to the above can be explained as follows.",
+            "To begin with, [万能原因]。",
+            "Moreover, [万能原因]。",
+            "Finally, [强调句收束]。"
+          ]
+        },
+        {
+          "no": "第 3 段",
+          "goal": "结论 + 建议/升华",
+          "budget": "2-3 句；约 2-3 行",
+          "points": [
+            "承接句：Taking into account what has been argued, we can conclude that ...",
+            "建议句：Relevant regulations should be established to ... / We must strive to ...",
+            "收束句：Let's get prepared and embrace the harmonious society built by our joint efforts."
+          ]
+        }
+      ]
+    },
+    "small": {
+      "label": "小作文（约 100 词，书信/通知）",
+      "paragraphs": [
+        {
+          "no": "称呼",
+          "goal": "格式分",
+          "budget": "1 行",
+          "points": ["已知收信人写 Dear + 身份/姓名,", "不知则写 Dear Sir or Madam,"]
+        },
+        {
+          "no": "第 1 段",
+          "goal": "点明写信目的",
+          "budget": "1-2 句",
+          "points": ["通用式：Regarding {主题词}, I, as {身份}, am writing this letter with the aim of {目的}."]
+        },
+        {
+          "no": "第 2 段",
+          "goal": "展开要点",
+          "budget": "2-3 句",
+          "points": ["开头：The details are as follows.", "To begin with ... Moreover ... Last but not least ..."]
+        },
+        {
+          "no": "第 3 段 + 落款",
+          "goal": "礼貌收尾 + 格式分",
+          "budget": "1-2 句 + 2 行落款",
+          "points": ["感谢/期待回复二选一或并用", "Yours sincerely, / Li Ming"]
+        }
+      ]
+    }
+  },
+  "logicChain": {
+    "title": "逻辑关系词链（写完必查）",
+    "intro": "老师批改时最先看的就是衔接词。一篇文章里同一层级的衔接词不要重复；下面按「启承转合」给出可轮换的选项。",
+    "groups": [
+      { "function": "启（第一条）", "options": ["To begin with", "First of all", "First and foremost", "To start with"] },
+      { "function": "承（补充）", "options": ["Moreover", "Furthermore", "In addition", "What's more", "Additionally"] },
+      { "function": "转（对比/让步）", "options": ["However", "Nevertheless", "By contrast", "On the other hand", "While it is true that ..."] },
+      { "function": "合（收束）", "options": ["Last but not least", "More importantly", "Finally", "Above all", "Most importantly"] },
+      { "function": "结论", "options": ["In conclusion", "To sum up", "Taking into account what has been argued", "All in all", "Altogether"] }
+    ]
+  },
+  "topicWords": {
+    "title": "高频话题主题词（考场直接填）",
+    "intro": "主题词写对是内容分的地基，写错（如把「国潮」拼成 national tide）会直接掉档。按话题分组记忆，每个话题优先记 3-4 个。",
+    "groups": [
+      {
+        "topic": "科技与 AI",
+        "words": [
+          ["artificial intelligence (AI)", "人工智能"],
+          ["AI-assisted learning", "人工智能辅助学习"],
+          ["technological innovation", "科技创新"],
+          ["information explosion", "信息爆炸"],
+          ["digital divide", "数字鸿沟"]
+        ]
+      },
+      {
+        "topic": "品质与精神",
+        "words": [
+          ["perseverance", "坚持不懈"],
+          ["resilience / ability to cope with setbacks", "抗压能力；挫折承受力"],
+          ["teamwork / cooperation", "团队合作"],
+          ["optimism", "乐观"],
+          ["sense of social responsibility", "社会责任感"]
+        ]
+      },
+      {
+        "topic": "文化与交流",
+        "words": [
+          ["cultural heritage", "文化遗产"],
+          ["intangible cultural heritage", "非物质文化遗产"],
+          ["cultural exchange", "文化交流"],
+          ["Guochao brands / national-trend brands", "国潮品牌"],
+          ["cultural confidence", "文化自信"]
+        ]
+      },
+      {
+        "topic": "环境与可持续",
+        "words": [
+          ["environmental protection / conservation", "环境保护"],
+          ["sustainable development", "可持续发展"],
+          ["garbage sorting", "垃圾分类"],
+          ["low-carbon life", "低碳生活"],
+          ["recyclable products", "可回收产品"]
+        ]
+      },
+      {
+        "topic": "国家发展与热点",
+        "words": [
+          ["aerospace industry", "航天事业"],
+          ["live commerce / livestreaming", "直播带货"],
+          ["means of payment / digital wallet", "支付方式；数字钱包"],
+          ["takeout / online meal ordering", "外卖；在线订餐"],
+          ["the spirit of patriotism", "爱国主义精神"]
+        ]
+      },
+      {
+        "topic": "学习与教育",
+        "words": [
+          ["lifelong learning", "终身学习"],
+          ["practical skills", "实用技能"],
+          ["humanities", "人文学科"],
+          ["long-termism vs short-termism", "长期主义与短期主义"],
+          ["critical thinking", "批判性思维"]
+        ]
+      }
+    ]
+  },
+  "selfCheck": {
+    "title": "老师视角自检清单",
+    "intro": "下面这套自检来自「硬槽数 + 双评取中」的判分思路：先数硬槽，再看两侧评分，最后按优先级清错。写完对一遍，比盲目背模板有效得多。",
+    "blocks": [
+      {
+        "name": "① 硬槽自检（反套话）",
+        "detail": "把题目话题换掉后，数一数你文中有几处必须由本题信息填写的槽位（时间、数据、主题词、具体例子）。",
+        "rules": [
+          "≥2 处：属于灵活运用，模板句被本题信息激活，放心交。",
+          "=1 处：警戒，指出还缺哪个槽，补一个本题细节。",
+          "=0 处：属于死背，模板句与题目完全无关，必须改造而不是删除。"
+        ]
+      },
+      {
+        "name": "② 双评自检（两侧打分）",
+        "detail": "分别用「内容优先」和「语言优先」两把尺子各打一次分，若两者差距过大，说明某一项明显拖后腿。",
+        "rules": [
+          "内容优先：要点是否齐全、是否回应题目要求、例子是否贴题。",
+          "语言优先：语法是否有错、句式是否有变化、词汇是否准确。",
+          "两者差异大 → 先补短板，再谈升格。"
+        ]
+      },
+      {
+        "name": "③ 清错优先级",
+        "detail": "改动必须按优先级，不要为了改而改。",
+        "rules": [
+          "第一优先：语法硬错（主谓一致、时态、冠词、单复数、拼写）。",
+          "第二优先：中式表达与搭配错误。",
+          "第三优先：句式升格（低配→高配），只改「没错但很平」的句子。",
+          "原文中同源且槽位已满的句子保留不动。"
+        ]
+      },
+      {
+        "name": "④ 低配→高配替换链",
+        "detail": "同一功能位的句子，从保底版升到展示版，考场上按剩余时间决定用哪一档。",
+        "rules": [
+          "表示「很重要」：It is important → It plays a pivotal role in ... → It is ... that makes ... possible.",
+          "表示「越来越多的人」：more and more people → many people, if not most → an increasing number of individuals.",
+          "表示「原因」：because → which explains why → The fundamental factors contributing to this can be explained as follows.",
+          "表示「我认为」：I think → From my perspective → My point of view is consistent with ..."
+        ]
+      }
+    ]
+  }
+}

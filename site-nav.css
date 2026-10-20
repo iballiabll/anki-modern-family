@@ -1,0 +1,299 @@
+/**
+ * 全站导航：底部标签栏 + 模块抽屉（今天 / 精读 / 词汇 / 练习 / 我的）。
+ *
+ * 只在移动端与平板（<=1024px）显示；桌面端维持原有顶栏与侧栏导航。
+ * 打开抽屉时用 body.is-site-sheet-open 控制，词卡面板（z-index 80）
+ * 仍然盖在标签栏之上，不会互相遮挡。
+ * 配色统一走 site-theme.css 的 Astra 令牌，带兜底色值。
+ */
+
+:root {
+  --site-nav-height: 62px;
+}
+
+.site-tabbar,
+.site-nav-backdrop,
+.site-nav-sheet {
+  display: none;
+}
+
+@media print {
+  .site-nav-root {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .site-nav-root {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  body.has-site-tabbar {
+    padding-bottom: calc(
+      var(--site-nav-height) + env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  .site-tabbar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+    padding: 6px max(8px, env(safe-area-inset-right, 0px))
+      max(6px, env(safe-area-inset-bottom, 0px))
+      max(8px, env(safe-area-inset-left, 0px));
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid var(--astra-line, #dce5f0);
+    box-shadow: 0 -8px 22px rgba(36, 54, 75, 0.08);
+    backdrop-filter: blur(12px);
+  }
+
+  .site-tab {
+    min-width: 0;
+    min-height: 50px;
+    padding: 5px 2px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--astra-muted, #5e6f83);
+    background: none;
+    border: 0;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .site-tab-icon {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+  }
+
+  .site-tab-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .site-tab.is-active {
+    color: var(--astra-brand-deep, #1b3f6b);
+    background: var(--astra-surface-soft, #eaf2fb);
+  }
+
+  .site-tab.is-active .site-tab-icon {
+    color: var(--astra-brand, #285e9c);
+  }
+
+  .site-tab:focus-visible,
+  .site-nav-link:focus-visible,
+  .site-nav-close:focus-visible {
+    outline: 3px solid rgba(40, 94, 156, 0.35);
+    outline-offset: 1px;
+  }
+
+  .site-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: block;
+    background: rgba(36, 54, 75, 0.42);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 180ms ease,
+      visibility 0s linear 180ms;
+  }
+
+  body.is-site-sheet-open .site-nav-backdrop {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 180ms ease,
+      visibility 0s;
+  }
+
+  .site-nav-sheet {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 71;
+    display: block;
+    max-height: min(82vh, 660px);
+    max-height: min(82dvh, 660px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 max(16px, env(safe-area-inset-right, 0px))
+      calc(20px + env(safe-area-inset-bottom, 0px))
+      max(16px, env(safe-area-inset-left, 0px));
+    background: #ffffff;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -18px 48px rgba(36, 54, 75, 0.22);
+    transform: translateY(102%);
+    visibility: hidden;
+    transition:
+      transform 220ms ease,
+      visibility 0s linear 220ms;
+  }
+
+  body.is-site-sheet-open .site-nav-sheet {
+    transform: translateY(0);
+    visibility: visible;
+    transition:
+      transform 220ms ease,
+      visibility 0s;
+  }
+
+  body.is-site-sheet-open {
+    overflow: hidden;
+  }
+
+  .site-nav-sheet-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 -2px 4px;
+    padding: 14px 2px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--astra-line, #dce5f0);
+  }
+
+  .site-nav-sheet-title strong {
+    display: block;
+    color: var(--astra-brand-deep, #1b3f6b);
+    font-size: 16px;
+  }
+
+  .site-nav-sheet-title span {
+    color: var(--astra-muted, #5e6f83);
+    font-size: 11.5px;
+  }
+
+  .site-nav-close {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 40px;
+    padding: 0 12px;
+    color: var(--astra-brand, #285e9c);
+    background: var(--astra-surface-soft, #eaf2fb);
+    border: 0;
+    border-radius: 9px;
+    font-weight: 800;
+  }
+
+  .site-nav-group {
+    margin-top: 14px;
+  }
+
+  .site-nav-group h3 {
+    margin: 0 0 8px;
+    color: var(--astra-muted, #5e6f83);
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+
+  .site-nav-group-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .site-nav-link {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 14px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 11px;
+    color: var(--astra-ink, #24364b);
+    background: #f7fafd;
+    border: 1px solid var(--astra-line, #dce5f0);
+    border-radius: 10px;
+    text-decoration: none;
+  }
+
+  .site-nav-link strong {
+    display: block;
+    font-size: 13.5px;
+  }
+
+  .site-nav-link small {
+    display: block;
+    margin-top: 2px;
+    color: var(--astra-muted, #5e6f83);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .site-nav-link-badge {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    color: var(--astra-brand-deep, #1b3f6b);
+    background: var(--astra-surface-soft, #eaf2fb);
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .site-nav-link-arrow {
+    color: #7d8fa3;
+    font-size: 14px;
+    text-align: right;
+  }
+
+  .site-nav-link.is-current {
+    background: #ffffff;
+    border-color: var(--astra-brand, #285e9c);
+    box-shadow: inset 3px 0 0 var(--astra-brand, #285e9c);
+  }
+
+  /* 站内浮层让位：底部标签栏出现时把 toast 与悬浮按钮抬高。 */
+  body.has-site-tabbar .toast {
+    bottom: calc(var(--site-nav-height) + 14px + env(safe-area-inset-bottom, 0px));
+    z-index: 95;
+  }
+
+  body.has-site-tabbar.is-vocab-blur #blurModeButton {
+    bottom: calc(var(--site-nav-height) + 14px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 360px) {
+  .site-tab {
+    font-size: 10px;
+  }
+
+  .site-nav-link {
+    grid-template-columns: 30px minmax(0, 1fr) 12px;
+    padding: 9px;
+  }
+
+  .site-nav-link-badge {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav-backdrop,
+  .site-nav-sheet {
+    transition: none;
+  }
+}

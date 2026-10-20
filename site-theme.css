@@ -1,0 +1,519 @@
+/**
+ * Astra 主题层 · 白色 + 清新蓝
+ * ---------------------------------------------------------------------------
+ * 设计依据：学习站-Astra前端改版设计.md 第 7 节「视觉规范」。
+ *
+ * 这一层只在全站最后加载，用「受控覆盖」的方式把旧的多轮配色收敛到同一套
+ * 令牌上，不重写任何模块的布局与交互：
+ *   1. 覆盖 :root 令牌（styles.css / intensive.css / reading.css / review.css
+ *      共用同一批变量名，因此一处覆盖即可全站生效）；
+ *   2. 去掉方格背景与大范围渐变，换成 #F6F9FD 轻蓝白；
+ *   3. 登录页由深色改为轻蓝白；
+ *   4. 把深色区块（口语 / 在线复习抬头）改成浅色内容面；
+ *   5. 补上「今天」首页首屏的组件样式。
+ *
+ * 约束：不使用全局 !important 叠覆盖；旧模块的 DOM、参数与数据语义不动。
+ */
+
+:root {
+  /* —— Astra 设计令牌（新） —— */
+  --astra-bg: #f6f9fd;
+  --astra-surface: #ffffff;
+  --astra-surface-soft: #eaf2fb;
+  --astra-ink: #24364b;
+  --astra-muted: #5e6f83;
+  --astra-line: #dce5f0;
+  --astra-brand: #285e9c;
+  --astra-brand-strong: #1b4a7a;
+  --astra-brand-deep: #1b3f6b;
+  --astra-radius-sm: 8px;
+  --astra-radius-md: 12px;
+  --astra-radius-lg: 16px;
+  --astra-shadow: 0 8px 28px rgba(36, 54, 75, 0.1);
+  --astra-shadow-sm: 0 4px 14px rgba(36, 54, 75, 0.07);
+  --astra-focus: 0 0 0 3px rgba(40, 94, 156, 0.28);
+
+  /* —— 旧令牌重映射：让各模块的既有规则自动跟着变 —— */
+  --canvas: var(--astra-bg);
+  --surface: var(--astra-surface);
+  --surface-soft: var(--astra-surface-soft);
+  --paper: var(--astra-surface);
+  --ink: var(--astra-ink);
+  --muted: var(--astra-muted);
+  --line: var(--astra-line);
+  --line-strong: #c7d6e6;
+  --forest: var(--astra-brand);
+  --forest-deep: var(--astra-brand-deep);
+  --forest-soft: var(--astra-surface-soft);
+  --coral: var(--astra-brand);
+  --coral-dark: var(--astra-brand-strong);
+  --coral-soft: var(--astra-surface-soft);
+  --mint: var(--astra-surface-soft);
+  --mint-soft: #f2f7fd;
+  --blue: #2e7bb8;
+  --gold: #c9971f;
+  --shadow: var(--astra-shadow);
+  --small-shadow: var(--astra-shadow-sm);
+  --paper-shadow: 0 6px 20px rgba(36, 54, 75, 0.06);
+}
+
+/* 去掉方格背景与深色画布，换成纯净的轻蓝白。 */
+html {
+  background: var(--astra-bg);
+}
+
+body {
+  background: var(--astra-bg);
+  background-image: none;
+  color: var(--astra-ink);
+}
+
+/* ------------------------------------------------------------------ 登录页 */
+/* 设计：同样的字标、轻蓝白背景与单个表单区域，登录失败内联反馈。 */
+.login-view {
+  background: var(--astra-bg);
+  background-image: none;
+}
+
+.login-story {
+  color: var(--astra-ink);
+}
+
+.login-story::before {
+  background: linear-gradient(
+    180deg,
+    var(--astra-brand) 0 45%,
+    var(--astra-line) 45%
+  );
+}
+
+.eyebrow {
+  color: var(--astra-muted);
+}
+
+.login-copy {
+  color: var(--astra-muted);
+}
+
+.login-features span {
+  color: var(--astra-brand-deep);
+  background: var(--astra-surface);
+  border: 1px solid var(--astra-line);
+}
+
+.login-usage {
+  color: var(--astra-muted);
+}
+
+.login-panel {
+  border: 1px solid var(--astra-line);
+  border-radius: var(--astra-radius-lg);
+  box-shadow: var(--astra-shadow);
+}
+
+.login-panel::before {
+  background: var(--astra-brand);
+  height: 3px;
+}
+
+.panel-kicker {
+  color: var(--astra-brand);
+}
+
+/* iball 印记：圆形蓝色小印记，替代原来的金色方块。 */
+.brand-mark {
+  color: #ffffff;
+  background: var(--astra-brand);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(40, 94, 156, 0.22);
+}
+
+/* ------------------------------------------------------------ 通用控件收敛 */
+.login-form input,
+.search-field input,
+select,
+textarea {
+  background: var(--astra-surface);
+  border-color: var(--astra-line);
+}
+
+.login-form input:focus,
+.search-field:focus-within,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 0;
+  border-color: var(--astra-brand);
+  box-shadow: var(--astra-focus);
+}
+
+.primary-button,
+.practice-launch-button,
+.practice-primary-button,
+.vocab-embed-close,
+.practice-realtime-button.is-active,
+.collection-filter-button.is-active {
+  color: #ffffff;
+  background: var(--astra-brand);
+  border-color: var(--astra-brand);
+  box-shadow: 0 6px 16px rgba(40, 94, 156, 0.18);
+}
+
+.primary-button:hover,
+.practice-launch-button:hover,
+.practice-primary-button:hover,
+.vocab-embed-close:hover {
+  background: var(--astra-brand-strong);
+  border-color: var(--astra-brand-strong);
+}
+
+/* 深色区块改为浅色内容面：口语练习抬头与在线复习抬头。 */
+.practice-header,
+.review-header {
+  color: var(--astra-ink);
+  background: var(--astra-surface);
+  background-image: none;
+  border: 1px solid var(--astra-line);
+  border-left: 4px solid var(--astra-brand);
+  border-radius: var(--astra-radius-md);
+  box-shadow: var(--astra-shadow-sm);
+}
+
+.practice-header::before,
+.review-header::before {
+  display: none;
+}
+
+.practice-header h2,
+.review-header h2 {
+  color: var(--astra-ink);
+}
+
+.practice-header .practice-secondary-button,
+.review-header .practice-secondary-button {
+  color: var(--astra-brand);
+  background: var(--astra-surface-soft);
+  border-color: transparent;
+}
+
+.practice-header .practice-secondary-button:hover,
+.review-header .practice-secondary-button:hover {
+  background: #dfeaf7;
+}
+
+/* 顶部条 / 侧栏里的深色渐变也一并收敛为轻蓝白。 */
+.vocab-embed-toolbar {
+  border-left-color: var(--astra-brand);
+}
+
+/* ------------------------------------------------------------ 「今天」首屏 */
+.today-band {
+  margin: 0 0 18px;
+  padding: 22px 24px;
+  background: var(--astra-surface);
+  border: 1px solid var(--astra-line);
+  border-radius: var(--astra-radius-md);
+}
+
+.today-band[hidden] {
+  display: none !important;
+}
+
+.today-band-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.today-band-date {
+  margin: 0;
+  color: var(--astra-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.today-band-toggle {
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--astra-brand);
+  background: var(--astra-surface-soft);
+  border: 1px solid transparent;
+  border-radius: var(--astra-radius-sm);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.today-band-toggle:hover {
+  background: #dfeaf7;
+}
+
+.today-band-title {
+  margin: 8px 0 0;
+  color: var(--astra-ink);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.today-band-copy {
+  margin: 6px 0 0;
+  color: var(--astra-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.today-band-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.today-resume {
+  padding: 18px 20px;
+  background: var(--astra-surface-soft);
+  border-radius: var(--astra-radius-md);
+}
+
+.today-resume-label {
+  margin: 0;
+  color: var(--astra-brand);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.today-resume-title {
+  margin: 10px 0 0;
+  color: var(--astra-ink);
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.today-resume-note {
+  margin: 4px 0 0;
+  color: var(--astra-muted);
+  font-size: 13px;
+}
+
+.today-resume-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.today-resume-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  color: #ffffff;
+  background: var(--astra-brand);
+  border-radius: var(--astra-radius-sm);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.today-resume-button:hover {
+  background: var(--astra-brand-strong);
+}
+
+.today-link-plain {
+  color: var(--astra-brand);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.today-link-plain:hover {
+  text-decoration: underline;
+}
+
+.today-quick {
+  display: grid;
+  gap: 2px;
+}
+
+.today-quick-title {
+  margin: 0 0 6px;
+  color: var(--astra-ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.today-quick-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 6px 0;
+  color: var(--astra-ink);
+  border-bottom: 1px solid var(--astra-line);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.today-quick-row:last-child {
+  border-bottom: 0;
+}
+
+.today-quick-row span:last-child {
+  color: var(--astra-brand);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.today-quick-note {
+  margin: 8px 0 0;
+  color: var(--astra-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.today-recent {
+  margin-top: 18px;
+  border-top: 1px solid var(--astra-line);
+  padding-top: 12px;
+}
+
+.today-recent-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.today-recent-head strong {
+  color: var(--astra-ink);
+  font-size: 15px;
+}
+
+.today-recent-list {
+  margin-top: 6px;
+  display: grid;
+  gap: 0;
+}
+
+.today-recent-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 6px 0;
+  color: var(--astra-ink);
+  border-bottom: 1px solid var(--astra-line);
+  text-decoration: none;
+}
+
+.today-recent-row:last-child {
+  border-bottom: 0;
+}
+
+.today-recent-kind {
+  color: var(--astra-brand);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.today-recent-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.today-recent-go {
+  color: var(--astra-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.today-recent-row:hover .today-recent-go {
+  color: var(--astra-brand);
+}
+
+.today-recent-empty {
+  margin: 6px 0 0;
+  color: var(--astra-muted);
+  font-size: 13px;
+}
+
+/* 收起态：只留一行，把正文让出来。 */
+.today-band.is-collapsed {
+  padding: 12px 18px;
+}
+
+.today-band.is-collapsed .today-band-title,
+.today-band.is-collapsed .today-band-copy,
+.today-band.is-collapsed .today-band-body {
+  display: none;
+}
+
+/* 首页内嵌词汇库时，整块「今天」让位。 */
+.workspace.is-vocab-embedded .today-band {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .today-band {
+    padding: 18px 16px;
+  }
+
+  .today-band-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .today-band-title {
+    font-size: 22px;
+  }
+}
+
+/* 手机：首屏只留「继续上次学习」，其余入口交给底部标签栏，
+   避免把正文推到首屏之外。 */
+@media (max-width: 760px) {
+  .today-band {
+    margin-bottom: 14px;
+    padding: 16px 14px;
+  }
+
+  .today-band-title {
+    font-size: 20px;
+  }
+
+  .today-band-copy {
+    display: none;
+  }
+
+  .today-quick,
+  .today-recent {
+    display: none;
+  }
+
+  .today-resume {
+    padding: 14px 16px;
+  }
+
+  .today-resume-title {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-band * {
+    transition: none !important;
+  }
+}

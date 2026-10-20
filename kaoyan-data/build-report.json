@@ -1,0 +1,484 @@
+{
+  "generatedAt": "2026-10-09",
+  "corpus": "kaoyan-english references/papers（本机语料目录路径不写入产物）",
+  "papers": [
+    {
+      "id": "english-i-2010",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 25,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 50,
+        "words": 2780,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2011",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 23,
+        "readingParagraphs": 14,
+        "translatedParagraphs": 14,
+        "questions": 50,
+        "words": 2677,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2012",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 34,
+        "readingParagraphs": 20,
+        "translatedParagraphs": 20,
+        "questions": 50,
+        "words": 3141,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2013",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 28,
+        "readingParagraphs": 16,
+        "translatedParagraphs": 16,
+        "questions": 50,
+        "words": 3082,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2014",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 29,
+        "readingParagraphs": 20,
+        "translatedParagraphs": 20,
+        "questions": 50,
+        "words": 2714,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2015",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 18,
+        "translatedParagraphs": 18,
+        "questions": 50,
+        "words": 3068,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2016",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 14,
+        "translatedParagraphs": 14,
+        "questions": 50,
+        "words": 3490,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2017",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 35,
+        "readingParagraphs": 22,
+        "translatedParagraphs": 22,
+        "questions": 50,
+        "words": 2701,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2018",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 27,
+        "readingParagraphs": 20,
+        "translatedParagraphs": 20,
+        "questions": 50,
+        "words": 2656,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2019",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 31,
+        "readingParagraphs": 21,
+        "translatedParagraphs": 21,
+        "questions": 50,
+        "words": 2642,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2020",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 35,
+        "readingParagraphs": 20,
+        "translatedParagraphs": 20,
+        "questions": 50,
+        "words": 3413,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2021",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 27,
+        "readingParagraphs": 15,
+        "translatedParagraphs": 15,
+        "questions": 50,
+        "words": 3098,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2022",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 20,
+        "translatedParagraphs": 20,
+        "questions": 50,
+        "words": 3297,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2023",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 21,
+        "readingParagraphs": 13,
+        "translatedParagraphs": 13,
+        "questions": 50,
+        "words": 2615,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2024",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 39,
+        "readingParagraphs": 23,
+        "translatedParagraphs": 23,
+        "questions": 50,
+        "words": 3296,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2025",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 28,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 50,
+        "words": 2789,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-i-2026",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 27,
+        "readingParagraphs": 18,
+        "translatedParagraphs": 18,
+        "questions": 50,
+        "words": 2696,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2010",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 3051,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2011",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 35,
+        "readingParagraphs": 18,
+        "translatedParagraphs": 18,
+        "questions": 46,
+        "words": 2940,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2012",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 27,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 2966,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2013",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 20,
+        "translatedParagraphs": 20,
+        "questions": 46,
+        "words": 2860,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2014",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 29,
+        "readingParagraphs": 15,
+        "translatedParagraphs": 15,
+        "questions": 46,
+        "words": 2825,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2015",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 36,
+        "readingParagraphs": 19,
+        "translatedParagraphs": 19,
+        "questions": 46,
+        "words": 3223,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2016",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 15,
+        "translatedParagraphs": 15,
+        "questions": 46,
+        "words": 3339,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2017",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 29,
+        "readingParagraphs": 16,
+        "translatedParagraphs": 16,
+        "questions": 46,
+        "words": 2934,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2018",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 41,
+        "readingParagraphs": 24,
+        "translatedParagraphs": 24,
+        "questions": 46,
+        "words": 2942,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2019",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 36,
+        "readingParagraphs": 21,
+        "translatedParagraphs": 21,
+        "questions": 46,
+        "words": 2929,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2020",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 3252,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2021",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 34,
+        "readingParagraphs": 21,
+        "translatedParagraphs": 21,
+        "questions": 46,
+        "words": 3347,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2022",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 33,
+        "readingParagraphs": 19,
+        "translatedParagraphs": 19,
+        "questions": 46,
+        "words": 3296,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2023",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 28,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 2889,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2024",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 32,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 2881,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2025",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 35,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 3192,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    },
+    {
+      "id": "english-ii-2026",
+      "stats": {
+        "sections": 8,
+        "paragraphs": 31,
+        "readingParagraphs": 17,
+        "translatedParagraphs": 17,
+        "questions": 46,
+        "words": 2904,
+        "enrichment": 23
+      },
+      "warnings": [],
+      "notes": []
+    }
+  ],
+  "warnings": [],
+  "notes": []
+}

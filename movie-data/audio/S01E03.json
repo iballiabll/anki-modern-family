@@ -1,0 +1,8393 @@
+{
+  "episode": "S01E03",
+  "status": "ready",
+  "generatedBy": "scripts/build-movie-audio-manifest.mjs",
+  "generatedAt": "2026-09-25",
+  "sprite": "S01E03.mp3",
+  "alignment": "count",
+  "cueCount": 465,
+  "lineCueCount": 465,
+  "segmentCount": 465,
+  "dialogueLineCount": 465,
+  "subtitleCueCount": 465,
+  "sources": {
+    "subtitle": "materials\\电影\\摩登家庭\\S01E03\\S01E03.srt",
+    "audio": "materials\\电影\\摩登家庭\\S01E03\\S01E03.mp3",
+    "video": ""
+  },
+  "notes": [],
+  "cues": [
+    {
+      "id": "segment-1",
+      "start": 0,
+      "end": 1.71,
+      "text": "Riley Morton coming up now.",
+      "lineIds": [
+        "b1"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-2",
+      "start": 1.89,
+      "end": 4.73,
+      "text": "Kelly at second. Started the inning with a double.",
+      "lineIds": [
+        "b2"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-3",
+      "start": 4.91,
+      "end": 6.57,
+      "text": "That seems like an hour ago.",
+      "lineIds": [
+        "b3"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-4",
+      "start": 6.75,
+      "end": 8.61,
+      "text": "- Honey, I thought you were gonna take out the garbage. - I am.",
+      "lineIds": [
+        "b4"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-5",
+      "start": 8.79,
+      "end": 12.69,
+      "text": "High fly to right. Hooking, hooking- Foul.",
+      "lineIds": [
+        "b5"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-6",
+      "start": 12.87,
+      "end": 14.86,
+      "text": "- Phil. - Yes. Getting it.",
+      "lineIds": [
+        "b6"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-7",
+      "start": 15.04,
+      "end": 16.71,
+      "text": "I was- I was gonna get it.",
+      "lineIds": [
+        "b7"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-8",
+      "start": 16.89,
+      "end": 18.46,
+      "text": "- Dylan. - Hey, Mrs. Dunphy.",
+      "lineIds": [
+        "b8"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-9",
+      "start": 18.64,
+      "end": 20.38,
+      "text": "Um, I'm just waiting for Haley.",
+      "lineIds": [
+        "b9"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-10",
+      "start": 20.56,
+      "end": 22.64,
+      "text": "- Did you ring the bell? - I texted.",
+      "lineIds": [
+        "b10"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-11",
+      "start": 22.82,
+      "end": 24.75,
+      "text": "She said she'd be down in just a minute.",
+      "lineIds": [
+        "b11"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-12",
+      "start": 24.93,
+      "end": 27.57,
+      "text": "- Oh, great. Tell her I said \"Hi.\" - I will.",
+      "lineIds": [
+        "b12"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-13",
+      "start": 27.75,
+      "end": 29.93,
+      "text": "Dylan! D-Money!",
+      "lineIds": [
+        "b13"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-14",
+      "start": 30.11,
+      "end": 32.19,
+      "text": "Chillin' with Dylan the villain!",
+      "lineIds": [
+        "b14"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-15",
+      "start": 32.37,
+      "end": 34.5,
+      "text": "- \"D\" To the \"Y\" To the- - Hey, Mr. Dunphy.",
+      "lineIds": [
+        "b15"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-16",
+      "start": 34.68,
+      "end": 35.66,
+      "text": "Hey! Come on in.",
+      "lineIds": [
+        "b16"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-17",
+      "start": 35.84,
+      "end": 37.52,
+      "text": "You're just in time to catch the end of the game.",
+      "lineIds": [
+        "b17"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-18",
+      "start": 37.7,
+      "end": 39.75,
+      "text": "Oh, I'm not really a baseball guy.",
+      "lineIds": [
+        "b18"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-19",
+      "start": 39.93,
+      "end": 40.86,
+      "text": "Haley says \"Hi.\"",
+      "lineIds": [
+        "b19"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-20",
+      "start": 41.04,
+      "end": 42.32,
+      "text": "I was just being facetious.",
+      "lineIds": [
+        "b20"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-21",
+      "start": 42.5,
+      "end": 43.65,
+      "text": "Come on. I'll catch you up.",
+      "lineIds": [
+        "b21"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-22",
+      "start": 43.83,
+      "end": 45.26,
+      "text": "Sit it. Park it.",
+      "lineIds": [
+        "b22"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-23",
+      "start": 45.44,
+      "end": 46.72,
+      "text": "Come on. I don't bite.",
+      "lineIds": [
+        "b23"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-24",
+      "start": 46.9,
+      "end": 47.73,
+      "text": "Kidding.",
+      "lineIds": [
+        "b24"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-25",
+      "start": 47.91,
+      "end": 48.85,
+      "text": "I'm kidding.",
+      "lineIds": [
+        "b25"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-26",
+      "start": 49.03,
+      "end": 51.11,
+      "text": "Okay. See that guy? He's the tying run.",
+      "lineIds": [
+        "b26"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-27",
+      "start": 51.29,
+      "end": 52.72,
+      "text": "Interesting story about him.",
+      "lineIds": [
+        "b27"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-28",
+      "start": 52.9,
+      "end": 54.89,
+      "text": "He's been stuck on second base forever,",
+      "lineIds": [
+        "b28"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-29",
+      "start": 55.07,
+      "end": 57.16,
+      "text": "and I'm pretty sure he's gonna try and steal third,",
+      "lineIds": [
+        "b29"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-30",
+      "start": 57.34,
+      "end": 60.37,
+      "text": "which is just a terrible, terrible idea.",
+      "lineIds": [
+        "b30"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-31",
+      "start": 60.55,
+      "end": 61.74,
+      "text": "How are you and Haley doing?",
+      "lineIds": [
+        "b31"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-32",
+      "start": 61.92,
+      "end": 64.58,
+      "text": "I wish I could stay home with you and fly toy airplanes.",
+      "lineIds": [
+        "b32"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-33",
+      "start": 64.76,
+      "end": 66.33,
+      "text": "These aren't toy airplanes, Manny.",
+      "lineIds": [
+        "b33"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-34",
+      "start": 66.51,
+      "end": 68.58,
+      "text": "These are models, and they're very complicated.",
+      "lineIds": [
+        "b34"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-35",
+      "start": 68.76,
+      "end": 72.19,
+      "text": "You wanna fly one of these, you gotta be familiar with airfoil,",
+      "lineIds": [
+        "b35"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-36",
+      "start": 72.37,
+      "end": 74.27,
+      "text": "drag, lift and thrust-",
+      "lineIds": [
+        "b36"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-37",
+      "start": 74.45,
+      "end": 76.73,
+      "text": "and these are all principles of aerodynamics.",
+      "lineIds": [
+        "b37"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-38",
+      "start": 76.91,
+      "end": 78.66,
+      "text": "The box says \"12 and up.\"",
+      "lineIds": [
+        "b38"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-39",
+      "start": 78.84,
+      "end": 79.74,
+      "text": "What?",
+      "lineIds": [
+        "b39"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-40",
+      "start": 79.92,
+      "end": 81.97,
+      "text": "You can fly toy planes with Jay next time.",
+      "lineIds": [
+        "b40"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-41",
+      "start": 82.15,
+      "end": 84.4,
+      "text": "- Today you have to spend time with Luke. - Why?",
+      "lineIds": [
+        "b41"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-42",
+      "start": 84.58,
+      "end": 86.92,
+      "text": "Because his mother invited you, so you go.",
+      "lineIds": [
+        "b42"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-43",
+      "start": 87.1,
+      "end": 89.23,
+      "text": "Family needs to be close. Right, Jay?",
+      "lineIds": [
+        "b43"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-44",
+      "start": 89.41,
+      "end": 91.42,
+      "text": "I'm pretty sure this is a typo.",
+      "lineIds": [
+        "b44"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-45",
+      "start": 91.6,
+      "end": 94.92,
+      "text": "Men need their hobbies. Manny's father had many hobbies.",
+      "lineIds": [
+        "b45"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-46",
+      "start": 95.1,
+      "end": 96.96,
+      "text": "Like hiking in the desert,",
+      "lineIds": [
+        "b46"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-47",
+      "start": 97.14,
+      "end": 99.55,
+      "text": "that kind of skiing that they drop you from the-",
+      "lineIds": [
+        "b47"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-48",
+      "start": 99.73,
+      "end": 100.79,
+      "text": "How do you say in English?",
+      "lineIds": [
+        "b48"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-49",
+      "start": 100.97,
+      "end": 102.84,
+      "text": "- Helicopter. - Yes.",
+      "lineIds": [
+        "b49"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-50",
+      "start": 103.02,
+      "end": 105.91,
+      "text": "Once, on a dare, he even boxed with an alligator.",
+      "lineIds": [
+        "b50"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-51",
+      "start": 106.09,
+      "end": 108.13,
+      "text": "\"Wrestle.\" You wrestle-",
+      "lineIds": [
+        "b51"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-52",
+      "start": 108.31,
+      "end": 110.06,
+      "text": "You can't box with alligators.",
+      "lineIds": [
+        "b52"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-53",
+      "start": 110.24,
+      "end": 110.95,
+      "text": "Are you sure?",
+      "lineIds": [
+        "b53"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-54",
+      "start": 111.13,
+      "end": 113.35,
+      "text": "How would they get the gloves on those little claws?",
+      "lineIds": [
+        "b54"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-55",
+      "start": 113.53,
+      "end": 115.78,
+      "text": "- Aren't they like tiny little hands? - No!",
+      "lineIds": [
+        "b55"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-56",
+      "start": 115.96,
+      "end": 117.69,
+      "text": "Okay, now I forgot what we're talking about.",
+      "lineIds": [
+        "b56"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-57",
+      "start": 117.87,
+      "end": 120.9,
+      "text": "Anyways, hobbies are important for the men,",
+      "lineIds": [
+        "b57"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-58",
+      "start": 121.08,
+      "end": 123.28,
+      "text": "whether you're risking your life...",
+      "lineIds": [
+        "b58"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-59",
+      "start": 123.46,
+      "end": 126.13,
+      "text": "or flying little planes from a safe distance.",
+      "lineIds": [
+        "b59"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-60",
+      "start": 126.31,
+      "end": 127.6,
+      "text": "Wait, wait, wait. What are you doing?",
+      "lineIds": [
+        "b60"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-61",
+      "start": 127.78,
+      "end": 130.45,
+      "text": "Uh, we're just gonna buy some diapers. It'll just take a second.",
+      "lineIds": [
+        "b61"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-62",
+      "start": 130.63,
+      "end": 133.98,
+      "text": "- This is Costco. - Yeah, which is where we buy diapers.",
+      "lineIds": [
+        "b62"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-63",
+      "start": 134.16,
+      "end": 135.21,
+      "text": "Since when?",
+      "lineIds": [
+        "b63"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-64",
+      "start": 135.39,
+      "end": 138.54,
+      "text": "Do you remember when we adopted that baby a few months back?",
+      "lineIds": [
+        "b64"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-65",
+      "start": 138.72,
+      "end": 139.7,
+      "text": "Since then.",
+      "lineIds": [
+        "b65"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-66",
+      "start": 139.88,
+      "end": 141.14,
+      "text": "Mitchell is a snob.",
+      "lineIds": [
+        "b66"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-67",
+      "start": 141.32,
+      "end": 144.03,
+      "text": "No. N-No, I-I'm discerning.",
+      "lineIds": [
+        "b67"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-68",
+      "start": 144.21,
+      "end": 147,
+      "text": "Official slogan for snobs.",
+      "lineIds": [
+        "b68"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-69",
+      "start": 147.18,
+      "end": 148.96,
+      "text": "When we first met, he wouldn't even look at me...",
+      "lineIds": [
+        "b69"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-70",
+      "start": 149.14,
+      "end": 151.86,
+      "text": "because I was a hick from the farm in Missouri,",
+      "lineIds": [
+        "b70"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-71",
+      "start": 152.04,
+      "end": 153.86,
+      "text": "and he's a big city mouse.",
+      "lineIds": [
+        "b71"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-72",
+      "start": 154.04,
+      "end": 155.66,
+      "text": "Who says \"City mouse\"?",
+      "lineIds": [
+        "b72"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-73",
+      "start": 155.84,
+      "end": 157,
+      "text": "Country mice.",
+      "lineIds": [
+        "b73"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-74",
+      "start": 157.18,
+      "end": 159.73,
+      "text": "- I think I'm gonna go wait in the car. - Okay.",
+      "lineIds": [
+        "b74"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-75",
+      "start": 159.91,
+      "end": 162.04,
+      "text": "Hey, if you're on your way out, can you grab the garbage?",
+      "lineIds": [
+        "b75"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-76",
+      "start": 162.22,
+      "end": 164.12,
+      "text": "- I got it. - Okay. We got it.",
+      "lineIds": [
+        "b76"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-77",
+      "start": 164.3,
+      "end": 166.44,
+      "text": "- He's a little jumpy. - Oh, go figure-",
+      "lineIds": [
+        "b77"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-78",
+      "start": 166.62,
+      "end": 169.61,
+      "text": "a teenage boy doesn't want to hang out with his girlfriend's dad.",
+      "lineIds": [
+        "b78"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-79",
+      "start": 169.79,
+      "end": 171.25,
+      "text": "Thought we were past all that.",
+      "lineIds": [
+        "b79"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-80",
+      "start": 171.43,
+      "end": 172.32,
+      "text": "I'm all about-",
+      "lineIds": [
+        "b80"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-81",
+      "start": 172.5,
+      "end": 175.34,
+      "text": "- I'm all about taking it to the next level. - Really?",
+      "lineIds": [
+        "b81"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-82",
+      "start": 175.52,
+      "end": 177.64,
+      "text": "- Thought you were all about keeping it real. - Yes.",
+      "lineIds": [
+        "b82"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-83",
+      "start": 177.82,
+      "end": 179.3,
+      "text": "But the whole point of keeping it real is",
+      "lineIds": [
+        "b83"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-84",
+      "start": 179.48,
+      "end": 180.85,
+      "text": "so you can take it to the next level.",
+      "lineIds": [
+        "b84"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-85",
+      "start": 181.03,
+      "end": 182.37,
+      "text": "Did you really not know that?",
+      "lineIds": [
+        "b85"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-86",
+      "start": 182.55,
+      "end": 185.04,
+      "text": "You haven't exactly taken it to the next level with my dad.",
+      "lineIds": [
+        "b86"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-87",
+      "start": 185.22,
+      "end": 186.88,
+      "text": "What are you talking about?",
+      "lineIds": [
+        "b87"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-88",
+      "start": 187.06,
+      "end": 188.61,
+      "text": "We've been married for 16 years,",
+      "lineIds": [
+        "b88"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-89",
+      "start": 188.79,
+      "end": 190.87,
+      "text": "and you still walk on eggshells around him.",
+      "lineIds": [
+        "b89"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-90",
+      "start": 191.05,
+      "end": 193.26,
+      "text": "What? Are you kidding?",
+      "lineIds": [
+        "b90"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-91",
+      "start": 193.44,
+      "end": 196.23,
+      "text": "Jay and I are total buds.",
+      "lineIds": [
+        "b91"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-92",
+      "start": 196.41,
+      "end": 197.95,
+      "text": "You-You want to just hang out?",
+      "lineIds": [
+        "b92"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-93",
+      "start": 198.13,
+      "end": 200.13,
+      "text": "Brought six friends, so that just-",
+      "lineIds": [
+        "b93"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-94",
+      "start": 200.31,
+      "end": 201.3,
+      "text": "That's-",
+      "lineIds": [
+        "b94"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-95",
+      "start": 201.48,
+      "end": 203.8,
+      "text": "Manny brought his favorite game to play with Luke.",
+      "lineIds": [
+        "b95"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-96",
+      "start": 203.98,
+      "end": 205.18,
+      "text": "It's called Empire.",
+      "lineIds": [
+        "b96"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-97",
+      "start": 205.36,
+      "end": 208.9,
+      "text": "You use strategy to expand territories and take over the world.",
+      "lineIds": [
+        "b97"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-98",
+      "start": 209.08,
+      "end": 211.46,
+      "text": "Luke is gonna love that. He's out back playing.",
+      "lineIds": [
+        "b98"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-99",
+      "start": 211.64,
+      "end": 214.01,
+      "text": "Do you need me to get you something while I'm out shopping?",
+      "lineIds": [
+        "b99"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-100",
+      "start": 214.19,
+      "end": 216.14,
+      "text": "That's such a nice offer, but I think we're good. Thanks.",
+      "lineIds": [
+        "b100"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-101",
+      "start": 216.32,
+      "end": 218.7,
+      "text": "Okay. What about this?",
+      "lineIds": [
+        "b101"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-102",
+      "start": 218.88,
+      "end": 221.03,
+      "text": "You don't even say \"Hello\" To Gloria and Manny?",
+      "lineIds": [
+        "b102"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-103",
+      "start": 221.21,
+      "end": 224.55,
+      "text": "Hi, Gloria and Manny. Okay, Mom, what about this?",
+      "lineIds": [
+        "b103"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-104",
+      "start": 224.73,
+      "end": 227.81,
+      "text": "- No. You're wearing a dress. - Mom, come on.",
+      "lineIds": [
+        "b104"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-105",
+      "start": 227.99,
+      "end": 230.52,
+      "text": "What? It's gonna kill you to look like a girl for one afternoon?",
+      "lineIds": [
+        "b105"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-106",
+      "start": 230.7,
+      "end": 233.73,
+      "text": "But it's a wedding for some friend of yours I never even heard of.",
+      "lineIds": [
+        "b106"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-107",
+      "start": 233.91,
+      "end": 236.73,
+      "text": "It's non-negotiable. You can borrow a dress of Haley's again.",
+      "lineIds": [
+        "b107"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-108",
+      "start": 236.91,
+      "end": 237.72,
+      "text": "No.",
+      "lineIds": [
+        "b108"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-109",
+      "start": 237.9,
+      "end": 240.84,
+      "text": "That sends an ugly message- that I'm Haley.",
+      "lineIds": [
+        "b109"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-110",
+      "start": 241.02,
+      "end": 243.73,
+      "text": "You know, instead of trying to force me to wear a dress,",
+      "lineIds": [
+        "b110"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-111",
+      "start": 243.91,
+      "end": 247.09,
+      "text": "why don't you worry about getting Luke to wear some pants?",
+      "lineIds": [
+        "b111"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-112",
+      "start": 247.27,
+      "end": 250.86,
+      "text": "What? Why does he do this?",
+      "lineIds": [
+        "b112"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-113",
+      "start": 251.04,
+      "end": 252.13,
+      "text": "Luke!",
+      "lineIds": [
+        "b113"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-114",
+      "start": 252.31,
+      "end": 254.47,
+      "text": "Pants! Come on!",
+      "lineIds": [
+        "b114"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-115",
+      "start": 254.65,
+      "end": 256.42,
+      "text": "Jay and I are buds, for sure-",
+      "lineIds": [
+        "b115"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-116",
+      "start": 256.6,
+      "end": 259.86,
+      "text": "but with kind of, um, an invisible asterisk.",
+      "lineIds": [
+        "b116"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-117",
+      "start": 260.04,
+      "end": 263.29,
+      "text": "Um, he's not, uh- He's not a talker.",
+      "lineIds": [
+        "b117"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-118",
+      "start": 263.47,
+      "end": 266.22,
+      "text": "Or-Or a hugger.",
+      "lineIds": [
+        "b118"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-119",
+      "start": 266.4,
+      "end": 269.15,
+      "text": "Once he ran over my foot with his car.",
+      "lineIds": [
+        "b119"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-120",
+      "start": 269.33,
+      "end": 271.58,
+      "text": "To-To be fair, he had just given up smoking,",
+      "lineIds": [
+        "b120"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-121",
+      "start": 271.76,
+      "end": 274.18,
+      "text": "but basically we're-we're buds.",
+      "lineIds": [
+        "b121"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-122",
+      "start": 274.36,
+      "end": 275.74,
+      "text": "Do you have to just stand there?",
+      "lineIds": [
+        "b122"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-123",
+      "start": 275.92,
+      "end": 277.66,
+      "text": "You're making me feel uneasy.",
+      "lineIds": [
+        "b123"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-124",
+      "start": 277.84,
+      "end": 279.91,
+      "text": "Oh, for God's sake. Sit here. Here.",
+      "lineIds": [
+        "b124"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-125",
+      "start": 280.09,
+      "end": 282.99,
+      "text": "Hold this wing like this while I adjust this.",
+      "lineIds": [
+        "b125"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-126",
+      "start": 283.17,
+      "end": 284.15,
+      "text": "Okay.",
+      "lineIds": [
+        "b126"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-127",
+      "start": 284.33,
+      "end": 285.38,
+      "text": "Come on. Here.",
+      "lineIds": [
+        "b127"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-128",
+      "start": 285.56,
+      "end": 286.69,
+      "text": "Not too hard.",
+      "lineIds": [
+        "b128"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-129",
+      "start": 286.87,
+      "end": 289.31,
+      "text": "Alex, why don't you come shopping with me?",
+      "lineIds": [
+        "b129"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-130",
+      "start": 289.49,
+      "end": 292.15,
+      "text": "Maybe I can help you find something that you like.",
+      "lineIds": [
+        "b130"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-131",
+      "start": 292.33,
+      "end": 295.54,
+      "text": "That's a really nice offer, but it's not really her thing.",
+      "lineIds": [
+        "b131"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-132",
+      "start": 295.72,
+      "end": 297.9,
+      "text": "Actually, I'd love to go.",
+      "lineIds": [
+        "b132"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-133",
+      "start": 298.08,
+      "end": 300.18,
+      "text": "See, you don't know what my thing is.",
+      "lineIds": [
+        "b133"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-134",
+      "start": 300.36,
+      "end": 301.82,
+      "text": "You have no idea what my thing is.",
+      "lineIds": [
+        "b134"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-135",
+      "start": 302,
+      "end": 303.33,
+      "text": "I know what your thing is.",
+      "lineIds": [
+        "b135"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-136",
+      "start": 303.51,
+      "end": 306.33,
+      "text": "Your thing is to provoke, just like your sister's thing...",
+      "lineIds": [
+        "b136"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-137",
+      "start": 306.51,
+      "end": 307.96,
+      "text": "is to never come out of her room,",
+      "lineIds": [
+        "b137"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-138",
+      "start": 308.14,
+      "end": 309.14,
+      "text": "and your brother's thing-",
+      "lineIds": [
+        "b138"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-139",
+      "start": 309.32,
+      "end": 310.93,
+      "text": "Well, there's your brother's thing.",
+      "lineIds": [
+        "b139"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-140",
+      "start": 311.11,
+      "end": 315.44,
+      "text": "Luke! Put 'em on! Mm-hmm.",
+      "lineIds": [
+        "b140"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-141",
+      "start": 315.62,
+      "end": 318.24,
+      "text": "The thing about me and Jay is our relationship's...",
+      "lineIds": [
+        "b141"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-142",
+      "start": 318.42,
+      "end": 320.21,
+      "text": "always been stuck in that,",
+      "lineIds": [
+        "b142"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-143",
+      "start": 320.39,
+      "end": 323.01,
+      "text": "that primal place where it started.",
+      "lineIds": [
+        "b143"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-144",
+      "start": 323.19,
+      "end": 325.5,
+      "text": "You know, he's the old silverback protecting his females,",
+      "lineIds": [
+        "b144"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-145",
+      "start": 325.68,
+      "end": 329.01,
+      "text": "then along comes this younger, stronger gorilla swinging in,",
+      "lineIds": [
+        "b145"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-146",
+      "start": 329.19,
+      "end": 330.12,
+      "text": "beating his chest.",
+      "lineIds": [
+        "b146"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-147",
+      "start": 330.3,
+      "end": 333.05,
+      "text": "You know, naturally, the ape ladies come running,",
+      "lineIds": [
+        "b147"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-148",
+      "start": 333.23,
+      "end": 335.48,
+      "text": "presenting their nice scarlet behinds.",
+      "lineIds": [
+        "b148"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-149",
+      "start": 335.66,
+      "end": 338.41,
+      "text": "Papa ape wants to stop all that, but he can't.",
+      "lineIds": [
+        "b149"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-150",
+      "start": 338.59,
+      "end": 342.05,
+      "text": "You know? That's-That's life. I'm not the enemy.",
+      "lineIds": [
+        "b150"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-151",
+      "start": 342.23,
+      "end": 344.27,
+      "text": "The enemy is poachers.",
+      "lineIds": [
+        "b151"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-152",
+      "start": 344.45,
+      "end": 346.76,
+      "text": "That'll do it. Don't touch it.",
+      "lineIds": [
+        "b152"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-153",
+      "start": 346.94,
+      "end": 347.83,
+      "text": "All right.",
+      "lineIds": [
+        "b153"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-154",
+      "start": 348.01,
+      "end": 349.97,
+      "text": "- You wanna go fly it? - Sure.",
+      "lineIds": [
+        "b154"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-155",
+      "start": 350.15,
+      "end": 353.72,
+      "text": "Oh. Hey, I got the toothpaste and the soap.",
+      "lineIds": [
+        "b155"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-156",
+      "start": 353.9,
+      "end": 356,
+      "text": "Good. Now we can open that general store.",
+      "lineIds": [
+        "b156"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-157",
+      "start": 356.18,
+      "end": 357.69,
+      "text": "I thought we were just here to get diapers.",
+      "lineIds": [
+        "b157"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-158",
+      "start": 357.87,
+      "end": 358.86,
+      "text": "We had a saying on the farm:",
+      "lineIds": [
+        "b158"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-159",
+      "start": 359.04,
+      "end": 361.07,
+      "text": "as long as you're bringing the mule to the market, you-",
+      "lineIds": [
+        "b159"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-160",
+      "start": 361.25,
+      "end": 363.18,
+      "text": "I feel you rolling your eyes at me.",
+      "lineIds": [
+        "b160"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-161",
+      "start": 363.36,
+      "end": 365.84,
+      "text": "We met at one of Pepper's legendary game nights.",
+      "lineIds": [
+        "b161"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-162",
+      "start": 366.02,
+      "end": 367.35,
+      "text": "I remember Mitchell because",
+      "lineIds": [
+        "b162"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-163",
+      "start": 367.53,
+      "end": 370.17,
+      "text": "he kept rolling his eyes every time I would get a little boisterous.",
+      "lineIds": [
+        "b163"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-164",
+      "start": 370.35,
+      "end": 371.56,
+      "text": "I did not.",
+      "lineIds": [
+        "b164"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-165",
+      "start": 371.74,
+      "end": 372.73,
+      "text": "A little bit.",
+      "lineIds": [
+        "b165"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-166",
+      "start": 372.91,
+      "end": 374.43,
+      "text": "Yeah, maybe a little bit.",
+      "lineIds": [
+        "b166"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-167",
+      "start": 374.61,
+      "end": 376.49,
+      "text": "Anyway, we were- we were playing charades,",
+      "lineIds": [
+        "b167"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-168",
+      "start": 376.67,
+      "end": 378.72,
+      "text": "and I had no idea how to act out my clue.",
+      "lineIds": [
+        "b168"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-169",
+      "start": 378.9,
+      "end": 381.31,
+      "text": "And all I could think of to do was-",
+      "lineIds": [
+        "b169"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-170",
+      "start": 381.49,
+      "end": 383.74,
+      "text": "And without missing a beat, Cam says-",
+      "lineIds": [
+        "b170"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-171",
+      "start": 383.92,
+      "end": 385.8,
+      "text": "Casablanca.",
+      "lineIds": [
+        "b171"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-172",
+      "start": 385.98,
+      "end": 388.07,
+      "text": "- All I did was this- - Casablanca.",
+      "lineIds": [
+        "b172"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-173",
+      "start": 388.25,
+      "end": 389.88,
+      "text": "Casablanca.",
+      "lineIds": [
+        "b173"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-174",
+      "start": 390.06,
+      "end": 391.96,
+      "text": "Can we just please get the diapers and get out of here?",
+      "lineIds": [
+        "b174"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-175",
+      "start": 392.14,
+      "end": 394.29,
+      "text": "Fine, but I wanna stop by the wine section first.",
+      "lineIds": [
+        "b175"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-176",
+      "start": 394.47,
+      "end": 397.45,
+      "text": "Wait. There's a wine section?",
+      "lineIds": [
+        "b176"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-177",
+      "start": 397.63,
+      "end": 399.51,
+      "text": "Yeah, a really good one- just past the tires.",
+      "lineIds": [
+        "b177"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-178",
+      "start": 399.69,
+      "end": 403.16,
+      "text": "No way. They do not have- Oh, my God.",
+      "lineIds": [
+        "b178"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-179",
+      "start": 403.34,
+      "end": 406.74,
+      "text": "Oh, my- Cam. Cam. The paper shredder I wanted.",
+      "lineIds": [
+        "b179"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-180",
+      "start": 406.92,
+      "end": 408.74,
+      "text": "Huh? Confetti and crosscut.",
+      "lineIds": [
+        "b180"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-181",
+      "start": 408.92,
+      "end": 409.84,
+      "text": "Yep.",
+      "lineIds": [
+        "b181"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-182",
+      "start": 410.02,
+      "end": 411.65,
+      "text": "Oh, my God. Amazing.",
+      "lineIds": [
+        "b182"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-183",
+      "start": 411.83,
+      "end": 412.92,
+      "text": "Yeah.",
+      "lineIds": [
+        "b183"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-184",
+      "start": 413.1,
+      "end": 416.69,
+      "text": "Cam, what is this place?",
+      "lineIds": [
+        "b184"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-185",
+      "start": 416.87,
+      "end": 419.82,
+      "text": "Those cookies smell like heaven. Your own recipe?",
+      "lineIds": [
+        "b185"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-186",
+      "start": 420,
+      "end": 421.87,
+      "text": "No, I just throw 'em in the oven.",
+      "lineIds": [
+        "b186"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-187",
+      "start": 422.05,
+      "end": 424.56,
+      "text": "And added the secret ingredient of caring?",
+      "lineIds": [
+        "b187"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-188",
+      "start": 424.74,
+      "end": 425.6,
+      "text": "Sure.",
+      "lineIds": [
+        "b188"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-189",
+      "start": 425.78,
+      "end": 427.66,
+      "text": "So, you and Luke having a good time?",
+      "lineIds": [
+        "b189"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-190",
+      "start": 427.84,
+      "end": 430.38,
+      "text": "I don't know. He won't come out of his box.",
+      "lineIds": [
+        "b190"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-191",
+      "start": 430.56,
+      "end": 433.44,
+      "text": "Maybe I'll just stay here and spend some time with my sister.",
+      "lineIds": [
+        "b191"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-192",
+      "start": 433.62,
+      "end": 437.01,
+      "text": "Oh, right. I guess technically I would be your stepsister.",
+      "lineIds": [
+        "b192"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-193",
+      "start": 437.19,
+      "end": 439.56,
+      "text": "My mother says we are never to use the word \"Step\"",
+      "lineIds": [
+        "b193"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-194",
+      "start": 439.74,
+      "end": 441.09,
+      "text": "Because it means \"Not real.\"",
+      "lineIds": [
+        "b194"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-195",
+      "start": 441.27,
+      "end": 443.29,
+      "text": "And we are a real family. Mmm.",
+      "lineIds": [
+        "b195"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-196",
+      "start": 443.47,
+      "end": 445.47,
+      "text": "So what is the matter, Claire?",
+      "lineIds": [
+        "b196"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-197",
+      "start": 445.65,
+      "end": 447.74,
+      "text": "- What? - You seem sad.",
+      "lineIds": [
+        "b197"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-198",
+      "start": 447.92,
+      "end": 449.72,
+      "text": "It's just stuff with Alex.",
+      "lineIds": [
+        "b198"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-199",
+      "start": 449.9,
+      "end": 451,
+      "text": "You know, kid stuff.",
+      "lineIds": [
+        "b199"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-200",
+      "start": 451.18,
+      "end": 451.94,
+      "text": "Kids.",
+      "lineIds": [
+        "b200"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-201",
+      "start": 452.12,
+      "end": 454.58,
+      "text": "You don't have to tell me. My school is full of them.",
+      "lineIds": [
+        "b201"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-202",
+      "start": 454.76,
+      "end": 457.69,
+      "text": "I was thinking after lunch we can go and do a little shopping.",
+      "lineIds": [
+        "b202"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-203",
+      "start": 457.87,
+      "end": 459.45,
+      "text": "I'm not getting a dress.",
+      "lineIds": [
+        "b203"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-204",
+      "start": 459.63,
+      "end": 461.1,
+      "text": "I don't care. I'm not your mother.",
+      "lineIds": [
+        "b204"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-205",
+      "start": 461.28,
+      "end": 463.18,
+      "text": "I know. You're my grandmother.",
+      "lineIds": [
+        "b205"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-206",
+      "start": 463.36,
+      "end": 464.94,
+      "text": "Step-grandmother.",
+      "lineIds": [
+        "b206"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-207",
+      "start": 465.12,
+      "end": 468.18,
+      "text": "Anyways, today, think of me as a girlfriend.",
+      "lineIds": [
+        "b207"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-208",
+      "start": 468.36,
+      "end": 471.55,
+      "text": "Two girls out for an afternoon of fun.",
+      "lineIds": [
+        "b208"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-209",
+      "start": 471.73,
+      "end": 474.65,
+      "text": "What do you usually do with your girlfriends?",
+      "lineIds": [
+        "b209"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-210",
+      "start": 474.83,
+      "end": 478.55,
+      "text": "I don't know. We go out. We talk, drink wine.",
+      "lineIds": [
+        "b210"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-211",
+      "start": 478.73,
+      "end": 480.44,
+      "text": "- Can I drink wine? - No.",
+      "lineIds": [
+        "b211"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-212",
+      "start": 480.62,
+      "end": 481.66,
+      "text": "Some friend.",
+      "lineIds": [
+        "b212"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-213",
+      "start": 481.84,
+      "end": 485.21,
+      "text": "Well, you can still talk to me about anything.",
+      "lineIds": [
+        "b213"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-214",
+      "start": 485.39,
+      "end": 488.2,
+      "text": "Yeah, adults always say that, but they don't mean it.",
+      "lineIds": [
+        "b214"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-215",
+      "start": 488.38,
+      "end": 490.54,
+      "text": "When my mom says I can ask her anything,",
+      "lineIds": [
+        "b215"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-216",
+      "start": 490.72,
+      "end": 491.8,
+      "text": "I really can't.",
+      "lineIds": [
+        "b216"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-217",
+      "start": 491.98,
+      "end": 493.38,
+      "text": "She just freaks out.",
+      "lineIds": [
+        "b217"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-218",
+      "start": 493.56,
+      "end": 496.15,
+      "text": "I won't freak out. Shoot.",
+      "lineIds": [
+        "b218"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-219",
+      "start": 496.33,
+      "end": 497.26,
+      "text": "Okay.",
+      "lineIds": [
+        "b219"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-220",
+      "start": 497.44,
+      "end": 498.79,
+      "text": "How many men have you slept with?",
+      "lineIds": [
+        "b220"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-221",
+      "start": 498.97,
+      "end": 500.49,
+      "text": "Eight. Next.",
+      "lineIds": [
+        "b221"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-222",
+      "start": 500.67,
+      "end": 502.89,
+      "text": "- Now can I try it? - No.",
+      "lineIds": [
+        "b222"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-223",
+      "start": 503.07,
+      "end": 505.43,
+      "text": "I should get one of those. I've always loved planes.",
+      "lineIds": [
+        "b223"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-224",
+      "start": 505.61,
+      "end": 507.31,
+      "text": "If things had gone a little differently in my life,",
+      "lineIds": [
+        "b224"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-225",
+      "start": 507.49,
+      "end": 508.83,
+      "text": "I think I would have been a pilot.",
+      "lineIds": [
+        "b225"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-226",
+      "start": 509.01,
+      "end": 510.38,
+      "text": "Hey, what would happen if you turned the remote off",
+      "lineIds": [
+        "b226"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-227",
+      "start": 510.56,
+      "end": 512.02,
+      "text": "and then back on real fast?",
+      "lineIds": [
+        "b227"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-228",
+      "start": 512.2,
+      "end": 513.87,
+      "text": "Yeah, you'd have been a great pilot.",
+      "lineIds": [
+        "b228"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-229",
+      "start": 514.05,
+      "end": 515.99,
+      "text": "So, can you do a- Can you do a loop-de-loop?",
+      "lineIds": [
+        "b229"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-230",
+      "start": 516.17,
+      "end": 517.47,
+      "text": "If I wanted to.",
+      "lineIds": [
+        "b230"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-231",
+      "start": 517.65,
+      "end": 519.68,
+      "text": "No way! Can I try it?",
+      "lineIds": [
+        "b231"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-232",
+      "start": 519.86,
+      "end": 521,
+      "text": "No.",
+      "lineIds": [
+        "b232"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-233",
+      "start": 521.18,
+      "end": 523.77,
+      "text": "I can see why you like this. It's so peaceful.",
+      "lineIds": [
+        "b233"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-234",
+      "start": 523.95,
+      "end": 527.83,
+      "text": "It's like the whole world just... disappears out here.",
+      "lineIds": [
+        "b234"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-235",
+      "start": 528.01,
+      "end": 529.74,
+      "text": "- I remember this one summer- - I'll tell you what.",
+      "lineIds": [
+        "b235"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-236",
+      "start": 529.92,
+      "end": 531.82,
+      "text": "There's another trick called \"Threading the needle.\"",
+      "lineIds": [
+        "b236"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-237",
+      "start": 532,
+      "end": 533.67,
+      "text": "I used to do it with Claire and Mitch when they were kids.",
+      "lineIds": [
+        "b237"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-238",
+      "start": 533.85,
+      "end": 535.52,
+      "text": "- You wanna try it? - How's it go?",
+      "lineIds": [
+        "b238"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-239",
+      "start": 535.7,
+      "end": 537.66,
+      "text": "You grab one of those hoops over there...",
+      "lineIds": [
+        "b239"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-240",
+      "start": 537.84,
+      "end": 540.56,
+      "text": "and go to the far, far, far end of the field...",
+      "lineIds": [
+        "b240"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-241",
+      "start": 540.74,
+      "end": 543.47,
+      "text": "and stand there, and I fly the plane through it.",
+      "lineIds": [
+        "b241"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-242",
+      "start": 543.65,
+      "end": 546.17,
+      "text": "Um, that sounds awesome!",
+      "lineIds": [
+        "b242"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-243",
+      "start": 546.35,
+      "end": 548.33,
+      "text": "- And then I get a chance flying it? - No.",
+      "lineIds": [
+        "b243"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-244",
+      "start": 548.51,
+      "end": 549.39,
+      "text": "Okay.",
+      "lineIds": [
+        "b244"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-245",
+      "start": 549.57,
+      "end": 550.68,
+      "text": "How's this?",
+      "lineIds": [
+        "b245"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-246",
+      "start": 550.86,
+      "end": 552.65,
+      "text": "Not far enough. Go on.",
+      "lineIds": [
+        "b246"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-247",
+      "start": 552.83,
+      "end": 555.32,
+      "text": "- Okay. Further down. - You can't go too far.",
+      "lineIds": [
+        "b247"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-248",
+      "start": 555.5,
+      "end": 557.9,
+      "text": "Right. Okay, I get it. I get it.",
+      "lineIds": [
+        "b248"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-249",
+      "start": 558.08,
+      "end": 560,
+      "text": "- How's this? - Good.",
+      "lineIds": [
+        "b249"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-250",
+      "start": 560.18,
+      "end": 562.77,
+      "text": "Now stand still. Don't move.",
+      "lineIds": [
+        "b250"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-251",
+      "start": 562.95,
+      "end": 566.38,
+      "text": "Okay, let's do it. Whoo!",
+      "lineIds": [
+        "b251"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-252",
+      "start": 566.56,
+      "end": 568.39,
+      "text": "Whoo! I love it!",
+      "lineIds": [
+        "b252"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-253",
+      "start": 568.57,
+      "end": 570.73,
+      "text": "I love... it!",
+      "lineIds": [
+        "b253"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-254",
+      "start": 570.91,
+      "end": 572.81,
+      "text": "You drove a plane into my face.",
+      "lineIds": [
+        "b254"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-255",
+      "start": 572.99,
+      "end": 575.19,
+      "text": "You must have moved. I told you to stay still.",
+      "lineIds": [
+        "b255"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-256",
+      "start": 575.37,
+      "end": 576.99,
+      "text": "- I didn't move. - Try not to talk.",
+      "lineIds": [
+        "b256"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-257",
+      "start": 577.17,
+      "end": 578.9,
+      "text": "I want to make sure nothing's broken.",
+      "lineIds": [
+        "b257"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-258",
+      "start": 579.08,
+      "end": 580.81,
+      "text": "Alex and I can't just disagree.",
+      "lineIds": [
+        "b258"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-259",
+      "start": 580.99,
+      "end": 583.67,
+      "text": "I mean, she has to turn everything into a fight.",
+      "lineIds": [
+        "b259"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-260",
+      "start": 583.85,
+      "end": 586.12,
+      "text": "Hmm. A strong, independent woman.",
+      "lineIds": [
+        "b260"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-261",
+      "start": 586.3,
+      "end": 588.21,
+      "text": "Sounds like somebody else I know.",
+      "lineIds": [
+        "b261"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-262",
+      "start": 588.39,
+      "end": 589.68,
+      "text": "I was never hostile though.",
+      "lineIds": [
+        "b262"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-263",
+      "start": 589.86,
+      "end": 591.98,
+      "text": "I mean, this whole thing with the dress-",
+      "lineIds": [
+        "b263"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-264",
+      "start": 592.16,
+      "end": 593.86,
+      "text": "Never had this problem with Haley.",
+      "lineIds": [
+        "b264"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-265",
+      "start": 594.04,
+      "end": 596.69,
+      "text": "Maybe Alex doesn't want to compete with her big sister.",
+      "lineIds": [
+        "b265"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-266",
+      "start": 596.87,
+      "end": 599.18,
+      "text": "Maybe she's trying to create her own identity.",
+      "lineIds": [
+        "b266"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-267",
+      "start": 599.36,
+      "end": 601.61,
+      "text": "Put her in a dress, and she disappears.",
+      "lineIds": [
+        "b267"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-268",
+      "start": 601.79,
+      "end": 603.13,
+      "text": "For one afternoon?",
+      "lineIds": [
+        "b268"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-269",
+      "start": 603.31,
+      "end": 605.92,
+      "text": "I wouldn't give up being myself for even one second.",
+      "lineIds": [
+        "b269"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-270",
+      "start": 606.1,
+      "end": 608.78,
+      "text": "Sometimes it's hard to remember you're only 10 years old.",
+      "lineIds": [
+        "b270"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-271",
+      "start": 608.96,
+      "end": 611.12,
+      "text": "- And three-quarters. - Yeah.",
+      "lineIds": [
+        "b271"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-272",
+      "start": 611.3,
+      "end": 612.83,
+      "text": "Hey, it's Mitchell. Do you guys eat olives?",
+      "lineIds": [
+        "b272"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-273",
+      "start": 613.01,
+      "end": 613.62,
+      "text": "Olives?",
+      "lineIds": [
+        "b273"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-274",
+      "start": 613.8,
+      "end": 615.52,
+      "text": "- Really good olives? - Yeah.",
+      "lineIds": [
+        "b274"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-275",
+      "start": 615.7,
+      "end": 616.93,
+      "text": "You got it.",
+      "lineIds": [
+        "b275"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-276",
+      "start": 617.11,
+      "end": 619.82,
+      "text": "Mitchell, I found the diapers. They're over here.",
+      "lineIds": [
+        "b276"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-277",
+      "start": 620,
+      "end": 622.02,
+      "text": "Cameron, guess what I found?",
+      "lineIds": [
+        "b277"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-278",
+      "start": 622.2,
+      "end": 623.43,
+      "text": "Coffins.",
+      "lineIds": [
+        "b278"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-279",
+      "start": 623.61,
+      "end": 625.56,
+      "text": "They sell baby formula and they sell coffins.",
+      "lineIds": [
+        "b279"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-280",
+      "start": 625.74,
+      "end": 626.58,
+      "text": "You can buy literally buy",
+      "lineIds": [
+        "b280"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-281",
+      "start": 626.76,
+      "end": 628.49,
+      "text": "everything you need from birth to death.",
+      "lineIds": [
+        "b281"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-282",
+      "start": 628.67,
+      "end": 631.19,
+      "text": "Oh, my God. Look at these diapers.",
+      "lineIds": [
+        "b282"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-283",
+      "start": 631.37,
+      "end": 632.77,
+      "text": "Look how cheap they are!",
+      "lineIds": [
+        "b283"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-284",
+      "start": 632.95,
+      "end": 633.85,
+      "text": "Oh. You know what we should do?",
+      "lineIds": [
+        "b284"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-285",
+      "start": 634.03,
+      "end": 635.97,
+      "text": "We should get enough for the next year or two, right?",
+      "lineIds": [
+        "b285"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-286",
+      "start": 636.15,
+      "end": 637.19,
+      "text": "Where would we keep them?",
+      "lineIds": [
+        "b286"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-287",
+      "start": 637.37,
+      "end": 639.34,
+      "text": "- They sell sheds. - Really?",
+      "lineIds": [
+        "b287"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-288",
+      "start": 639.52,
+      "end": 640.81,
+      "text": "You want to buy a diaper shed?",
+      "lineIds": [
+        "b288"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-289",
+      "start": 640.99,
+      "end": 643.61,
+      "text": "We're those guys now? The guys with a diaper shed?",
+      "lineIds": [
+        "b289"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-290",
+      "start": 643.79,
+      "end": 644.78,
+      "text": "Just grab two more.",
+      "lineIds": [
+        "b290"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-291",
+      "start": 644.96,
+      "end": 646.46,
+      "text": "I'm not grabbing two more, Mitchell.",
+      "lineIds": [
+        "b291"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-292",
+      "start": 646.64,
+      "end": 647.47,
+      "text": "It's time to go.",
+      "lineIds": [
+        "b292"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-293",
+      "start": 647.65,
+      "end": 650.65,
+      "text": "Come on, come on. We need, uh- Hey, excuse me.",
+      "lineIds": [
+        "b293"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-294",
+      "start": 650.83,
+      "end": 653,
+      "text": "- Where did you get that flatbed thing? - Over there.",
+      "lineIds": [
+        "b294"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-295",
+      "start": 653.18,
+      "end": 655.37,
+      "text": "- Go grab one of those. - Really?",
+      "lineIds": [
+        "b295"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-296",
+      "start": 655.55,
+      "end": 656.81,
+      "text": "Yeah. Get two.",
+      "lineIds": [
+        "b296"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-297",
+      "start": 656.99,
+      "end": 658.5,
+      "text": "I'm in the applesauce aisle.",
+      "lineIds": [
+        "b297"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-298",
+      "start": 658.68,
+      "end": 659.64,
+      "text": "So, anyways,",
+      "lineIds": [
+        "b298"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-299",
+      "start": 659.82,
+      "end": 661.31,
+      "text": "after charades, we went out for coffee.",
+      "lineIds": [
+        "b299"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-300",
+      "start": 661.49,
+      "end": 663.65,
+      "text": "And I learned that he loves art.",
+      "lineIds": [
+        "b300"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-301",
+      "start": 663.83,
+      "end": 667.03,
+      "text": "He plays the piano. He speaks French.",
+      "lineIds": [
+        "b301"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-302",
+      "start": 667.21,
+      "end": 668.8,
+      "text": "- Un peu. - You see?",
+      "lineIds": [
+        "b302"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-303",
+      "start": 668.98,
+      "end": 670.43,
+      "text": "I-I misjudged him.",
+      "lineIds": [
+        "b303"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-304",
+      "start": 670.61,
+      "end": 672.25,
+      "text": "Yeah, I'm sort of like Costco.",
+      "lineIds": [
+        "b304"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-305",
+      "start": 672.43,
+      "end": 674.96,
+      "text": "I'm big, I'm not fancy, and I dare you to not like me.",
+      "lineIds": [
+        "b305"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-306",
+      "start": 675.14,
+      "end": 677.27,
+      "text": "Yeah, and I'm kinda more like that, um-",
+      "lineIds": [
+        "b306"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-307",
+      "start": 677.45,
+      "end": 679.83,
+      "text": "What is the name of that little shop we went to in Paris?",
+      "lineIds": [
+        "b307"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-308",
+      "start": 680.01,
+      "end": 681.64,
+      "text": "You are such a snob.",
+      "lineIds": [
+        "b308"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-309",
+      "start": 681.82,
+      "end": 683.82,
+      "text": "Casablanca.",
+      "lineIds": [
+        "b309"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-310",
+      "start": 684,
+      "end": 685.96,
+      "text": "I have a small flower on my ankle...",
+      "lineIds": [
+        "b310"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-311",
+      "start": 686.14,
+      "end": 690.47,
+      "text": "and a tiny little butterfly on my... thigh.",
+      "lineIds": [
+        "b311"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-312",
+      "start": 690.65,
+      "end": 691.94,
+      "text": "How high up?",
+      "lineIds": [
+        "b312"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-313",
+      "start": 692.12,
+      "end": 695.04,
+      "text": "- Pretty high. - Did you do it to look sexy?",
+      "lineIds": [
+        "b313"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-314",
+      "start": 695.22,
+      "end": 698.39,
+      "text": "No- - Did you do it for a guy? Does Grandpa like it?",
+      "lineIds": [
+        "b314"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-315",
+      "start": 698.57,
+      "end": 700.91,
+      "text": "No, no and yes.",
+      "lineIds": [
+        "b315"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-316",
+      "start": 701.09,
+      "end": 703.14,
+      "text": "That's gross",
+      "lineIds": [
+        "b316"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-317",
+      "start": 703.32,
+      "end": 705.74,
+      "text": "- Let's go back to your piercings. - No, no, no.",
+      "lineIds": [
+        "b317"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-318",
+      "start": 705.92,
+      "end": 708,
+      "text": "I've answered enough of your questions.",
+      "lineIds": [
+        "b318"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-319",
+      "start": 708.18,
+      "end": 709.94,
+      "text": "Now it's your turn to answer one.",
+      "lineIds": [
+        "b319"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-320",
+      "start": 710.12,
+      "end": 711.83,
+      "text": "What is it?",
+      "lineIds": [
+        "b320"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-321",
+      "start": 712.01,
+      "end": 713.93,
+      "text": "Why you don't want to wear a dress?",
+      "lineIds": [
+        "b321"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-322",
+      "start": 714.11,
+      "end": 717.36,
+      "text": "Because I don't want to look like Haley and her stupid friends.",
+      "lineIds": [
+        "b322"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-323",
+      "start": 717.54,
+      "end": 720.04,
+      "text": "I wear dresses and I don't look like Haley.",
+      "lineIds": [
+        "b323"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-324",
+      "start": 720.22,
+      "end": 723.52,
+      "text": "You are Haley, just 40 years older.",
+      "lineIds": [
+        "b324"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-325",
+      "start": 723.7,
+      "end": 724.99,
+      "text": "- Ten. - Twenty.",
+      "lineIds": [
+        "b325"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-326",
+      "start": 725.17,
+      "end": 728.84,
+      "text": "Deal. Alex, why are you fighting me on this?",
+      "lineIds": [
+        "b326"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-327",
+      "start": 729.02,
+      "end": 730.85,
+      "text": "Just- It doesn't matter if I dress up.",
+      "lineIds": [
+        "b327"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-328",
+      "start": 731.03,
+      "end": 732.66,
+      "text": "I'm not pretty like Haley and you.",
+      "lineIds": [
+        "b328"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-329",
+      "start": 732.84,
+      "end": 735.8,
+      "text": "- That's ridiculous! You're beautiful. - I'm not.",
+      "lineIds": [
+        "b329"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-330",
+      "start": 735.98,
+      "end": 738.82,
+      "text": "But that's okay. I'm the smart one.",
+      "lineIds": [
+        "b330"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-331",
+      "start": 739,
+      "end": 742.52,
+      "text": "The cute busboy doesn't know that you're smart.",
+      "lineIds": [
+        "b331"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-332",
+      "start": 742.7,
+      "end": 743.41,
+      "text": "What?",
+      "lineIds": [
+        "b332"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-333",
+      "start": 743.59,
+      "end": 746.09,
+      "text": "He's been smiling at you every time he comes to the table.",
+      "lineIds": [
+        "b333"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-334",
+      "start": 746.27,
+      "end": 747.54,
+      "text": "He does not!",
+      "lineIds": [
+        "b334"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-335",
+      "start": 747.72,
+      "end": 750.01,
+      "text": "Why do you think we are the only people with bread?",
+      "lineIds": [
+        "b335"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-336",
+      "start": 750.19,
+      "end": 754.88,
+      "text": "Look. One day you're going to want to date a cute guy like that.",
+      "lineIds": [
+        "b336"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-337",
+      "start": 755.06,
+      "end": 758.41,
+      "text": "And when that day comes, you're going to want to look beautiful,",
+      "lineIds": [
+        "b337"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-338",
+      "start": 758.59,
+      "end": 760.27,
+      "text": "and then you'll wear a dress.",
+      "lineIds": [
+        "b338"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-339",
+      "start": 760.45,
+      "end": 762.18,
+      "text": "So, you ever kiss another girl?",
+      "lineIds": [
+        "b339"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-340",
+      "start": 762.36,
+      "end": 764.64,
+      "text": "That's no way to talk to your grandmother.",
+      "lineIds": [
+        "b340"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-341",
+      "start": 764.82,
+      "end": 766.96,
+      "text": "Was my mom hard on me growing up?",
+      "lineIds": [
+        "b341"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-342",
+      "start": 767.14,
+      "end": 768.46,
+      "text": "Yeah, she was.",
+      "lineIds": [
+        "b342"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-343",
+      "start": 768.64,
+      "end": 770.21,
+      "text": "But you know what? Back then",
+      "lineIds": [
+        "b343"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-344",
+      "start": 770.39,
+      "end": 773.72,
+      "text": "everything was Betty Friedan and Gloria Steinem.",
+      "lineIds": [
+        "b344"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-345",
+      "start": 773.9,
+      "end": 775.05,
+      "text": "They didn't understand-",
+      "lineIds": [
+        "b345"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-346",
+      "start": 775.23,
+      "end": 777.09,
+      "text": "- Hola! We're back. - Hello.",
+      "lineIds": [
+        "b346"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-347",
+      "start": 777.27,
+      "end": 780.09,
+      "text": "- Hey, how'd it go? - It was great.",
+      "lineIds": [
+        "b347"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-348",
+      "start": 780.27,
+      "end": 782.09,
+      "text": "- Did you have fun with Luke? - Well, not-",
+      "lineIds": [
+        "b348"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-349",
+      "start": 782.27,
+      "end": 783.98,
+      "text": "We had a great time.",
+      "lineIds": [
+        "b349"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-350",
+      "start": 784.16,
+      "end": 787.13,
+      "text": "Alex, I've been thinking, and...",
+      "lineIds": [
+        "b350"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-351",
+      "start": 787.31,
+      "end": 789.25,
+      "text": "if you don't want to wear a dress to the wedding,",
+      "lineIds": [
+        "b351"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-352",
+      "start": 789.43,
+      "end": 790.53,
+      "text": "it's not the end of the world.",
+      "lineIds": [
+        "b352"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-353",
+      "start": 790.71,
+      "end": 793.57,
+      "text": "It's all right. I bought one.",
+      "lineIds": [
+        "b353"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-354",
+      "start": 793.75,
+      "end": 795.45,
+      "text": "Do you see how she has to provoke me?",
+      "lineIds": [
+        "b354"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-355",
+      "start": 795.63,
+      "end": 797.1,
+      "text": "We'll talk about it next week.",
+      "lineIds": [
+        "b355"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-356",
+      "start": 797.28,
+      "end": 798.46,
+      "text": "Claire!",
+      "lineIds": [
+        "b356"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-357",
+      "start": 798.64,
+      "end": 800.51,
+      "text": "Clear the way. Coming through. Ow!",
+      "lineIds": [
+        "b357"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-358",
+      "start": 800.69,
+      "end": 802.31,
+      "text": "Coming through. Easy. Easy, fella. Ow!",
+      "lineIds": [
+        "b358"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-359",
+      "start": 802.49,
+      "end": 804.57,
+      "text": "- I need to rest my face. - You're fine.",
+      "lineIds": [
+        "b359"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-360",
+      "start": 804.75,
+      "end": 806,
+      "text": "You'll be all right. Hang on.",
+      "lineIds": [
+        "b360"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-361",
+      "start": 806.18,
+      "end": 807.93,
+      "text": "- Oh, my God! - Get the door.",
+      "lineIds": [
+        "b361"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-362",
+      "start": 808.11,
+      "end": 809.19,
+      "text": "Ah! Dad?",
+      "lineIds": [
+        "b362"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-363",
+      "start": 809.37,
+      "end": 810.74,
+      "text": "Little accident. Nothing big.",
+      "lineIds": [
+        "b363"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-364",
+      "start": 810.92,
+      "end": 813.17,
+      "text": "- I was in a plane crash. - What happened?",
+      "lineIds": [
+        "b364"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-365",
+      "start": 813.35,
+      "end": 815.48,
+      "text": "We were threading the needle, and somebody moved.",
+      "lineIds": [
+        "b365"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-366",
+      "start": 815.66,
+      "end": 818.52,
+      "text": "No, I didn't. You did it on purpose.",
+      "lineIds": [
+        "b366"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-367",
+      "start": 818.7,
+      "end": 820.48,
+      "text": "That's the painkiller talking.",
+      "lineIds": [
+        "b367"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-368",
+      "start": 820.66,
+      "end": 821.7,
+      "text": "He's a little loopy.",
+      "lineIds": [
+        "b368"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-369",
+      "start": 821.88,
+      "end": 823.91,
+      "text": "- How bad is it? - Well, the wing is cracked,",
+      "lineIds": [
+        "b369"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-370",
+      "start": 824.09,
+      "end": 826.57,
+      "text": "- the propeller's bent, but I can- I can- - I mean Phil.",
+      "lineIds": [
+        "b370"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-371",
+      "start": 826.75,
+      "end": 829.42,
+      "text": "- I was in a plane crash. - Thanks, Dad.",
+      "lineIds": [
+        "b371"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-372",
+      "start": 829.6,
+      "end": 831.84,
+      "text": "I didn't ask him to be there. He insisted.",
+      "lineIds": [
+        "b372"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-373",
+      "start": 832.02,
+      "end": 833.61,
+      "text": "He took a chance. This is what happened.",
+      "lineIds": [
+        "b373"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-374",
+      "start": 833.79,
+      "end": 835.57,
+      "text": "Kind of like the time you ran over his foot.",
+      "lineIds": [
+        "b374"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-375",
+      "start": 835.75,
+      "end": 836.74,
+      "text": "You ran over his foot?",
+      "lineIds": [
+        "b375"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-376",
+      "start": 836.92,
+      "end": 838.98,
+      "text": "- That was an accident. - You know, Dad, you did it on purpose.",
+      "lineIds": [
+        "b376"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-377",
+      "start": 839.16,
+      "end": 841.02,
+      "text": "We all saw the tire marks on the lawn.",
+      "lineIds": [
+        "b377"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-378",
+      "start": 841.2,
+      "end": 842.57,
+      "text": "I had just quit smoking.",
+      "lineIds": [
+        "b378"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-379",
+      "start": 842.75,
+      "end": 844.88,
+      "text": "See, you're upsetting your husband.",
+      "lineIds": [
+        "b379"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-380",
+      "start": 845.06,
+      "end": 846.53,
+      "text": "- Water. - I'll get it.",
+      "lineIds": [
+        "b380"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-381",
+      "start": 846.71,
+      "end": 847.76,
+      "text": "Ay. You okay?",
+      "lineIds": [
+        "b381"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-382",
+      "start": 847.94,
+      "end": 851.12,
+      "text": "Gloria! Thank God you're here.",
+      "lineIds": [
+        "b382"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-383",
+      "start": 851.3,
+      "end": 852.71,
+      "text": "Don't worry. I'm here too.",
+      "lineIds": [
+        "b383"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-384",
+      "start": 852.89,
+      "end": 854.03,
+      "text": "Who's this?",
+      "lineIds": [
+        "b384"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-385",
+      "start": 854.21,
+      "end": 855.48,
+      "text": "Wasn't my fault.",
+      "lineIds": [
+        "b385"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-386",
+      "start": 855.66,
+      "end": 858.18,
+      "text": "I have seen you thread the needle a million times.",
+      "lineIds": [
+        "b386"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-387",
+      "start": 858.36,
+      "end": 859.21,
+      "text": "You never miss.",
+      "lineIds": [
+        "b387"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-388",
+      "start": 859.39,
+      "end": 860.85,
+      "text": "Yeah. I must be getting old.",
+      "lineIds": [
+        "b388"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-389",
+      "start": 861.03,
+      "end": 863.28,
+      "text": "Why don't you just admit it? You never liked Phil.",
+      "lineIds": [
+        "b389"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-390",
+      "start": 863.46,
+      "end": 865.42,
+      "text": "Put that down. You do not get a cookie.",
+      "lineIds": [
+        "b390"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-391",
+      "start": 865.6,
+      "end": 866.28,
+      "text": "I like Phil.",
+      "lineIds": [
+        "b391"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-392",
+      "start": 866.46,
+      "end": 869.66,
+      "text": "It's just that sometimes he tries too hard, you know?",
+      "lineIds": [
+        "b392"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-393",
+      "start": 869.84,
+      "end": 872.43,
+      "text": "And it's just kind of- irritating.",
+      "lineIds": [
+        "b393"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-394",
+      "start": 872.61,
+      "end": 874.03,
+      "text": "Okay, maybe he tries too hard",
+      "lineIds": [
+        "b394"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-395",
+      "start": 874.21,
+      "end": 876.41,
+      "text": "because you make zero effort with him.",
+      "lineIds": [
+        "b395"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-396",
+      "start": 876.59,
+      "end": 878.72,
+      "text": "You know what? In the 16 years that we've been married,",
+      "lineIds": [
+        "b396"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-397",
+      "start": 878.9,
+      "end": 882.28,
+      "text": "have you one time told him that you liked him?",
+      "lineIds": [
+        "b397"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-398",
+      "start": 882.46,
+      "end": 884.71,
+      "text": "- Not in those exact words, no. - No.",
+      "lineIds": [
+        "b398"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-399",
+      "start": 884.89,
+      "end": 886.81,
+      "text": "Not in any words, Dad.",
+      "lineIds": [
+        "b399"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-400",
+      "start": 886.99,
+      "end": 888.57,
+      "text": "How do you think that makes me feel?",
+      "lineIds": [
+        "b400"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-401",
+      "start": 888.75,
+      "end": 890.58,
+      "text": "You've never told your son that you love him?",
+      "lineIds": [
+        "b401"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-402",
+      "start": 890.76,
+      "end": 892.78,
+      "text": "Whoa, whoa. When did we jump to love?",
+      "lineIds": [
+        "b402"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-403",
+      "start": 892.96,
+      "end": 894.75,
+      "text": "And he's technically not my son.",
+      "lineIds": [
+        "b403"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-404",
+      "start": 894.93,
+      "end": 898.03,
+      "text": "- Ah. So that means that you don't love Manny either? - Sure, I do.",
+      "lineIds": [
+        "b404"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-405",
+      "start": 898.21,
+      "end": 899.79,
+      "text": "I mean, believe me, when I was in that park,",
+      "lineIds": [
+        "b405"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-406",
+      "start": 899.97,
+      "end": 901.64,
+      "text": "I really wished Manny was there.",
+      "lineIds": [
+        "b406"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-407",
+      "start": 901.82,
+      "end": 902.77,
+      "text": "For what?",
+      "lineIds": [
+        "b407"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-408",
+      "start": 902.95,
+      "end": 906.02,
+      "text": "So that you could fly the plane into his head? Huh?",
+      "lineIds": [
+        "b408"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-409",
+      "start": 906.2,
+      "end": 908.88,
+      "text": "Dad, thanks so much for bringing Phil home.",
+      "lineIds": [
+        "b409"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-410",
+      "start": 909.06,
+      "end": 912.56,
+      "text": "I found one of your little flaps in his hair. So-",
+      "lineIds": [
+        "b410"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-411",
+      "start": 912.74,
+      "end": 914.4,
+      "text": "Actually, this is called an aileron.",
+      "lineIds": [
+        "b411"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-412",
+      "start": 914.58,
+      "end": 916.61,
+      "text": "- It controls... - because that's what matters right now.",
+      "lineIds": [
+        "b412"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-413",
+      "start": 916.79,
+      "end": 917.84,
+      "text": "Bye, Dad.",
+      "lineIds": [
+        "b413"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-414",
+      "start": 918.02,
+      "end": 920.1,
+      "text": "- Hey, Phil. - Jay.",
+      "lineIds": [
+        "b414"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-415",
+      "start": 920.28,
+      "end": 921.55,
+      "text": "What are you, made of china?",
+      "lineIds": [
+        "b415"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-416",
+      "start": 921.73,
+      "end": 924.69,
+      "text": "Phil, I just want you to know I'm sorry.",
+      "lineIds": [
+        "b416"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-417",
+      "start": 924.87,
+      "end": 927.56,
+      "text": "And whether I, uh, missed or you moved-",
+      "lineIds": [
+        "b417"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-418",
+      "start": 927.74,
+      "end": 929.39,
+      "text": "- I didn't. - either way.",
+      "lineIds": [
+        "b418"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-419",
+      "start": 929.57,
+      "end": 931.96,
+      "text": "I just want to say that I like you.",
+      "lineIds": [
+        "b419"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-420",
+      "start": 932.14,
+      "end": 934.8,
+      "text": "- Really? - Yeah.",
+      "lineIds": [
+        "b420"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-421",
+      "start": 934.98,
+      "end": 936.43,
+      "text": "What do you like about me?",
+      "lineIds": [
+        "b421"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-422",
+      "start": 936.61,
+      "end": 938.68,
+      "text": "You're a nice guy.",
+      "lineIds": [
+        "b422"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-423",
+      "start": 938.86,
+      "end": 941.82,
+      "text": "Try real hard.",
+      "lineIds": [
+        "b423"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-424",
+      "start": 942,
+      "end": 944.04,
+      "text": "I do.",
+      "lineIds": [
+        "b424"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-425",
+      "start": 944.22,
+      "end": 945.67,
+      "text": "And you're a good dad.",
+      "lineIds": [
+        "b425"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-426",
+      "start": 945.85,
+      "end": 947.83,
+      "text": "Hey, I'm a good dad. Come here.",
+      "lineIds": [
+        "b426"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-427",
+      "start": 948.01,
+      "end": 949.07,
+      "text": "Come here, you.",
+      "lineIds": [
+        "b427"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-428",
+      "start": 949.25,
+      "end": 950.8,
+      "text": "This feels so right.",
+      "lineIds": [
+        "b428"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-429",
+      "start": 950.98,
+      "end": 951.99,
+      "text": "What's going on?",
+      "lineIds": [
+        "b429"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-430",
+      "start": 952.17,
+      "end": 953.63,
+      "text": "There was a little accident,",
+      "lineIds": [
+        "b430"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-431",
+      "start": 953.81,
+      "end": 956.87,
+      "text": "but Jay's telling Phil how much he loves him.",
+      "lineIds": [
+        "b431"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-432",
+      "start": 957.05,
+      "end": 958.74,
+      "text": "Oh. Well, that's nice for Phil.",
+      "lineIds": [
+        "b432"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-433",
+      "start": 958.92,
+      "end": 959.58,
+      "text": "That's great,",
+      "lineIds": [
+        "b433"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-434",
+      "start": 959.76,
+      "end": 961.59,
+      "text": "since he's never said anything like that to my boyfriend.",
+      "lineIds": [
+        "b434"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-435",
+      "start": 961.77,
+      "end": 963.7,
+      "text": "- Let it go. - No, it's not okay.",
+      "lineIds": [
+        "b435"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-436",
+      "start": 963.88,
+      "end": 966.63,
+      "text": "No, Mitch is right. Go in there too, Cam. Come on.",
+      "lineIds": [
+        "b436"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-437",
+      "start": 966.81,
+      "end": 968.24,
+      "text": "You're kidding.",
+      "lineIds": [
+        "b437"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-438",
+      "start": 968.42,
+      "end": 970.05,
+      "text": "- Jay! - I'm gonna get this.",
+      "lineIds": [
+        "b438"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-439",
+      "start": 970.23,
+      "end": 971.86,
+      "text": "- Come on in, Cam. - Just a little hug.",
+      "lineIds": [
+        "b439"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-440",
+      "start": 972.04,
+      "end": 973.46,
+      "text": "- Get in here. - Say it.",
+      "lineIds": [
+        "b440"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-441",
+      "start": 973.64,
+      "end": 975.89,
+      "text": "- Whoa! Hey, hey, hey! - Say it! Say it!",
+      "lineIds": [
+        "b441"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-442",
+      "start": 976.07,
+      "end": 977.78,
+      "text": "I like you too, Cam.",
+      "lineIds": [
+        "b442"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-443",
+      "start": 977.96,
+      "end": 979.96,
+      "text": "- What do you like about him? - Oh, jez.",
+      "lineIds": [
+        "b443"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-444",
+      "start": 980.14,
+      "end": 981.68,
+      "text": "Where did you get that camera?",
+      "lineIds": [
+        "b444"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-445",
+      "start": 981.86,
+      "end": 984.49,
+      "text": "Only the greatest store on earth.",
+      "lineIds": [
+        "b445"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-446",
+      "start": 984.67,
+      "end": 986.08,
+      "text": "Thanks, Dad.",
+      "lineIds": [
+        "b446"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-447",
+      "start": 986.26,
+      "end": 988.55,
+      "text": "Manny, picture! Get in there too.",
+      "lineIds": [
+        "b447"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-448",
+      "start": 988.73,
+      "end": 990.85,
+      "text": "Get in here, mi amigo. Oh!",
+      "lineIds": [
+        "b448"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-449",
+      "start": 991.03,
+      "end": 992.87,
+      "text": "Stay still. Say \"Cheese.\"",
+      "lineIds": [
+        "b449"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-450",
+      "start": 993.05,
+      "end": 995.06,
+      "text": "- Don't push it. - Cheese!",
+      "lineIds": [
+        "b450"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-451",
+      "start": 995.24,
+      "end": 996.41,
+      "text": "Picture.",
+      "lineIds": [
+        "b451"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-452",
+      "start": 996.59,
+      "end": 998.61,
+      "text": "- Cheese! - Cheese. Queso.",
+      "lineIds": [
+        "b452"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-453",
+      "start": 998.79,
+      "end": 999.63,
+      "text": "Oh, boy!",
+      "lineIds": [
+        "b453"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-454",
+      "start": 999.81,
+      "end": 1002.67,
+      "text": "Doesn't it feel like these arms could go around the world?",
+      "lineIds": [
+        "b454"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-455",
+      "start": 1002.85,
+      "end": 1004.23,
+      "text": "I think I strained something.",
+      "lineIds": [
+        "b455"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-456",
+      "start": 1004.41,
+      "end": 1006.17,
+      "text": "I always wanted a daughter-",
+      "lineIds": [
+        "b456"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-457",
+      "start": 1006.35,
+      "end": 1008.31,
+      "text": "to dress her up in pretty dresses,",
+      "lineIds": [
+        "b457"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-458",
+      "start": 1008.49,
+      "end": 1012.22,
+      "text": "do her hair, her nails, her makeup.",
+      "lineIds": [
+        "b458"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-459",
+      "start": 1012.4,
+      "end": 1015.88,
+      "text": "No one knows this, but for the first year of his life,",
+      "lineIds": [
+        "b459"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-460",
+      "start": 1016.06,
+      "end": 1017.43,
+      "text": "I made up Manny like a girl",
+      "lineIds": [
+        "b460"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-461",
+      "start": 1017.61,
+      "end": 1019.82,
+      "text": "and told everybody that he was my daughter.",
+      "lineIds": [
+        "b461"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-462",
+      "start": 1020,
+      "end": 1021.57,
+      "text": "Ay, but just for a few times.",
+      "lineIds": [
+        "b462"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-463",
+      "start": 1021.75,
+      "end": 1023.36,
+      "text": "I didn't want to mess with his head.",
+      "lineIds": [
+        "b463"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-464",
+      "start": 1023.54,
+      "end": 1024.5,
+      "text": "When he found the pictures,",
+      "lineIds": [
+        "b464"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    },
+    {
+      "id": "segment-465",
+      "start": 1024.68,
+      "end": 1027.41,
+      "text": "I told him that it was his twin sister who died.",
+      "lineIds": [
+        "b465"
+      ],
+      "matchedLines": 1,
+      "totalLines": 1
+    }
+  ],
+  "lineCues": [
+    {
+      "id": "b1",
+      "segmentId": "segment-1",
+      "start": 0,
+      "end": 1.71,
+      "text": "Riley Morton coming up now."
+    },
+    {
+      "id": "b2",
+      "segmentId": "segment-2",
+      "start": 1.89,
+      "end": 4.73,
+      "text": "Kelly at second. Started the inning with a double."
+    },
+    {
+      "id": "b3",
+      "segmentId": "segment-3",
+      "start": 4.91,
+      "end": 6.57,
+      "text": "That seems like an hour ago."
+    },
+    {
+      "id": "b4",
+      "segmentId": "segment-4",
+      "start": 6.75,
+      "end": 8.61,
+      "text": "- Honey, I thought you were gonna take out the garbage. - I am."
+    },
+    {
+      "id": "b5",
+      "segmentId": "segment-5",
+      "start": 8.79,
+      "end": 12.69,
+      "text": "High fly to right. Hooking, hooking- Foul."
+    },
+    {
+      "id": "b6",
+      "segmentId": "segment-6",
+      "start": 12.87,
+      "end": 14.86,
+      "text": "- Phil. - Yes. Getting it."
+    },
+    {
+      "id": "b7",
+      "segmentId": "segment-7",
+      "start": 15.04,
+      "end": 16.71,
+      "text": "I was- I was gonna get it."
+    },
+    {
+      "id": "b8",
+      "segmentId": "segment-8",
+      "start": 16.89,
+      "end": 18.46,
+      "text": "- Dylan. - Hey, Mrs. Dunphy."
+    },
+    {
+      "id": "b9",
+      "segmentId": "segment-9",
+      "start": 18.64,
+      "end": 20.38,
+      "text": "Um, I'm just waiting for Haley."
+    },
+    {
+      "id": "b10",
+      "segmentId": "segment-10",
+      "start": 20.56,
+      "end": 22.64,
+      "text": "- Did you ring the bell? - I texted."
+    },
+    {
+      "id": "b11",
+      "segmentId": "segment-11",
+      "start": 22.82,
+      "end": 24.75,
+      "text": "She said she'd be down in just a minute."
+    },
+    {
+      "id": "b12",
+      "segmentId": "segment-12",
+      "start": 24.93,
+      "end": 27.57,
+      "text": "- Oh, great. Tell her I said \"Hi.\" - I will."
+    },
+    {
+      "id": "b13",
+      "segmentId": "segment-13",
+      "start": 27.75,
+      "end": 29.93,
+      "text": "Dylan! D-Money!"
+    },
+    {
+      "id": "b14",
+      "segmentId": "segment-14",
+      "start": 30.11,
+      "end": 32.19,
+      "text": "Chillin' with Dylan the villain!"
+    },
+    {
+      "id": "b15",
+      "segmentId": "segment-15",
+      "start": 32.37,
+      "end": 34.5,
+      "text": "- \"D\" To the \"Y\" To the- - Hey, Mr. Dunphy."
+    },
+    {
+      "id": "b16",
+      "segmentId": "segment-16",
+      "start": 34.68,
+      "end": 35.66,
+      "text": "Hey! Come on in."
+    },
+    {
+      "id": "b17",
+      "segmentId": "segment-17",
+      "start": 35.84,
+      "end": 37.52,
+      "text": "You're just in time to catch the end of the game."
+    },
+    {
+      "id": "b18",
+      "segmentId": "segment-18",
+      "start": 37.7,
+      "end": 39.75,
+      "text": "Oh, I'm not really a baseball guy."
+    },
+    {
+      "id": "b19",
+      "segmentId": "segment-19",
+      "start": 39.93,
+      "end": 40.86,
+      "text": "Haley says \"Hi.\""
+    },
+    {
+      "id": "b20",
+      "segmentId": "segment-20",
+      "start": 41.04,
+      "end": 42.32,
+      "text": "I was just being facetious."
+    },
+    {
+      "id": "b21",
+      "segmentId": "segment-21",
+      "start": 42.5,
+      "end": 43.65,
+      "text": "Come on. I'll catch you up."
+    },
+    {
+      "id": "b22",
+      "segmentId": "segment-22",
+      "start": 43.83,
+      "end": 45.26,
+      "text": "Sit it. Park it."
+    },
+    {
+      "id": "b23",
+      "segmentId": "segment-23",
+      "start": 45.44,
+      "end": 46.72,
+      "text": "Come on. I don't bite."
+    },
+    {
+      "id": "b24",
+      "segmentId": "segment-24",
+      "start": 46.9,
+      "end": 47.73,
+      "text": "Kidding."
+    },
+    {
+      "id": "b25",
+      "segmentId": "segment-25",
+      "start": 47.91,
+      "end": 48.85,
+      "text": "I'm kidding."
+    },
+    {
+      "id": "b26",
+      "segmentId": "segment-26",
+      "start": 49.03,
+      "end": 51.11,
+      "text": "Okay. See that guy? He's the tying run."
+    },
+    {
+      "id": "b27",
+      "segmentId": "segment-27",
+      "start": 51.29,
+      "end": 52.72,
+      "text": "Interesting story about him."
+    },
+    {
+      "id": "b28",
+      "segmentId": "segment-28",
+      "start": 52.9,
+      "end": 54.89,
+      "text": "He's been stuck on second base forever,"
+    },
+    {
+      "id": "b29",
+      "segmentId": "segment-29",
+      "start": 55.07,
+      "end": 57.16,
+      "text": "and I'm pretty sure he's gonna try and steal third,"
+    },
+    {
+      "id": "b30",
+      "segmentId": "segment-30",
+      "start": 57.34,
+      "end": 60.37,
+      "text": "which is just a terrible, terrible idea."
+    },
+    {
+      "id": "b31",
+      "segmentId": "segment-31",
+      "start": 60.55,
+      "end": 61.74,
+      "text": "How are you and Haley doing?"
+    },
+    {
+      "id": "b32",
+      "segmentId": "segment-32",
+      "start": 61.92,
+      "end": 64.58,
+      "text": "I wish I could stay home with you and fly toy airplanes."
+    },
+    {
+      "id": "b33",
+      "segmentId": "segment-33",
+      "start": 64.76,
+      "end": 66.33,
+      "text": "These aren't toy airplanes, Manny."
+    },
+    {
+      "id": "b34",
+      "segmentId": "segment-34",
+      "start": 66.51,
+      "end": 68.58,
+      "text": "These are models, and they're very complicated."
+    },
+    {
+      "id": "b35",
+      "segmentId": "segment-35",
+      "start": 68.76,
+      "end": 72.19,
+      "text": "You wanna fly one of these, you gotta be familiar with airfoil,"
+    },
+    {
+      "id": "b36",
+      "segmentId": "segment-36",
+      "start": 72.37,
+      "end": 74.27,
+      "text": "drag, lift and thrust-"
+    },
+    {
+      "id": "b37",
+      "segmentId": "segment-37",
+      "start": 74.45,
+      "end": 76.73,
+      "text": "and these are all principles of aerodynamics."
+    },
+    {
+      "id": "b38",
+      "segmentId": "segment-38",
+      "start": 76.91,
+      "end": 78.66,
+      "text": "The box says \"12 and up.\""
+    },
+    {
+      "id": "b39",
+      "segmentId": "segment-39",
+      "start": 78.84,
+      "end": 79.74,
+      "text": "What?"
+    },
+    {
+      "id": "b40",
+      "segmentId": "segment-40",
+      "start": 79.92,
+      "end": 81.97,
+      "text": "You can fly toy planes with Jay next time."
+    },
+    {
+      "id": "b41",
+      "segmentId": "segment-41",
+      "start": 82.15,
+      "end": 84.4,
+      "text": "- Today you have to spend time with Luke. - Why?"
+    },
+    {
+      "id": "b42",
+      "segmentId": "segment-42",
+      "start": 84.58,
+      "end": 86.92,
+      "text": "Because his mother invited you, so you go."
+    },
+    {
+      "id": "b43",
+      "segmentId": "segment-43",
+      "start": 87.1,
+      "end": 89.23,
+      "text": "Family needs to be close. Right, Jay?"
+    },
+    {
+      "id": "b44",
+      "segmentId": "segment-44",
+      "start": 89.41,
+      "end": 91.42,
+      "text": "I'm pretty sure this is a typo."
+    },
+    {
+      "id": "b45",
+      "segmentId": "segment-45",
+      "start": 91.6,
+      "end": 94.92,
+      "text": "Men need their hobbies. Manny's father had many hobbies."
+    },
+    {
+      "id": "b46",
+      "segmentId": "segment-46",
+      "start": 95.1,
+      "end": 96.96,
+      "text": "Like hiking in the desert,"
+    },
+    {
+      "id": "b47",
+      "segmentId": "segment-47",
+      "start": 97.14,
+      "end": 99.55,
+      "text": "that kind of skiing that they drop you from the-"
+    },
+    {
+      "id": "b48",
+      "segmentId": "segment-48",
+      "start": 99.73,
+      "end": 100.79,
+      "text": "How do you say in English?"
+    },
+    {
+      "id": "b49",
+      "segmentId": "segment-49",
+      "start": 100.97,
+      "end": 102.84,
+      "text": "- Helicopter. - Yes."
+    },
+    {
+      "id": "b50",
+      "segmentId": "segment-50",
+      "start": 103.02,
+      "end": 105.91,
+      "text": "Once, on a dare, he even boxed with an alligator."
+    },
+    {
+      "id": "b51",
+      "segmentId": "segment-51",
+      "start": 106.09,
+      "end": 108.13,
+      "text": "\"Wrestle.\" You wrestle-"
+    },
+    {
+      "id": "b52",
+      "segmentId": "segment-52",
+      "start": 108.31,
+      "end": 110.06,
+      "text": "You can't box with alligators."
+    },
+    {
+      "id": "b53",
+      "segmentId": "segment-53",
+      "start": 110.24,
+      "end": 110.95,
+      "text": "Are you sure?"
+    },
+    {
+      "id": "b54",
+      "segmentId": "segment-54",
+      "start": 111.13,
+      "end": 113.35,
+      "text": "How would they get the gloves on those little claws?"
+    },
+    {
+      "id": "b55",
+      "segmentId": "segment-55",
+      "start": 113.53,
+      "end": 115.78,
+      "text": "- Aren't they like tiny little hands? - No!"
+    },
+    {
+      "id": "b56",
+      "segmentId": "segment-56",
+      "start": 115.96,
+      "end": 117.69,
+      "text": "Okay, now I forgot what we're talking about."
+    },
+    {
+      "id": "b57",
+      "segmentId": "segment-57",
+      "start": 117.87,
+      "end": 120.9,
+      "text": "Anyways, hobbies are important for the men,"
+    },
+    {
+      "id": "b58",
+      "segmentId": "segment-58",
+      "start": 121.08,
+      "end": 123.28,
+      "text": "whether you're risking your life..."
+    },
+    {
+      "id": "b59",
+      "segmentId": "segment-59",
+      "start": 123.46,
+      "end": 126.13,
+      "text": "or flying little planes from a safe distance."
+    },
+    {
+      "id": "b60",
+      "segmentId": "segment-60",
+      "start": 126.31,
+      "end": 127.6,
+      "text": "Wait, wait, wait. What are you doing?"
+    },
+    {
+      "id": "b61",
+      "segmentId": "segment-61",
+      "start": 127.78,
+      "end": 130.45,
+      "text": "Uh, we're just gonna buy some diapers. It'll just take a second."
+    },
+    {
+      "id": "b62",
+      "segmentId": "segment-62",
+      "start": 130.63,
+      "end": 133.98,
+      "text": "- This is Costco. - Yeah, which is where we buy diapers."
+    },
+    {
+      "id": "b63",
+      "segmentId": "segment-63",
+      "start": 134.16,
+      "end": 135.21,
+      "text": "Since when?"
+    },
+    {
+      "id": "b64",
+      "segmentId": "segment-64",
+      "start": 135.39,
+      "end": 138.54,
+      "text": "Do you remember when we adopted that baby a few months back?"
+    },
+    {
+      "id": "b65",
+      "segmentId": "segment-65",
+      "start": 138.72,
+      "end": 139.7,
+      "text": "Since then."
+    },
+    {
+      "id": "b66",
+      "segmentId": "segment-66",
+      "start": 139.88,
+      "end": 141.14,
+      "text": "Mitchell is a snob."
+    },
+    {
+      "id": "b67",
+      "segmentId": "segment-67",
+      "start": 141.32,
+      "end": 144.03,
+      "text": "No. N-No, I-I'm discerning."
+    },
+    {
+      "id": "b68",
+      "segmentId": "segment-68",
+      "start": 144.21,
+      "end": 147,
+      "text": "Official slogan for snobs."
+    },
+    {
+      "id": "b69",
+      "segmentId": "segment-69",
+      "start": 147.18,
+      "end": 148.96,
+      "text": "When we first met, he wouldn't even look at me..."
+    },
+    {
+      "id": "b70",
+      "segmentId": "segment-70",
+      "start": 149.14,
+      "end": 151.86,
+      "text": "because I was a hick from the farm in Missouri,"
+    },
+    {
+      "id": "b71",
+      "segmentId": "segment-71",
+      "start": 152.04,
+      "end": 153.86,
+      "text": "and he's a big city mouse."
+    },
+    {
+      "id": "b72",
+      "segmentId": "segment-72",
+      "start": 154.04,
+      "end": 155.66,
+      "text": "Who says \"City mouse\"?"
+    },
+    {
+      "id": "b73",
+      "segmentId": "segment-73",
+      "start": 155.84,
+      "end": 157,
+      "text": "Country mice."
+    },
+    {
+      "id": "b74",
+      "segmentId": "segment-74",
+      "start": 157.18,
+      "end": 159.73,
+      "text": "- I think I'm gonna go wait in the car. - Okay."
+    },
+    {
+      "id": "b75",
+      "segmentId": "segment-75",
+      "start": 159.91,
+      "end": 162.04,
+      "text": "Hey, if you're on your way out, can you grab the garbage?"
+    },
+    {
+      "id": "b76",
+      "segmentId": "segment-76",
+      "start": 162.22,
+      "end": 164.12,
+      "text": "- I got it. - Okay. We got it."
+    },
+    {
+      "id": "b77",
+      "segmentId": "segment-77",
+      "start": 164.3,
+      "end": 166.44,
+      "text": "- He's a little jumpy. - Oh, go figure-"
+    },
+    {
+      "id": "b78",
+      "segmentId": "segment-78",
+      "start": 166.62,
+      "end": 169.61,
+      "text": "a teenage boy doesn't want to hang out with his girlfriend's dad."
+    },
+    {
+      "id": "b79",
+      "segmentId": "segment-79",
+      "start": 169.79,
+      "end": 171.25,
+      "text": "Thought we were past all that."
+    },
+    {
+      "id": "b80",
+      "segmentId": "segment-80",
+      "start": 171.43,
+      "end": 172.32,
+      "text": "I'm all about-"
+    },
+    {
+      "id": "b81",
+      "segmentId": "segment-81",
+      "start": 172.5,
+      "end": 175.34,
+      "text": "- I'm all about taking it to the next level. - Really?"
+    },
+    {
+      "id": "b82",
+      "segmentId": "segment-82",
+      "start": 175.52,
+      "end": 177.64,
+      "text": "- Thought you were all about keeping it real. - Yes."
+    },
+    {
+      "id": "b83",
+      "segmentId": "segment-83",
+      "start": 177.82,
+      "end": 179.3,
+      "text": "But the whole point of keeping it real is"
+    },
+    {
+      "id": "b84",
+      "segmentId": "segment-84",
+      "start": 179.48,
+      "end": 180.85,
+      "text": "so you can take it to the next level."
+    },
+    {
+      "id": "b85",
+      "segmentId": "segment-85",
+      "start": 181.03,
+      "end": 182.37,
+      "text": "Did you really not know that?"
+    },
+    {
+      "id": "b86",
+      "segmentId": "segment-86",
+      "start": 182.55,
+      "end": 185.04,
+      "text": "You haven't exactly taken it to the next level with my dad."
+    },
+    {
+      "id": "b87",
+      "segmentId": "segment-87",
+      "start": 185.22,
+      "end": 186.88,
+      "text": "What are you talking about?"
+    },
+    {
+      "id": "b88",
+      "segmentId": "segment-88",
+      "start": 187.06,
+      "end": 188.61,
+      "text": "We've been married for 16 years,"
+    },
+    {
+      "id": "b89",
+      "segmentId": "segment-89",
+      "start": 188.79,
+      "end": 190.87,
+      "text": "and you still walk on eggshells around him."
+    },
+    {
+      "id": "b90",
+      "segmentId": "segment-90",
+      "start": 191.05,
+      "end": 193.26,
+      "text": "What? Are you kidding?"
+    },
+    {
+      "id": "b91",
+      "segmentId": "segment-91",
+      "start": 193.44,
+      "end": 196.23,
+      "text": "Jay and I are total buds."
+    },
+    {
+      "id": "b92",
+      "segmentId": "segment-92",
+      "start": 196.41,
+      "end": 197.95,
+      "text": "You-You want to just hang out?"
+    },
+    {
+      "id": "b93",
+      "segmentId": "segment-93",
+      "start": 198.13,
+      "end": 200.13,
+      "text": "Brought six friends, so that just-"
+    },
+    {
+      "id": "b94",
+      "segmentId": "segment-94",
+      "start": 200.31,
+      "end": 201.3,
+      "text": "That's-"
+    },
+    {
+      "id": "b95",
+      "segmentId": "segment-95",
+      "start": 201.48,
+      "end": 203.8,
+      "text": "Manny brought his favorite game to play with Luke."
+    },
+    {
+      "id": "b96",
+      "segmentId": "segment-96",
+      "start": 203.98,
+      "end": 205.18,
+      "text": "It's called Empire."
+    },
+    {
+      "id": "b97",
+      "segmentId": "segment-97",
+      "start": 205.36,
+      "end": 208.9,
+      "text": "You use strategy to expand territories and take over the world."
+    },
+    {
+      "id": "b98",
+      "segmentId": "segment-98",
+      "start": 209.08,
+      "end": 211.46,
+      "text": "Luke is gonna love that. He's out back playing."
+    },
+    {
+      "id": "b99",
+      "segmentId": "segment-99",
+      "start": 211.64,
+      "end": 214.01,
+      "text": "Do you need me to get you something while I'm out shopping?"
+    },
+    {
+      "id": "b100",
+      "segmentId": "segment-100",
+      "start": 214.19,
+      "end": 216.14,
+      "text": "That's such a nice offer, but I think we're good. Thanks."
+    },
+    {
+      "id": "b101",
+      "segmentId": "segment-101",
+      "start": 216.32,
+      "end": 218.7,
+      "text": "Okay. What about this?"
+    },
+    {
+      "id": "b102",
+      "segmentId": "segment-102",
+      "start": 218.88,
+      "end": 221.03,
+      "text": "You don't even say \"Hello\" To Gloria and Manny?"
+    },
+    {
+      "id": "b103",
+      "segmentId": "segment-103",
+      "start": 221.21,
+      "end": 224.55,
+      "text": "Hi, Gloria and Manny. Okay, Mom, what about this?"
+    },
+    {
+      "id": "b104",
+      "segmentId": "segment-104",
+      "start": 224.73,
+      "end": 227.81,
+      "text": "- No. You're wearing a dress. - Mom, come on."
+    },
+    {
+      "id": "b105",
+      "segmentId": "segment-105",
+      "start": 227.99,
+      "end": 230.52,
+      "text": "What? It's gonna kill you to look like a girl for one afternoon?"
+    },
+    {
+      "id": "b106",
+      "segmentId": "segment-106",
+      "start": 230.7,
+      "end": 233.73,
+      "text": "But it's a wedding for some friend of yours I never even heard of."
+    },
+    {
+      "id": "b107",
+      "segmentId": "segment-107",
+      "start": 233.91,
+      "end": 236.73,
+      "text": "It's non-negotiable. You can borrow a dress of Haley's again."
+    },
+    {
+      "id": "b108",
+      "segmentId": "segment-108",
+      "start": 236.91,
+      "end": 237.72,
+      "text": "No."
+    },
+    {
+      "id": "b109",
+      "segmentId": "segment-109",
+      "start": 237.9,
+      "end": 240.84,
+      "text": "That sends an ugly message- that I'm Haley."
+    },
+    {
+      "id": "b110",
+      "segmentId": "segment-110",
+      "start": 241.02,
+      "end": 243.73,
+      "text": "You know, instead of trying to force me to wear a dress,"
+    },
+    {
+      "id": "b111",
+      "segmentId": "segment-111",
+      "start": 243.91,
+      "end": 247.09,
+      "text": "why don't you worry about getting Luke to wear some pants?"
+    },
+    {
+      "id": "b112",
+      "segmentId": "segment-112",
+      "start": 247.27,
+      "end": 250.86,
+      "text": "What? Why does he do this?"
+    },
+    {
+      "id": "b113",
+      "segmentId": "segment-113",
+      "start": 251.04,
+      "end": 252.13,
+      "text": "Luke!"
+    },
+    {
+      "id": "b114",
+      "segmentId": "segment-114",
+      "start": 252.31,
+      "end": 254.47,
+      "text": "Pants! Come on!"
+    },
+    {
+      "id": "b115",
+      "segmentId": "segment-115",
+      "start": 254.65,
+      "end": 256.42,
+      "text": "Jay and I are buds, for sure-"
+    },
+    {
+      "id": "b116",
+      "segmentId": "segment-116",
+      "start": 256.6,
+      "end": 259.86,
+      "text": "but with kind of, um, an invisible asterisk."
+    },
+    {
+      "id": "b117",
+      "segmentId": "segment-117",
+      "start": 260.04,
+      "end": 263.29,
+      "text": "Um, he's not, uh- He's not a talker."
+    },
+    {
+      "id": "b118",
+      "segmentId": "segment-118",
+      "start": 263.47,
+      "end": 266.22,
+      "text": "Or-Or a hugger."
+    },
+    {
+      "id": "b119",
+      "segmentId": "segment-119",
+      "start": 266.4,
+      "end": 269.15,
+      "text": "Once he ran over my foot with his car."
+    },
+    {
+      "id": "b120",
+      "segmentId": "segment-120",
+      "start": 269.33,
+      "end": 271.58,
+      "text": "To-To be fair, he had just given up smoking,"
+    },
+    {
+      "id": "b121",
+      "segmentId": "segment-121",
+      "start": 271.76,
+      "end": 274.18,
+      "text": "but basically we're-we're buds."
+    },
+    {
+      "id": "b122",
+      "segmentId": "segment-122",
+      "start": 274.36,
+      "end": 275.74,
+      "text": "Do you have to just stand there?"
+    },
+    {
+      "id": "b123",
+      "segmentId": "segment-123",
+      "start": 275.92,
+      "end": 277.66,
+      "text": "You're making me feel uneasy."
+    },
+    {
+      "id": "b124",
+      "segmentId": "segment-124",
+      "start": 277.84,
+      "end": 279.91,
+      "text": "Oh, for God's sake. Sit here. Here."
+    },
+    {
+      "id": "b125",
+      "segmentId": "segment-125",
+      "start": 280.09,
+      "end": 282.99,
+      "text": "Hold this wing like this while I adjust this."
+    },
+    {
+      "id": "b126",
+      "segmentId": "segment-126",
+      "start": 283.17,
+      "end": 284.15,
+      "text": "Okay."
+    },
+    {
+      "id": "b127",
+      "segmentId": "segment-127",
+      "start": 284.33,
+      "end": 285.38,
+      "text": "Come on. Here."
+    },
+    {
+      "id": "b128",
+      "segmentId": "segment-128",
+      "start": 285.56,
+      "end": 286.69,
+      "text": "Not too hard."
+    },
+    {
+      "id": "b129",
+      "segmentId": "segment-129",
+      "start": 286.87,
+      "end": 289.31,
+      "text": "Alex, why don't you come shopping with me?"
+    },
+    {
+      "id": "b130",
+      "segmentId": "segment-130",
+      "start": 289.49,
+      "end": 292.15,
+      "text": "Maybe I can help you find something that you like."
+    },
+    {
+      "id": "b131",
+      "segmentId": "segment-131",
+      "start": 292.33,
+      "end": 295.54,
+      "text": "That's a really nice offer, but it's not really her thing."
+    },
+    {
+      "id": "b132",
+      "segmentId": "segment-132",
+      "start": 295.72,
+      "end": 297.9,
+      "text": "Actually, I'd love to go."
+    },
+    {
+      "id": "b133",
+      "segmentId": "segment-133",
+      "start": 298.08,
+      "end": 300.18,
+      "text": "See, you don't know what my thing is."
+    },
+    {
+      "id": "b134",
+      "segmentId": "segment-134",
+      "start": 300.36,
+      "end": 301.82,
+      "text": "You have no idea what my thing is."
+    },
+    {
+      "id": "b135",
+      "segmentId": "segment-135",
+      "start": 302,
+      "end": 303.33,
+      "text": "I know what your thing is."
+    },
+    {
+      "id": "b136",
+      "segmentId": "segment-136",
+      "start": 303.51,
+      "end": 306.33,
+      "text": "Your thing is to provoke, just like your sister's thing..."
+    },
+    {
+      "id": "b137",
+      "segmentId": "segment-137",
+      "start": 306.51,
+      "end": 307.96,
+      "text": "is to never come out of her room,"
+    },
+    {
+      "id": "b138",
+      "segmentId": "segment-138",
+      "start": 308.14,
+      "end": 309.14,
+      "text": "and your brother's thing-"
+    },
+    {
+      "id": "b139",
+      "segmentId": "segment-139",
+      "start": 309.32,
+      "end": 310.93,
+      "text": "Well, there's your brother's thing."
+    },
+    {
+      "id": "b140",
+      "segmentId": "segment-140",
+      "start": 311.11,
+      "end": 315.44,
+      "text": "Luke! Put 'em on! Mm-hmm."
+    },
+    {
+      "id": "b141",
+      "segmentId": "segment-141",
+      "start": 315.62,
+      "end": 318.24,
+      "text": "The thing about me and Jay is our relationship's..."
+    },
+    {
+      "id": "b142",
+      "segmentId": "segment-142",
+      "start": 318.42,
+      "end": 320.21,
+      "text": "always been stuck in that,"
+    },
+    {
+      "id": "b143",
+      "segmentId": "segment-143",
+      "start": 320.39,
+      "end": 323.01,
+      "text": "that primal place where it started."
+    },
+    {
+      "id": "b144",
+      "segmentId": "segment-144",
+      "start": 323.19,
+      "end": 325.5,
+      "text": "You know, he's the old silverback protecting his females,"
+    },
+    {
+      "id": "b145",
+      "segmentId": "segment-145",
+      "start": 325.68,
+      "end": 329.01,
+      "text": "then along comes this younger, stronger gorilla swinging in,"
+    },
+    {
+      "id": "b146",
+      "segmentId": "segment-146",
+      "start": 329.19,
+      "end": 330.12,
+      "text": "beating his chest."
+    },
+    {
+      "id": "b147",
+      "segmentId": "segment-147",
+      "start": 330.3,
+      "end": 333.05,
+      "text": "You know, naturally, the ape ladies come running,"
+    },
+    {
+      "id": "b148",
+      "segmentId": "segment-148",
+      "start": 333.23,
+      "end": 335.48,
+      "text": "presenting their nice scarlet behinds."
+    },
+    {
+      "id": "b149",
+      "segmentId": "segment-149",
+      "start": 335.66,
+      "end": 338.41,
+      "text": "Papa ape wants to stop all that, but he can't."
+    },
+    {
+      "id": "b150",
+      "segmentId": "segment-150",
+      "start": 338.59,
+      "end": 342.05,
+      "text": "You know? That's-That's life. I'm not the enemy."
+    },
+    {
+      "id": "b151",
+      "segmentId": "segment-151",
+      "start": 342.23,
+      "end": 344.27,
+      "text": "The enemy is poachers."
+    },
+    {
+      "id": "b152",
+      "segmentId": "segment-152",
+      "start": 344.45,
+      "end": 346.76,
+      "text": "That'll do it. Don't touch it."
+    },
+    {
+      "id": "b153",
+      "segmentId": "segment-153",
+      "start": 346.94,
+      "end": 347.83,
+      "text": "All right."
+    },
+    {
+      "id": "b154",
+      "segmentId": "segment-154",
+      "start": 348.01,
+      "end": 349.97,
+      "text": "- You wanna go fly it? - Sure."
+    },
+    {
+      "id": "b155",
+      "segmentId": "segment-155",
+      "start": 350.15,
+      "end": 353.72,
+      "text": "Oh. Hey, I got the toothpaste and the soap."
+    },
+    {
+      "id": "b156",
+      "segmentId": "segment-156",
+      "start": 353.9,
+      "end": 356,
+      "text": "Good. Now we can open that general store."
+    },
+    {
+      "id": "b157",
+      "segmentId": "segment-157",
+      "start": 356.18,
+      "end": 357.69,
+      "text": "I thought we were just here to get diapers."
+    },
+    {
+      "id": "b158",
+      "segmentId": "segment-158",
+      "start": 357.87,
+      "end": 358.86,
+      "text": "We had a saying on the farm:"
+    },
+    {
+      "id": "b159",
+      "segmentId": "segment-159",
+      "start": 359.04,
+      "end": 361.07,
+      "text": "as long as you're bringing the mule to the market, you-"
+    },
+    {
+      "id": "b160",
+      "segmentId": "segment-160",
+      "start": 361.25,
+      "end": 363.18,
+      "text": "I feel you rolling your eyes at me."
+    },
+    {
+      "id": "b161",
+      "segmentId": "segment-161",
+      "start": 363.36,
+      "end": 365.84,
+      "text": "We met at one of Pepper's legendary game nights."
+    },
+    {
+      "id": "b162",
+      "segmentId": "segment-162",
+      "start": 366.02,
+      "end": 367.35,
+      "text": "I remember Mitchell because"
+    },
+    {
+      "id": "b163",
+      "segmentId": "segment-163",
+      "start": 367.53,
+      "end": 370.17,
+      "text": "he kept rolling his eyes every time I would get a little boisterous."
+    },
+    {
+      "id": "b164",
+      "segmentId": "segment-164",
+      "start": 370.35,
+      "end": 371.56,
+      "text": "I did not."
+    },
+    {
+      "id": "b165",
+      "segmentId": "segment-165",
+      "start": 371.74,
+      "end": 372.73,
+      "text": "A little bit."
+    },
+    {
+      "id": "b166",
+      "segmentId": "segment-166",
+      "start": 372.91,
+      "end": 374.43,
+      "text": "Yeah, maybe a little bit."
+    },
+    {
+      "id": "b167",
+      "segmentId": "segment-167",
+      "start": 374.61,
+      "end": 376.49,
+      "text": "Anyway, we were- we were playing charades,"
+    },
+    {
+      "id": "b168",
+      "segmentId": "segment-168",
+      "start": 376.67,
+      "end": 378.72,
+      "text": "and I had no idea how to act out my clue."
+    },
+    {
+      "id": "b169",
+      "segmentId": "segment-169",
+      "start": 378.9,
+      "end": 381.31,
+      "text": "And all I could think of to do was-"
+    },
+    {
+      "id": "b170",
+      "segmentId": "segment-170",
+      "start": 381.49,
+      "end": 383.74,
+      "text": "And without missing a beat, Cam says-"
+    },
+    {
+      "id": "b171",
+      "segmentId": "segment-171",
+      "start": 383.92,
+      "end": 385.8,
+      "text": "Casablanca."
+    },
+    {
+      "id": "b172",
+      "segmentId": "segment-172",
+      "start": 385.98,
+      "end": 388.07,
+      "text": "- All I did was this- - Casablanca."
+    },
+    {
+      "id": "b173",
+      "segmentId": "segment-173",
+      "start": 388.25,
+      "end": 389.88,
+      "text": "Casablanca."
+    },
+    {
+      "id": "b174",
+      "segmentId": "segment-174",
+      "start": 390.06,
+      "end": 391.96,
+      "text": "Can we just please get the diapers and get out of here?"
+    },
+    {
+      "id": "b175",
+      "segmentId": "segment-175",
+      "start": 392.14,
+      "end": 394.29,
+      "text": "Fine, but I wanna stop by the wine section first."
+    },
+    {
+      "id": "b176",
+      "segmentId": "segment-176",
+      "start": 394.47,
+      "end": 397.45,
+      "text": "Wait. There's a wine section?"
+    },
+    {
+      "id": "b177",
+      "segmentId": "segment-177",
+      "start": 397.63,
+      "end": 399.51,
+      "text": "Yeah, a really good one- just past the tires."
+    },
+    {
+      "id": "b178",
+      "segmentId": "segment-178",
+      "start": 399.69,
+      "end": 403.16,
+      "text": "No way. They do not have- Oh, my God."
+    },
+    {
+      "id": "b179",
+      "segmentId": "segment-179",
+      "start": 403.34,
+      "end": 406.74,
+      "text": "Oh, my- Cam. Cam. The paper shredder I wanted."
+    },
+    {
+      "id": "b180",
+      "segmentId": "segment-180",
+      "start": 406.92,
+      "end": 408.74,
+      "text": "Huh? Confetti and crosscut."
+    },
+    {
+      "id": "b181",
+      "segmentId": "segment-181",
+      "start": 408.92,
+      "end": 409.84,
+      "text": "Yep."
+    },
+    {
+      "id": "b182",
+      "segmentId": "segment-182",
+      "start": 410.02,
+      "end": 411.65,
+      "text": "Oh, my God. Amazing."
+    },
+    {
+      "id": "b183",
+      "segmentId": "segment-183",
+      "start": 411.83,
+      "end": 412.92,
+      "text": "Yeah."
+    },
+    {
+      "id": "b184",
+      "segmentId": "segment-184",
+      "start": 413.1,
+      "end": 416.69,
+      "text": "Cam, what is this place?"
+    },
+    {
+      "id": "b185",
+      "segmentId": "segment-185",
+      "start": 416.87,
+      "end": 419.82,
+      "text": "Those cookies smell like heaven. Your own recipe?"
+    },
+    {
+      "id": "b186",
+      "segmentId": "segment-186",
+      "start": 420,
+      "end": 421.87,
+      "text": "No, I just throw 'em in the oven."
+    },
+    {
+      "id": "b187",
+      "segmentId": "segment-187",
+      "start": 422.05,
+      "end": 424.56,
+      "text": "And added the secret ingredient of caring?"
+    },
+    {
+      "id": "b188",
+      "segmentId": "segment-188",
+      "start": 424.74,
+      "end": 425.6,
+      "text": "Sure."
+    },
+    {
+      "id": "b189",
+      "segmentId": "segment-189",
+      "start": 425.78,
+      "end": 427.66,
+      "text": "So, you and Luke having a good time?"
+    },
+    {
+      "id": "b190",
+      "segmentId": "segment-190",
+      "start": 427.84,
+      "end": 430.38,
+      "text": "I don't know. He won't come out of his box."
+    },
+    {
+      "id": "b191",
+      "segmentId": "segment-191",
+      "start": 430.56,
+      "end": 433.44,
+      "text": "Maybe I'll just stay here and spend some time with my sister."
+    },
+    {
+      "id": "b192",
+      "segmentId": "segment-192",
+      "start": 433.62,
+      "end": 437.01,
+      "text": "Oh, right. I guess technically I would be your stepsister."
+    },
+    {
+      "id": "b193",
+      "segmentId": "segment-193",
+      "start": 437.19,
+      "end": 439.56,
+      "text": "My mother says we are never to use the word \"Step\""
+    },
+    {
+      "id": "b194",
+      "segmentId": "segment-194",
+      "start": 439.74,
+      "end": 441.09,
+      "text": "Because it means \"Not real.\""
+    },
+    {
+      "id": "b195",
+      "segmentId": "segment-195",
+      "start": 441.27,
+      "end": 443.29,
+      "text": "And we are a real family. Mmm."
+    },
+    {
+      "id": "b196",
+      "segmentId": "segment-196",
+      "start": 443.47,
+      "end": 445.47,
+      "text": "So what is the matter, Claire?"
+    },
+    {
+      "id": "b197",
+      "segmentId": "segment-197",
+      "start": 445.65,
+      "end": 447.74,
+      "text": "- What? - You seem sad."
+    },
+    {
+      "id": "b198",
+      "segmentId": "segment-198",
+      "start": 447.92,
+      "end": 449.72,
+      "text": "It's just stuff with Alex."
+    },
+    {
+      "id": "b199",
+      "segmentId": "segment-199",
+      "start": 449.9,
+      "end": 451,
+      "text": "You know, kid stuff."
+    },
+    {
+      "id": "b200",
+      "segmentId": "segment-200",
+      "start": 451.18,
+      "end": 451.94,
+      "text": "Kids."
+    },
+    {
+      "id": "b201",
+      "segmentId": "segment-201",
+      "start": 452.12,
+      "end": 454.58,
+      "text": "You don't have to tell me. My school is full of them."
+    },
+    {
+      "id": "b202",
+      "segmentId": "segment-202",
+      "start": 454.76,
+      "end": 457.69,
+      "text": "I was thinking after lunch we can go and do a little shopping."
+    },
+    {
+      "id": "b203",
+      "segmentId": "segment-203",
+      "start": 457.87,
+      "end": 459.45,
+      "text": "I'm not getting a dress."
+    },
+    {
+      "id": "b204",
+      "segmentId": "segment-204",
+      "start": 459.63,
+      "end": 461.1,
+      "text": "I don't care. I'm not your mother."
+    },
+    {
+      "id": "b205",
+      "segmentId": "segment-205",
+      "start": 461.28,
+      "end": 463.18,
+      "text": "I know. You're my grandmother."
+    },
+    {
+      "id": "b206",
+      "segmentId": "segment-206",
+      "start": 463.36,
+      "end": 464.94,
+      "text": "Step-grandmother."
+    },
+    {
+      "id": "b207",
+      "segmentId": "segment-207",
+      "start": 465.12,
+      "end": 468.18,
+      "text": "Anyways, today, think of me as a girlfriend."
+    },
+    {
+      "id": "b208",
+      "segmentId": "segment-208",
+      "start": 468.36,
+      "end": 471.55,
+      "text": "Two girls out for an afternoon of fun."
+    },
+    {
+      "id": "b209",
+      "segmentId": "segment-209",
+      "start": 471.73,
+      "end": 474.65,
+      "text": "What do you usually do with your girlfriends?"
+    },
+    {
+      "id": "b210",
+      "segmentId": "segment-210",
+      "start": 474.83,
+      "end": 478.55,
+      "text": "I don't know. We go out. We talk, drink wine."
+    },
+    {
+      "id": "b211",
+      "segmentId": "segment-211",
+      "start": 478.73,
+      "end": 480.44,
+      "text": "- Can I drink wine? - No."
+    },
+    {
+      "id": "b212",
+      "segmentId": "segment-212",
+      "start": 480.62,
+      "end": 481.66,
+      "text": "Some friend."
+    },
+    {
+      "id": "b213",
+      "segmentId": "segment-213",
+      "start": 481.84,
+      "end": 485.21,
+      "text": "Well, you can still talk to me about anything."
+    },
+    {
+      "id": "b214",
+      "segmentId": "segment-214",
+      "start": 485.39,
+      "end": 488.2,
+      "text": "Yeah, adults always say that, but they don't mean it."
+    },
+    {
+      "id": "b215",
+      "segmentId": "segment-215",
+      "start": 488.38,
+      "end": 490.54,
+      "text": "When my mom says I can ask her anything,"
+    },
+    {
+      "id": "b216",
+      "segmentId": "segment-216",
+      "start": 490.72,
+      "end": 491.8,
+      "text": "I really can't."
+    },
+    {
+      "id": "b217",
+      "segmentId": "segment-217",
+      "start": 491.98,
+      "end": 493.38,
+      "text": "She just freaks out."
+    },
+    {
+      "id": "b218",
+      "segmentId": "segment-218",
+      "start": 493.56,
+      "end": 496.15,
+      "text": "I won't freak out. Shoot."
+    },
+    {
+      "id": "b219",
+      "segmentId": "segment-219",
+      "start": 496.33,
+      "end": 497.26,
+      "text": "Okay."
+    },
+    {
+      "id": "b220",
+      "segmentId": "segment-220",
+      "start": 497.44,
+      "end": 498.79,
+      "text": "How many men have you slept with?"
+    },
+    {
+      "id": "b221",
+      "segmentId": "segment-221",
+      "start": 498.97,
+      "end": 500.49,
+      "text": "Eight. Next."
+    },
+    {
+      "id": "b222",
+      "segmentId": "segment-222",
+      "start": 500.67,
+      "end": 502.89,
+      "text": "- Now can I try it? - No."
+    },
+    {
+      "id": "b223",
+      "segmentId": "segment-223",
+      "start": 503.07,
+      "end": 505.43,
+      "text": "I should get one of those. I've always loved planes."
+    },
+    {
+      "id": "b224",
+      "segmentId": "segment-224",
+      "start": 505.61,
+      "end": 507.31,
+      "text": "If things had gone a little differently in my life,"
+    },
+    {
+      "id": "b225",
+      "segmentId": "segment-225",
+      "start": 507.49,
+      "end": 508.83,
+      "text": "I think I would have been a pilot."
+    },
+    {
+      "id": "b226",
+      "segmentId": "segment-226",
+      "start": 509.01,
+      "end": 510.38,
+      "text": "Hey, what would happen if you turned the remote off"
+    },
+    {
+      "id": "b227",
+      "segmentId": "segment-227",
+      "start": 510.56,
+      "end": 512.02,
+      "text": "and then back on real fast?"
+    },
+    {
+      "id": "b228",
+      "segmentId": "segment-228",
+      "start": 512.2,
+      "end": 513.87,
+      "text": "Yeah, you'd have been a great pilot."
+    },
+    {
+      "id": "b229",
+      "segmentId": "segment-229",
+      "start": 514.05,
+      "end": 515.99,
+      "text": "So, can you do a- Can you do a loop-de-loop?"
+    },
+    {
+      "id": "b230",
+      "segmentId": "segment-230",
+      "start": 516.17,
+      "end": 517.47,
+      "text": "If I wanted to."
+    },
+    {
+      "id": "b231",
+      "segmentId": "segment-231",
+      "start": 517.65,
+      "end": 519.68,
+      "text": "No way! Can I try it?"
+    },
+    {
+      "id": "b232",
+      "segmentId": "segment-232",
+      "start": 519.86,
+      "end": 521,
+      "text": "No."
+    },
+    {
+      "id": "b233",
+      "segmentId": "segment-233",
+      "start": 521.18,
+      "end": 523.77,
+      "text": "I can see why you like this. It's so peaceful."
+    },
+    {
+      "id": "b234",
+      "segmentId": "segment-234",
+      "start": 523.95,
+      "end": 527.83,
+      "text": "It's like the whole world just... disappears out here."
+    },
+    {
+      "id": "b235",
+      "segmentId": "segment-235",
+      "start": 528.01,
+      "end": 529.74,
+      "text": "- I remember this one summer- - I'll tell you what."
+    },
+    {
+      "id": "b236",
+      "segmentId": "segment-236",
+      "start": 529.92,
+      "end": 531.82,
+      "text": "There's another trick called \"Threading the needle.\""
+    },
+    {
+      "id": "b237",
+      "segmentId": "segment-237",
+      "start": 532,
+      "end": 533.67,
+      "text": "I used to do it with Claire and Mitch when they were kids."
+    },
+    {
+      "id": "b238",
+      "segmentId": "segment-238",
+      "start": 533.85,
+      "end": 535.52,
+      "text": "- You wanna try it? - How's it go?"
+    },
+    {
+      "id": "b239",
+      "segmentId": "segment-239",
+      "start": 535.7,
+      "end": 537.66,
+      "text": "You grab one of those hoops over there..."
+    },
+    {
+      "id": "b240",
+      "segmentId": "segment-240",
+      "start": 537.84,
+      "end": 540.56,
+      "text": "and go to the far, far, far end of the field..."
+    },
+    {
+      "id": "b241",
+      "segmentId": "segment-241",
+      "start": 540.74,
+      "end": 543.47,
+      "text": "and stand there, and I fly the plane through it."
+    },
+    {
+      "id": "b242",
+      "segmentId": "segment-242",
+      "start": 543.65,
+      "end": 546.17,
+      "text": "Um, that sounds awesome!"
+    },
+    {
+      "id": "b243",
+      "segmentId": "segment-243",
+      "start": 546.35,
+      "end": 548.33,
+      "text": "- And then I get a chance flying it? - No."
+    },
+    {
+      "id": "b244",
+      "segmentId": "segment-244",
+      "start": 548.51,
+      "end": 549.39,
+      "text": "Okay."
+    },
+    {
+      "id": "b245",
+      "segmentId": "segment-245",
+      "start": 549.57,
+      "end": 550.68,
+      "text": "How's this?"
+    },
+    {
+      "id": "b246",
+      "segmentId": "segment-246",
+      "start": 550.86,
+      "end": 552.65,
+      "text": "Not far enough. Go on."
+    },
+    {
+      "id": "b247",
+      "segmentId": "segment-247",
+      "start": 552.83,
+      "end": 555.32,
+      "text": "- Okay. Further down. - You can't go too far."
+    },
+    {
+      "id": "b248",
+      "segmentId": "segment-248",
+      "start": 555.5,
+      "end": 557.9,
+      "text": "Right. Okay, I get it. I get it."
+    },
+    {
+      "id": "b249",
+      "segmentId": "segment-249",
+      "start": 558.08,
+      "end": 560,
+      "text": "- How's this? - Good."
+    },
+    {
+      "id": "b250",
+      "segmentId": "segment-250",
+      "start": 560.18,
+      "end": 562.77,
+      "text": "Now stand still. Don't move."
+    },
+    {
+      "id": "b251",
+      "segmentId": "segment-251",
+      "start": 562.95,
+      "end": 566.38,
+      "text": "Okay, let's do it. Whoo!"
+    },
+    {
+      "id": "b252",
+      "segmentId": "segment-252",
+      "start": 566.56,
+      "end": 568.39,
+      "text": "Whoo! I love it!"
+    },
+    {
+      "id": "b253",
+      "segmentId": "segment-253",
+      "start": 568.57,
+      "end": 570.73,
+      "text": "I love... it!"
+    },
+    {
+      "id": "b254",
+      "segmentId": "segment-254",
+      "start": 570.91,
+      "end": 572.81,
+      "text": "You drove a plane into my face."
+    },
+    {
+      "id": "b255",
+      "segmentId": "segment-255",
+      "start": 572.99,
+      "end": 575.19,
+      "text": "You must have moved. I told you to stay still."
+    },
+    {
+      "id": "b256",
+      "segmentId": "segment-256",
+      "start": 575.37,
+      "end": 576.99,
+      "text": "- I didn't move. - Try not to talk."
+    },
+    {
+      "id": "b257",
+      "segmentId": "segment-257",
+      "start": 577.17,
+      "end": 578.9,
+      "text": "I want to make sure nothing's broken."
+    },
+    {
+      "id": "b258",
+      "segmentId": "segment-258",
+      "start": 579.08,
+      "end": 580.81,
+      "text": "Alex and I can't just disagree."
+    },
+    {
+      "id": "b259",
+      "segmentId": "segment-259",
+      "start": 580.99,
+      "end": 583.67,
+      "text": "I mean, she has to turn everything into a fight."
+    },
+    {
+      "id": "b260",
+      "segmentId": "segment-260",
+      "start": 583.85,
+      "end": 586.12,
+      "text": "Hmm. A strong, independent woman."
+    },
+    {
+      "id": "b261",
+      "segmentId": "segment-261",
+      "start": 586.3,
+      "end": 588.21,
+      "text": "Sounds like somebody else I know."
+    },
+    {
+      "id": "b262",
+      "segmentId": "segment-262",
+      "start": 588.39,
+      "end": 589.68,
+      "text": "I was never hostile though."
+    },
+    {
+      "id": "b263",
+      "segmentId": "segment-263",
+      "start": 589.86,
+      "end": 591.98,
+      "text": "I mean, this whole thing with the dress-"
+    },
+    {
+      "id": "b264",
+      "segmentId": "segment-264",
+      "start": 592.16,
+      "end": 593.86,
+      "text": "Never had this problem with Haley."
+    },
+    {
+      "id": "b265",
+      "segmentId": "segment-265",
+      "start": 594.04,
+      "end": 596.69,
+      "text": "Maybe Alex doesn't want to compete with her big sister."
+    },
+    {
+      "id": "b266",
+      "segmentId": "segment-266",
+      "start": 596.87,
+      "end": 599.18,
+      "text": "Maybe she's trying to create her own identity."
+    },
+    {
+      "id": "b267",
+      "segmentId": "segment-267",
+      "start": 599.36,
+      "end": 601.61,
+      "text": "Put her in a dress, and she disappears."
+    },
+    {
+      "id": "b268",
+      "segmentId": "segment-268",
+      "start": 601.79,
+      "end": 603.13,
+      "text": "For one afternoon?"
+    },
+    {
+      "id": "b269",
+      "segmentId": "segment-269",
+      "start": 603.31,
+      "end": 605.92,
+      "text": "I wouldn't give up being myself for even one second."
+    },
+    {
+      "id": "b270",
+      "segmentId": "segment-270",
+      "start": 606.1,
+      "end": 608.78,
+      "text": "Sometimes it's hard to remember you're only 10 years old."
+    },
+    {
+      "id": "b271",
+      "segmentId": "segment-271",
+      "start": 608.96,
+      "end": 611.12,
+      "text": "- And three-quarters. - Yeah."
+    },
+    {
+      "id": "b272",
+      "segmentId": "segment-272",
+      "start": 611.3,
+      "end": 612.83,
+      "text": "Hey, it's Mitchell. Do you guys eat olives?"
+    },
+    {
+      "id": "b273",
+      "segmentId": "segment-273",
+      "start": 613.01,
+      "end": 613.62,
+      "text": "Olives?"
+    },
+    {
+      "id": "b274",
+      "segmentId": "segment-274",
+      "start": 613.8,
+      "end": 615.52,
+      "text": "- Really good olives? - Yeah."
+    },
+    {
+      "id": "b275",
+      "segmentId": "segment-275",
+      "start": 615.7,
+      "end": 616.93,
+      "text": "You got it."
+    },
+    {
+      "id": "b276",
+      "segmentId": "segment-276",
+      "start": 617.11,
+      "end": 619.82,
+      "text": "Mitchell, I found the diapers. They're over here."
+    },
+    {
+      "id": "b277",
+      "segmentId": "segment-277",
+      "start": 620,
+      "end": 622.02,
+      "text": "Cameron, guess what I found?"
+    },
+    {
+      "id": "b278",
+      "segmentId": "segment-278",
+      "start": 622.2,
+      "end": 623.43,
+      "text": "Coffins."
+    },
+    {
+      "id": "b279",
+      "segmentId": "segment-279",
+      "start": 623.61,
+      "end": 625.56,
+      "text": "They sell baby formula and they sell coffins."
+    },
+    {
+      "id": "b280",
+      "segmentId": "segment-280",
+      "start": 625.74,
+      "end": 626.58,
+      "text": "You can buy literally buy"
+    },
+    {
+      "id": "b281",
+      "segmentId": "segment-281",
+      "start": 626.76,
+      "end": 628.49,
+      "text": "everything you need from birth to death."
+    },
+    {
+      "id": "b282",
+      "segmentId": "segment-282",
+      "start": 628.67,
+      "end": 631.19,
+      "text": "Oh, my God. Look at these diapers."
+    },
+    {
+      "id": "b283",
+      "segmentId": "segment-283",
+      "start": 631.37,
+      "end": 632.77,
+      "text": "Look how cheap they are!"
+    },
+    {
+      "id": "b284",
+      "segmentId": "segment-284",
+      "start": 632.95,
+      "end": 633.85,
+      "text": "Oh. You know what we should do?"
+    },
+    {
+      "id": "b285",
+      "segmentId": "segment-285",
+      "start": 634.03,
+      "end": 635.97,
+      "text": "We should get enough for the next year or two, right?"
+    },
+    {
+      "id": "b286",
+      "segmentId": "segment-286",
+      "start": 636.15,
+      "end": 637.19,
+      "text": "Where would we keep them?"
+    },
+    {
+      "id": "b287",
+      "segmentId": "segment-287",
+      "start": 637.37,
+      "end": 639.34,
+      "text": "- They sell sheds. - Really?"
+    },
+    {
+      "id": "b288",
+      "segmentId": "segment-288",
+      "start": 639.52,
+      "end": 640.81,
+      "text": "You want to buy a diaper shed?"
+    },
+    {
+      "id": "b289",
+      "segmentId": "segment-289",
+      "start": 640.99,
+      "end": 643.61,
+      "text": "We're those guys now? The guys with a diaper shed?"
+    },
+    {
+      "id": "b290",
+      "segmentId": "segment-290",
+      "start": 643.79,
+      "end": 644.78,
+      "text": "Just grab two more."
+    },
+    {
+      "id": "b291",
+      "segmentId": "segment-291",
+      "start": 644.96,
+      "end": 646.46,
+      "text": "I'm not grabbing two more, Mitchell."
+    },
+    {
+      "id": "b292",
+      "segmentId": "segment-292",
+      "start": 646.64,
+      "end": 647.47,
+      "text": "It's time to go."
+    },
+    {
+      "id": "b293",
+      "segmentId": "segment-293",
+      "start": 647.65,
+      "end": 650.65,
+      "text": "Come on, come on. We need, uh- Hey, excuse me."
+    },
+    {
+      "id": "b294",
+      "segmentId": "segment-294",
+      "start": 650.83,
+      "end": 653,
+      "text": "- Where did you get that flatbed thing? - Over there."
+    },
+    {
+      "id": "b295",
+      "segmentId": "segment-295",
+      "start": 653.18,
+      "end": 655.37,
+      "text": "- Go grab one of those. - Really?"
+    },
+    {
+      "id": "b296",
+      "segmentId": "segment-296",
+      "start": 655.55,
+      "end": 656.81,
+      "text": "Yeah. Get two."
+    },
+    {
+      "id": "b297",
+      "segmentId": "segment-297",
+      "start": 656.99,
+      "end": 658.5,
+      "text": "I'm in the applesauce aisle."
+    },
+    {
+      "id": "b298",
+      "segmentId": "segment-298",
+      "start": 658.68,
+      "end": 659.64,
+      "text": "So, anyways,"
+    },
+    {
+      "id": "b299",
+      "segmentId": "segment-299",
+      "start": 659.82,
+      "end": 661.31,
+      "text": "after charades, we went out for coffee."
+    },
+    {
+      "id": "b300",
+      "segmentId": "segment-300",
+      "start": 661.49,
+      "end": 663.65,
+      "text": "And I learned that he loves art."
+    },
+    {
+      "id": "b301",
+      "segmentId": "segment-301",
+      "start": 663.83,
+      "end": 667.03,
+      "text": "He plays the piano. He speaks French."
+    },
+    {
+      "id": "b302",
+      "segmentId": "segment-302",
+      "start": 667.21,
+      "end": 668.8,
+      "text": "- Un peu. - You see?"
+    },
+    {
+      "id": "b303",
+      "segmentId": "segment-303",
+      "start": 668.98,
+      "end": 670.43,
+      "text": "I-I misjudged him."
+    },
+    {
+      "id": "b304",
+      "segmentId": "segment-304",
+      "start": 670.61,
+      "end": 672.25,
+      "text": "Yeah, I'm sort of like Costco."
+    },
+    {
+      "id": "b305",
+      "segmentId": "segment-305",
+      "start": 672.43,
+      "end": 674.96,
+      "text": "I'm big, I'm not fancy, and I dare you to not like me."
+    },
+    {
+      "id": "b306",
+      "segmentId": "segment-306",
+      "start": 675.14,
+      "end": 677.27,
+      "text": "Yeah, and I'm kinda more like that, um-"
+    },
+    {
+      "id": "b307",
+      "segmentId": "segment-307",
+      "start": 677.45,
+      "end": 679.83,
+      "text": "What is the name of that little shop we went to in Paris?"
+    },
+    {
+      "id": "b308",
+      "segmentId": "segment-308",
+      "start": 680.01,
+      "end": 681.64,
+      "text": "You are such a snob."
+    },
+    {
+      "id": "b309",
+      "segmentId": "segment-309",
+      "start": 681.82,
+      "end": 683.82,
+      "text": "Casablanca."
+    },
+    {
+      "id": "b310",
+      "segmentId": "segment-310",
+      "start": 684,
+      "end": 685.96,
+      "text": "I have a small flower on my ankle..."
+    },
+    {
+      "id": "b311",
+      "segmentId": "segment-311",
+      "start": 686.14,
+      "end": 690.47,
+      "text": "and a tiny little butterfly on my... thigh."
+    },
+    {
+      "id": "b312",
+      "segmentId": "segment-312",
+      "start": 690.65,
+      "end": 691.94,
+      "text": "How high up?"
+    },
+    {
+      "id": "b313",
+      "segmentId": "segment-313",
+      "start": 692.12,
+      "end": 695.04,
+      "text": "- Pretty high. - Did you do it to look sexy?"
+    },
+    {
+      "id": "b314",
+      "segmentId": "segment-314",
+      "start": 695.22,
+      "end": 698.39,
+      "text": "No- - Did you do it for a guy? Does Grandpa like it?"
+    },
+    {
+      "id": "b315",
+      "segmentId": "segment-315",
+      "start": 698.57,
+      "end": 700.91,
+      "text": "No, no and yes."
+    },
+    {
+      "id": "b316",
+      "segmentId": "segment-316",
+      "start": 701.09,
+      "end": 703.14,
+      "text": "That's gross"
+    },
+    {
+      "id": "b317",
+      "segmentId": "segment-317",
+      "start": 703.32,
+      "end": 705.74,
+      "text": "- Let's go back to your piercings. - No, no, no."
+    },
+    {
+      "id": "b318",
+      "segmentId": "segment-318",
+      "start": 705.92,
+      "end": 708,
+      "text": "I've answered enough of your questions."
+    },
+    {
+      "id": "b319",
+      "segmentId": "segment-319",
+      "start": 708.18,
+      "end": 709.94,
+      "text": "Now it's your turn to answer one."
+    },
+    {
+      "id": "b320",
+      "segmentId": "segment-320",
+      "start": 710.12,
+      "end": 711.83,
+      "text": "What is it?"
+    },
+    {
+      "id": "b321",
+      "segmentId": "segment-321",
+      "start": 712.01,
+      "end": 713.93,
+      "text": "Why you don't want to wear a dress?"
+    },
+    {
+      "id": "b322",
+      "segmentId": "segment-322",
+      "start": 714.11,
+      "end": 717.36,
+      "text": "Because I don't want to look like Haley and her stupid friends."
+    },
+    {
+      "id": "b323",
+      "segmentId": "segment-323",
+      "start": 717.54,
+      "end": 720.04,
+      "text": "I wear dresses and I don't look like Haley."
+    },
+    {
+      "id": "b324",
+      "segmentId": "segment-324",
+      "start": 720.22,
+      "end": 723.52,
+      "text": "You are Haley, just 40 years older."
+    },
+    {
+      "id": "b325",
+      "segmentId": "segment-325",
+      "start": 723.7,
+      "end": 724.99,
+      "text": "- Ten. - Twenty."
+    },
+    {
+      "id": "b326",
+      "segmentId": "segment-326",
+      "start": 725.17,
+      "end": 728.84,
+      "text": "Deal. Alex, why are you fighting me on this?"
+    },
+    {
+      "id": "b327",
+      "segmentId": "segment-327",
+      "start": 729.02,
+      "end": 730.85,
+      "text": "Just- It doesn't matter if I dress up."
+    },
+    {
+      "id": "b328",
+      "segmentId": "segment-328",
+      "start": 731.03,
+      "end": 732.66,
+      "text": "I'm not pretty like Haley and you."
+    },
+    {
+      "id": "b329",
+      "segmentId": "segment-329",
+      "start": 732.84,
+      "end": 735.8,
+      "text": "- That's ridiculous! You're beautiful. - I'm not."
+    },
+    {
+      "id": "b330",
+      "segmentId": "segment-330",
+      "start": 735.98,
+      "end": 738.82,
+      "text": "But that's okay. I'm the smart one."
+    },
+    {
+      "id": "b331",
+      "segmentId": "segment-331",
+      "start": 739,
+      "end": 742.52,
+      "text": "The cute busboy doesn't know that you're smart."
+    },
+    {
+      "id": "b332",
+      "segmentId": "segment-332",
+      "start": 742.7,
+      "end": 743.41,
+      "text": "What?"
+    },
+    {
+      "id": "b333",
+      "segmentId": "segment-333",
+      "start": 743.59,
+      "end": 746.09,
+      "text": "He's been smiling at you every time he comes to the table."
+    },
+    {
+      "id": "b334",
+      "segmentId": "segment-334",
+      "start": 746.27,
+      "end": 747.54,
+      "text": "He does not!"
+    },
+    {
+      "id": "b335",
+      "segmentId": "segment-335",
+      "start": 747.72,
+      "end": 750.01,
+      "text": "Why do you think we are the only people with bread?"
+    },
+    {
+      "id": "b336",
+      "segmentId": "segment-336",
+      "start": 750.19,
+      "end": 754.88,
+      "text": "Look. One day you're going to want to date a cute guy like that."
+    },
+    {
+      "id": "b337",
+      "segmentId": "segment-337",
+      "start": 755.06,
+      "end": 758.41,
+      "text": "And when that day comes, you're going to want to look beautiful,"
+    },
+    {
+      "id": "b338",
+      "segmentId": "segment-338",
+      "start": 758.59,
+      "end": 760.27,
+      "text": "and then you'll wear a dress."
+    },
+    {
+      "id": "b339",
+      "segmentId": "segment-339",
+      "start": 760.45,
+      "end": 762.18,
+      "text": "So, you ever kiss another girl?"
+    },
+    {
+      "id": "b340",
+      "segmentId": "segment-340",
+      "start": 762.36,
+      "end": 764.64,
+      "text": "That's no way to talk to your grandmother."
+    },
+    {
+      "id": "b341",
+      "segmentId": "segment-341",
+      "start": 764.82,
+      "end": 766.96,
+      "text": "Was my mom hard on me growing up?"
+    },
+    {
+      "id": "b342",
+      "segmentId": "segment-342",
+      "start": 767.14,
+      "end": 768.46,
+      "text": "Yeah, she was."
+    },
+    {
+      "id": "b343",
+      "segmentId": "segment-343",
+      "start": 768.64,
+      "end": 770.21,
+      "text": "But you know what? Back then"
+    },
+    {
+      "id": "b344",
+      "segmentId": "segment-344",
+      "start": 770.39,
+      "end": 773.72,
+      "text": "everything was Betty Friedan and Gloria Steinem."
+    },
+    {
+      "id": "b345",
+      "segmentId": "segment-345",
+      "start": 773.9,
+      "end": 775.05,
+      "text": "They didn't understand-"
+    },
+    {
+      "id": "b346",
+      "segmentId": "segment-346",
+      "start": 775.23,
+      "end": 777.09,
+      "text": "- Hola! We're back. - Hello."
+    },
+    {
+      "id": "b347",
+      "segmentId": "segment-347",
+      "start": 777.27,
+      "end": 780.09,
+      "text": "- Hey, how'd it go? - It was great."
+    },
+    {
+      "id": "b348",
+      "segmentId": "segment-348",
+      "start": 780.27,
+      "end": 782.09,
+      "text": "- Did you have fun with Luke? - Well, not-"
+    },
+    {
+      "id": "b349",
+      "segmentId": "segment-349",
+      "start": 782.27,
+      "end": 783.98,
+      "text": "We had a great time."
+    },
+    {
+      "id": "b350",
+      "segmentId": "segment-350",
+      "start": 784.16,
+      "end": 787.13,
+      "text": "Alex, I've been thinking, and..."
+    },
+    {
+      "id": "b351",
+      "segmentId": "segment-351",
+      "start": 787.31,
+      "end": 789.25,
+      "text": "if you don't want to wear a dress to the wedding,"
+    },
+    {
+      "id": "b352",
+      "segmentId": "segment-352",
+      "start": 789.43,
+      "end": 790.53,
+      "text": "it's not the end of the world."
+    },
+    {
+      "id": "b353",
+      "segmentId": "segment-353",
+      "start": 790.71,
+      "end": 793.57,
+      "text": "It's all right. I bought one."
+    },
+    {
+      "id": "b354",
+      "segmentId": "segment-354",
+      "start": 793.75,
+      "end": 795.45,
+      "text": "Do you see how she has to provoke me?"
+    },
+    {
+      "id": "b355",
+      "segmentId": "segment-355",
+      "start": 795.63,
+      "end": 797.1,
+      "text": "We'll talk about it next week."
+    },
+    {
+      "id": "b356",
+      "segmentId": "segment-356",
+      "start": 797.28,
+      "end": 798.46,
+      "text": "Claire!"
+    },
+    {
+      "id": "b357",
+      "segmentId": "segment-357",
+      "start": 798.64,
+      "end": 800.51,
+      "text": "Clear the way. Coming through. Ow!"
+    },
+    {
+      "id": "b358",
+      "segmentId": "segment-358",
+      "start": 800.69,
+      "end": 802.31,
+      "text": "Coming through. Easy. Easy, fella. Ow!"
+    },
+    {
+      "id": "b359",
+      "segmentId": "segment-359",
+      "start": 802.49,
+      "end": 804.57,
+      "text": "- I need to rest my face. - You're fine."
+    },
+    {
+      "id": "b360",
+      "segmentId": "segment-360",
+      "start": 804.75,
+      "end": 806,
+      "text": "You'll be all right. Hang on."
+    },
+    {
+      "id": "b361",
+      "segmentId": "segment-361",
+      "start": 806.18,
+      "end": 807.93,
+      "text": "- Oh, my God! - Get the door."
+    },
+    {
+      "id": "b362",
+      "segmentId": "segment-362",
+      "start": 808.11,
+      "end": 809.19,
+      "text": "Ah! Dad?"
+    },
+    {
+      "id": "b363",
+      "segmentId": "segment-363",
+      "start": 809.37,
+      "end": 810.74,
+      "text": "Little accident. Nothing big."
+    },
+    {
+      "id": "b364",
+      "segmentId": "segment-364",
+      "start": 810.92,
+      "end": 813.17,
+      "text": "- I was in a plane crash. - What happened?"
+    },
+    {
+      "id": "b365",
+      "segmentId": "segment-365",
+      "start": 813.35,
+      "end": 815.48,
+      "text": "We were threading the needle, and somebody moved."
+    },
+    {
+      "id": "b366",
+      "segmentId": "segment-366",
+      "start": 815.66,
+      "end": 818.52,
+      "text": "No, I didn't. You did it on purpose."
+    },
+    {
+      "id": "b367",
+      "segmentId": "segment-367",
+      "start": 818.7,
+      "end": 820.48,
+      "text": "That's the painkiller talking."
+    },
+    {
+      "id": "b368",
+      "segmentId": "segment-368",
+      "start": 820.66,
+      "end": 821.7,
+      "text": "He's a little loopy."
+    },
+    {
+      "id": "b369",
+      "segmentId": "segment-369",
+      "start": 821.88,
+      "end": 823.91,
+      "text": "- How bad is it? - Well, the wing is cracked,"
+    },
+    {
+      "id": "b370",
+      "segmentId": "segment-370",
+      "start": 824.09,
+      "end": 826.57,
+      "text": "- the propeller's bent, but I can- I can- - I mean Phil."
+    },
+    {
+      "id": "b371",
+      "segmentId": "segment-371",
+      "start": 826.75,
+      "end": 829.42,
+      "text": "- I was in a plane crash. - Thanks, Dad."
+    },
+    {
+      "id": "b372",
+      "segmentId": "segment-372",
+      "start": 829.6,
+      "end": 831.84,
+      "text": "I didn't ask him to be there. He insisted."
+    },
+    {
+      "id": "b373",
+      "segmentId": "segment-373",
+      "start": 832.02,
+      "end": 833.61,
+      "text": "He took a chance. This is what happened."
+    },
+    {
+      "id": "b374",
+      "segmentId": "segment-374",
+      "start": 833.79,
+      "end": 835.57,
+      "text": "Kind of like the time you ran over his foot."
+    },
+    {
+      "id": "b375",
+      "segmentId": "segment-375",
+      "start": 835.75,
+      "end": 836.74,
+      "text": "You ran over his foot?"
+    },
+    {
+      "id": "b376",
+      "segmentId": "segment-376",
+      "start": 836.92,
+      "end": 838.98,
+      "text": "- That was an accident. - You know, Dad, you did it on purpose."
+    },
+    {
+      "id": "b377",
+      "segmentId": "segment-377",
+      "start": 839.16,
+      "end": 841.02,
+      "text": "We all saw the tire marks on the lawn."
+    },
+    {
+      "id": "b378",
+      "segmentId": "segment-378",
+      "start": 841.2,
+      "end": 842.57,
+      "text": "I had just quit smoking."
+    },
+    {
+      "id": "b379",
+      "segmentId": "segment-379",
+      "start": 842.75,
+      "end": 844.88,
+      "text": "See, you're upsetting your husband."
+    },
+    {
+      "id": "b380",
+      "segmentId": "segment-380",
+      "start": 845.06,
+      "end": 846.53,
+      "text": "- Water. - I'll get it."
+    },
+    {
+      "id": "b381",
+      "segmentId": "segment-381",
+      "start": 846.71,
+      "end": 847.76,
+      "text": "Ay. You okay?"
+    },
+    {
+      "id": "b382",
+      "segmentId": "segment-382",
+      "start": 847.94,
+      "end": 851.12,
+      "text": "Gloria! Thank God you're here."
+    },
+    {
+      "id": "b383",
+      "segmentId": "segment-383",
+      "start": 851.3,
+      "end": 852.71,
+      "text": "Don't worry. I'm here too."
+    },
+    {
+      "id": "b384",
+      "segmentId": "segment-384",
+      "start": 852.89,
+      "end": 854.03,
+      "text": "Who's this?"
+    },
+    {
+      "id": "b385",
+      "segmentId": "segment-385",
+      "start": 854.21,
+      "end": 855.48,
+      "text": "Wasn't my fault."
+    },
+    {
+      "id": "b386",
+      "segmentId": "segment-386",
+      "start": 855.66,
+      "end": 858.18,
+      "text": "I have seen you thread the needle a million times."
+    },
+    {
+      "id": "b387",
+      "segmentId": "segment-387",
+      "start": 858.36,
+      "end": 859.21,
+      "text": "You never miss."
+    },
+    {
+      "id": "b388",
+      "segmentId": "segment-388",
+      "start": 859.39,
+      "end": 860.85,
+      "text": "Yeah. I must be getting old."
+    },
+    {
+      "id": "b389",
+      "segmentId": "segment-389",
+      "start": 861.03,
+      "end": 863.28,
+      "text": "Why don't you just admit it? You never liked Phil."
+    },
+    {
+      "id": "b390",
+      "segmentId": "segment-390",
+      "start": 863.46,
+      "end": 865.42,
+      "text": "Put that down. You do not get a cookie."
+    },
+    {
+      "id": "b391",
+      "segmentId": "segment-391",
+      "start": 865.6,
+      "end": 866.28,
+      "text": "I like Phil."
+    },
+    {
+      "id": "b392",
+      "segmentId": "segment-392",
+      "start": 866.46,
+      "end": 869.66,
+      "text": "It's just that sometimes he tries too hard, you know?"
+    },
+    {
+      "id": "b393",
+      "segmentId": "segment-393",
+      "start": 869.84,
+      "end": 872.43,
+      "text": "And it's just kind of- irritating."
+    },
+    {
+      "id": "b394",
+      "segmentId": "segment-394",
+      "start": 872.61,
+      "end": 874.03,
+      "text": "Okay, maybe he tries too hard"
+    },
+    {
+      "id": "b395",
+      "segmentId": "segment-395",
+      "start": 874.21,
+      "end": 876.41,
+      "text": "because you make zero effort with him."
+    },
+    {
+      "id": "b396",
+      "segmentId": "segment-396",
+      "start": 876.59,
+      "end": 878.72,
+      "text": "You know what? In the 16 years that we've been married,"
+    },
+    {
+      "id": "b397",
+      "segmentId": "segment-397",
+      "start": 878.9,
+      "end": 882.28,
+      "text": "have you one time told him that you liked him?"
+    },
+    {
+      "id": "b398",
+      "segmentId": "segment-398",
+      "start": 882.46,
+      "end": 884.71,
+      "text": "- Not in those exact words, no. - No."
+    },
+    {
+      "id": "b399",
+      "segmentId": "segment-399",
+      "start": 884.89,
+      "end": 886.81,
+      "text": "Not in any words, Dad."
+    },
+    {
+      "id": "b400",
+      "segmentId": "segment-400",
+      "start": 886.99,
+      "end": 888.57,
+      "text": "How do you think that makes me feel?"
+    },
+    {
+      "id": "b401",
+      "segmentId": "segment-401",
+      "start": 888.75,
+      "end": 890.58,
+      "text": "You've never told your son that you love him?"
+    },
+    {
+      "id": "b402",
+      "segmentId": "segment-402",
+      "start": 890.76,
+      "end": 892.78,
+      "text": "Whoa, whoa. When did we jump to love?"
+    },
+    {
+      "id": "b403",
+      "segmentId": "segment-403",
+      "start": 892.96,
+      "end": 894.75,
+      "text": "And he's technically not my son."
+    },
+    {
+      "id": "b404",
+      "segmentId": "segment-404",
+      "start": 894.93,
+      "end": 898.03,
+      "text": "- Ah. So that means that you don't love Manny either? - Sure, I do."
+    },
+    {
+      "id": "b405",
+      "segmentId": "segment-405",
+      "start": 898.21,
+      "end": 899.79,
+      "text": "I mean, believe me, when I was in that park,"
+    },
+    {
+      "id": "b406",
+      "segmentId": "segment-406",
+      "start": 899.97,
+      "end": 901.64,
+      "text": "I really wished Manny was there."
+    },
+    {
+      "id": "b407",
+      "segmentId": "segment-407",
+      "start": 901.82,
+      "end": 902.77,
+      "text": "For what?"
+    },
+    {
+      "id": "b408",
+      "segmentId": "segment-408",
+      "start": 902.95,
+      "end": 906.02,
+      "text": "So that you could fly the plane into his head? Huh?"
+    },
+    {
+      "id": "b409",
+      "segmentId": "segment-409",
+      "start": 906.2,
+      "end": 908.88,
+      "text": "Dad, thanks so much for bringing Phil home."
+    },
+    {
+      "id": "b410",
+      "segmentId": "segment-410",
+      "start": 909.06,
+      "end": 912.56,
+      "text": "I found one of your little flaps in his hair. So-"
+    },
+    {
+      "id": "b411",
+      "segmentId": "segment-411",
+      "start": 912.74,
+      "end": 914.4,
+      "text": "Actually, this is called an aileron."
+    },
+    {
+      "id": "b412",
+      "segmentId": "segment-412",
+      "start": 914.58,
+      "end": 916.61,
+      "text": "- It controls... - because that's what matters right now."
+    },
+    {
+      "id": "b413",
+      "segmentId": "segment-413",
+      "start": 916.79,
+      "end": 917.84,
+      "text": "Bye, Dad."
+    },
+    {
+      "id": "b414",
+      "segmentId": "segment-414",
+      "start": 918.02,
+      "end": 920.1,
+      "text": "- Hey, Phil. - Jay."
+    },
+    {
+      "id": "b415",
+      "segmentId": "segment-415",
+      "start": 920.28,
+      "end": 921.55,
+      "text": "What are you, made of china?"
+    },
+    {
+      "id": "b416",
+      "segmentId": "segment-416",
+      "start": 921.73,
+      "end": 924.69,
+      "text": "Phil, I just want you to know I'm sorry."
+    },
+    {
+      "id": "b417",
+      "segmentId": "segment-417",
+      "start": 924.87,
+      "end": 927.56,
+      "text": "And whether I, uh, missed or you moved-"
+    },
+    {
+      "id": "b418",
+      "segmentId": "segment-418",
+      "start": 927.74,
+      "end": 929.39,
+      "text": "- I didn't. - either way."
+    },
+    {
+      "id": "b419",
+      "segmentId": "segment-419",
+      "start": 929.57,
+      "end": 931.96,
+      "text": "I just want to say that I like you."
+    },
+    {
+      "id": "b420",
+      "segmentId": "segment-420",
+      "start": 932.14,
+      "end": 934.8,
+      "text": "- Really? - Yeah."
+    },
+    {
+      "id": "b421",
+      "segmentId": "segment-421",
+      "start": 934.98,
+      "end": 936.43,
+      "text": "What do you like about me?"
+    },
+    {
+      "id": "b422",
+      "segmentId": "segment-422",
+      "start": 936.61,
+      "end": 938.68,
+      "text": "You're a nice guy."
+    },
+    {
+      "id": "b423",
+      "segmentId": "segment-423",
+      "start": 938.86,
+      "end": 941.82,
+      "text": "Try real hard."
+    },
+    {
+      "id": "b424",
+      "segmentId": "segment-424",
+      "start": 942,
+      "end": 944.04,
+      "text": "I do."
+    },
+    {
+      "id": "b425",
+      "segmentId": "segment-425",
+      "start": 944.22,
+      "end": 945.67,
+      "text": "And you're a good dad."
+    },
+    {
+      "id": "b426",
+      "segmentId": "segment-426",
+      "start": 945.85,
+      "end": 947.83,
+      "text": "Hey, I'm a good dad. Come here."
+    },
+    {
+      "id": "b427",
+      "segmentId": "segment-427",
+      "start": 948.01,
+      "end": 949.07,
+      "text": "Come here, you."
+    },
+    {
+      "id": "b428",
+      "segmentId": "segment-428",
+      "start": 949.25,
+      "end": 950.8,
+      "text": "This feels so right."
+    },
+    {
+      "id": "b429",
+      "segmentId": "segment-429",
+      "start": 950.98,
+      "end": 951.99,
+      "text": "What's going on?"
+    },
+    {
+      "id": "b430",
+      "segmentId": "segment-430",
+      "start": 952.17,
+      "end": 953.63,
+      "text": "There was a little accident,"
+    },
+    {
+      "id": "b431",
+      "segmentId": "segment-431",
+      "start": 953.81,
+      "end": 956.87,
+      "text": "but Jay's telling Phil how much he loves him."
+    },
+    {
+      "id": "b432",
+      "segmentId": "segment-432",
+      "start": 957.05,
+      "end": 958.74,
+      "text": "Oh. Well, that's nice for Phil."
+    },
+    {
+      "id": "b433",
+      "segmentId": "segment-433",
+      "start": 958.92,
+      "end": 959.58,
+      "text": "That's great,"
+    },
+    {
+      "id": "b434",
+      "segmentId": "segment-434",
+      "start": 959.76,
+      "end": 961.59,
+      "text": "since he's never said anything like that to my boyfriend."
+    },
+    {
+      "id": "b435",
+      "segmentId": "segment-435",
+      "start": 961.77,
+      "end": 963.7,
+      "text": "- Let it go. - No, it's not okay."
+    },
+    {
+      "id": "b436",
+      "segmentId": "segment-436",
+      "start": 963.88,
+      "end": 966.63,
+      "text": "No, Mitch is right. Go in there too, Cam. Come on."
+    },
+    {
+      "id": "b437",
+      "segmentId": "segment-437",
+      "start": 966.81,
+      "end": 968.24,
+      "text": "You're kidding."
+    },
+    {
+      "id": "b438",
+      "segmentId": "segment-438",
+      "start": 968.42,
+      "end": 970.05,
+      "text": "- Jay! - I'm gonna get this."
+    },
+    {
+      "id": "b439",
+      "segmentId": "segment-439",
+      "start": 970.23,
+      "end": 971.86,
+      "text": "- Come on in, Cam. - Just a little hug."
+    },
+    {
+      "id": "b440",
+      "segmentId": "segment-440",
+      "start": 972.04,
+      "end": 973.46,
+      "text": "- Get in here. - Say it."
+    },
+    {
+      "id": "b441",
+      "segmentId": "segment-441",
+      "start": 973.64,
+      "end": 975.89,
+      "text": "- Whoa! Hey, hey, hey! - Say it! Say it!"
+    },
+    {
+      "id": "b442",
+      "segmentId": "segment-442",
+      "start": 976.07,
+      "end": 977.78,
+      "text": "I like you too, Cam."
+    },
+    {
+      "id": "b443",
+      "segmentId": "segment-443",
+      "start": 977.96,
+      "end": 979.96,
+      "text": "- What do you like about him? - Oh, jez."
+    },
+    {
+      "id": "b444",
+      "segmentId": "segment-444",
+      "start": 980.14,
+      "end": 981.68,
+      "text": "Where did you get that camera?"
+    },
+    {
+      "id": "b445",
+      "segmentId": "segment-445",
+      "start": 981.86,
+      "end": 984.49,
+      "text": "Only the greatest store on earth."
+    },
+    {
+      "id": "b446",
+      "segmentId": "segment-446",
+      "start": 984.67,
+      "end": 986.08,
+      "text": "Thanks, Dad."
+    },
+    {
+      "id": "b447",
+      "segmentId": "segment-447",
+      "start": 986.26,
+      "end": 988.55,
+      "text": "Manny, picture! Get in there too."
+    },
+    {
+      "id": "b448",
+      "segmentId": "segment-448",
+      "start": 988.73,
+      "end": 990.85,
+      "text": "Get in here, mi amigo. Oh!"
+    },
+    {
+      "id": "b449",
+      "segmentId": "segment-449",
+      "start": 991.03,
+      "end": 992.87,
+      "text": "Stay still. Say \"Cheese.\""
+    },
+    {
+      "id": "b450",
+      "segmentId": "segment-450",
+      "start": 993.05,
+      "end": 995.06,
+      "text": "- Don't push it. - Cheese!"
+    },
+    {
+      "id": "b451",
+      "segmentId": "segment-451",
+      "start": 995.24,
+      "end": 996.41,
+      "text": "Picture."
+    },
+    {
+      "id": "b452",
+      "segmentId": "segment-452",
+      "start": 996.59,
+      "end": 998.61,
+      "text": "- Cheese! - Cheese. Queso."
+    },
+    {
+      "id": "b453",
+      "segmentId": "segment-453",
+      "start": 998.79,
+      "end": 999.63,
+      "text": "Oh, boy!"
+    },
+    {
+      "id": "b454",
+      "segmentId": "segment-454",
+      "start": 999.81,
+      "end": 1002.67,
+      "text": "Doesn't it feel like these arms could go around the world?"
+    },
+    {
+      "id": "b455",
+      "segmentId": "segment-455",
+      "start": 1002.85,
+      "end": 1004.23,
+      "text": "I think I strained something."
+    },
+    {
+      "id": "b456",
+      "segmentId": "segment-456",
+      "start": 1004.41,
+      "end": 1006.17,
+      "text": "I always wanted a daughter-"
+    },
+    {
+      "id": "b457",
+      "segmentId": "segment-457",
+      "start": 1006.35,
+      "end": 1008.31,
+      "text": "to dress her up in pretty dresses,"
+    },
+    {
+      "id": "b458",
+      "segmentId": "segment-458",
+      "start": 1008.49,
+      "end": 1012.22,
+      "text": "do her hair, her nails, her makeup."
+    },
+    {
+      "id": "b459",
+      "segmentId": "segment-459",
+      "start": 1012.4,
+      "end": 1015.88,
+      "text": "No one knows this, but for the first year of his life,"
+    },
+    {
+      "id": "b460",
+      "segmentId": "segment-460",
+      "start": 1016.06,
+      "end": 1017.43,
+      "text": "I made up Manny like a girl"
+    },
+    {
+      "id": "b461",
+      "segmentId": "segment-461",
+      "start": 1017.61,
+      "end": 1019.82,
+      "text": "and told everybody that he was my daughter."
+    },
+    {
+      "id": "b462",
+      "segmentId": "segment-462",
+      "start": 1020,
+      "end": 1021.57,
+      "text": "Ay, but just for a few times."
+    },
+    {
+      "id": "b463",
+      "segmentId": "segment-463",
+      "start": 1021.75,
+      "end": 1023.36,
+      "text": "I didn't want to mess with his head."
+    },
+    {
+      "id": "b464",
+      "segmentId": "segment-464",
+      "start": 1023.54,
+      "end": 1024.5,
+      "text": "When he found the pictures,"
+    },
+    {
+      "id": "b465",
+      "segmentId": "segment-465",
+      "start": 1024.68,
+      "end": 1027.41,
+      "text": "I told him that it was his twin sister who died."
+    }
+  ]
+}

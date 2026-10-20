@@ -1,0 +1,465 @@
+{
+  "exam": "cet6",
+  "examLabel": "六级",
+  "wordTarget": "150-200 词，通常三段",
+  "note": "本站原创整理的骨架与自查清单，不是官方范文。六级比四级更看重论证深度与句式变化，槽位必须按题干替换；评分维度参考 kaoyan-english skill 的任务完成 / 内容展开 / 组织 / 语法 / 词汇 / 细节权重。",
+  "templates": [
+    {
+      "id": "cet6-large-argument",
+      "kind": "large",
+      "kindLabel": "大作文 · 150-200 词",
+      "genre": "议论文 · 观点论证型",
+      "title": "观点论证型 · 立场 + 两层论证 + 让步",
+      "scenario": "题干给出一句有争议的判断或一句评论，要求表明立场并论证，六级常要求同时讨论反面。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 引入争议",
+          "en": "Few issues are debated as heatedly as {话题}.",
+          "zh": "很少有议题像……这样引起激烈争论。",
+          "note": "用倒装或比较结构开场，比 Nowadays 更符合六级预期。"
+        },
+        {
+          "section": "第 1 段 · 表明立场",
+          "en": "While reasonable people disagree, I would argue that {立场}.",
+          "zh": "尽管各有道理，我认为……。",
+          "note": "先承认分歧再表态，立场立刻显得成熟。"
+        },
+        {
+          "section": "第 2 段 · 论证一 + 展开",
+          "en": "The case for this position rests on {论点一}. This is not merely a matter of {表面现象}; it concerns {更深一层}.",
+          "zh": "这一立场的依据是……。这不只是……的问题，而关乎……。",
+          "note": "论证要下沉一层，从现象写到影响或机制。"
+        },
+        {
+          "section": "第 2 段 · 论证二",
+          "en": "Equally important is {论点二}, which {结果}.",
+          "zh": "同样重要的是……，它……。",
+          "note": "用 Equally important is 起句让第二层论证有节奏变化。"
+        },
+        {
+          "section": "第 3 段 · 让步与反驳",
+          "en": "It is true that {反方理由}. Yet this argument overlooks {被忽略的前提}.",
+          "zh": "诚然……。然而这一论点忽略了……。",
+          "note": "让步写一句，反驳写一句半，重心仍在自己的立场上。"
+        },
+        {
+          "section": "第 3 段 · 结论",
+          "en": "The debate will continue, but {判断} remains the more defensible view.",
+          "zh": "争论还会继续，但……仍是更站得住的看法。",
+          "note": "六级结尾宜留有余地，不必把话说满。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "引入争议",
+          "en": "Few campus topics are debated as heatedly as the use of AI tools in coursework.",
+          "zh": "很少有校园话题像在作业中使用 AI 工具这样引起激烈争论。"
+        },
+        {
+          "function": "表述立场",
+          "en": "I would argue that such tools should be allowed, provided that their use is declared.",
+          "zh": "我认为，只要声明使用情况，这类工具就应当被允许。"
+        },
+        {
+          "function": "加深论证",
+          "en": "This is not merely a matter of convenience; it concerns how students learn to judge information.",
+          "zh": "这不仅关乎便利，更关乎学生如何学会判断信息。"
+        },
+        {
+          "function": "让步反驳",
+          "en": "It is true that such tools can be misused. Yet that argument overlooks how easily the same misuse can be detected.",
+          "zh": "诚然这类工具可能被滥用。然而该论点忽略了这类滥用其实很容易被发现。"
+        }
+      ],
+      "demo": {
+        "topic": "观点：课程作业是否应允许使用 AI 工具",
+        "paragraphs": [
+          "Few campus topics are debated as heatedly as the use of AI tools in coursework. While reasonable people disagree, I would argue that such tools should be allowed, provided that their use is declared.",
+          "The case for this position rests on the way professionals now work. This is not merely a matter of convenience; it concerns whether students learn to judge information rather than merely produce it. A student who drafts with a tool and then checks every claim against a source is practising exactly the skill an employer will later expect. Equally important is the honesty that declaration encourages, which turns a grey area into a teachable one. Where the rule is clear, teachers can discuss quality instead of hunting for evidence of cheating.",
+          "It is true that such tools can be misused, and that weak students may lean on them too heavily. Yet this argument overlooks how easily a submitted text with no revision history can be spotted, and how much a clear policy helps everyone. The debate will continue, but a declared, supervised use of these tools remains the more defensible view."
+        ],
+        "translation": [
+          "很少有校园话题像在课程作业中使用 AI 工具这样引起激烈争论。尽管各有道理，我认为只要声明使用情况，这类工具就应当被允许。",
+          "支持这一立场的依据在于如今专业人士的工作方式。这不仅关乎便利，更关乎学生能否学会判断信息，而不只是产出信息。一名借助工具起草、再逐条核对来源的学生，练习的正是未来雇主所期待的能力。同样重要的是声明制度所鼓励的诚实，它把灰色地带变成了可讨论的问题。规则清楚时，教师可以讨论质量，而不是去寻找作弊的证据。",
+          "诚然，这类工具可能被滥用，基础薄弱的学生也可能过度依赖它们。然而这一论点忽略了：一份没有修改痕迹的稿件很容易被识别，而清楚的规则对所有人都更有帮助。争论还会继续，但“声明并受监督地使用”仍是更站得住的看法。"
+        ]
+      },
+      "pitfalls": [
+        "立场放在段末，前两句读完仍不知道你要论证什么。",
+        "两条论证是同一层意思的重复，例如都写提高效率。",
+        "让步段写得太长，反而说服读者接受反方。"
+      ],
+      "adapt": [
+        "题干里的抽象名词先转成具体场景，例如 AI tools → 课程作业的写作环节。",
+        "第二段固定写两个角度：一个谈能力，一个谈规则或关系。",
+        "让步句用 It is true that，反驳句必须有具体依据，不能只说 however it is wrong。"
+      ]
+    },
+    {
+      "id": "cet6-large-phenomenon",
+      "kind": "large",
+      "kindLabel": "大作文 · 150-200 词",
+      "genre": "议论文 · 现象与对策",
+      "title": "现象与对策 · 描述 → 剖析 → 落地方案",
+      "scenario": "题干描述一种新现象或新问题（如短视频占据睡前时间、城市青年独居），要求分析成因与影响并提出对策。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 精确描述现象",
+          "en": "Over the past few years, {现象} has moved from the margin to the centre of {领域}.",
+          "zh": "过去几年，……已从边缘走到……的中心。",
+          "note": "用 from ... to ... 的位移表达，比 more and more 更能体现六级语言水平。"
+        },
+        {
+          "section": "第 1 段 · 限定讨论范围",
+          "en": "This essay focuses on {具体人群或场景} rather than the phenomenon in general.",
+          "zh": "本文讨论的是……，而非泛泛而谈。",
+          "note": "主动限定范围能防止偏题，也方便后文举具体例子。"
+        },
+        {
+          "section": "第 2 段 · 成因",
+          "en": "Two forces lie behind this shift: {成因一} and {成因二}.",
+          "zh": "这一变化背后有两股力量：……与……。",
+          "note": "成因一条写技术或环境，一条写人的需求。"
+        },
+        {
+          "section": "第 2 段 · 影响分层",
+          "en": "The consequences are double-edged: {正面}, yet {负面}.",
+          "zh": "其影响是双面的：……，然而……。",
+          "note": "双面写法比单向批评更客观，也更容易写出变化句式。"
+        },
+        {
+          "section": "第 3 段 · 对策",
+          "en": "A workable response would combine {个人层面} with {制度层面}.",
+          "zh": "可行的应对需要把……与……结合起来。",
+          "note": "两层对策比单一建议更完整：自己怎么做 + 学校或平台怎么做。"
+        },
+        {
+          "section": "第 3 段 · 收束判断",
+          "en": "Handled with care, {现象} need not be a threat; it can be a test of how well we organise our attention.",
+          "zh": "若处置得当，……未必是威胁，而可以成为对我们如何管理注意力的检验。",
+          "note": "用分词短语开头收尾，句式收得干净。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "描述变化",
+          "en": "Over the past few years, short videos have moved from the margin to the centre of student life.",
+          "zh": "过去几年，短视频已从边缘走到学生生活的中心。"
+        },
+        {
+          "function": "剖析成因",
+          "en": "Two forces lie behind this shift: the design of recommendation systems and the need for quick relief after a long day.",
+          "zh": "这一变化背后有两股力量：推荐系统的设计，以及漫长一天之后对快速放松的需求。"
+        },
+        {
+          "function": "分析双面影响",
+          "en": "The consequences are double-edged: they relieve stress, yet they also erode the habit of sustained reading.",
+          "zh": "其影响是双面的：它们缓解压力，却也侵蚀了持续阅读的习惯。"
+        },
+        {
+          "function": "提出对策",
+          "en": "A workable response would combine personal limits with platform-level design.",
+          "zh": "可行的应对需要把个人限制与平台层面的设计结合起来。"
+        }
+      ],
+      "demo": {
+        "topic": "现象：睡前短视频占用大学生休息时间",
+        "paragraphs": [
+          "Over the past few years, short videos have moved from the margin to the centre of student life. This essay focuses on the hour before sleep, when the habit is hardest to notice and hardest to break.",
+          "Two forces lie behind this shift: the design of recommendation systems, which keeps offering one more clip, and the need for quick relief after a day of lectures and deadlines. The consequences are double-edged. A few minutes of comedy can genuinely calm a tired mind, yet the same minutes push bedtime later and later, and the lost sleep shows up in morning classes. What is more, the habit quietly replaces reading, which requires patience that short clips never ask for.",
+          "A workable response would combine personal limits with platform-level design. Students might charge the phone outside the bedroom, while platforms could stop autoplay at night. Handled with care, short videos need not be a threat; they can be a test of how well we organise our attention."
+        ],
+        "translation": [
+          "过去几年，短视频已从边缘走到学生生活的中心。本文讨论的是睡前那一小时——此时这一习惯最难被察觉，也最难戒掉。",
+          "这一变化背后有两股力量：推荐系统的设计让人总想再看一条，以及一天课程与截止日期之后对快速放松的需求。其影响是双面的：几分钟的搞笑视频确实能让疲惫的头脑平静下来，但同样这几分钟把入睡时间越推越晚，缺觉会在早课上显现出来。此外，这一习惯还在悄悄取代阅读，而阅读所需的耐心是短视频从不要求的。",
+          "可行的应对需要把个人限制与平台层面的设计结合起来。学生可以把手机放在卧室外充电，平台则可以在夜间停止自动播放。若处置得当，短视频未必是威胁，而可以成为对我们如何管理注意力的检验。"
+        ]
+      },
+      "pitfalls": [
+        "通篇写 more and more people，没有具体场景与人群。",
+        "只批评现象，不写它满足了什么真实需求，论证显得单薄。",
+        "对策只写 we should use it properly，无法执行。"
+      ],
+      "adapt": [
+        "第 1 段末尾限定场景（例如睡前、通勤路上），后面所有论证都围绕它。",
+        "影响段先给一句正面再给一句负面，用 yet 连接，保持客观。",
+        "对策必须落到动作：谁、做什么、在什么时间。"
+      ]
+    },
+    {
+      "id": "cet6-large-chart",
+      "kind": "large",
+      "kindLabel": "大作文 · 150-200 词",
+      "genre": "图表议论型",
+      "title": "图表议论型 · 数据 → 解释 → 判断",
+      "scenario": "题干给出图表或数据（比例、趋势、对比），要求描述关键数据、分析原因并给出评论。",
+      "skeleton": [
+        {
+          "section": "第 1 段 · 图表主题",
+          "en": "The chart presents {指标} across {对象}.",
+          "zh": "该图表呈现了……在……上的情况。",
+          "note": "第一句只说图表在讲什么，先不要报数字。"
+        },
+        {
+          "section": "第 1 段 · 两组关键数据",
+          "en": "The figure for {A} stands at {数值}, whereas {B} accounts for only {数值}.",
+          "zh": "……的比例为……，而……仅占……。",
+          "note": "最多用两组数据，其余忽略，篇幅留给分析。"
+        },
+        {
+          "section": "第 2 段 · 解释数据",
+          "en": "The gap is less about {表面原因} than about {深层原因}.",
+          "zh": "这一差距与其说在于……，不如说在于……。",
+          "note": "less ... than ... 是六级图表文的加分句式，注意比较对象对称。"
+        },
+        {
+          "section": "第 2 段 · 补充维度",
+          "en": "Seen from another angle, {补充解释}.",
+          "zh": "换个角度看，……。",
+          "note": "第二个解释换主体，例如从学生需求换到学校资源。"
+        },
+        {
+          "section": "第 3 段 · 判断与建议",
+          "en": "Such a pattern suggests that {判断}. To respond, {建议}.",
+          "zh": "这样的格局说明……。为应对，……。",
+          "note": "图表文结尾写判断，不要重复数字。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "引出图表",
+          "en": "The chart presents the main sources of campus stress reported by first-year students.",
+          "zh": "该图表呈现了一年级学生反映的主要校园压力来源。"
+        },
+        {
+          "function": "对比数据",
+          "en": "Academic workload accounts for 46 percent, whereas financial pressure stands at only 12 percent.",
+          "zh": "学业负担占 46%，而经济压力仅占 12%。"
+        },
+        {
+          "function": "解释数据",
+          "en": "The gap is less about effort than about how support is distributed.",
+          "zh": "这一差距与其说在于努力程度，不如说在于支持的分布方式。"
+        },
+        {
+          "function": "给出判断",
+          "en": "Such a pattern suggests that advice services should reach students before the exam week.",
+          "zh": "这样的格局说明，咨询服务的介入应早于考试周。"
+        }
+      ],
+      "demo": {
+        "topic": "图表：一年级学生的主要压力来源",
+        "paragraphs": [
+          "The chart presents the main sources of campus stress reported by first-year students. Academic workload accounts for forty-six percent, whereas financial pressure stands at only twelve percent. Time management follows close behind at thirty percent.",
+          "The gap is less about effort than about how support is distributed. Academic pressure is felt daily, while money worries surface mainly at the start of a term, so one naturally dominates a monthly survey. Seen from another angle, first-year students may simply lack the study strategies that older classmates have already built, which turns ordinary coursework into a constant source of anxiety.",
+          "Such a pattern suggests that advice services should reach students before the exam week, not during it. Workshops on planning and on handling deadlines are likely to relieve more pressure than a general talk about wellbeing."
+        ],
+        "translation": [
+          "该图表呈现了一年级学生反映的主要校园压力来源。学业负担占 46%，而经济压力仅占 12%。时间管理紧随其后，占 30%。",
+          "这一差距与其说在于努力程度，不如说在于支持的分布方式。学业压力每天都在被感受到，而金钱上的担忧主要出现在学期初，因此在按月进行的调查中，前者自然占主导。换个角度看，一年级学生可能只是缺少高年级同学已经建立起来的学习策略，这让普通的课程作业变成了持续的焦虑来源。",
+          "这样的格局说明，咨询服务应当在考试周之前就触达学生，而不是在考试期间。关于计划安排与截止日期处理的工作坊，很可能比一场关于身心健康的泛泛讲座更能减轻压力。"
+        ]
+      },
+      "pitfalls": [
+        "把图表每组数据都念一遍，既超字数又没有分析。",
+        "数字与单位混用，percent 与 percentage point 不分。",
+        "结论段又出现新数字，读者以为图表还有内容没讲。"
+      ],
+      "adapt": [
+        "读图时先写下图表标题、比较对象、两组关键数据，共四行。",
+        "解释段必须给出一个不靠数据也能听懂的理由。",
+        "数字只用英文表达三处以内，其余用 figure、proportion 概括。"
+      ]
+    },
+    {
+      "id": "cet6-small-letter",
+      "kind": "small",
+      "kindLabel": "小作文 · 150-200 词",
+      "genre": "应用文 · 申请 / 建议信",
+      "title": "申请与建议信 · 目的明确、诉求具体",
+      "scenario": "向老师、部门或机构写信，申请项目、反映问题、提出建议或请求批准某一安排。",
+      "skeleton": [
+        {
+          "section": "称呼",
+          "en": "Dear Professor {姓},",
+          "zh": "尊敬的……教授：",
+          "note": "不知道姓名时用 Dear Sir or Madam；不要写 Dear Teacher。"
+        },
+        {
+          "section": "第 1 段 · 身份 + 事由",
+          "en": "I am a {身份} writing to {申请/反映/建议} {事项}.",
+          "zh": "我是一名……，写信是为了……。",
+          "note": "一句话同时交代身份和目的，六级写作看重效率与语域。"
+        },
+        {
+          "section": "第 2 段 · 背景与理由",
+          "en": "The reason for my request is that {理由}, which has affected {影响}.",
+          "zh": "我提出请求的原因是……，这已影响到……。",
+          "note": "理由要具体到可以核实的事实，例如时间、频率、人数。"
+        },
+        {
+          "section": "第 2 段 · 具体诉求",
+          "en": "I would be grateful if you could {请求一}. It would also help if {请求二}.",
+          "zh": "如果您能……我将非常感激；若还能……也很有帮助。",
+          "note": "诉求分主次，第一条最重要，第二条是补充。"
+        },
+        {
+          "section": "第 3 段 · 表态与致谢",
+          "en": "I am ready to provide any further information you may need.",
+          "zh": "如需更多信息，我可以随时提供。",
+          "note": "主动提供信息是正式书信的礼貌收尾，也能自然结束全文。"
+        },
+        {
+          "section": "落款",
+          "en": "Yours sincerely,\nLi Hua",
+          "zh": "此致\n李华",
+          "note": "Yours sincerely 用于知道对方姓名时，否则用 Yours faithfully。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "说明写信目的",
+          "en": "I am writing to apply for a place on the summer research programme.",
+          "zh": "我写信是为了申请暑期研究项目的一个名额。"
+        },
+        {
+          "function": "陈述理由",
+          "en": "The reason for my request is that the laboratory closes at five, which makes evening experiments impossible.",
+          "zh": "我提出请求的原因是实验室五点关门，这让晚间实验无法进行。"
+        },
+        {
+          "function": "提出诉求",
+          "en": "I would be grateful if the opening hours could be extended by two hours during the examination period.",
+          "zh": "如果考试期间开放时间能延长两小时，我将非常感激。"
+        },
+        {
+          "function": "礼貌收尾",
+          "en": "Thank you for considering my request.",
+          "zh": "感谢您考虑我的请求。"
+        }
+      ],
+      "demo": {
+        "topic": "建议信：延长实验室考试周开放时间",
+        "paragraphs": [
+          "Dear Professor Wang,",
+          "I am a third-year student in the School of Engineering, writing to suggest a small change to the opening hours of the teaching laboratory during the examination period. The laboratory currently closes at five in the afternoon, which means that students who have daytime lectures cannot use it at all in the weeks when project work is due.",
+          "I would be grateful if the laboratory could stay open until nine in the evening for the two weeks before the deadline. It would also help if one technician could be on duty during those hours, since several experiments require supervision. I have collected twenty-two signatures from classmates who would use the extra time, and I am ready to help organise a duty roster if that would reduce the workload for staff.",
+          "Thank you for considering my request. I am happy to provide any further information you may need.",
+          "Yours sincerely,\nLi Hua"
+        ],
+        "translation": [
+          "尊敬的王教授：",
+          "我是工程学院三年级学生，写信是想建议对教学实验室在考试周的开放时间做一点调整。实验室目前在下午五点关闭，这意味着白天有课的学生在项目截止前的那几周完全用不上实验室。",
+          "如果实验室能在截止日期前的两周开放到晚上九点，我将非常感激。如果那段时间能有一位技术员值班也很有帮助，因为有几项实验需要有人监督。我已收集到二十二位同学的签名，他们会使用这段延长的时间；如果这能减轻教职工负担，我也愿意协助安排值班表。",
+          "感谢您考虑我的请求。如需更多信息，我很乐意提供。",
+          "此致\n李华"
+        ]
+      },
+      "pitfalls": [
+        "称呼写成 Dear Teacher 或 Dear Sir（不知姓名时应用 Sir or Madam）。",
+        "只表达愿望，不写具体时间、人数等可核实的事实。",
+        "语气过于强硬，如 You must open the lab earlier。"
+      ],
+      "adapt": [
+        "把请求写成一条主诉求 + 一条补充诉求，主次清楚。",
+        "理由句里至少放一个具体数字或时间，增强可信度。",
+        "结尾用主动提供信息或协助收束，比 Thank you 单句更完整。"
+      ]
+    },
+    {
+      "id": "cet6-small-report",
+      "kind": "small",
+      "kindLabel": "小作文 · 150-200 词",
+      "genre": "应用文 · 报告 / 通知",
+      "title": "报告与通知 · 事实在前，结论在后",
+      "scenario": "向老师或组织提交一份简短报告，说明调查结果、活动情况或问题现状，并给出结论与建议。",
+      "skeleton": [
+        {
+          "section": "标题与呈报对象",
+          "en": "Report on {主题}\nTo: {呈报对象}",
+          "zh": "关于……的报告\n呈报：……",
+          "note": "报告需要标题与呈报对象，这是与普通信件最大的格式差别。"
+        },
+        {
+          "section": "第 1 段 · 交代任务",
+          "en": "This report examines {调查对象} and is based on {数据来源}.",
+          "zh": "本报告考察了……，依据的是……。",
+          "note": "先说明依据，读者才知道结论可信到什么程度。"
+        },
+        {
+          "section": "第 2 段 · 主要发现",
+          "en": "The survey of {人数} respondents shows that {发现一}.",
+          "zh": "对……名受访者的调查显示……。",
+          "note": "发现要有数字支撑，一到两条即可。"
+        },
+        {
+          "section": "第 2 段 · 次要发现",
+          "en": "A further finding is that {发现二}.",
+          "zh": "另一个发现是……。",
+          "note": "第二条发现最好与第一条形成对照，例如需求高但供给少。"
+        },
+        {
+          "section": "第 3 段 · 结论与建议",
+          "en": "It is therefore recommended that {建议}.",
+          "zh": "因此建议……。",
+          "note": "报告用 It is recommended that 句型，比 I think we should 更符合文体。"
+        },
+        {
+          "section": "落款",
+          "en": "Reported by {身份}\n{日期}",
+          "zh": "报告人：……\n……（日期）",
+          "note": "报告落款写报告人与日期，不需要客套祝语。"
+        }
+      ],
+      "phrases": [
+        {
+          "function": "说明报告依据",
+          "en": "This report is based on a questionnaire completed by eighty students.",
+          "zh": "本报告依据八十名学生填写的问卷。"
+        },
+        {
+          "function": "呈现发现",
+          "en": "The survey shows that two thirds of respondents have never used the writing centre.",
+          "zh": "调查显示，三分之二的受访者从未使用过写作中心。"
+        },
+        {
+          "function": "形成对照",
+          "en": "A further finding is that most of them would like to, but do not know how to book a session.",
+          "zh": "另一个发现是，他们中多数人愿意使用，却不知道如何预约。"
+        },
+        {
+          "function": "提出建议",
+          "en": "It is therefore recommended that booking be made available through the student app.",
+          "zh": "因此建议通过学生应用开放预约。"
+        }
+      ],
+      "demo": {
+        "topic": "报告：写作中心使用情况的调查",
+        "paragraphs": [
+          "Report on the use of the university writing centre\nTo: the Director of the Language Centre",
+          "This report examines how students use the writing centre and is based on a questionnaire completed by eighty students from four departments during the second week of May.",
+          "The survey shows that two thirds of the respondents have never booked a session, even though three quarters of them say they find academic writing difficult. A further finding is that most of the non-users would like to attend but do not know how to make an appointment; only nine percent were aware of the online booking form. Several students also mentioned that the centre closes before their afternoon classes end.",
+          "It is therefore recommended that booking be moved to the student app, that two evening slots be added each week, and that each department be sent a short guide at the start of every term.",
+          "Reported by Li Hua\n16 May 2026"
+        ],
+        "translation": [
+          "关于校写作中心使用情况的报告\n呈报：语言中心主任",
+          "本报告考察学生如何使用写作中心，依据是四月份第二周来自四个院系的八十名学生填写的问卷。",
+          "调查显示，三分之二的受访者从未预约过辅导，尽管其中四分之三的人表示学术写作对他们来说很难。另一个发现是，多数未使用者愿意参加，却不知道如何预约；只有 9% 的人知道在线预约表。还有几位同学提到，写作中心在他们的下午课程结束前就关门了。",
+          "因此建议：把预约迁移到学生应用上，每周增加两个晚间时段，并在每学期初向各院系发送一份简短指引。",
+          "报告人：李华\n2026 年 5 月 16 日"
+        ]
+      },
+      "pitfalls": [
+        "写成普通信件，没有标题与呈报对象，格式分丢失。",
+        "只有结论没有数据，读者无法判断可靠程度。",
+        "建议多于两条且互相重叠，显得没有重点。"
+      ],
+      "adapt": [
+        "动笔前定好调查对象、样本量、两条发现，写在草稿边上。",
+        "发现句固定用 The survey shows that / A further finding is that 起头。",
+        "建议按“工具 + 时间 + 材料”三类各写一条，覆盖面清楚。"
+      ]
+    }
+  ]
+}
