@@ -10,7 +10,7 @@
  * 安全约定：
  *   · 调用者必须传会话里解析出来的 userId，绝不接受客户端自带 ID；
  *   · 落盘前递归剔除 apiKey / token / password 之类的字段；
- *   · 单条值超过 256 KB、键数超过上限的直接丢弃，防止磁盘被撑爆。
+ *   · 单条值默认限 256 KB，背词记录限 2 MB；键数也有上限。
  */
 
 const fsp = require("fs/promises");
@@ -22,6 +22,7 @@ const STORE_VERSION = 1;
 const MAX_ENTRIES = 400;
 const MAX_TOMBSTONES = 400;
 const MAX_VALUE_BYTES = 256 * 1024;
+const MAX_RECITE_BYTES = 2 * 1024 * 1024;
 const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 // 清单型键的逐词条删除记录：数量小、语义强，单独存一张表。
 const MAX_REMOVED_PER_KEY = 200;
@@ -89,12 +90,10 @@ function stripSensitive(value, depth = 0) {
  * localStorage 里存的是字符串；能解析成 JSON 就按 JSON 存，
  * 这样服务端剔敏感字段时能真正看清结构。
  */
-function normalizeIncomingValue(rawValue) {
-  if (typeof rawValue !== "string") {
-    return stripSensitive(rawValue);
-  }
-  const text = rawValue;
-  if (text.length > MAX_VALUE_BYTES) {
+function normalizeIncomingValue(rawValue, key) {
+  const text = typeof rawValue === "string" ? rawValue : JSON.stringify(rawValue);
+  const limit = key === "iball_vocab_recite_v1" ? MAX_RECITE_BYTES : MAX_VALUE_BYTES;
+  if (text === undefined || Buffer.byteLength(text) > limit) {
     return undefined;
   }
   try {
@@ -241,7 +240,7 @@ async function mergeProgress(userId, snapshot = {}) {
       if (current && Number(current.t || 0) >= incomingTime) {
         continue;
       }
-      const value = normalizeIncomingValue(item?.v);
+      const value = normalizeIncomingValue(item?.v, key);
       if (value === undefined) {
         skipped += 1;
         continue;

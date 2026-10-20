@@ -2,12 +2,14 @@ import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { syncBasicHandout } from "./sync-basic-handout.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const materialsRoot = path.join(root, "materials");
 const manifestPath = path.join(root, "resources.json");
 const publicRoot = path.join(root, "public");
 const checkOnly = process.argv.includes("--check");
+if (!checkOnly) await syncBasicHandout(root);
 const staticEntries = [
   "account-store.js",
   "admin.css",
@@ -101,6 +103,7 @@ const staticEntries = [
   "vocab-index.js",
   "vocab-index.json",
   "vocab-library.js",
+  "vocab-userbook.js",
   "vocab-recite-api.js",
   "vocab.js",
   "writing-data",
@@ -350,7 +353,12 @@ async function buildPublicDirectory() {
 
 await fs.mkdir(materialsRoot, { recursive: true });
 const files = await walk(materialsRoot);
-const resources = await Promise.all(files.map(buildResource));
+// 保留线上已清理的素材入口；源文件仍在，词库、旧链接和下载不受影响。
+const visibility = JSON.parse(await fs.readFile(path.join(root, "data/material-visibility.json"), "utf8").catch(() => '{"hidden":[]}'));
+const hiddenResources = new Set(visibility.hidden || []);
+const resources = (await Promise.all(files.map(buildResource))).filter(
+  resource => !hiddenResources.has(decodeURIComponent(resource.file.slice("./materials/".length))),
+);
 const categories = await buildCategories();
 const nextManifest = serializeManifest(resources, categories);
 

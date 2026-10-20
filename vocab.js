@@ -20,7 +20,7 @@
 
   // 词表文件不常改，但一旦更新就必须绕开旧 CDN 副本。
   // 发布新词表时同步更新这个版本号，避免部分节点继续返回旧词数。
-  const DATA_VERSION = "20260927-867effa";
+  const DATA_VERSION = "20261020-basic1440";
   const versioned = (url) => `${url}?v=${DATA_VERSION}`;
   const INDEX_URL = versioned("./vocab-index/lexemes.json");
   const QUICK_URL = versioned("./vocab-index/word-quick.json");
@@ -87,7 +87,7 @@
     kaoyan2: { deck: "kaoyan", label: "考研英语二", title: "考研英语二 · 核心词库" },
     cet4: { deck: "cet4", label: "四级", title: "四级核心词库" },
     cet6: { deck: "cet6", label: "六级", title: "六级核心词库" },
-    basic: { deck: "basic", label: "零基础", title: "零基础高频词库" },
+    basic: { deck: "basic", label: "零基础", title: "零基础词汇讲义 Level 1–2" },
   };
 
   /** 认不出来的词库（历史偏好 / URL 参数）一律回退到默认词库。 */
@@ -204,6 +204,7 @@
     shardMapPromise: null,
     shardCache: new Map(),
     deckCache: new Map(),
+    basicQuick: new Map(),
     deckKey: DEFAULT_DECK,
     deckWords: [],
     visibleCount: PAGE_SIZE,
@@ -284,6 +285,11 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function formatPhonetic(value) {
+    const text = String(value || "").trim().replace(/^[/\[\s]+|[/\]\s]+$/g, "");
+    return text ? `/${text}/` : "";
   }
 
   let toastTimer = 0;
@@ -382,6 +388,11 @@
     }
     return fetchJson(versioned(`./vocab-index/deck-${cacheKey}.json`)).then((data) => {
       const words = Array.isArray(data?.words) ? data.words : [];
+      if (cacheKey === "basic") {
+        state.basicQuick = new Map((data.entries || []).map(([word, phonetic, meaning]) => [
+          normalize(word), { phonetic, meaning, tags: ["零基础"] },
+        ]));
+      }
       state.deckCache.set(cacheKey, words);
       return words;
     });
@@ -411,12 +422,19 @@
         state.shardCache.delete(oldest);
       }
     }
-    return state.shardCache.get(shard)?.get(key) || null;
+    const entry = state.shardCache.get(shard)?.get(key) || null;
+    if (state.deckKey === "basic" && entry?.basic) {
+      return { ...entry, phonetic: entry.basic.phonetic, translation: entry.basic.translation,
+        example: entry.basic.examples?.[0] || entry.example, handoutExamples: entry.basic.examples,
+        handoutGroup: entry.basic.group, handoutHeadword: entry.basic.headword };
+    }
+    return entry;
   }
 
   /** 轻量释义：点词索引里的「音标 / 释义 / 标签」。 */
   function quickEntry(word) {
     const key = normalize(word);
+    if (state.deckKey === "basic" && state.basicQuick.has(key)) return state.basicQuick.get(key);
     // 固定搭配与短语存在 phrases 段（例如 according to、ice cream）。
     const raw = state.quick?.[key] || state.quickPhrases?.[key];
     if (!raw) {
@@ -573,7 +591,7 @@
       });
     }
     // 「默认词书顺序」和「高频 / 单元顺序」都直接用词表文件的原始顺序
-    // （kaoyan、cet、basic 词表本身就是按词频导出的，恋练有词 2027 是按单元顺序导出的），
+    // （零基础按讲义 Level / Day，恋练有词按单元；其他词库按各自导出顺序），
     // 只有字母序需要在这里重新排序。
     if (state.sort === "alpha") {
       words = [...words].sort((left, right) => left.localeCompare(right));
@@ -670,7 +688,7 @@
               <span class="vocab-row-index">${index + 1}</span>
               <span class="vocab-row-copy">
                 <span class="vocab-row-word">${escapeHtml(word)}${
-                  quick?.phonetic ? `<small>/${escapeHtml(quick.phonetic)}/</small>` : ""
+                  quick?.phonetic ? `<small>${escapeHtml(formatPhonetic(quick.phonetic))}</small>` : ""
                 }</span>
                 <span class="vocab-row-meaning">${escapeHtml(
                   quick?.meaning || "词卡详情按分片懒加载，点击查看例句与词根",
@@ -986,7 +1004,7 @@
     const quick = quickEntry(state.drawWord);
     els.drawWord.textContent = state.drawWord;
     if (els.drawPhonetic) {
-      els.drawPhonetic.textContent = quick?.phonetic ? `/${quick.phonetic}/` : "";
+      els.drawPhonetic.textContent = formatPhonetic(quick?.phonetic);
     }
     els.drawAnswer.innerHTML = `<p>${escapeHtml(
       quick?.meaning || "释义正在加载，稍后会显示在这里。",
@@ -1112,7 +1130,7 @@
           <h3>${escapeHtml(word)}</h3>
           ${
             quick?.phonetic
-              ? `<div class="vocab-head-line"><span>/${escapeHtml(quick.phonetic)}/</span></div>`
+              ? `<div class="vocab-head-line"><span>${escapeHtml(formatPhonetic(quick.phonetic))}</span></div>`
               : ""
           }
         </div>
@@ -1134,7 +1152,8 @@
       <div class="vocab-head-word">
         <h3>${escapeHtml(entry.word)}</h3>
         <div class="vocab-head-line">
-          ${entry.phonetic ? `<span>/${escapeHtml(entry.phonetic)}/</span>` : ""}
+          ${entry.phonetic ? `<span>${escapeHtml(formatPhonetic(entry.phonetic))}</span>` : ""}
+          ${entry.handoutGroup ? `<span class="vocab-tag">${escapeHtml(entry.handoutGroup)}</span>` : ""}
           ${(entry.tags || [])
             .map((tag) => `<span class="vocab-tag">${escapeHtml(tag)}</span>`)
             .join("")}
@@ -1159,6 +1178,10 @@
           <h4>例句 / 英释</h4>
           <p class="vocab-example" lang="en">${escapeHtml(entry.example)}</p>
         </div>`);
+    }
+    if (entry.handoutExamples?.length > 1) {
+      blocks.push(`<div class="vocab-block"><h4>讲义补充例句</h4>${entry.handoutExamples.slice(1)
+        .map(line => `<p class="vocab-example">${escapeHtml(line)}</p>`).join("")}</div>`);
     }
     if (entry.definition?.length > 1) {
       blocks.push(`
@@ -1431,7 +1454,7 @@
     const frequencyButton = els.sortGroup?.querySelector("[data-sort='frequency']");
     if (frequencyButton) {
       // 恋练有词按教材单元顺序输出，回退排序时提示成“单元顺序”更准确。
-      frequencyButton.textContent = config === "llyc2027" ? "单元顺序" : "高频优先";
+      frequencyButton.textContent = config === "basic" ? "讲义顺序" : config === "llyc2027" ? "单元顺序" : "高频优先";
     }
     if (els.deckMeta) {
       els.deckMeta.textContent = "正在取词表…";
@@ -1813,7 +1836,7 @@
             record.word,
           )}" aria-label="查看 ${escapeHtml(record.word)} 的词卡">
             <span class="library-word-text">${escapeHtml(record.word)}</span>
-            ${phonetic ? `<small>/${escapeHtml(phonetic)}/</small>` : ""}
+            ${phonetic ? `<small>${escapeHtml(formatPhonetic(phonetic))}</small>` : ""}
             <span class="library-progress-badge is-${escapeHtml(status)}">${escapeHtml(
               statusLabel,
             )}</span>
@@ -1990,7 +2013,7 @@
             item.word,
           )}" aria-label="查看 ${escapeHtml(item.word)} 的词卡">
             <span class="library-word-text">${escapeHtml(item.word)}</span>
-            ${phonetic ? `<small>/${escapeHtml(phonetic)}/</small>` : ""}
+            ${phonetic ? `<small>${escapeHtml(formatPhonetic(phonetic))}</small>` : ""}
           </button>
           <span class="library-progress-badge is-${escapeHtml(status)}">${escapeHtml(
             label,

@@ -28,6 +28,8 @@
   const VALUE_KEY_PATTERN = /^iball:v1:([A-Za-z0-9_-]{1,64}):([\s\S]+)$/;
   const MAX_TOMBSTONES = 400;
   const MAX_ENTRY_BYTES = 256 * 1024;
+  // 一整本词书的逐词记录 + 最近 500 次复习会超过通用的 256 KB 限制。
+  const MAX_RECITE_BYTES = 2 * 1024 * 1024;
   const MAX_ENTRIES = 400;
   const SYNC_DEBOUNCE_MS = 2500;
   const SYNC_RETRY_MS = 15000;
@@ -471,8 +473,9 @@
     setItem(key, value) {
       const id = String(key);
       const text = String(value);
-      if (byteLength(text) > MAX_ENTRY_BYTES) {
-        console.warn(`[iball] 这条数据超过 256 KB，未保存：${id}`);
+      const limit = id === "iball_vocab_recite_v1" ? MAX_RECITE_BYTES : MAX_ENTRY_BYTES;
+      if (byteLength(text) > limit) {
+        console.warn(`[iball] 这条数据超过 ${limit / 1024} KB，未保存：${id}`);
         return;
       }
       const previous =

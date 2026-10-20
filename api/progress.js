@@ -47,7 +47,7 @@ async function handler(request, response) {
       return;
     }
 
-    const body = await readJsonBody(request);
+    const body = await readJsonBody(request, 4 * 1024 * 1024);
     const result = await mergeProgress(user.id, body);
     const snapshot = await readProgress(user.id);
     telemetry.setMeta(response, { written: result.written, keys: result.keys });

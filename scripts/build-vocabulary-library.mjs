@@ -958,3 +958,7 @@ async function main() {
 }
 
 await main();
+if (!reportOnly) {
+  const { syncBasicHandout } = await import('./sync-basic-handout.mjs');
+  await syncBasicHandout(root);
+}

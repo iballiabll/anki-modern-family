@@ -168,6 +168,7 @@
     const partOfSpeechIndex = findColumn("词性");
     const meaningIndex = findColumn("中文释义", "释义", "Back");
     const sentenceIndex = findColumn("英文例句", "例句", "英文释义");
+    const stableIdIndex = findColumn("卡片ID");
 
     if (phraseIndex < 0) {
       return [];
@@ -189,7 +190,7 @@
           .join(" ");
 
         return {
-          id: `${resource.id}:${index + 1}:${itemIndex + 1}`,
+          id: `${resource.id}:${index + 1}:${row[stableIdIndex] || itemIndex + 1}`,
           phrase,
           phonetic: cleanVocabularyText(row[phoneticIndex]),
           meaning: combinedMeaning || "查看例句理解用法",

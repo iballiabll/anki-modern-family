@@ -18,6 +18,7 @@ import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
 import { fileURLToPath } from "node:url";
+import { syncBasicHandout } from "./sync-basic-handout.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportOnly = process.argv.includes("--report");
@@ -611,6 +612,7 @@ for (const [fileName, payload] of outputs) {
 }
 
 const quickSize = (await fs.stat(path.join(OUT_DIR, "word-quick.json"))).size;
+await syncBasicHandout(root);
 console.log(
   JSON.stringify(
     {
